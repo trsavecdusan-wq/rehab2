@@ -46,20 +46,160 @@
         android:layout_marginBottom="20dp"
         android:layout_weight="1"
         android:background="#1A1F24"
-        android:gravity="center"
         android:orientation="vertical"
         android:padding="24dp">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="12dp"
+            android:layout_weight="1"
             android:background="#232A31"
-            android:gravity="center"
-            android:padding="24dp"
-            android:text="AAC GRID"
-            android:textColor="#F4F7FA"
-            android:textSize="34sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:padding="12dp"
+                android:text="ŽEJNA"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:padding="12dp"
+                android:text="LAČNA"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:padding="12dp"
+                android:text="POMOČ"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="12dp"
+            android:layout_weight="1"
+            android:background="#232A31"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:padding="12dp"
+                android:text="WC"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:padding="12dp"
+                android:text="DOBRO"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:padding="12dp"
+                android:text="SLABO"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#232A31"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:padding="12dp"
+                android:text="UTRUJENA"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:padding="12dp"
+                android:text="MRAZ"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:padding="12dp"
+                android:text="VROČE"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
