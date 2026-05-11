@@ -10,32 +10,41 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.btnAacZejna).setOnClickListener {
-            Toast.makeText(this, it.text.toString(), Toast.LENGTH_SHORT).show()
+        val btnAacZejna: Button = findViewById(R.id.btnAacZejna)
+        btnAacZejna.setOnClickListener {
+            Toast.makeText(this, btnAacZejna.text.toString(), Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnAacLacna).setOnClickListener {
-            Toast.makeText(this, it.text.toString(), Toast.LENGTH_SHORT).show()
+        val btnAacLacna: Button = findViewById(R.id.btnAacLacna)
+        btnAacLacna.setOnClickListener {
+            Toast.makeText(this, btnAacLacna.text.toString(), Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnAacPomoc).setOnClickListener {
-            Toast.makeText(this, it.text.toString(), Toast.LENGTH_SHORT).show()
+        val btnAacPomoc: Button = findViewById(R.id.btnAacPomoc)
+        btnAacPomoc.setOnClickListener {
+            Toast.makeText(this, btnAacPomoc.text.toString(), Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnAacWc).setOnClickListener {
-            Toast.makeText(this, it.text.toString(), Toast.LENGTH_SHORT).show()
+        val btnAacWc: Button = findViewById(R.id.btnAacWc)
+        btnAacWc.setOnClickListener {
+            Toast.makeText(this, btnAacWc.text.toString(), Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnAacDobro).setOnClickListener {
-            Toast.makeText(this, it.text.toString(), Toast.LENGTH_SHORT).show()
+        val btnAacDobro: Button = findViewById(R.id.btnAacDobro)
+        btnAacDobro.setOnClickListener {
+            Toast.makeText(this, btnAacDobro.text.toString(), Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnAacSlabo).setOnClickListener {
-            Toast.makeText(this, it.text.toString(), Toast.LENGTH_SHORT).show()
+        val btnAacSlabo: Button = findViewById(R.id.btnAacSlabo)
+        btnAacSlabo.setOnClickListener {
+            Toast.makeText(this, btnAacSlabo.text.toString(), Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnAacUtrujena).setOnClickListener {
-            Toast.makeText(this, it.text.toString(), Toast.LENGTH_SHORT).show()
+        val btnAacUtrujena: Button = findViewById(R.id.btnAacUtrujena)
+        btnAacUtrujena.setOnClickListener {
+            Toast.makeText(this, btnAacUtrujena.text.toString(), Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnAacMraz).setOnClickListener {
-            Toast.makeText(this, it.text.toString(), Toast.LENGTH_SHORT).show()
+        val btnAacMraz: Button = findViewById(R.id.btnAacMraz)
+        btnAacMraz.setOnClickListener {
+            Toast.makeText(this, btnAacMraz.text.toString(), Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnAacVroce).setOnClickListener {
-            Toast.makeText(this, it.text.toString(), Toast.LENGTH_SHORT).show()
+        val btnAacVroce: Button = findViewById(R.id.btnAacVroce)
+        btnAacVroce.setOnClickListener {
+            Toast.makeText(this, btnAacVroce.text.toString(), Toast.LENGTH_SHORT).show()
         }
     }
 }
