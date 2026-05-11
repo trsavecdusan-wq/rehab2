@@ -109,6 +109,7 @@
             android:padding="8dp">
 
             <Button
+                android:id="@+id/btnAacZejna"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
@@ -128,6 +129,7 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/btnAacLacna"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
@@ -148,6 +150,7 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/btnAacPomoc"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
@@ -178,6 +181,7 @@
             android:padding="8dp">
 
             <Button
+                android:id="@+id/btnAacWc"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
@@ -197,6 +201,7 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/btnAacDobro"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
@@ -217,6 +222,7 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/btnAacSlabo"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
@@ -246,6 +252,7 @@
             android:padding="8dp">
 
             <Button
+                android:id="@+id/btnAacUtrujena"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
@@ -265,6 +272,7 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/btnAacMraz"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
@@ -285,6 +293,7 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/btnAacVroce"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
