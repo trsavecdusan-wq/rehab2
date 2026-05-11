@@ -8,19 +8,17 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginBottom="16dp"
+        android:layout_height="44dp"
+        android:layout_marginBottom="12dp"
         android:background="#1A1F24"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp">
 
         <SeekBar
             android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
+            android:layout_height="40dp"
             android:progressDrawable="@drawable/volume_seekbar_progress"
             android:thumb="@drawable/volume_seekbar_thumb"
             android:thumbOffset="0dp"
@@ -32,7 +30,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="156dp"
+        android:layout_height="176dp"
         android:layout_marginBottom="20dp"
         android:orientation="horizontal">
 
@@ -44,7 +42,7 @@
             android:background="#1E2329"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="18dp">
+            android:padding="14dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -69,12 +67,12 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
-                        android:maxLines="1"
-                        android:padding="8dp"
+                        android:maxLines="2"
+                        android:padding="10dp"
                         android:text="R1"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <Button
@@ -88,12 +86,12 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
-                        android:maxLines="1"
-                        android:padding="8dp"
+                        android:maxLines="2"
+                        android:padding="10dp"
                         android:text="R2"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -116,12 +114,12 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
-                        android:maxLines="1"
-                        android:padding="8dp"
+                        android:maxLines="2"
+                        android:padding="10dp"
                         android:text="R3"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <Button
@@ -136,12 +134,12 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
-                        android:maxLines="1"
-                        android:padding="8dp"
+                        android:maxLines="2"
+                        android:padding="10dp"
                         android:text="R4"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -163,12 +161,12 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
-                        android:maxLines="1"
-                        android:padding="8dp"
+                        android:maxLines="2"
+                        android:padding="10dp"
                         android:text="R5"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <Button
@@ -182,12 +180,12 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
-                        android:maxLines="1"
-                        android:padding="8dp"
+                        android:maxLines="2"
+                        android:padding="10dp"
                         android:text="MP3"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -204,7 +202,7 @@
             android:background="#1E2329"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="18dp">
+            android:padding="14dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -248,10 +246,6 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:autoSizeMaxTextSize="22sp"
-                android:autoSizeMinTextSize="11sp"
-                android:autoSizeStepGranularity="1sp"
-                android:autoSizeTextType="uniform"
                 android:backgroundTint="#34414D"
                 android:gravity="center"
                 android:maxLines="1"
@@ -259,7 +253,7 @@
                 android:text="ŽEJNA"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
@@ -269,10 +263,6 @@
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:autoSizeMaxTextSize="22sp"
-                android:autoSizeMinTextSize="11sp"
-                android:autoSizeStepGranularity="1sp"
-                android:autoSizeTextType="uniform"
                 android:backgroundTint="#34414D"
                 android:gravity="center"
                 android:maxLines="1"
@@ -280,7 +270,7 @@
                 android:text="LAČNA"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
@@ -289,10 +279,6 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:autoSizeMaxTextSize="22sp"
-                android:autoSizeMinTextSize="11sp"
-                android:autoSizeStepGranularity="1sp"
-                android:autoSizeTextType="uniform"
                 android:backgroundTint="#34414D"
                 android:gravity="center"
                 android:maxLines="1"
@@ -300,7 +286,7 @@
                 android:text="POMOČ"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -320,10 +306,6 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:autoSizeMaxTextSize="22sp"
-                android:autoSizeMinTextSize="11sp"
-                android:autoSizeStepGranularity="1sp"
-                android:autoSizeTextType="uniform"
                 android:backgroundTint="#34414D"
                 android:gravity="center"
                 android:maxLines="1"
@@ -331,7 +313,7 @@
                 android:text="WC"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
@@ -341,10 +323,6 @@
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:autoSizeMaxTextSize="22sp"
-                android:autoSizeMinTextSize="11sp"
-                android:autoSizeStepGranularity="1sp"
-                android:autoSizeTextType="uniform"
                 android:backgroundTint="#34414D"
                 android:gravity="center"
                 android:maxLines="1"
@@ -352,7 +330,7 @@
                 android:text="DOBRO"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
@@ -361,10 +339,6 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:autoSizeMaxTextSize="22sp"
-                android:autoSizeMinTextSize="11sp"
-                android:autoSizeStepGranularity="1sp"
-                android:autoSizeTextType="uniform"
                 android:backgroundTint="#34414D"
                 android:gravity="center"
                 android:maxLines="1"
@@ -372,7 +346,7 @@
                 android:text="SLABO"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -391,10 +365,6 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:autoSizeMaxTextSize="22sp"
-                android:autoSizeMinTextSize="11sp"
-                android:autoSizeStepGranularity="1sp"
-                android:autoSizeTextType="uniform"
                 android:backgroundTint="#34414D"
                 android:gravity="center"
                 android:maxLines="1"
@@ -402,7 +372,7 @@
                 android:text="UTRUJENA"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
@@ -412,10 +382,6 @@
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:autoSizeMaxTextSize="22sp"
-                android:autoSizeMinTextSize="11sp"
-                android:autoSizeStepGranularity="1sp"
-                android:autoSizeTextType="uniform"
                 android:backgroundTint="#34414D"
                 android:gravity="center"
                 android:maxLines="1"
@@ -423,7 +389,7 @@
                 android:text="MRAZ"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
@@ -432,10 +398,6 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:autoSizeMaxTextSize="22sp"
-                android:autoSizeMinTextSize="11sp"
-                android:autoSizeStepGranularity="1sp"
-                android:autoSizeTextType="uniform"
                 android:backgroundTint="#34414D"
                 android:gravity="center"
                 android:maxLines="1"
@@ -443,7 +405,7 @@
                 android:text="VROČE"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
