@@ -33,7 +33,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="236dp"
+        android:layout_height="260dp"
         android:layout_marginBottom="16dp"
         android:orientation="horizontal">
 
@@ -45,7 +45,7 @@
             android:background="#1E2329"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="2dp">
+            android:padding="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -55,14 +55,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginBottom="1dp"
+                    android:layout_marginBottom="0dp"
                     android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginEnd="1dp"
+                        android:layout_marginEnd="0dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -70,18 +70,21 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
+                        android:includeFontPadding="false"
                         android:maxLines="2"
-                        android:padding="4dp"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:padding="2dp"
                         android:text="R1"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="1dp"
+                        android:layout_marginStart="0dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -89,12 +92,15 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
+                        android:includeFontPadding="false"
                         android:maxLines="2"
-                        android:padding="4dp"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:padding="2dp"
                         android:text="R2"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -102,14 +108,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginBottom="1dp"
+                    android:layout_marginBottom="0dp"
                     android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginEnd="1dp"
+                        android:layout_marginEnd="0dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -117,18 +123,21 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
+                        android:includeFontPadding="false"
                         android:maxLines="2"
-                        android:padding="4dp"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:padding="2dp"
                         android:text="R3"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="1dp"
+                        android:layout_marginStart="0dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -136,12 +145,15 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
+                        android:includeFontPadding="false"
                         android:maxLines="2"
-                        android:padding="4dp"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:padding="2dp"
                         android:text="R4"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -155,7 +167,7 @@
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginEnd="1dp"
+                        android:layout_marginEnd="0dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -163,18 +175,21 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
+                        android:includeFontPadding="false"
                         android:maxLines="2"
-                        android:padding="4dp"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:padding="2dp"
                         android:text="R5"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="1dp"
+                        android:layout_marginStart="0dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -182,12 +197,15 @@
                         android:autoSizeTextType="uniform"
                         android:backgroundTint="#34414D"
                         android:gravity="center"
+                        android:includeFontPadding="false"
                         android:maxLines="2"
-                        android:padding="4dp"
+                        android:minHeight="0dp"
+                        android:minWidth="0dp"
+                        android:padding="2dp"
                         android:text="MP3"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -204,7 +222,7 @@
             android:background="#1E2329"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="2dp">
+            android:padding="0dp">
 
             <TextView
                 android:layout_width="match_parent"
