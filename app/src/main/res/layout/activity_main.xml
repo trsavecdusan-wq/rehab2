@@ -500,7 +500,7 @@
             android:padding="6dp"
             android:text="VIDEO"
             android:textColor="#F4F7FA"
-            android:textSize="11sp"
+            android:textSize="9sp"
             android:textStyle="bold" />
 
         <TextView
@@ -515,7 +515,7 @@
             android:padding="6dp"
             android:text="GALERIJA"
             android:textColor="#F4F7FA"
-            android:textSize="11sp"
+            android:textSize="9sp"
             android:textStyle="bold" />
 
         <TextView
@@ -530,7 +530,7 @@
             android:padding="6dp"
             android:text="OGLEDALO"
             android:textColor="#F4F7FA"
-            android:textSize="11sp"
+            android:textSize="9sp"
             android:textStyle="bold" />
 
         <TextView
@@ -544,7 +544,7 @@
             android:padding="6dp"
             android:text="SPROSTITEV"
             android:textColor="#F4F7FA"
-            android:textSize="11sp"
+            android:textSize="9sp"
             android:textStyle="bold" />
 
     </LinearLayout>
