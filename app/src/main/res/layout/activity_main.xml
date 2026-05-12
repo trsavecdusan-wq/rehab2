@@ -33,19 +33,19 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="196dp"
+        android:layout_height="236dp"
         android:layout_marginBottom="16dp"
         android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
             android:background="#1E2329"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -55,14 +55,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginBottom="2dp"
+                    android:layout_marginBottom="1dp"
                     android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginEnd="2dp"
+                        android:layout_marginEnd="1dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -71,7 +71,7 @@
                         android:backgroundTint="#34414D"
                         android:gravity="center"
                         android:maxLines="2"
-                        android:padding="6dp"
+                        android:padding="4dp"
                         android:text="R1"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
@@ -81,7 +81,7 @@
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="2dp"
+                        android:layout_marginStart="1dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -90,7 +90,7 @@
                         android:backgroundTint="#34414D"
                         android:gravity="center"
                         android:maxLines="2"
-                        android:padding="6dp"
+                        android:padding="4dp"
                         android:text="R2"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
@@ -102,14 +102,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginBottom="2dp"
+                    android:layout_marginBottom="1dp"
                     android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginEnd="2dp"
+                        android:layout_marginEnd="1dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -118,7 +118,7 @@
                         android:backgroundTint="#34414D"
                         android:gravity="center"
                         android:maxLines="2"
-                        android:padding="6dp"
+                        android:padding="4dp"
                         android:text="R3"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
@@ -128,7 +128,7 @@
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="2dp"
+                        android:layout_marginStart="1dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -137,7 +137,7 @@
                         android:backgroundTint="#34414D"
                         android:gravity="center"
                         android:maxLines="2"
-                        android:padding="6dp"
+                        android:padding="4dp"
                         android:text="R4"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
@@ -155,7 +155,7 @@
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginEnd="2dp"
+                        android:layout_marginEnd="1dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -164,7 +164,7 @@
                         android:backgroundTint="#34414D"
                         android:gravity="center"
                         android:maxLines="2"
-                        android:padding="6dp"
+                        android:padding="4dp"
                         android:text="R5"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
@@ -174,7 +174,7 @@
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="2dp"
+                        android:layout_marginStart="1dp"
                         android:layout_weight="1"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeMinTextSize="12sp"
@@ -183,7 +183,7 @@
                         android:backgroundTint="#34414D"
                         android:gravity="center"
                         android:maxLines="2"
-                        android:padding="6dp"
+                        android:padding="4dp"
                         android:text="MP3"
                         android:textAllCaps="false"
                         android:textColor="#F4F7FA"
@@ -199,12 +199,12 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="6dp"
             android:layout_weight="1"
             android:background="#1E2329"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="2dp">
 
             <TextView
                 android:layout_width="match_parent"
