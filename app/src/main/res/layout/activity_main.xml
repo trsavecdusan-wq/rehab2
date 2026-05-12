@@ -278,7 +278,7 @@
                         android:gravity="center"
                         android:text="5"
                         android:textColor="#F4F7FA"
-                        android:textSize="52sp"
+                        android:textSize="44sp"
                         android:textStyle="bold" />
 
                     <Space
