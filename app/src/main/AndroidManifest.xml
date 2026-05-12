@@ -6,6 +6,7 @@
         android:label="rehab2"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".AddRadioStationActivity" />
         <activity android:name=".RadioSettingsActivity" />
         <activity android:name=".SettingsActivity" />
         <activity

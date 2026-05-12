@@ -1,5 +1,6 @@
 package com.rehab2
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
@@ -45,7 +46,7 @@ class RadioSettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnPreviousPage).setOnClickListener {
-            Toast.makeText(this, "Prejšnja stran", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "PrejĹˇnja stran", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btnNextPage).setOnClickListener {
@@ -53,7 +54,7 @@ class RadioSettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnAddStation).setOnClickListener {
-            Toast.makeText(this, "Dodaj postajo", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, AddRadioStationActivity::class.java))
         }
     }
 }
