@@ -1,0 +1,119 @@
+{
+  "pageId": "main_4x4",
+  "title": "Main 4x4",
+  "gridSize": 4,
+  "items": [
+    {
+      "id": "zejna",
+      "label": "ŽEJNA",
+      "iconType": "emoji",
+      "iconValue": "🥤",
+      "order": 1
+    },
+    {
+      "id": "lacna",
+      "label": "LAČNA",
+      "iconType": "emoji",
+      "iconValue": "🍽",
+      "order": 2
+    },
+    {
+      "id": "pomoc",
+      "label": "POMOČ",
+      "iconType": "emoji",
+      "iconValue": "🆘",
+      "order": 3
+    },
+    {
+      "id": "da",
+      "label": "DA",
+      "iconType": "emoji",
+      "iconValue": "✅",
+      "order": 4
+    },
+    {
+      "id": "wc",
+      "label": "WC",
+      "iconType": "emoji",
+      "iconValue": "🚽",
+      "order": 5
+    },
+    {
+      "id": "dobro",
+      "label": "DOBRO",
+      "iconType": "emoji",
+      "iconValue": "🙂",
+      "order": 6
+    },
+    {
+      "id": "slabo",
+      "label": "SLABO",
+      "iconType": "emoji",
+      "iconValue": "😟",
+      "order": 7
+    },
+    {
+      "id": "ne",
+      "label": "NE",
+      "iconType": "emoji",
+      "iconValue": "❌",
+      "order": 8
+    },
+    {
+      "id": "utrujena",
+      "label": "UTRUJENA",
+      "iconType": "emoji",
+      "iconValue": "🌙",
+      "order": 9
+    },
+    {
+      "id": "mraz",
+      "label": "MRAZ",
+      "iconType": "emoji",
+      "iconValue": "❄",
+      "order": 10
+    },
+    {
+      "id": "vroce",
+      "label": "VROČE",
+      "iconType": "emoji",
+      "iconValue": "☀",
+      "order": 11
+    },
+    {
+      "id": "bolecina",
+      "label": "BOLEČINA",
+      "iconType": "emoji",
+      "iconValue": "⚕",
+      "order": 12
+    },
+    {
+      "id": "domov",
+      "label": "DOMOV",
+      "iconType": "emoji",
+      "iconValue": "🏠",
+      "order": 13
+    },
+    {
+      "id": "zdravnik",
+      "label": "ZDRAVNIK",
+      "iconType": "emoji",
+      "iconValue": "👨‍⚕️",
+      "order": 14
+    },
+    {
+      "id": "druzina",
+      "label": "DRUŽINA",
+      "iconType": "emoji",
+      "iconValue": "👨‍👩‍👧",
+      "order": 15
+    },
+    {
+      "id": "stop",
+      "label": "STOP",
+      "iconType": "emoji",
+      "iconValue": "🛑",
+      "order": 16
+    }
+  ]
+}
