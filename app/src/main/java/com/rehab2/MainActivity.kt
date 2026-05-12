@@ -2,6 +2,7 @@ package com.rehab2
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +17,8 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
         WindowInsetsControllerCompat(window, window.decorView).hide(WindowInsetsCompat.Type.statusBars())
-        val root = findViewById<View>(android.R.id.content).getChildAt(0)
+        val content: ViewGroup = findViewById(android.R.id.content)
+        val root = content.getChildAt(0)
         val baseLeft = root.paddingLeft
         val baseRight = root.paddingRight
         val baseBottom = root.paddingBottom
