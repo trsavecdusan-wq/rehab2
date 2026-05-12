@@ -1,17 +1,31 @@
 package com.rehab2
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
         WindowInsetsControllerCompat(window, window.decorView).hide(WindowInsetsCompat.Type.statusBars())
+        val root = findViewById<View>(android.R.id.content).getChildAt(0)
+        val baseLeft = root.paddingLeft
+        val baseRight = root.paddingRight
+        val baseBottom = root.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(baseLeft, 0, baseRight, baseBottom + systemBars.bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(root)
 
         val btnAacZejna: Button = findViewById(R.id.btnAacZejna)
         btnAacZejna.setOnClickListener {
