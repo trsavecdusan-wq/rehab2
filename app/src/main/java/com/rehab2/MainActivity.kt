@@ -1,5 +1,6 @@
 package com.rehab2
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,11 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         ViewCompat.requestApplyInsets(root)
+
+        findViewById<View>(R.id.statusModule).setOnLongClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+            true
+        }
 
         val aacTiles = listOf(
             R.id.tileAacZejna to "ŽEJNA",
