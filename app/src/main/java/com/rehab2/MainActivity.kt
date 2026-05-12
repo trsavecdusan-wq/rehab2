@@ -3,7 +3,6 @@ package com.rehab2
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -29,29 +28,28 @@ class MainActivity : AppCompatActivity() {
         }
         ViewCompat.requestApplyInsets(root)
 
-        val aacButtonIds = listOf(
-            R.id.btnAacZejna,
-            R.id.btnAacLacna,
-            R.id.btnAacPomoc,
-            R.id.btnAacDa,
-            R.id.btnAacWc,
-            R.id.btnAacDobro,
-            R.id.btnAacSlabo,
-            R.id.btnAacNe,
-            R.id.btnAacUtrujena,
-            R.id.btnAacMraz,
-            R.id.btnAacVroce,
-            R.id.btnAacBolecina,
-            R.id.btnAacDomov,
-            R.id.btnAacZdravnik,
-            R.id.btnAacDruzina,
-            R.id.btnAacStop
+        val aacTiles = listOf(
+            R.id.tileAacZejna to "ŽEJNA",
+            R.id.tileAacLacna to "LAČNA",
+            R.id.tileAacPomoc to "POMOČ",
+            R.id.tileAacDa to "DA",
+            R.id.tileAacWc to "WC",
+            R.id.tileAacDobro to "DOBRO",
+            R.id.tileAacSlabo to "SLABO",
+            R.id.tileAacNe to "NE",
+            R.id.tileAacUtrujena to "UTRUJENA",
+            R.id.tileAacMraz to "MRAZ",
+            R.id.tileAacVroce to "VROČE",
+            R.id.tileAacBolecina to "BOLEČINA",
+            R.id.tileAacDomov to "DOMOV",
+            R.id.tileAacZdravnik to "ZDRAVNIK",
+            R.id.tileAacDruzina to "DRUŽINA",
+            R.id.tileAacStop to "STOP"
         )
 
-        aacButtonIds.forEach { buttonId ->
-            val button: Button = findViewById(buttonId)
-            button.setOnClickListener {
-                Toast.makeText(this, button.text.toString(), Toast.LENGTH_SHORT).show()
+        aacTiles.forEach { (tileId, label) ->
+            findViewById<View>(tileId).setOnClickListener {
+                Toast.makeText(this, label, Toast.LENGTH_SHORT).show()
             }
         }
     }

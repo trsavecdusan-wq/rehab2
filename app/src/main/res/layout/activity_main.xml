@@ -301,236 +301,452 @@
         android:layout_weight="1"
         android:background="#1A1F24"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="1dp"
             android:layout_weight="1"
             android:background="#232A31"
             android:orientation="horizontal"
-            android:padding="4dp">
+            android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacZejna"
+            <LinearLayout
+                android:id="@+id/tileAacZejna"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="3dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="🥤&#10;ŽEJNA"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacLacna"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F964;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="&#x017D;EJNA"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacLacna"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="🍽&#10;LAČNA"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacPomoc"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F37D;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="LA&#x010C;NA"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacPomoc"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="🆘&#10;POMOČ"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacDa"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F198;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="POMO&#x010C;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacDa"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
+                android:layout_marginStart="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="✅&#10;DA"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x2705;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="DA"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="1dp"
             android:layout_weight="1"
             android:background="#232A31"
             android:orientation="horizontal"
-            android:padding="4dp">
+            android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacWc"
+            <LinearLayout
+                android:id="@+id/tileAacWc"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="3dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="🚽&#10;WC"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacDobro"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F6BD;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="WC"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacDobro"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="🙂&#10;DOBRO"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacSlabo"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F642;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="DOBRO"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacSlabo"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="😟&#10;SLABO"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacNe"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F61F;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="SLABO"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacNe"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
+                android:layout_marginStart="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="❌&#10;NE"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x274C;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="NE"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="1dp"
             android:layout_weight="1"
             android:background="#232A31"
             android:orientation="horizontal"
-            android:padding="4dp">
+            android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacUtrujena"
+            <LinearLayout
+                android:id="@+id/tileAacUtrujena"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="3dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="🌙&#10;UTRUJENA"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacMraz"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F319;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="UTRUJENA"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacMraz"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="❄&#10;MRAZ"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacVroce"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x2744;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="MRAZ"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacVroce"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="☀&#10;VROČE"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacBolecina"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x2600;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="VRO&#x010C;E"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacBolecina"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
+                android:layout_marginStart="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="⚕&#10;BOLEČINA"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x2695;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="BOLE&#x010C;INA"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -540,73 +756,145 @@
             android:layout_weight="1"
             android:background="#232A31"
             android:orientation="horizontal"
-            android:padding="4dp">
+            android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacDomov"
+            <LinearLayout
+                android:id="@+id/tileAacDomov"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="3dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="🏠&#10;DOMOV"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacZdravnik"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F3E0;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="DOMOV"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacZdravnik"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="👨‍⚕️&#10;ZDRAVNIK"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacDruzina"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F468;&#x200D;&#x2695;&#xFE0F;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="ZDRAVNIK"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacDruzina"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="👨‍👩‍👧&#10;DRUŽINA"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
 
-            <Button
-                android:id="@+id/btnAacStop"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="DRU&#x017D;INA"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileAacStop"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
+                android:layout_marginStart="1dp"
                 android:layout_weight="1"
-                android:backgroundTint="#34414D"
+                android:background="#34414D"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
-                android:maxLines="2"
-                android:padding="6dp"
-                android:text="🛑&#10;STOP"
-                android:textAllCaps="false"
-                android:textColor="#F4F7FA"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="1dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="&#x1F6D1;"
+                    android:textColor="#F4F7FA"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="STOP"
+                    android:textColor="#F4F7FA"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
