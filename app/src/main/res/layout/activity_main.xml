@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -191,7 +191,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🇸🇮"
+                    android:text="đź‡¸đź‡®"
                     android:textColor="#F4F7FA"
                     android:textSize="16sp" />
 
@@ -212,7 +212,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="●"
+                    android:text="â—Ź"
                     android:textColor="#6FD38A"
                     android:textSize="14sp" />
 
@@ -332,7 +332,7 @@
                     android:gravity="center"
                     android:text="&#x1F964;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -367,7 +367,7 @@
                     android:gravity="center"
                     android:text="&#x1F37D;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -402,7 +402,7 @@
                     android:gravity="center"
                     android:text="&#x1F198;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -436,7 +436,7 @@
                     android:gravity="center"
                     android:text="&#x2705;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -481,7 +481,7 @@
                     android:gravity="center"
                     android:text="&#x1F6BD;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -516,7 +516,7 @@
                     android:gravity="center"
                     android:text="&#x1F642;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -551,7 +551,7 @@
                     android:gravity="center"
                     android:text="&#x1F61F;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -585,7 +585,7 @@
                     android:gravity="center"
                     android:text="&#x274C;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -630,7 +630,7 @@
                     android:gravity="center"
                     android:text="&#x1F319;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -665,7 +665,7 @@
                     android:gravity="center"
                     android:text="&#x2744;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -700,7 +700,7 @@
                     android:gravity="center"
                     android:text="&#x2600;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -734,7 +734,7 @@
                     android:gravity="center"
                     android:text="&#x2695;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -778,7 +778,7 @@
                     android:gravity="center"
                     android:text="&#x1F3E0;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -813,7 +813,7 @@
                     android:gravity="center"
                     android:text="&#x1F468;&#x200D;&#x2695;&#xFE0F;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -848,7 +848,7 @@
                     android:gravity="center"
                     android:text="&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -882,7 +882,7 @@
                     android:gravity="center"
                     android:text="&#x1F6D1;"
                     android:textColor="#F4F7FA"
-                    android:textSize="28sp" />
+                    android:textSize="38sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -966,3 +966,4 @@
     </LinearLayout>
 
 </LinearLayout>
+
