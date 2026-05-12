@@ -41,7 +41,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="4dp"
-            android:layout_weight="1"
+            android:layout_weight="1.15"
             android:background="#1E2329"
             android:gravity="center"
             android:orientation="vertical"
@@ -69,7 +69,7 @@
                         android:includeFontPadding="false"
                         android:maxLines="2"
                         android:padding="2dp"
-                        android:text="R1"
+                        android:text="Radio&#10;1"
                         android:textColor="#F4F7FA"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -84,7 +84,7 @@
                         android:includeFontPadding="false"
                         android:maxLines="2"
                         android:padding="2dp"
-                        android:text="R2"
+                        android:text="Radio&#10;2"
                         android:textColor="#F4F7FA"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -108,7 +108,7 @@
                         android:includeFontPadding="false"
                         android:maxLines="2"
                         android:padding="2dp"
-                        android:text="R3"
+                        android:text="ROKS&#10;UA"
                         android:textColor="#F4F7FA"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -123,7 +123,7 @@
                         android:includeFontPadding="false"
                         android:maxLines="2"
                         android:padding="2dp"
-                        android:text="R4"
+                        android:text="Kiss&#10;FM"
                         android:textColor="#F4F7FA"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -146,7 +146,7 @@
                         android:includeFontPadding="false"
                         android:maxLines="2"
                         android:padding="2dp"
-                        android:text="R5"
+                        android:text="Nashe&#10;UA"
                         android:textColor="#F4F7FA"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -176,7 +176,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="4dp"
-            android:layout_weight="1"
+            android:layout_weight="0.85"
             android:background="#1E2329"
             android:gravity="center"
             android:orientation="vertical"
