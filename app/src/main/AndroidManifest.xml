@@ -9,6 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:usesCleartextTraffic="true">
+        <activity android:name=".RadioStationEditActivity" />
         <activity android:name=".RadioPreviewActivity" />
         <activity android:name=".AddRadioStationActivity" />
         <activity android:name=".RadioSettingsActivity" />

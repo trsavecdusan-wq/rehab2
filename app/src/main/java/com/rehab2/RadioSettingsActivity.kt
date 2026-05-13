@@ -6,17 +6,22 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.rehab2.radio.SavedRadioStation
 import com.rehab2.radio.RadioStationStore
 
 class RadioSettingsActivity : AppCompatActivity() {
     private var currentPage = 1
     private lateinit var pageLabel: TextView
     private lateinit var stationLabels: List<TextView>
+    private lateinit var visibleButtons: List<Button>
+    private lateinit var editButtons: List<Button>
+    private lateinit var store: RadioStationStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_radio_settings)
 
+        store = RadioStationStore(this)
         pageLabel = findViewById(R.id.txtPageLabel)
         stationLabels = listOf(
             findViewById(R.id.txtStationSlot1),
@@ -26,39 +31,25 @@ class RadioSettingsActivity : AppCompatActivity() {
             findViewById(R.id.txtStationSlot5),
             findViewById(R.id.txtStationSlot6)
         )
+        visibleButtons = listOf(
+            findViewById(R.id.btnVisibleStation1),
+            findViewById(R.id.btnVisibleStation2),
+            findViewById(R.id.btnVisibleStation3),
+            findViewById(R.id.btnVisibleStation4),
+            findViewById(R.id.btnVisibleStation5),
+            findViewById(R.id.btnVisibleStation6)
+        )
+        editButtons = listOf(
+            findViewById(R.id.btnEditStation1),
+            findViewById(R.id.btnEditStation2),
+            findViewById(R.id.btnEditStation3),
+            findViewById(R.id.btnEditStation4),
+            findViewById(R.id.btnEditStation5),
+            findViewById(R.id.btnEditStation6)
+        )
 
         findViewById<Button>(R.id.btnBackRadioSettings).setOnClickListener {
             finish()
-        }
-
-        val visibleButtons = listOf(
-            R.id.btnVisibleStation1,
-            R.id.btnVisibleStation2,
-            R.id.btnVisibleStation3,
-            R.id.btnVisibleStation4,
-            R.id.btnVisibleStation5,
-            R.id.btnVisibleStation6
-        )
-
-        val editButtons = listOf(
-            R.id.btnEditStation1,
-            R.id.btnEditStation2,
-            R.id.btnEditStation3,
-            R.id.btnEditStation4,
-            R.id.btnEditStation5,
-            R.id.btnEditStation6
-        )
-
-        visibleButtons.forEach { buttonId ->
-            findViewById<Button>(buttonId).setOnClickListener {
-                Toast.makeText(this, "Vidnost postaje", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        editButtons.forEach { buttonId ->
-            findViewById<Button>(buttonId).setOnClickListener {
-                Toast.makeText(this, "Uredi postajo", Toast.LENGTH_SHORT).show()
-            }
         }
 
         findViewById<Button>(R.id.btnPreviousPage).setOnClickListener {
@@ -84,15 +75,47 @@ class RadioSettingsActivity : AppCompatActivity() {
     }
 
     private fun renderCurrentPage() {
-        val stationsOnPage = RadioStationStore(this)
-            .loadStations()
-            .filter { it.page == currentPage }
-            .sortedBy { it.position }
+        val stationsOnPage = store.getStationsForPage(currentPage)
 
         pageLabel.text = "STRAN $currentPage"
         stationLabels.forEachIndexed { index, textView ->
             val station = stationsOnPage.firstOrNull { it.position == index + 1 }
-            textView.text = station?.name ?: "PRAZNO"
+            textView.text = station?.buttonLabel?.ifBlank { station.name } ?: "PRAZNO"
+            bindVisibleButton(index, station)
+            bindEditButton(index, station)
+        }
+    }
+
+    private fun bindVisibleButton(index: Int, station: SavedRadioStation?) {
+        val button = visibleButtons[index]
+        if (station == null) {
+            button.text = "-"
+            button.isEnabled = false
+            return
+        }
+
+        button.isEnabled = true
+        button.text = if (station.visible) "VIDNO" else "SKRITO"
+        button.setOnClickListener {
+            val updated = store.toggleVisibility(station.stationUuid, station.streamUrl) ?: return@setOnClickListener
+            val toastMessage = if (updated.visible) "Postaja vidna" else "Postaja skrita"
+            Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
+            renderCurrentPage()
+        }
+    }
+
+    private fun bindEditButton(index: Int, station: SavedRadioStation?) {
+        val button = editButtons[index]
+        button.setOnClickListener {
+            if (station == null) {
+                Toast.makeText(this, "Ni postaje", Toast.LENGTH_SHORT).show()
+            } else {
+                val intent = Intent(this, RadioStationEditActivity::class.java).apply {
+                    putExtra(RadioStationEditActivity.EXTRA_STATION_UUID, station.stationUuid)
+                    putExtra(RadioStationEditActivity.EXTRA_STREAM_URL, station.streamUrl)
+                }
+                startActivity(intent)
+            }
         }
     }
 }

@@ -4,14 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.rehab2.radio.RadioStationStore
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var radioTiles: List<TextView>
+    private lateinit var fallbackRadioLabels: List<CharSequence>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -28,6 +33,16 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         ViewCompat.requestApplyInsets(root)
+
+        radioTiles = listOf(
+            findViewById(R.id.txtRadioTile1),
+            findViewById(R.id.txtRadioTile2),
+            findViewById(R.id.txtRadioTile3),
+            findViewById(R.id.txtRadioTile4),
+            findViewById(R.id.txtRadioTile5),
+            findViewById(R.id.txtRadioTile6)
+        )
+        fallbackRadioLabels = radioTiles.map { it.text }
 
         findViewById<View>(R.id.statusModule).setOnLongClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
@@ -57,6 +72,22 @@ class MainActivity : AppCompatActivity() {
             findViewById<View>(tileId).setOnClickListener {
                 Toast.makeText(this, label, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshRadioTiles()
+    }
+
+    private fun refreshRadioTiles() {
+        val stations = RadioStationStore(this)
+            .getStationsForPage(1)
+            .filter { it.visible }
+
+        radioTiles.forEachIndexed { index, textView ->
+            val station = stations.firstOrNull { it.position == index + 1 }
+            textView.text = station?.buttonLabel?.ifBlank { station.name } ?: fallbackRadioLabels[index]
         }
     }
 }

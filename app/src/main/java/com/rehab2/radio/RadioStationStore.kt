@@ -12,6 +12,11 @@ class RadioStationStore(private val context: Context) {
         val position: Int
     )
 
+    data class UpdateResult(
+        val success: Boolean,
+        val invalidSlot: Boolean = false
+    )
+
     fun loadStations(): List<SavedRadioStation> {
         val file = getStoreFile()
         if (!file.exists()) {
@@ -24,10 +29,14 @@ class RadioStationStore(private val context: Context) {
             buildList {
                 for (index in 0 until stations.length()) {
                     val item = stations.optJSONObject(index) ?: continue
+                    val name = item.optString("name")
                     add(
                         SavedRadioStation(
                             stationUuid = item.optString("stationUuid"),
-                            name = item.optString("name"),
+                            name = name,
+                            buttonLabel = normalizeButtonLabel(
+                                item.optString("buttonLabel").ifBlank { deriveButtonLabel(name) }
+                            ),
                             streamUrl = item.optString("streamUrl"),
                             country = item.optString("country"),
                             genre = item.optString("genre"),
@@ -40,21 +49,27 @@ class RadioStationStore(private val context: Context) {
                         )
                     )
                 }
-            }
+            }.sortedWith(compareBy<SavedRadioStation> { it.page }.thenBy { it.position })
         } catch (_: Exception) {
             emptyList()
         }
     }
 
+    fun getStationsForPage(page: Int): List<SavedRadioStation> {
+        return loadStations()
+            .filter { it.page == page }
+            .sortedBy { it.position }
+    }
+
+    fun findStation(stationUuid: String, streamUrl: String): SavedRadioStation? {
+        return loadStations().firstOrNull { matchesIdentity(it, stationUuid, streamUrl) }
+    }
+
     fun saveStation(candidate: SavedRadioStation): SaveResult {
         val stations = loadStations().toMutableList()
         val duplicate = stations.any { existing ->
-            candidate.stationUuid.isNotBlank() && existing.stationUuid.isNotBlank() &&
-                existing.stationUuid == candidate.stationUuid
-        } || (
-            candidate.stationUuid.isBlank() &&
-                stations.any { existing -> existing.streamUrl.equals(candidate.streamUrl, ignoreCase = true) }
-            )
+            matchesIdentity(existing, candidate.stationUuid, candidate.streamUrl)
+        }
 
         if (duplicate) {
             return SaveResult(duplicate = true, page = 0, position = 0)
@@ -62,6 +77,9 @@ class RadioStationStore(private val context: Context) {
 
         val freeSlot = findFirstFreeSlot(stations)
         val stationToSave = candidate.copy(
+            buttonLabel = normalizeButtonLabel(
+                candidate.buttonLabel.ifBlank { deriveButtonLabel(candidate.name) }
+            ),
             visible = true,
             page = freeSlot.first,
             position = freeSlot.second
@@ -69,6 +87,66 @@ class RadioStationStore(private val context: Context) {
         stations += stationToSave
         writeStations(stations)
         return SaveResult(duplicate = false, page = freeSlot.first, position = freeSlot.second)
+    }
+
+    fun toggleVisibility(stationUuid: String, streamUrl: String): SavedRadioStation? {
+        val stations = loadStations().toMutableList()
+        val index = stations.indexOfFirst { matchesIdentity(it, stationUuid, streamUrl) }
+        if (index == -1) {
+            return null
+        }
+
+        val updated = stations[index].copy(visible = !stations[index].visible)
+        stations[index] = updated
+        writeStations(stations)
+        return updated
+    }
+
+    fun updateStation(updatedStation: SavedRadioStation): UpdateResult {
+        if (updatedStation.page < 1 || updatedStation.position !in 1..6) {
+            return UpdateResult(success = false, invalidSlot = true)
+        }
+
+        val stations = loadStations().toMutableList()
+        val currentIndex = stations.indexOfFirst {
+            matchesIdentity(it, updatedStation.stationUuid, updatedStation.streamUrl)
+        }
+        if (currentIndex == -1) {
+            return UpdateResult(success = false)
+        }
+
+        val currentStation = stations[currentIndex]
+        val normalized = updatedStation.copy(
+            buttonLabel = normalizeButtonLabel(
+                updatedStation.buttonLabel.ifBlank { deriveButtonLabel(updatedStation.name) }
+            )
+        )
+
+        val occupantIndex = stations.withIndex().firstOrNull { indexed ->
+            indexed.index != currentIndex &&
+                indexed.value.page == normalized.page &&
+                indexed.value.position == normalized.position
+        }?.index
+
+        if (occupantIndex >= 0) {
+            val occupant = stations[occupantIndex]
+            stations[occupantIndex] = occupant.copy(
+                page = currentStation.page,
+                position = currentStation.position
+            )
+        }
+
+        stations[currentIndex] = normalized
+        writeStations(stations)
+        return UpdateResult(success = true)
+    }
+
+    private fun matchesIdentity(existing: SavedRadioStation, stationUuid: String, streamUrl: String): Boolean {
+        return if (stationUuid.isNotBlank() && existing.stationUuid.isNotBlank()) {
+            existing.stationUuid == stationUuid
+        } else {
+            existing.streamUrl.equals(streamUrl, ignoreCase = true)
+        }
     }
 
     private fun findFirstFreeSlot(stations: List<SavedRadioStation>): Pair<Int, Int> {
@@ -91,6 +169,7 @@ class RadioStationStore(private val context: Context) {
                 JSONObject().apply {
                     put("stationUuid", station.stationUuid)
                     put("name", station.name)
+                    put("buttonLabel", normalizeButtonLabel(station.buttonLabel))
                     put("streamUrl", station.streamUrl)
                     put("country", station.country)
                     put("genre", station.genre)
@@ -115,5 +194,32 @@ class RadioStationStore(private val context: Context) {
 
     private fun getStoreFile(): File {
         return File(File(context.filesDir, "radio"), "stations.json")
+    }
+
+    companion object {
+        fun deriveButtonLabel(name: String): String {
+            val cleanName = name.trim().replace(Regex("\\s+"), " ")
+            if (cleanName.isBlank()) {
+                return ""
+            }
+
+            val words = cleanName.split(" ")
+            return when {
+                words.size == 1 -> normalizeButtonLabel(words.first().take(12))
+                else -> normalizeButtonLabel(
+                    words.first().take(12) + "\n" + words.drop(1).joinToString(" ").take(12)
+                )
+            }
+        }
+
+        fun normalizeButtonLabel(raw: String): String {
+            val lines = raw.replace("\r", "")
+                .split("\n")
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .take(2)
+                .map { it.take(12) }
+            return lines.joinToString("\n")
+        }
     }
 }
