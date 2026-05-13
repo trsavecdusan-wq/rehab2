@@ -6,6 +6,7 @@ import android.os.Looper
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.rehab2.BuildConfig
 import com.rehab2.update.ApkDownloadManager
 import com.rehab2.update.GitHubUpdateClient
 
