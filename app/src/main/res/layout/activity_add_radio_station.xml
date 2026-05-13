@@ -74,10 +74,12 @@
         android:textStyle="bold" />
 
     <HorizontalScrollView
+        android:id="@+id/scrollCountryPresets"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/countryPresetsContainer"
@@ -97,7 +99,8 @@
         android:textAllCaps="false"
         android:textColor="#F4F7FA"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/btnSearchByGenre"
@@ -112,10 +115,12 @@
         android:textStyle="bold" />
 
     <HorizontalScrollView
+        android:id="@+id/scrollGenrePresets"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/genrePresetsContainer"

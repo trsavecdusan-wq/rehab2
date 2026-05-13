@@ -2,6 +2,7 @@ package com.rehab2
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -40,6 +42,8 @@ class AddRadioStationActivity : AppCompatActivity() {
     private lateinit var searchInput: EditText
     private lateinit var statusText: TextView
     private lateinit var resultsContainer: LinearLayout
+    private lateinit var scrollCountryPresets: HorizontalScrollView
+    private lateinit var scrollGenrePresets: HorizontalScrollView
     private lateinit var countryPresetsContainer: LinearLayout
     private lateinit var genrePresetsContainer: LinearLayout
     private val radioBrowserClient = RadioBrowserClient()
@@ -54,6 +58,8 @@ class AddRadioStationActivity : AppCompatActivity() {
         searchInput = findViewById(R.id.editSearchQuery)
         statusText = findViewById(R.id.txtSearchStatus)
         resultsContainer = findViewById(R.id.resultsContainer)
+        scrollCountryPresets = findViewById(R.id.scrollCountryPresets)
+        scrollGenrePresets = findViewById(R.id.scrollGenrePresets)
         countryPresetsContainer = findViewById(R.id.countryPresetsContainer)
         genrePresetsContainer = findViewById(R.id.genrePresetsContainer)
 
@@ -66,21 +72,21 @@ class AddRadioStationActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnSearchByCountry).setOnClickListener {
-            prepareForSearch()
-            performSearch(SearchMode.COUNTRY)
+            handleCountryAction()
         }
 
         findViewById<Button>(R.id.btnAddCountryPreset).setOnClickListener {
+            showCountryPresetMenu()
             searchInput.requestFocus()
             showKeyboard()
         }
 
         findViewById<Button>(R.id.btnSearchByGenre).setOnClickListener {
-            prepareForSearch()
-            performSearch(SearchMode.GENRE)
+            handleGenreAction()
         }
 
         findViewById<Button>(R.id.btnSearchByName).setOnClickListener {
+            hidePresetMenus()
             prepareForSearch()
             performSearch(SearchMode.NAME)
         }
@@ -99,6 +105,8 @@ class AddRadioStationActivity : AppCompatActivity() {
             Toast.makeText(this, "Vpi\u0161i iskalni pojem", Toast.LENGTH_SHORT).show()
             return
         }
+
+        hidePresetMenus()
 
         if (mode == SearchMode.COUNTRY) {
             presetsStore.addCountryIfMissing(query)
@@ -245,7 +253,7 @@ class AddRadioStationActivity : AppCompatActivity() {
                 gravity = Gravity.CENTER
                 setTextColor(0xFFF4F7FA.toInt())
                 setPadding(dp(16), 0, dp(16), 0)
-                backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF3A3F45.toInt())
+                backgroundTintList = ColorStateList.valueOf(0xFF3A3F45.toInt())
                 setOnClickListener { onClick(value) }
             }
             container.addView(button)
@@ -259,12 +267,57 @@ class AddRadioStationActivity : AppCompatActivity() {
         performSearch(mode)
     }
 
+    private fun handleCountryAction() {
+        if (searchInput.text.toString().trim().isEmpty()) {
+            showCountryPresetMenu()
+        } else {
+            hidePresetMenus()
+            prepareForSearch()
+            performSearch(SearchMode.COUNTRY)
+        }
+    }
+
+    private fun handleGenreAction() {
+        if (searchInput.text.toString().trim().isEmpty()) {
+            showGenrePresetMenu()
+        } else {
+            hidePresetMenus()
+            prepareForSearch()
+            performSearch(SearchMode.GENRE)
+        }
+    }
+
+    private fun showCountryPresetMenu() {
+        hideKeyboard()
+        searchInput.clearFocus()
+        renderCountryPresets()
+        scrollCountryPresets.visibility = View.VISIBLE
+        findViewById<Button>(R.id.btnAddCountryPreset).visibility = View.VISIBLE
+        scrollGenrePresets.visibility = View.GONE
+    }
+
+    private fun showGenrePresetMenu() {
+        hideKeyboard()
+        searchInput.clearFocus()
+        renderGenrePresets()
+        scrollGenrePresets.visibility = View.VISIBLE
+        scrollCountryPresets.visibility = View.GONE
+        findViewById<Button>(R.id.btnAddCountryPreset).visibility = View.GONE
+    }
+
+    private fun hidePresetMenus() {
+        scrollCountryPresets.visibility = View.GONE
+        scrollGenrePresets.visibility = View.GONE
+        findViewById<Button>(R.id.btnAddCountryPreset).visibility = View.GONE
+    }
+
     private fun clearSearchUi() {
         hideKeyboard()
         searchInput.clearFocus()
         searchInput.setText("")
         statusText.text = ""
         resultsContainer.removeAllViews()
+        hidePresetMenus()
     }
 
     private fun prepareForSearch() {
