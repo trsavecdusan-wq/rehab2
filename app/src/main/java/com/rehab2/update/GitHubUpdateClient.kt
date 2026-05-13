@@ -1,9 +1,13 @@
 package com.rehab2.update
 
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
+import java.io.IOException
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
+import java.net.UnknownHostException
 
 class GitHubUpdateClient {
     data class ReleaseInfo(
@@ -23,7 +27,8 @@ class GitHubUpdateClient {
         return try {
             val responseCode = connection.responseCode
             if (responseCode !in 200..299) {
-                throw IllegalStateException("Preverjanje ni uspelo")
+                val suffix = connection.responseMessage?.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""
+                throw IllegalStateException("Preverjanje ni uspelo: HTTP $responseCode$suffix")
             }
 
             val responseText = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
@@ -32,12 +37,26 @@ class GitHubUpdateClient {
             val body = root.optString("body")
             val assets = root.optJSONArray("assets") ?: JSONArray()
             val apkUrl = findApkUrl(assets)
+            if (tagName.isBlank()) {
+                throw IllegalStateException("Preverjanje ni uspelo: neveljaven odgovor GitHub")
+            }
+            if (apkUrl.isNullOrBlank()) {
+                throw IllegalStateException("Preverjanje ni uspelo: manjka rehab-release.apk")
+            }
 
             ReleaseInfo(
                 tagName = tagName,
                 body = body,
                 apkUrl = apkUrl
             )
+        } catch (_: SocketTimeoutException) {
+            throw IllegalStateException("Preverjanje ni uspelo: ni internetne povezave")
+        } catch (_: UnknownHostException) {
+            throw IllegalStateException("Preverjanje ni uspelo: ni internetne povezave")
+        } catch (_: JSONException) {
+            throw IllegalStateException("Preverjanje ni uspelo: neveljaven odgovor GitHub")
+        } catch (_: IOException) {
+            throw IllegalStateException("Preverjanje ni uspelo: ni internetne povezave")
         } finally {
             connection.disconnect()
         }

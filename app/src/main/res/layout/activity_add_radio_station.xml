@@ -73,6 +73,32 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/countryPresetsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+
+    </HorizontalScrollView>
+
+    <Button
+        android:id="@+id/btnAddCountryPreset"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#3A3F45"
+        android:text="DODAJ DR&#x017D;AVO"
+        android:textAllCaps="false"
+        android:textColor="#F4F7FA"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
     <Button
         android:id="@+id/btnSearchByGenre"
         android:layout_width="match_parent"
@@ -84,6 +110,20 @@
         android:textColor="#F4F7FA"
         android:textSize="20sp"
         android:textStyle="bold" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/genrePresetsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+
+    </HorizontalScrollView>
 
     <Button
         android:id="@+id/btnSearchByName"

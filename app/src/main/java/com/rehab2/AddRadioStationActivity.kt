@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -17,22 +18,44 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.rehab2.radio.RadioBrowserClient
 import com.rehab2.radio.RadioBrowserClient.SearchMode
+import com.rehab2.radio.RadioSearchPresetsStore
 import com.rehab2.radio.RadioSearchResult
 
 class AddRadioStationActivity : AppCompatActivity() {
+    companion object {
+        private val GENRE_PRESETS = listOf(
+            "pop",
+            "rock",
+            "news",
+            "folk",
+            "classical",
+            "dance",
+            "talk",
+            "children",
+            "ukrainian",
+            "slovenian"
+        )
+    }
+
     private lateinit var searchInput: EditText
     private lateinit var statusText: TextView
     private lateinit var resultsContainer: LinearLayout
+    private lateinit var countryPresetsContainer: LinearLayout
+    private lateinit var genrePresetsContainer: LinearLayout
     private val radioBrowserClient = RadioBrowserClient()
     private val mainHandler = Handler(Looper.getMainLooper())
+    private lateinit var presetsStore: RadioSearchPresetsStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_radio_station)
 
+        presetsStore = RadioSearchPresetsStore(this)
         searchInput = findViewById(R.id.editSearchQuery)
         statusText = findViewById(R.id.txtSearchStatus)
         resultsContainer = findViewById(R.id.resultsContainer)
+        countryPresetsContainer = findViewById(R.id.countryPresetsContainer)
+        genrePresetsContainer = findViewById(R.id.genrePresetsContainer)
 
         findViewById<Button>(R.id.btnBackAddRadioStation).setOnClickListener {
             finish()
@@ -45,6 +68,11 @@ class AddRadioStationActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSearchByCountry).setOnClickListener {
             prepareForSearch()
             performSearch(SearchMode.COUNTRY)
+        }
+
+        findViewById<Button>(R.id.btnAddCountryPreset).setOnClickListener {
+            searchInput.requestFocus()
+            showKeyboard()
         }
 
         findViewById<Button>(R.id.btnSearchByGenre).setOnClickListener {
@@ -60,6 +88,9 @@ class AddRadioStationActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnLocalMusic).setOnClickListener {
             startActivity(Intent(this, LocalMusicActivity::class.java))
         }
+
+        renderCountryPresets()
+        renderGenrePresets()
     }
 
     private fun performSearch(mode: SearchMode) {
@@ -67,6 +98,11 @@ class AddRadioStationActivity : AppCompatActivity() {
         if (query.isEmpty()) {
             Toast.makeText(this, "Vpi\u0161i iskalni pojem", Toast.LENGTH_SHORT).show()
             return
+        }
+
+        if (mode == SearchMode.COUNTRY) {
+            presetsStore.addCountryIfMissing(query)
+            renderCountryPresets()
         }
 
         statusText.text = "Nalagam..."
@@ -169,6 +205,60 @@ class AddRadioStationActivity : AppCompatActivity() {
         return (value * resources.displayMetrics.density).toInt()
     }
 
+    private fun renderCountryPresets() {
+        renderPresetButtons(
+            container = countryPresetsContainer,
+            values = presetsStore.loadCountries()
+        ) { country ->
+            runPresetSearch(country, SearchMode.COUNTRY)
+        }
+    }
+
+    private fun renderGenrePresets() {
+        renderPresetButtons(
+            container = genrePresetsContainer,
+            values = GENRE_PRESETS
+        ) { genre ->
+            runPresetSearch(genre, SearchMode.GENRE)
+        }
+    }
+
+    private fun renderPresetButtons(
+        container: LinearLayout,
+        values: List<String>,
+        onClick: (String) -> Unit
+    ) {
+        container.removeAllViews()
+        values.forEachIndexed { index, value ->
+            val button = Button(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    dp(48)
+                ).also { params ->
+                    if (index < values.lastIndex) {
+                        params.marginEnd = dp(8)
+                    }
+                }
+                text = value
+                textSize = 16f
+                isAllCaps = false
+                gravity = Gravity.CENTER
+                setTextColor(0xFFF4F7FA.toInt())
+                setPadding(dp(16), 0, dp(16), 0)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF3A3F45.toInt())
+                setOnClickListener { onClick(value) }
+            }
+            container.addView(button)
+        }
+    }
+
+    private fun runPresetSearch(value: String, mode: SearchMode) {
+        searchInput.setText(value)
+        searchInput.setSelection(value.length)
+        prepareForSearch()
+        performSearch(mode)
+    }
+
     private fun clearSearchUi() {
         hideKeyboard()
         searchInput.clearFocus()
@@ -186,5 +276,11 @@ class AddRadioStationActivity : AppCompatActivity() {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         val tokenView: View = currentFocus ?: searchInput
         inputMethodManager?.hideSoftInputFromWindow(tokenView.windowToken, 0)
+    }
+
+    private fun showKeyboard() {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        searchInput.inputType = InputType.TYPE_CLASS_TEXT
+        inputMethodManager?.showSoftInput(searchInput, InputMethodManager.SHOW_IMPLICIT)
     }
 }

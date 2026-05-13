@@ -3,6 +3,7 @@ package com.rehab2
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -82,6 +83,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                 }
             } catch (error: Exception) {
                 val message = error.message?.takeIf { it.isNotBlank() } ?: "Preverjanje ni uspelo"
+                Log.e("NovaRehabUpdater", "Update check failed: $message", error)
                 mainHandler.post {
                     txtUpdateStatus.text = message
                     txtReleaseNotes.text = ""
