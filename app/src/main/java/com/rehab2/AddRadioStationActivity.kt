@@ -1,5 +1,6 @@
 package com.rehab2
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -37,6 +38,16 @@ class AddRadioStationActivity : AppCompatActivity() {
             "ukrainian",
             "slovenian"
         )
+        private val COUNTRY_GENRE_FILTERS = listOf(
+            "All",
+            "Pop",
+            "Rock",
+            "Jazz",
+            "Classical",
+            "News",
+            "Talk",
+            "Electronic"
+        )
     }
 
     private lateinit var searchInput: EditText
@@ -49,6 +60,9 @@ class AddRadioStationActivity : AppCompatActivity() {
     private val radioBrowserClient = RadioBrowserClient()
     private val mainHandler = Handler(Looper.getMainLooper())
     private lateinit var presetsStore: RadioSearchPresetsStore
+    private var lastSelectedCountryQuery: String? = null
+    private var selectedCountryGenreFilter: String? = null
+    private var lastCountryResults: List<RadioSearchResult> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,8 +123,12 @@ class AddRadioStationActivity : AppCompatActivity() {
         hidePresetMenus()
 
         if (mode == SearchMode.COUNTRY) {
+            lastSelectedCountryQuery = query
+            selectedCountryGenreFilter = null
             presetsStore.addCountryIfMissing(query)
             renderCountryPresets()
+        } else if (mode == SearchMode.NAME) {
+            clearCountryGenreState()
         }
 
         statusText.text = "Nalagam..."
@@ -121,15 +139,23 @@ class AddRadioStationActivity : AppCompatActivity() {
                 val results = radioBrowserClient.search(mode, query)
                 mainHandler.post {
                     if (results.isEmpty()) {
+                        if (mode == SearchMode.COUNTRY) {
+                            lastCountryResults = emptyList()
+                        }
                         statusText.text = "Ni rezultatov"
                     } else {
-                        statusText.text = "Najdenih postaj: ${results.size}"
-                        renderResults(results)
+                        if (mode == SearchMode.COUNTRY) {
+                            lastCountryResults = results
+                        }
+                        renderDisplayedResults(results)
                     }
                 }
             } catch (error: Exception) {
                 val message = error.message?.takeIf { it.isNotBlank() } ?: "Napaka pri iskanju postaj"
                 mainHandler.post {
+                    if (mode == SearchMode.COUNTRY) {
+                        lastCountryResults = emptyList()
+                    }
                     statusText.text = message
                     resultsContainer.removeAllViews()
                 }
@@ -278,13 +304,62 @@ class AddRadioStationActivity : AppCompatActivity() {
     }
 
     private fun handleGenreAction() {
-        if (searchInput.text.toString().trim().isEmpty()) {
+        if (!lastSelectedCountryQuery.isNullOrBlank() && lastCountryResults.isNotEmpty()) {
+            showGenreFilterChooser()
+        } else if (searchInput.text.toString().trim().isEmpty()) {
             showGenrePresetMenu()
         } else {
             hidePresetMenus()
+            clearCountryGenreState()
             prepareForSearch()
             performSearch(SearchMode.GENRE)
         }
+    }
+
+    private fun showGenreFilterChooser() {
+        AlertDialog.Builder(this)
+            .setTitle("ZVRST")
+            .setItems(COUNTRY_GENRE_FILTERS.toTypedArray()) { _, which ->
+                val selected = COUNTRY_GENRE_FILTERS[which]
+                if (selected == "All") {
+                    selectedCountryGenreFilter = null
+                    searchSelectedCountry()
+                } else {
+                    selectedCountryGenreFilter = selected
+                    filterCurrentCountryResults(selected)
+                }
+            }
+            .show()
+    }
+
+    private fun searchSelectedCountry() {
+        val country = lastSelectedCountryQuery ?: return
+        searchInput.setText(country)
+        searchInput.setSelection(country.length)
+        prepareForSearch()
+        performSearch(SearchMode.COUNTRY)
+    }
+
+    private fun filterCurrentCountryResults(selectedGenre: String) {
+        val normalizedGenre = selectedGenre.trim().lowercase()
+        val filtered = lastCountryResults.filter { result ->
+            val tags = result.tags.lowercase()
+            tags.split(",", ";").any { tag ->
+                tag.trim().contains(normalizedGenre)
+            }
+        }
+
+        if (filtered.isEmpty()) {
+            statusText.text = "Ni rezultatov"
+            resultsContainer.removeAllViews()
+        } else {
+            renderDisplayedResults(filtered)
+        }
+    }
+
+    private fun renderDisplayedResults(results: List<RadioSearchResult>) {
+        statusText.text = "Najdenih postaj: ${results.size}"
+        renderResults(results)
     }
 
     private fun showCountryPresetMenu() {
@@ -318,6 +393,7 @@ class AddRadioStationActivity : AppCompatActivity() {
         statusText.text = ""
         resultsContainer.removeAllViews()
         hidePresetMenus()
+        clearCountryGenreState()
     }
 
     private fun prepareForSearch() {
@@ -335,5 +411,11 @@ class AddRadioStationActivity : AppCompatActivity() {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         searchInput.inputType = InputType.TYPE_CLASS_TEXT
         inputMethodManager?.showSoftInput(searchInput, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun clearCountryGenreState() {
+        lastSelectedCountryQuery = null
+        selectedCountryGenreFilter = null
+        lastCountryResults = emptyList()
     }
 }
