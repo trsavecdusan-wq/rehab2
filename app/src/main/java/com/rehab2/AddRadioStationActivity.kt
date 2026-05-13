@@ -1,7 +1,7 @@
 package com.rehab2
 
-import android.content.Intent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -55,6 +55,10 @@ class AddRadioStationActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSearchByName).setOnClickListener {
             prepareForSearch()
             performSearch(SearchMode.NAME)
+        }
+
+        findViewById<Button>(R.id.btnLocalMusic).setOnClickListener {
+            startActivity(Intent(this, LocalMusicActivity::class.java))
         }
     }
 

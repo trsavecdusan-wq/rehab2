@@ -89,9 +89,21 @@
         android:id="@+id/btnSearchByName"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="12dp"
         android:backgroundTint="#214A78"
         android:text="PO IMENU"
+        android:textAllCaps="false"
+        android:textColor="#F4F7FA"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnLocalMusic"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#3E7C4A"
+        android:text="LOKALNA GLASBA"
         android:textAllCaps="false"
         android:textColor="#F4F7FA"
         android:textSize="20sp"

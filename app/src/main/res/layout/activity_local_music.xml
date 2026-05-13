@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121417"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:text="LOKALNA GLASBA"
+        android:textColor="#F4F7FA"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnBackLocalMusic"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#2F5F9E"
+        android:text="NAZAJ"
+        android:textAllCaps="false"
+        android:textColor="#F4F7FA"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnPickLocalMusicFolder"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#214A78"
+        android:text="IZBERI USB MAPO"
+        android:textAllCaps="false"
+        android:textColor="#F4F7FA"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnImportLocalMusic"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#3E7C4A"
+        android:text="UVOZI GLASBO"
+        android:textAllCaps="false"
+        android:textColor="#F4F7FA"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtLocalMusicStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:textColor="#F4F7FA"
+        android:textSize="16sp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/localMusicResultsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </ScrollView>
+
+</LinearLayout>
