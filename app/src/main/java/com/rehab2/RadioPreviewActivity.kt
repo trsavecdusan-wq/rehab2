@@ -6,6 +6,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.rehab2.radio.RadioPlayerController
+import com.rehab2.radio.RadioStationStore
+import com.rehab2.radio.SavedRadioStation
 
 class RadioPreviewActivity : AppCompatActivity() {
     companion object {
@@ -22,6 +24,7 @@ class RadioPreviewActivity : AppCompatActivity() {
     private lateinit var playerController: RadioPlayerController
     private lateinit var statusText: TextView
     private var streamUrl: String = ""
+    private var testSucceeded: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +34,10 @@ class RadioPreviewActivity : AppCompatActivity() {
         streamUrl = intent.getStringExtra(EXTRA_STREAM_URL).orEmpty()
         val country = intent.getStringExtra(EXTRA_COUNTRY).orEmpty()
         val tags = intent.getStringExtra(EXTRA_TAGS).orEmpty()
+        val stationUuid = intent.getStringExtra(EXTRA_STATION_UUID).orEmpty()
+        val codec = intent.getStringExtra(EXTRA_CODEC).orEmpty()
+        val bitrate = intent.getStringExtra(EXTRA_BITRATE).orEmpty().toIntOrNull() ?: 0
+        val faviconUrl = intent.getStringExtra(EXTRA_FAVICON_URL).orEmpty()
 
         statusText = findViewById(R.id.txtPreviewStatus)
         statusText.text = ""
@@ -43,6 +50,9 @@ class RadioPreviewActivity : AppCompatActivity() {
         playerController = RadioPlayerController(this) { status ->
             runOnUiThread {
                 statusText.text = status
+                if (status == "Postaja deluje") {
+                    testSucceeded = true
+                }
                 if (status == "Napaka pri predvajanju") {
                     Toast.makeText(this, "Postaja se ne predvaja", Toast.LENGTH_SHORT).show()
                 }
@@ -63,7 +73,36 @@ class RadioPreviewActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnSaveAssignStation).setOnClickListener {
-            Toast.makeText(this, "Shranjevanje bo dodano v naslednji fazi", Toast.LENGTH_SHORT).show()
+            if (!testSucceeded) {
+                Toast.makeText(this, "Najprej testiraj postajo", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val saveResult = RadioStationStore(this).saveStation(
+                SavedRadioStation(
+                    stationUuid = stationUuid,
+                    name = stationName,
+                    streamUrl = streamUrl,
+                    country = country,
+                    genre = tags,
+                    faviconUrl = faviconUrl,
+                    codec = codec,
+                    bitrate = bitrate,
+                    visible = true,
+                    page = 0,
+                    position = 0
+                )
+            )
+
+            if (saveResult.duplicate) {
+                Toast.makeText(this, "Postaja je že shranjena", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Shranjeno: stran ${saveResult.page}, pozicija ${saveResult.position}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
         findViewById<Button>(R.id.btnBackRadioPreview).setOnClickListener {

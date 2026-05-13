@@ -1,11 +1,14 @@
 package com.rehab2
 
 import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -35,15 +38,22 @@ class AddRadioStationActivity : AppCompatActivity() {
             finish()
         }
 
+        findViewById<Button>(R.id.btnClearSearch).setOnClickListener {
+            clearSearchUi()
+        }
+
         findViewById<Button>(R.id.btnSearchByCountry).setOnClickListener {
+            prepareForSearch()
             performSearch(SearchMode.COUNTRY)
         }
 
         findViewById<Button>(R.id.btnSearchByGenre).setOnClickListener {
+            prepareForSearch()
             performSearch(SearchMode.GENRE)
         }
 
         findViewById<Button>(R.id.btnSearchByName).setOnClickListener {
+            prepareForSearch()
             performSearch(SearchMode.NAME)
         }
     }
@@ -153,5 +163,24 @@ class AddRadioStationActivity : AppCompatActivity() {
 
     private fun dp(value: Int): Int {
         return (value * resources.displayMetrics.density).toInt()
+    }
+
+    private fun clearSearchUi() {
+        hideKeyboard()
+        searchInput.clearFocus()
+        searchInput.setText("")
+        statusText.text = ""
+        resultsContainer.removeAllViews()
+    }
+
+    private fun prepareForSearch() {
+        hideKeyboard()
+        searchInput.clearFocus()
+    }
+
+    private fun hideKeyboard() {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val tokenView: View = currentFocus ?: searchInput
+        inputMethodManager?.hideSoftInputFromWindow(tokenView.windowToken, 0)
     }
 }

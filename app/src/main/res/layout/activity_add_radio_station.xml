@@ -28,18 +28,38 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/editSearchQuery"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:background="#1E2329"
-        android:hint="Vpi&#x0161;i dr&#x017E;avo, &#x017E;anr ali ime"
-        android:inputType="text"
-        android:minHeight="56dp"
-        android:padding="16dp"
-        android:textColor="#F4F7FA"
-        android:textColorHint="#8E99A3" />
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/editSearchQuery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#1E2329"
+            android:hint="Vpi&#x0161;i dr&#x017E;avo, &#x017E;anr ali ime"
+            android:inputType="text"
+            android:minHeight="56dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#8E99A3" />
+
+        <Button
+            android:id="@+id/btnClearSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginStart="12dp"
+            android:backgroundTint="#6A4E8E"
+            android:text="PO&#x010C;ISTI"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnSearchByCountry"
