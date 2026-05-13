@@ -3,6 +3,13 @@ plugins {
     id "org.jetbrains.kotlin.android"
 }
 
+def releaseKeystorePath = System.getenv("ANDROID_KEYSTORE_PATH")
+def releaseKeystorePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+def releaseKeyAlias = System.getenv("ANDROID_KEY_ALIAS")
+def releaseKeyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+def hasReleaseSigning = [releaseKeystorePath, releaseKeystorePassword, releaseKeyAlias, releaseKeyPassword]
+    .every { it != null && !it.trim().isEmpty() }
+
 android {
     namespace "com.rehab2"
     compileSdk 34
@@ -11,12 +18,30 @@ android {
         applicationId "com.rehab2"
         minSdk 21
         targetSdk 34
+        // versionCode must increase for every future release.
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
+    }
+
+    signingConfigs {
+        release {
+            if (hasReleaseSigning) {
+                storeFile file(releaseKeystorePath)
+                storePassword releaseKeystorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
         debug {
+        }
+        release {
+            minifyEnabled false
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
@@ -33,5 +58,17 @@ android {
 dependencies {
     implementation "androidx.core:core-ktx:1.13.1"
     implementation "androidx.appcompat:appcompat:1.7.0"
-    implementation "androidx.media3:media3-exoplayer:1.4.1"
+}
+
+gradle.taskGraph.whenReady { graph ->
+    def needsReleaseSigning = graph.allTasks.any { task ->
+        task.name.toLowerCase().contains("release")
+    }
+
+    if (needsReleaseSigning && !hasReleaseSigning) {
+        throw new GradleException(
+            "Release signing environment variables are missing. " +
+                "Expected ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD."
+        )
+    }
 }
