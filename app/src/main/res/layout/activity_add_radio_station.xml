@@ -20,7 +20,7 @@
         android:id="@+id/btnBackAddRadioStation"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="#2F5F9E"
         android:text="NAZAJ"
         android:textAllCaps="false"
@@ -28,13 +28,26 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
+    <EditText
+        android:id="@+id/editSearchQuery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="#1E2329"
+        android:hint="Vpi&#x0161;i dr&#x017E;avo, &#x017E;anr ali ime"
+        android:inputType="text"
+        android:minHeight="56dp"
+        android:padding="16dp"
+        android:textColor="#F4F7FA"
+        android:textColorHint="#8E99A3" />
+
     <Button
         android:id="@+id/btnSearchByCountry"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="12dp"
         android:backgroundTint="#214A78"
-        android:text="PO DRŽAVI"
+        android:text="PO DR&#x017D;AVI"
         android:textAllCaps="false"
         android:textColor="#F4F7FA"
         android:textSize="20sp"
@@ -44,9 +57,9 @@
         android:id="@+id/btnSearchByGenre"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="12dp"
         android:backgroundTint="#214A78"
-        android:text="PO ŽANRU"
+        android:text="PO &#x017D;ANRU"
         android:textAllCaps="false"
         android:textColor="#F4F7FA"
         android:textSize="20sp"
@@ -56,11 +69,34 @@
         android:id="@+id/btnSearchByName"
         android:layout_width="match_parent"
         android:layout_height="72dp"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="#214A78"
         android:text="PO IMENU"
         android:textAllCaps="false"
         android:textColor="#F4F7FA"
         android:textSize="20sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtSearchStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:textColor="#F4F7FA"
+        android:textSize="16sp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/resultsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </ScrollView>
 
 </LinearLayout>
