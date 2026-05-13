@@ -1,9 +1,12 @@
 package com.rehab2
 
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +26,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var radioTiles: List<TextView>
     private lateinit var fallbackRadioLabels: List<CharSequence>
+    private lateinit var seekVolume: SeekBar
+    private lateinit var audioManager: AudioManager
     private lateinit var radioPlayerController: RadioPlayerController
     private var visibleRadioStations: List<SavedRadioStation?> = List(6) { null }
     private var activeStationKey: String? = null
@@ -31,6 +36,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
+        audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        seekVolume = findViewById(R.id.seekVolume)
         WindowInsetsControllerCompat(window, window.decorView).hide(WindowInsetsCompat.Type.statusBars())
         val content: ViewGroup = findViewById(android.R.id.content)
         val root = content.getChildAt(0)
@@ -53,6 +60,7 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.txtRadioTile6)
         )
         fallbackRadioLabels = radioTiles.map { it.text }
+        configureVolumeSlider()
         radioPlayerController = RadioPlayerController(this) { status ->
             if (status == "Napaka pri predvajanju") {
                 runOnUiThread {
@@ -103,12 +111,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        setVolumeControlStream(AudioManager.STREAM_MUSIC)
+        syncVolumeSlider()
         refreshRadioTiles()
     }
 
     override fun onDestroy() {
         radioPlayerController.release()
         super.onDestroy()
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN) {
+            when (event.keyCode) {
+                KeyEvent.KEYCODE_VOLUME_UP,
+                KeyEvent.KEYCODE_VOLUME_DOWN,
+                KeyEvent.KEYCODE_VOLUME_MUTE -> return true
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     private fun refreshRadioTiles() {
@@ -168,5 +189,44 @@ class MainActivity : AppCompatActivity() {
             val isActive = station != null && activeStationKey == stationKey(station)
             textView.setBackgroundColor(if (isActive) RADIO_TILE_GREEN else RADIO_TILE_BLUE)
         }
+    }
+
+    private fun configureVolumeSlider() {
+        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        if (audioManager.isVolumeFixed || maxVolume <= 0) {
+            seekVolume.max = if (maxVolume > 0) maxVolume else 1
+            seekVolume.progress = 0
+            seekVolume.isEnabled = false
+            return
+        }
+
+        seekVolume.isEnabled = true
+        seekVolume.max = maxVolume
+        syncVolumeSlider()
+        seekVolume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (!fromUser || audioManager.isVolumeFixed) {
+                    return
+                }
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+        })
+    }
+
+    private fun syncVolumeSlider() {
+        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        if (maxVolume <= 0) {
+            seekVolume.isEnabled = false
+            return
+        }
+
+        seekVolume.max = maxVolume
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        seekVolume.progress = currentVolume.coerceIn(0, maxVolume)
+        seekVolume.isEnabled = !audioManager.isVolumeFixed
     }
 }
