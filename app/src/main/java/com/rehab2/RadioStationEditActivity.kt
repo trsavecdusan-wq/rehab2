@@ -1,5 +1,6 @@
 package com.rehab2
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.Button
 import android.widget.CheckBox
@@ -78,6 +79,23 @@ class RadioStationEditActivity : AppCompatActivity() {
                 Toast.makeText(this, "Postaja prestavljena", Toast.LENGTH_SHORT).show()
                 finish()
             }
+        }
+
+        findViewById<Button>(R.id.btnDeleteStation).setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Izbriši postajo?")
+                .setMessage("Postaja bo odstranjena iz seznama.")
+                .setNegativeButton("NE", null)
+                .setPositiveButton("DA") { _, _ ->
+                    val deleted = store.deleteStation(currentStation.stationUuid, currentStation.streamUrl)
+                    if (deleted) {
+                        Toast.makeText(this, "Postaja izbrisana", Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
+                        Toast.makeText(this, "Ni postaje", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .show()
         }
     }
 }

@@ -2,6 +2,7 @@ package com.rehab2
 
 import android.content.Intent
 import android.os.Bundle
+import android.content.res.ColorStateList
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -90,15 +91,22 @@ class RadioSettingsActivity : AppCompatActivity() {
         val button = visibleButtons[index]
         if (station == null) {
             button.text = "-"
-            button.isEnabled = false
+            button.isEnabled = true
+            button.backgroundTintList = ColorStateList.valueOf(0xFF3A3F45.toInt())
+            button.setOnClickListener {
+                Toast.makeText(this, "Ni postaje", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
         button.isEnabled = true
-        button.text = if (station.visible) "VIDNO" else "SKRITO"
+        button.text = if (station.visible) "VIDNO" else "NEVIDNO"
+        button.backgroundTintList = ColorStateList.valueOf(
+            if (station.visible) 0xFF2E8B57.toInt() else 0xFFA64040.toInt()
+        )
         button.setOnClickListener {
             val updated = store.toggleVisibility(station.stationUuid, station.streamUrl) ?: return@setOnClickListener
-            val toastMessage = if (updated.visible) "Postaja vidna" else "Postaja skrita"
+            val toastMessage = if (updated.visible) "Postaja vidna" else "Postaja nevidna"
             Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
             renderCurrentPage()
         }

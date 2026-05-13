@@ -159,6 +159,18 @@
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/btnDeleteStation"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#A64040"
+            android:text="IZBRI&#x0160;I POSTAJO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
             android:id="@+id/btnBackStationEdit"
             android:layout_width="match_parent"
             android:layout_height="72dp"

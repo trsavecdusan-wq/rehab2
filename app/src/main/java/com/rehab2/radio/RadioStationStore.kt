@@ -102,6 +102,18 @@ class RadioStationStore(private val context: Context) {
         return updated
     }
 
+    fun deleteStation(stationUuid: String, streamUrl: String): Boolean {
+        val stations = loadStations().toMutableList()
+        val index = stations.indexOfFirst { matchesIdentity(it, stationUuid, streamUrl) }
+        if (index == -1) {
+            return false
+        }
+
+        stations.removeAt(index)
+        writeStations(stations)
+        return true
+    }
+
     fun updateStation(updatedStation: SavedRadioStation): UpdateResult {
         if (updatedStation.page < 1 || updatedStation.position !in 1..6) {
             return UpdateResult(success = false, invalidSlot = true)
