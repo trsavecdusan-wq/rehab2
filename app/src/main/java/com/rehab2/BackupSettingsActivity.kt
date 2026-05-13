@@ -6,7 +6,6 @@ import android.os.Looper
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.rehab2.BuildConfig
 import com.rehab2.update.ApkDownloadManager
 import com.rehab2.update.GitHubUpdateClient
 
@@ -16,6 +15,7 @@ class BackupSettingsActivity : AppCompatActivity() {
     private lateinit var txtUpdateStatus: TextView
     private lateinit var txtReleaseNotes: TextView
     private lateinit var btnDownloadApk: Button
+    private lateinit var currentVersionName: String
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val updateClient = GitHubUpdateClient()
@@ -32,8 +32,11 @@ class BackupSettingsActivity : AppCompatActivity() {
         txtUpdateStatus = findViewById(R.id.txtUpdateStatus)
         txtReleaseNotes = findViewById(R.id.txtReleaseNotes)
         btnDownloadApk = findViewById(R.id.btnDownloadApk)
+        @Suppress("DEPRECATION")
+        val packageInfo = packageManager.getPackageInfo(packageName, 0)
+        currentVersionName = packageInfo.versionName ?: "unknown"
 
-        txtCurrentVersion.text = "Trenutna verzija: ${BuildConfig.VERSION_NAME}"
+        txtCurrentVersion.text = "Trenutna verzija: $currentVersionName"
         txtLatestVersion.text = "Zadnja verzija: -"
         txtUpdateStatus.text = ""
         txtReleaseNotes.text = ""
@@ -61,7 +64,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             try {
                 val release = updateClient.fetchLatestRelease()
                 val remoteVersion = release.tagName.removePrefix("v")
-                val comparison = compareVersions(remoteVersion, BuildConfig.VERSION_NAME)
+                val comparison = compareVersions(remoteVersion, currentVersionName)
 
                 mainHandler.post {
                     latestRelease = release
