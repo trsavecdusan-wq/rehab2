@@ -9,6 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:usesCleartextTraffic="true">
+        <activity android:name=".BackupSettingsActivity" />
         <activity android:name=".LocalMusicActivity" />
         <activity android:name=".RadioStationEditActivity" />
         <activity android:name=".RadioPreviewActivity" />

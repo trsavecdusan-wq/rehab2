@@ -17,5 +17,9 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnRadioSettings).setOnClickListener {
             startActivity(Intent(this, RadioSettingsActivity::class.java))
         }
+
+        findViewById<Button>(R.id.btnBackupSettings).setOnClickListener {
+            startActivity(Intent(this, BackupSettingsActivity::class.java))
+        }
     }
 }

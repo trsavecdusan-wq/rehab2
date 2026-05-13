@@ -56,11 +56,15 @@
         android:textColor="#F4F7FA"
         android:textSize="20sp" />
 
-    <TextView
+    <Button
+        android:id="@+id/btnBackupSettings"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
+        android:backgroundTint="#214A78"
         android:text="Nadgradnje"
+        android:textAllCaps="false"
         android:textColor="#F4F7FA"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
 </LinearLayout>
