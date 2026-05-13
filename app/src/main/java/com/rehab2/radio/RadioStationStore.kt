@@ -122,11 +122,11 @@ class RadioStationStore(private val context: Context) {
             )
         )
 
-        val occupantIndex = stations.withIndex().firstOrNull { indexed ->
-            indexed.index != currentIndex &&
-                indexed.value.page == normalized.page &&
-                indexed.value.position == normalized.position
-        }?.index
+        val occupantIndex = stations.indexOfFirst { existing ->
+            existing !== currentStation &&
+                existing.page == normalized.page &&
+                existing.position == normalized.position
+        }
 
         if (occupantIndex >= 0) {
             val occupant = stations[occupantIndex]
