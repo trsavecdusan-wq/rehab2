@@ -11,11 +11,21 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.rehab2.radio.RadioPlayerController
+import com.rehab2.radio.SavedRadioStation
 import com.rehab2.radio.RadioStationStore
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val RADIO_TILE_BLUE = 0xFF2F5F9E.toInt()
+        private const val RADIO_TILE_GREEN = 0xFF2E8B57.toInt()
+    }
+
     private lateinit var radioTiles: List<TextView>
     private lateinit var fallbackRadioLabels: List<CharSequence>
+    private lateinit var radioPlayerController: RadioPlayerController
+    private var visibleRadioStations: List<SavedRadioStation?> = List(6) { null }
+    private var activeStationKey: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +53,22 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.txtRadioTile6)
         )
         fallbackRadioLabels = radioTiles.map { it.text }
+        radioPlayerController = RadioPlayerController(this) { status ->
+            if (status == "Napaka pri predvajanju") {
+                runOnUiThread {
+                    Toast.makeText(this, "Postaja se ne predvaja", Toast.LENGTH_SHORT).show()
+                    radioPlayerController.stop()
+                    activeStationKey = null
+                    updateRadioTileColors()
+                }
+            }
+        }
+
+        radioTiles.forEachIndexed { index, textView ->
+            textView.setOnClickListener {
+                handleRadioTileClick(index)
+            }
+        }
 
         findViewById<View>(R.id.statusModule).setOnLongClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
@@ -80,14 +106,67 @@ class MainActivity : AppCompatActivity() {
         refreshRadioTiles()
     }
 
+    override fun onDestroy() {
+        radioPlayerController.release()
+        super.onDestroy()
+    }
+
     private fun refreshRadioTiles() {
         val stations = RadioStationStore(this)
             .getStationsForPage(1)
             .filter { it.visible }
 
+        visibleRadioStations = List(6) { index ->
+            stations.firstOrNull { it.position == index + 1 }
+        }
+
         radioTiles.forEachIndexed { index, textView ->
-            val station = stations.firstOrNull { it.position == index + 1 }
+            val station = visibleRadioStations[index]
             textView.text = station?.buttonLabel?.ifBlank { station.name } ?: fallbackRadioLabels[index]
+        }
+
+        if (activeStationKey != null) {
+            val stillVisible = visibleRadioStations.any { station ->
+                station != null && stationKey(station) == activeStationKey
+            }
+            if (!stillVisible) {
+                radioPlayerController.stop()
+                activeStationKey = null
+            }
+        }
+
+        updateRadioTileColors()
+    }
+
+    private fun handleRadioTileClick(index: Int) {
+        val station = visibleRadioStations.getOrNull(index)
+        if (station == null) {
+            Toast.makeText(this, "Ni postaje", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val key = stationKey(station)
+        if (activeStationKey == key) {
+            radioPlayerController.stop()
+            activeStationKey = null
+            updateRadioTileColors()
+            return
+        }
+
+        activeStationKey = key
+        updateRadioTileColors()
+        radioPlayerController.play(station.streamUrl)
+    }
+
+    private fun stationKey(station: SavedRadioStation): String {
+        return station.stationUuid.ifBlank { station.streamUrl }
+    }
+
+    private fun updateRadioTileColors() {
+        radioTiles.forEachIndexed { index, textView ->
+            val station = visibleRadioStations.getOrNull(index)
+            val isActive = station != null && activeStationKey == stationKey(station)
+            textView.setBackgroundColor(if (isActive) RADIO_TILE_GREEN else RADIO_TILE_BLUE)
         }
     }
 }

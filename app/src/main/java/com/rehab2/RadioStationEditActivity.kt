@@ -83,7 +83,7 @@ class RadioStationEditActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnDeleteStation).setOnClickListener {
             AlertDialog.Builder(this)
-                .setTitle("Izbriši postajo?")
+                .setTitle("Izbri\u0161i postajo?")
                 .setMessage("Postaja bo odstranjena iz seznama.")
                 .setNegativeButton("NE", null)
                 .setPositiveButton("DA") { _, _ ->
