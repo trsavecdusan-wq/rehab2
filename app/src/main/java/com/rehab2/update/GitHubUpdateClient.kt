@@ -17,18 +17,19 @@ class GitHubUpdateClient {
     )
 
     fun fetchLatestRelease(): ReleaseInfo {
-        val connection = URL(LATEST_RELEASE_URL).openConnection() as HttpURLConnection
+        val releaseUrl = URL(LATEST_RELEASE_URL)
+        val connection = releaseUrl.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.connectTimeout = 15000
         connection.readTimeout = 15000
         connection.setRequestProperty("Accept", "application/vnd.github+json")
-        connection.setRequestProperty("User-Agent", "rehab2-update-check")
+        connection.setRequestProperty("User-Agent", "NovaRehab-Updater")
 
         return try {
             val responseCode = connection.responseCode
             if (responseCode !in 200..299) {
                 val suffix = connection.responseMessage?.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""
-                throw IllegalStateException("Preverjanje ni uspelo: HTTP $responseCode$suffix")
+                throw IllegalStateException("Preverjanje ni uspelo: HTTP $responseCode$suffix ($LATEST_RELEASE_URL)")
             }
 
             val responseText = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
@@ -38,10 +39,10 @@ class GitHubUpdateClient {
             val assets = root.optJSONArray("assets") ?: JSONArray()
             val apkUrl = findApkUrl(assets)
             if (tagName.isBlank()) {
-                throw IllegalStateException("Preverjanje ni uspelo: neveljaven odgovor GitHub")
+                throw IllegalStateException("Preverjanje ni uspelo: neveljaven odgovor GitHub ($LATEST_RELEASE_URL)")
             }
             if (apkUrl.isNullOrBlank()) {
-                throw IllegalStateException("Preverjanje ni uspelo: manjka rehab-release.apk")
+                throw IllegalStateException("Preverjanje ni uspelo: manjka rehab-release.apk ($LATEST_RELEASE_URL)")
             }
 
             ReleaseInfo(
@@ -50,16 +51,20 @@ class GitHubUpdateClient {
                 apkUrl = apkUrl
             )
         } catch (_: SocketTimeoutException) {
-            throw IllegalStateException("Preverjanje ni uspelo: ni internetne povezave")
+            throw IllegalStateException("Preverjanje ni uspelo: ni internetne povezave ($LATEST_RELEASE_URL)")
         } catch (_: UnknownHostException) {
-            throw IllegalStateException("Preverjanje ni uspelo: ni internetne povezave")
+            throw IllegalStateException("Preverjanje ni uspelo: ni internetne povezave ($LATEST_RELEASE_URL)")
         } catch (_: JSONException) {
-            throw IllegalStateException("Preverjanje ni uspelo: neveljaven odgovor GitHub")
+            throw IllegalStateException("Preverjanje ni uspelo: neveljaven odgovor GitHub ($LATEST_RELEASE_URL)")
         } catch (_: IOException) {
-            throw IllegalStateException("Preverjanje ni uspelo: ni internetne povezave")
+            throw IllegalStateException("Preverjanje ni uspelo: ni internetne povezave ($LATEST_RELEASE_URL)")
         } finally {
             connection.disconnect()
         }
+    }
+
+    fun getLatestReleaseUrl(): String {
+        return LATEST_RELEASE_URL
     }
 
     private fun findApkUrl(assets: JSONArray): String? {

@@ -7,8 +7,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.provider.Settings
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +30,7 @@ class BackupSettingsActivity : AppCompatActivity() {
     private val updateClient = GitHubUpdateClient()
     private lateinit var downloadManager: ApkDownloadManager
     private var latestRelease: GitHubUpdateClient.ReleaseInfo? = null
+    private val checkedReleaseUrl: String by lazy { updateClient.getLatestReleaseUrl() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,8 +54,8 @@ class BackupSettingsActivity : AppCompatActivity() {
 
         txtCurrentVersion.text = "Trenutna verzija: $currentVersionName ($currentVersionCode)"
         txtLatestVersion.text = "Zadnja verzija: -"
-        txtUpdateStatus.text = ""
-        txtReleaseNotes.text = ""
+        txtUpdateStatus.text = "Preverjen URL: $checkedReleaseUrl"
+        txtReleaseNotes.text = "Preverjen URL: $checkedReleaseUrl"
 
         findViewById<Button>(R.id.btnBackBackupSettings).setOnClickListener {
             finish()
@@ -72,8 +73,8 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun checkForUpdate() {
         btnDownloadApk.isEnabled = false
-        txtUpdateStatus.text = "Preverjam..."
-        txtReleaseNotes.text = ""
+        txtUpdateStatus.text = "Preverjam...\nURL: $checkedReleaseUrl"
+        txtReleaseNotes.text = "Preverjen URL: $checkedReleaseUrl"
 
         Thread {
             try {
@@ -84,14 +85,18 @@ class BackupSettingsActivity : AppCompatActivity() {
                 mainHandler.post {
                     latestRelease = release
                     txtLatestVersion.text = "Zadnja verzija: $remoteVersion"
+                    txtReleaseNotes.text = buildString {
+                        append("Preverjen URL: ").append(checkedReleaseUrl)
+                        if (release.body.isNotBlank()) {
+                            append("\n\n").append(release.body)
+                        }
+                    }
 
                     if (comparison > 0 && !release.apkUrl.isNullOrBlank()) {
-                        txtUpdateStatus.text = "Nova verzija na voljo"
-                        txtReleaseNotes.text = release.body
+                        txtUpdateStatus.text = "Nova verzija na voljo\nURL: $checkedReleaseUrl"
                         btnDownloadApk.isEnabled = true
                     } else {
-                        txtUpdateStatus.text = "Ni nove posodobitve"
-                        txtReleaseNotes.text = release.body
+                        txtUpdateStatus.text = "Ni nove posodobitve\nURL: $checkedReleaseUrl"
                         btnDownloadApk.isEnabled = false
                     }
                 }
@@ -99,9 +104,19 @@ class BackupSettingsActivity : AppCompatActivity() {
                 val message = error.message?.takeIf { it.isNotBlank() } ?: "Preverjanje ni uspelo"
                 Log.e("NovaRehabUpdater", "Update check failed: $message", error)
                 mainHandler.post {
-                    txtUpdateStatus.text = message
-                    txtReleaseNotes.text = ""
+                    latestRelease = null
                     btnDownloadApk.isEnabled = false
+                    txtUpdateStatus.text = if (message.contains("HTTP 404")) {
+                        "Posodobitve ni mogoče preveriti. GitHub release ni dosegljiv.\nURL: $checkedReleaseUrl"
+                    } else {
+                        "$message\nURL: $checkedReleaseUrl"
+                    }
+                    txtReleaseNotes.text = buildString {
+                        append("Preverjen URL: ").append(checkedReleaseUrl)
+                        if (message.contains("HTTP 404")) {
+                            append("\n\nČe je repozitorij zaseben, posodabljanje brez javnega GitHub release URL ne more delovati.")
+                        }
+                    }
                 }
             }
         }.start()
@@ -122,10 +137,11 @@ class BackupSettingsActivity : AppCompatActivity() {
                 if (result.success && result.file != null) {
                     txtUpdateStatus.text = "APK prenesen: ${result.file.absolutePath}"
                     openInstallHandoff(result.file)
+                    btnDownloadApk.isEnabled = latestRelease?.apkUrl?.isNotBlank() == true
                 } else {
                     txtUpdateStatus.text = result.message
+                    btnDownloadApk.isEnabled = false
                 }
-                btnDownloadApk.isEnabled = latestRelease?.apkUrl?.isNotBlank() == true
             }
         }.start()
     }
