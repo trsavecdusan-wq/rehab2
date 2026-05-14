@@ -2,6 +2,7 @@ package com.rehab2
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -18,10 +19,17 @@ import com.rehab2.update.GitHubUpdateClient
 import java.io.File
 
 class BackupSettingsActivity : AppCompatActivity() {
+    companion object {
+        private const val CHECK_BUTTON_COLOR = 0xFF214A78.toInt()
+        private const val DOWNLOAD_BUTTON_COLOR = 0xFF3E7C4A.toInt()
+        private const val BUSY_BUTTON_COLOR = 0xFF5B6672.toInt()
+    }
+
     private lateinit var txtCurrentVersion: TextView
     private lateinit var txtLatestVersion: TextView
     private lateinit var txtUpdateStatus: TextView
     private lateinit var txtReleaseNotes: TextView
+    private lateinit var btnCheckUpdate: Button
     private lateinit var btnDownloadApk: Button
     private lateinit var currentVersionName: String
     private var currentVersionCode: Long = 0L
@@ -41,6 +49,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         txtLatestVersion = findViewById(R.id.txtLatestVersion)
         txtUpdateStatus = findViewById(R.id.txtUpdateStatus)
         txtReleaseNotes = findViewById(R.id.txtReleaseNotes)
+        btnCheckUpdate = findViewById(R.id.btnCheckUpdate)
         btnDownloadApk = findViewById(R.id.btnDownloadApk)
         @Suppress("DEPRECATION")
         val packageInfo = packageManager.getPackageInfo(packageName, 0)
@@ -54,14 +63,14 @@ class BackupSettingsActivity : AppCompatActivity() {
 
         txtCurrentVersion.text = "Trenutna verzija: $currentVersionName ($currentVersionCode)"
         txtLatestVersion.text = "Zadnja verzija: -"
-        txtUpdateStatus.text = "Preverjen URL: $checkedReleaseUrl"
-        txtReleaseNotes.text = "Preverjen URL: $checkedReleaseUrl"
+        txtUpdateStatus.text = ""
+        txtReleaseNotes.text = ""
 
         findViewById<Button>(R.id.btnBackBackupSettings).setOnClickListener {
             finish()
         }
 
-        findViewById<Button>(R.id.btnCheckUpdate).setOnClickListener {
+        btnCheckUpdate.setOnClickListener {
             checkForUpdate()
         }
 
@@ -72,9 +81,10 @@ class BackupSettingsActivity : AppCompatActivity() {
     }
 
     private fun checkForUpdate() {
+        setCheckButtonLoading(true)
         btnDownloadApk.isEnabled = false
-        txtUpdateStatus.text = "Preverjam...\nURL: $checkedReleaseUrl"
-        txtReleaseNotes.text = "Preverjen URL: $checkedReleaseUrl"
+        txtUpdateStatus.text = "Preverjam posodobitev ..."
+        txtReleaseNotes.text = ""
 
         Thread {
             try {
@@ -85,20 +95,16 @@ class BackupSettingsActivity : AppCompatActivity() {
                 mainHandler.post {
                     latestRelease = release
                     txtLatestVersion.text = "Zadnja verzija: $remoteVersion"
-                    txtReleaseNotes.text = buildString {
-                        append(release.debugSummary)
-                        if (release.body.isNotBlank()) {
-                            append("\n\n").append(release.body)
-                        }
-                    }
+                    txtReleaseNotes.text = release.body
 
                     if (comparison > 0 && !release.apkUrl.isNullOrBlank()) {
-                        txtUpdateStatus.text = "Nova verzija na voljo\nURL: $checkedReleaseUrl"
+                        txtUpdateStatus.text = "Posodobitev je na voljo: $remoteVersion"
                         btnDownloadApk.isEnabled = true
                     } else {
-                        txtUpdateStatus.text = "Ni nove posodobitve\nURL: $checkedReleaseUrl"
+                        txtUpdateStatus.text = "Ni nove posodobitve."
                         btnDownloadApk.isEnabled = false
                     }
+                    setCheckButtonLoading(false)
                 }
             } catch (error: Exception) {
                 val message = error.message?.takeIf { it.isNotBlank() } ?: "Preverjanje ni uspelo"
@@ -106,29 +112,9 @@ class BackupSettingsActivity : AppCompatActivity() {
                 mainHandler.post {
                     latestRelease = null
                     btnDownloadApk.isEnabled = false
-                    txtUpdateStatus.text = if (
-                        message.contains("HTTP 404") || message.contains("GitHub release ni dosegljiv")
-                    ) {
-                        "Posodobitve ni mogoče preveriti.\nGitHub release ni dosegljiv."
-                    } else {
-                        message
-                    }
-                    val debugSummary =
-                        if (error is GitHubUpdateClient.UpdateCheckException) {
-                            error.debugSummary
-                        } else {
-                            buildString {
-                                appendLine("URL: $checkedReleaseUrl")
-                                appendLine("Napaka: ${error.javaClass.name}")
-                                append("Sporočilo: ${error.message ?: "-"}")
-                            }.trim()
-                        }
-                    txtReleaseNotes.text = buildString {
-                        append(debugSummary)
-                        if (message.contains("HTTP 404") || message.contains("GitHub release ni dosegljiv")) {
-                            append("\n\nČe je repozitorij zaseben, posodabljanje brez javnega GitHub release URL ne more delovati.")
-                        }
-                    }
+                    txtUpdateStatus.text = toUserFriendlyCheckStatus(message)
+                    txtReleaseNotes.text = ""
+                    setCheckButtonLoading(false)
                 }
             }
         }.start()
@@ -136,23 +122,26 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun downloadLatestApk(release: GitHubUpdateClient.ReleaseInfo) {
         val apkUrl = release.apkUrl ?: return
-        btnDownloadApk.isEnabled = false
+        setDownloadButtonLoading(true)
+        txtUpdateStatus.text = "Prenašam APK ..."
 
         Thread {
             val result = downloadManager.downloadLatestApk(apkUrl) { status ->
                 mainHandler.post {
-                    txtUpdateStatus.text = status
+                    txtUpdateStatus.text = when {
+                        status.contains("Prena") -> "Prenašam APK ..."
+                        else -> txtUpdateStatus.text
+                    }
                 }
             }
 
             mainHandler.post {
                 if (result.success && result.file != null) {
-                    txtUpdateStatus.text = "APK prenesen: ${result.file.absolutePath}"
+                    txtUpdateStatus.text = "Prenos končan. Odpiram namestitev ..."
                     openInstallHandoff(result.file)
-                    btnDownloadApk.isEnabled = latestRelease?.apkUrl?.isNotBlank() == true
                 } else {
-                    txtUpdateStatus.text = result.message
-                    btnDownloadApk.isEnabled = false
+                    txtUpdateStatus.text = toUserFriendlyDownloadStatus(result.message)
+                    restoreDownloadButtonState()
                 }
             }
         }.start()
@@ -176,6 +165,7 @@ class BackupSettingsActivity : AppCompatActivity() {
     private fun openInstallHandoff(apkFile: File) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
             txtUpdateStatus.text = "Dovoli nameščanje iz te aplikacije in poskusi znova."
+            restoreDownloadButtonState()
             openUnknownAppsSettings()
             return
         }
@@ -194,9 +184,12 @@ class BackupSettingsActivity : AppCompatActivity() {
 
         try {
             startActivity(installIntent)
+            txtUpdateStatus.text = "Namestitev je bila predana Androidu."
+            restoreDownloadButtonState()
         } catch (error: ActivityNotFoundException) {
             Log.e("NovaRehabUpdater", "Installer handoff failed", error)
             txtUpdateStatus.text = "Namestitve ni bilo mogoče odpreti."
+            restoreDownloadButtonState()
         }
     }
 
@@ -209,6 +202,49 @@ class BackupSettingsActivity : AppCompatActivity() {
             startActivity(intent)
         } catch (error: ActivityNotFoundException) {
             Log.e("NovaRehabUpdater", "Unknown app sources settings unavailable", error)
+        }
+    }
+
+    private fun setCheckButtonLoading(isLoading: Boolean) {
+        btnCheckUpdate.isEnabled = !isLoading
+        btnCheckUpdate.text = if (isLoading) "PREVERJANJE..." else "PREVERI POSODOBITEV"
+        btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(
+            if (isLoading) BUSY_BUTTON_COLOR else CHECK_BUTTON_COLOR
+        )
+    }
+
+    private fun setDownloadButtonLoading(isLoading: Boolean) {
+        btnDownloadApk.isEnabled = !isLoading
+        btnDownloadApk.text = if (isLoading) "PRENAŠANJE..." else "PRENESI APK"
+        btnDownloadApk.backgroundTintList = ColorStateList.valueOf(
+            if (isLoading) BUSY_BUTTON_COLOR else DOWNLOAD_BUTTON_COLOR
+        )
+    }
+
+    private fun restoreDownloadButtonState() {
+        setDownloadButtonLoading(false)
+        btnDownloadApk.isEnabled = latestRelease?.apkUrl?.isNotBlank() == true
+    }
+
+    private fun toUserFriendlyCheckStatus(message: String): String {
+        return when {
+            message.contains("ni internetne povezave", ignoreCase = true) -> "Ni internetne povezave."
+            message.contains("APK asset ni najden", ignoreCase = true) ||
+                message.contains("apk datoteka ni najdena", ignoreCase = true) ||
+                message.contains("manjka rehab-release.apk", ignoreCase = true) ->
+                "APK datoteka ni najdena v release-u."
+            message.contains("HTTP 404", ignoreCase = true) ||
+                message.contains("GitHub release ni dosegljiv", ignoreCase = true) ->
+                "Napaka pri preverjanju posodobitve.\nGitHub release ni dosegljiv."
+            else -> "Napaka pri preverjanju posodobitve."
+        }
+    }
+
+    private fun toUserFriendlyDownloadStatus(message: String): String {
+        return when {
+            message.contains("ni internetne povezave", ignoreCase = true) -> "Napaka pri prenosu APK.\nNi internetne povezave."
+            message.contains("časovna omejitev", ignoreCase = true) -> "Napaka pri prenosu APK.\nPovezava je potekla."
+            else -> "Napaka pri prenosu APK."
         }
     }
 }
