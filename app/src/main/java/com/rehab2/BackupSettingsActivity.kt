@@ -86,7 +86,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                     latestRelease = release
                     txtLatestVersion.text = "Zadnja verzija: $remoteVersion"
                     txtReleaseNotes.text = buildString {
-                        append("Preverjen URL: ").append(checkedReleaseUrl)
+                        append(release.debugSummary)
                         if (release.body.isNotBlank()) {
                             append("\n\n").append(release.body)
                         }
@@ -106,14 +106,26 @@ class BackupSettingsActivity : AppCompatActivity() {
                 mainHandler.post {
                     latestRelease = null
                     btnDownloadApk.isEnabled = false
-                    txtUpdateStatus.text = if (message.contains("HTTP 404")) {
-                        "Posodobitve ni mogoče preveriti. GitHub release ni dosegljiv.\nURL: $checkedReleaseUrl"
+                    txtUpdateStatus.text = if (
+                        message.contains("HTTP 404") || message.contains("GitHub release ni dosegljiv")
+                    ) {
+                        "Posodobitve ni mogoče preveriti.\nGitHub release ni dosegljiv."
                     } else {
-                        "$message\nURL: $checkedReleaseUrl"
+                        message
                     }
+                    val debugSummary =
+                        if (error is GitHubUpdateClient.UpdateCheckException) {
+                            error.debugSummary
+                        } else {
+                            buildString {
+                                appendLine("URL: $checkedReleaseUrl")
+                                appendLine("Napaka: ${error.javaClass.name}")
+                                append("Sporočilo: ${error.message ?: "-"}")
+                            }.trim()
+                        }
                     txtReleaseNotes.text = buildString {
-                        append("Preverjen URL: ").append(checkedReleaseUrl)
-                        if (message.contains("HTTP 404")) {
+                        append(debugSummary)
+                        if (message.contains("HTTP 404") || message.contains("GitHub release ni dosegljiv")) {
                             append("\n\nČe je repozitorij zaseben, posodabljanje brez javnega GitHub release URL ne more delovati.")
                         }
                     }
