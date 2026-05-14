@@ -17,12 +17,15 @@ import androidx.core.content.FileProvider
 import com.rehab2.update.ApkDownloadManager
 import com.rehab2.update.GitHubUpdateClient
 import java.io.File
+import java.io.IOException
 
 class BackupSettingsActivity : AppCompatActivity() {
     companion object {
         private const val CHECK_BUTTON_COLOR = 0xFF214A78.toInt()
         private const val DOWNLOAD_BUTTON_COLOR = 0xFF3E7C4A.toInt()
+        private const val RESTORE_BUTTON_COLOR = 0xFF7A5A2A.toInt()
         private const val BUSY_BUTTON_COLOR = 0xFF5B6672.toInt()
+        private const val RESTORE_STAGED_FILE_NAME = "NovaRehab_restore.apk"
     }
 
     private lateinit var txtCurrentVersion: TextView
@@ -31,6 +34,7 @@ class BackupSettingsActivity : AppCompatActivity() {
     private lateinit var txtReleaseNotes: TextView
     private lateinit var btnCheckUpdate: Button
     private lateinit var btnDownloadApk: Button
+    private lateinit var btnRestorePreviousVersion: Button
     private lateinit var currentVersionName: String
     private var currentVersionCode: Long = 0L
 
@@ -38,7 +42,6 @@ class BackupSettingsActivity : AppCompatActivity() {
     private val updateClient = GitHubUpdateClient()
     private lateinit var downloadManager: ApkDownloadManager
     private var latestRelease: GitHubUpdateClient.ReleaseInfo? = null
-    private val checkedReleaseUrl: String by lazy { updateClient.getLatestReleaseUrl() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +54,8 @@ class BackupSettingsActivity : AppCompatActivity() {
         txtReleaseNotes = findViewById(R.id.txtReleaseNotes)
         btnCheckUpdate = findViewById(R.id.btnCheckUpdate)
         btnDownloadApk = findViewById(R.id.btnDownloadApk)
+        btnRestorePreviousVersion = findViewById(R.id.btnRestorePreviousVersion)
+
         @Suppress("DEPRECATION")
         val packageInfo = packageManager.getPackageInfo(packageName, 0)
         currentVersionName = packageInfo.versionName ?: "unknown"
@@ -78,6 +83,17 @@ class BackupSettingsActivity : AppCompatActivity() {
             val release = latestRelease ?: return@setOnClickListener
             downloadLatestApk(release)
         }
+
+        btnRestorePreviousVersion.setOnClickListener {
+            restorePreviousVersion()
+        }
+
+        refreshRestoreButtonState()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshRestoreButtonState()
     }
 
     private fun checkForUpdate() {
@@ -123,21 +139,26 @@ class BackupSettingsActivity : AppCompatActivity() {
     private fun downloadLatestApk(release: GitHubUpdateClient.ReleaseInfo) {
         val apkUrl = release.apkUrl ?: return
         setDownloadButtonLoading(true)
-        txtUpdateStatus.text = "Prenašam APK ..."
+        txtUpdateStatus.text = "Prena\u0161am APK ..."
 
         Thread {
             val result = downloadManager.downloadLatestApk(apkUrl) { status ->
                 mainHandler.post {
-                    txtUpdateStatus.text = when {
-                        status.contains("Prena") -> "Prenašam APK ..."
-                        else -> txtUpdateStatus.text
+                    if (status.contains("Prena", ignoreCase = true)) {
+                        txtUpdateStatus.text = "Prena\u0161am APK ..."
                     }
                 }
             }
 
             mainHandler.post {
                 if (result.success && result.file != null) {
-                    txtUpdateStatus.text = "Prenos končan. Odpiram namestitev ..."
+                    val backupPrepared = prepareInstalledApkBackup()
+                    txtUpdateStatus.text = if (backupPrepared) {
+                        "Varnostna kopija pripravljena.\nPrenos kon\u010dan. Odpiram namestitev ..."
+                    } else {
+                        "Varnostne kopije ni bilo mogo\u010de pripraviti.\nPrenos kon\u010dan. Odpiram namestitev ..."
+                    }
+                    refreshRestoreButtonState()
                     openInstallHandoff(result.file)
                 } else {
                     txtUpdateStatus.text = toUserFriendlyDownloadStatus(result.message)
@@ -145,6 +166,105 @@ class BackupSettingsActivity : AppCompatActivity() {
                 }
             }
         }.start()
+    }
+
+    private fun restorePreviousVersion() {
+        val backupFile = getBackupApkFile()
+        if (!backupFile.exists() || backupFile.length() <= 0L) {
+            txtUpdateStatus.text = "Prej\u0161nja verzija ni na voljo."
+            refreshRestoreButtonState()
+            return
+        }
+
+        txtUpdateStatus.text = "Odpiram obnovitev prej\u0161nje verzije ..."
+        val stagedRestoreFile = stageBackupForRestore(backupFile)
+        if (stagedRestoreFile == null) {
+            txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
+            refreshRestoreButtonState()
+            return
+        }
+
+        openInstallHandoff(stagedRestoreFile)
+    }
+
+    private fun prepareInstalledApkBackup(): Boolean {
+        return try {
+            val sourceApk = File(applicationInfo.sourceDir)
+            if (!sourceApk.exists() || sourceApk.length() <= 0L) {
+                return false
+            }
+
+            val backupDir = getBackupDirectory().apply { mkdirs() }
+            if (!backupDir.exists()) {
+                return false
+            }
+
+            val backupFile = getBackupApkFile()
+            val tempFile = File(backupDir, "${backupFile.name}.tmp")
+            if (tempFile.exists()) {
+                tempFile.delete()
+            }
+
+            sourceApk.inputStream().use { input ->
+                tempFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            if (!tempFile.exists() || tempFile.length() <= 0L) {
+                tempFile.delete()
+                return false
+            }
+
+            if (backupFile.exists() && !backupFile.delete()) {
+                tempFile.delete()
+                return false
+            }
+
+            if (!tempFile.renameTo(backupFile)) {
+                tempFile.copyTo(backupFile, overwrite = true)
+                tempFile.delete()
+            }
+
+            backupFile.exists() && backupFile.length() > 0L
+        } catch (error: IOException) {
+            Log.e("NovaRehabUpdater", "Backup copy failed", error)
+            false
+        } catch (error: SecurityException) {
+            Log.e("NovaRehabUpdater", "Backup copy blocked", error)
+            false
+        }
+    }
+
+    private fun stageBackupForRestore(backupFile: File): File? {
+        return try {
+            val updatesDir = File(filesDir, "updates").apply { mkdirs() }
+            val stagedFile = File(updatesDir, RESTORE_STAGED_FILE_NAME)
+            if (stagedFile.exists()) {
+                stagedFile.delete()
+            }
+            backupFile.copyTo(stagedFile, overwrite = true)
+            if (stagedFile.exists() && stagedFile.length() > 0L) stagedFile else null
+        } catch (error: IOException) {
+            Log.e("NovaRehabUpdater", "Restore staging failed", error)
+            null
+        }
+    }
+
+    private fun getBackupDirectory(): File {
+        return File("/storage/emulated/0/NovaRehab/backups")
+    }
+
+    private fun getBackupApkFile(): File {
+        return File(getBackupDirectory(), "NovaRehab_last_working.apk")
+    }
+
+    private fun refreshRestoreButtonState() {
+        val hasBackup = getBackupApkFile().exists() && getBackupApkFile().length() > 0L
+        btnRestorePreviousVersion.isEnabled = hasBackup
+        btnRestorePreviousVersion.backgroundTintList = ColorStateList.valueOf(
+            if (hasBackup) RESTORE_BUTTON_COLOR else BUSY_BUTTON_COLOR
+        )
     }
 
     private fun compareVersions(remote: String, local: String): Int {
@@ -164,7 +284,7 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun openInstallHandoff(apkFile: File) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
-            txtUpdateStatus.text = "Dovoli nameščanje iz te aplikacije in poskusi znova."
+            txtUpdateStatus.text = "Dovoli name\u0161\u010danje iz te aplikacije in poskusi znova."
             restoreDownloadButtonState()
             openUnknownAppsSettings()
             return
@@ -188,7 +308,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             restoreDownloadButtonState()
         } catch (error: ActivityNotFoundException) {
             Log.e("NovaRehabUpdater", "Installer handoff failed", error)
-            txtUpdateStatus.text = "Namestitve ni bilo mogoče odpreti."
+            txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
             restoreDownloadButtonState()
         }
     }
@@ -215,7 +335,7 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun setDownloadButtonLoading(isLoading: Boolean) {
         btnDownloadApk.isEnabled = !isLoading
-        btnDownloadApk.text = if (isLoading) "PRENAŠANJE..." else "PRENESI APK"
+        btnDownloadApk.text = if (isLoading) "PRENA\u0160ANJE..." else "PRENESI APK"
         btnDownloadApk.backgroundTintList = ColorStateList.valueOf(
             if (isLoading) BUSY_BUTTON_COLOR else DOWNLOAD_BUTTON_COLOR
         )
@@ -242,8 +362,10 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun toUserFriendlyDownloadStatus(message: String): String {
         return when {
-            message.contains("ni internetne povezave", ignoreCase = true) -> "Napaka pri prenosu APK.\nNi internetne povezave."
-            message.contains("časovna omejitev", ignoreCase = true) -> "Napaka pri prenosu APK.\nPovezava je potekla."
+            message.contains("ni internetne povezave", ignoreCase = true) ->
+                "Napaka pri prenosu APK.\nNi internetne povezave."
+            message.contains("časovna omejitev", ignoreCase = true) ->
+                "Napaka pri prenosu APK.\nPovezava je potekla."
             else -> "Napaka pri prenosu APK."
         }
     }
