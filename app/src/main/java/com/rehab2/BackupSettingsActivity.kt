@@ -37,6 +37,7 @@ class BackupSettingsActivity : AppCompatActivity() {
     private lateinit var btnRestorePreviousVersion: Button
     private lateinit var currentVersionName: String
     private var currentVersionCode: Long = 0L
+    private var latestReleaseBody: String = ""
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val updateClient = GitHubUpdateClient()
@@ -69,7 +70,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         txtCurrentVersion.text = "Trenutna verzija: $currentVersionName ($currentVersionCode)"
         txtLatestVersion.text = "Zadnja verzija: -"
         txtUpdateStatus.text = ""
-        txtReleaseNotes.text = ""
+        updateReleaseNotes()
 
         findViewById<Button>(R.id.btnBackBackupSettings).setOnClickListener {
             finish()
@@ -110,8 +111,9 @@ class BackupSettingsActivity : AppCompatActivity() {
 
                 mainHandler.post {
                     latestRelease = release
+                    latestReleaseBody = release.body
                     txtLatestVersion.text = "Zadnja verzija: $remoteVersion"
-                    txtReleaseNotes.text = release.body
+                    updateReleaseNotes()
 
                     if (comparison > 0 && !release.apkUrl.isNullOrBlank()) {
                         txtUpdateStatus.text = "Posodobitev je na voljo: $remoteVersion"
@@ -127,9 +129,10 @@ class BackupSettingsActivity : AppCompatActivity() {
                 Log.e("NovaRehabUpdater", "Update check failed: $message", error)
                 mainHandler.post {
                     latestRelease = null
+                    latestReleaseBody = ""
                     btnDownloadApk.isEnabled = false
                     txtUpdateStatus.text = toUserFriendlyCheckStatus(message)
-                    txtReleaseNotes.text = ""
+                    updateReleaseNotes()
                     setCheckButtonLoading(false)
                 }
             }
@@ -271,11 +274,13 @@ class BackupSettingsActivity : AppCompatActivity() {
     }
 
     private fun refreshRestoreButtonState() {
-        val hasBackup = getBackupApkFile().exists() && getBackupApkFile().length() > 0L
-        btnRestorePreviousVersion.isEnabled = hasBackup
+        val backupFile = getBackupApkFile()
+        val hasBackup = backupFile.exists() && backupFile.length() > 0L
+        btnRestorePreviousVersion.isEnabled = true
         btnRestorePreviousVersion.backgroundTintList = ColorStateList.valueOf(
             if (hasBackup) RESTORE_BUTTON_COLOR else BUSY_BUTTON_COLOR
         )
+        updateReleaseNotes()
     }
 
     private fun compareVersions(remote: String, local: String): Int {
@@ -315,7 +320,6 @@ class BackupSettingsActivity : AppCompatActivity() {
 
         try {
             startActivity(installIntent)
-            txtUpdateStatus.text = "Namestitev je bila predana Androidu."
             restoreDownloadButtonState()
         } catch (error: ActivityNotFoundException) {
             Log.e("NovaRehabUpdater", "Installer handoff failed", error)
@@ -378,6 +382,20 @@ class BackupSettingsActivity : AppCompatActivity() {
             message.contains("časovna omejitev", ignoreCase = true) ->
                 "Napaka pri prenosu APK.\nPovezava je potekla."
             else -> "Napaka pri prenosu APK."
+        }
+    }
+    private fun updateReleaseNotes() {
+        val backupFile = getBackupApkFile()
+        val backupSummary = if (backupFile.exists() && backupFile.length() > 0L) {
+            "Backup obstaja.\nVelikost backup APK: da"
+        } else {
+            "Backup ne obstaja.\nVelikost backup APK: ne"
+        }
+
+        txtReleaseNotes.text = if (latestReleaseBody.isNotBlank()) {
+            latestReleaseBody + "\n\n" + backupSummary
+        } else {
+            backupSummary
         }
     }
 }

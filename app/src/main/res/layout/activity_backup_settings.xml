@@ -80,7 +80,6 @@
             android:layout_height="72dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="#7A5A2A"
-            android:enabled="false"
             android:text="OBNOVI PREJŠNJO VERZIJO"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
