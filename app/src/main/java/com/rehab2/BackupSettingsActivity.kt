@@ -25,6 +25,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         private const val DOWNLOAD_BUTTON_COLOR = 0xFF3E7C4A.toInt()
         private const val RESTORE_BUTTON_COLOR = 0xFF7A5A2A.toInt()
         private const val BUSY_BUTTON_COLOR = 0xFF5B6672.toInt()
+        private const val CURRENT_RELEASE_FILE_NAME = "current_release.apk"
         private const val RESTORE_STAGED_FILE_NAME = "NovaRehab_restore.apk"
     }
 
@@ -155,14 +156,21 @@ class BackupSettingsActivity : AppCompatActivity() {
 
             mainHandler.post {
                 if (result.success && result.file != null) {
-                    val backupPrepared = prepareInstalledApkBackup()
+                    val backupPrepared = rotateReleaseBackupIfAvailable()
+                    val currentReleaseFile = promoteDownloadedRelease(result.file)
+                    if (currentReleaseFile == null) {
+                        txtUpdateStatus.text = "Napaka pri prenosu APK."
+                        restoreDownloadButtonState()
+                        return@post
+                    }
+
                     txtUpdateStatus.text = if (backupPrepared) {
                         "Varnostna kopija pripravljena.\nPrenos kon\u010dan. Odpiram namestitev ..."
                     } else {
                         "Varnostne kopije ni bilo mogo\u010de pripraviti.\nPrenos kon\u010dan. Odpiram namestitev ..."
                     }
                     refreshRestoreButtonState()
-                    openInstallHandoff(result.file)
+                    openInstallHandoff(currentReleaseFile)
                 } else {
                     txtUpdateStatus.text = toUserFriendlyDownloadStatus(result.message)
                     restoreDownloadButtonState()
@@ -190,12 +198,12 @@ class BackupSettingsActivity : AppCompatActivity() {
         openInstallHandoff(stagedRestoreFile)
     }
 
-    private fun prepareInstalledApkBackup(): Boolean {
+    private fun rotateReleaseBackupIfAvailable(): Boolean {
         return try {
-            val sourceApk = File(applicationInfo.sourceDir)
-            Log.i("NovaRehabUpdater", "Backup source APK: ${sourceApk.absolutePath}")
-            if (!sourceApk.exists() || sourceApk.length() <= 0L) {
-                Log.e("NovaRehabUpdater", "Backup source APK missing or empty")
+            val previousReleaseFile = File(getUpdatesDirectory(), CURRENT_RELEASE_FILE_NAME)
+            Log.i("NovaRehabUpdater", "Previous release APK: ${previousReleaseFile.absolutePath}")
+            if (!previousReleaseFile.exists() || previousReleaseFile.length() <= 0L) {
+                Log.e("NovaRehabUpdater", "Previous release APK missing or empty")
                 return false
             }
 
@@ -211,7 +219,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                 tempFile.delete()
             }
 
-            sourceApk.inputStream().use { input ->
+            previousReleaseFile.inputStream().use { input ->
                 tempFile.outputStream().use { output ->
                     input.copyTo(output)
                 }
@@ -265,8 +273,62 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun promoteDownloadedRelease(downloadedFile: File): File? {
+        return try {
+            val updatesDir = getUpdatesDirectory().apply { mkdirs() }
+            if (!updatesDir.exists()) {
+                Log.e("NovaRehabUpdater", "Updates directory could not be created")
+                return null
+            }
+
+            val currentReleaseFile = File(updatesDir, CURRENT_RELEASE_FILE_NAME)
+            val tempFile = File(updatesDir, "${currentReleaseFile.name}.tmp")
+            if (tempFile.exists()) {
+                tempFile.delete()
+            }
+
+            downloadedFile.inputStream().use { input ->
+                tempFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            if (!tempFile.exists() || tempFile.length() <= 0L) {
+                tempFile.delete()
+                Log.e("NovaRehabUpdater", "Downloaded release temp file missing or empty")
+                return null
+            }
+
+            if (currentReleaseFile.exists() && !currentReleaseFile.delete()) {
+                tempFile.delete()
+                Log.e("NovaRehabUpdater", "Current release APK could not be replaced")
+                return null
+            }
+
+            if (!tempFile.renameTo(currentReleaseFile)) {
+                tempFile.copyTo(currentReleaseFile, overwrite = true)
+                tempFile.delete()
+            }
+
+            if (currentReleaseFile.exists() && currentReleaseFile.length() > 0L) {
+                Log.i("NovaRehabUpdater", "Current release saved, file length=${currentReleaseFile.length()}")
+                currentReleaseFile
+            } else {
+                Log.e("NovaRehabUpdater", "Current release APK missing or empty after save")
+                null
+            }
+        } catch (error: IOException) {
+            Log.e("NovaRehabUpdater", "Current release save failed", error)
+            null
+        }
+    }
+
     private fun getBackupDirectory(): File {
         return File(filesDir, "backups")
+    }
+
+    private fun getUpdatesDirectory(): File {
+        return File(filesDir, "updates")
     }
 
     private fun getBackupApkFile(): File {
