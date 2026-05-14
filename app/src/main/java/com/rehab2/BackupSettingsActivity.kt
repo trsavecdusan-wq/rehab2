@@ -190,12 +190,15 @@ class BackupSettingsActivity : AppCompatActivity() {
     private fun prepareInstalledApkBackup(): Boolean {
         return try {
             val sourceApk = File(applicationInfo.sourceDir)
+            Log.i("NovaRehabUpdater", "Backup source APK: ${sourceApk.absolutePath}")
             if (!sourceApk.exists() || sourceApk.length() <= 0L) {
+                Log.e("NovaRehabUpdater", "Backup source APK missing or empty")
                 return false
             }
 
             val backupDir = getBackupDirectory().apply { mkdirs() }
             if (!backupDir.exists()) {
+                Log.e("NovaRehabUpdater", "Backup directory could not be created")
                 return false
             }
 
@@ -213,11 +216,13 @@ class BackupSettingsActivity : AppCompatActivity() {
 
             if (!tempFile.exists() || tempFile.length() <= 0L) {
                 tempFile.delete()
+                Log.e("NovaRehabUpdater", "Backup temp file missing or empty")
                 return false
             }
 
             if (backupFile.exists() && !backupFile.delete()) {
                 tempFile.delete()
+                Log.e("NovaRehabUpdater", "Previous backup could not be replaced")
                 return false
             }
 
@@ -226,7 +231,13 @@ class BackupSettingsActivity : AppCompatActivity() {
                 tempFile.delete()
             }
 
-            backupFile.exists() && backupFile.length() > 0L
+            val success = backupFile.exists() && backupFile.length() > 0L
+            if (success) {
+                Log.i("NovaRehabUpdater", "Backup success, file length=${backupFile.length()}")
+            } else {
+                Log.e("NovaRehabUpdater", "Backup failed, resulting file missing or empty")
+            }
+            success
         } catch (error: IOException) {
             Log.e("NovaRehabUpdater", "Backup copy failed", error)
             false
@@ -252,7 +263,7 @@ class BackupSettingsActivity : AppCompatActivity() {
     }
 
     private fun getBackupDirectory(): File {
-        return File("/storage/emulated/0/NovaRehab/backups")
+        return File(filesDir, "backups")
     }
 
     private fun getBackupApkFile(): File {
