@@ -37,8 +37,9 @@ class BackupSettingsActivity : AppCompatActivity() {
         private const val RESTORE_BUTTON_COLOR = 0xFF7A5A2A.toInt()
         private const val BUSY_BUTTON_COLOR = 0xFF5B6672.toInt()
         private const val RESTORE_RESULT_HINT_DELAY_MS = 3000L
-        private const val CURRENT_BACKUP_RELEASE_FILE_NAME = "NovaRehab_current_downloaded_release.apk"
-        private const val PREVIOUS_BACKUP_RELEASE_FILE_NAME = "NovaRehab_previous_downloaded_release.apk"
+        private const val CURRENT_INSTALLED_RELEASE_FILE_NAME = "NovaRehab_current_installed_release.apk"
+        private const val PREVIOUS_RESTORABLE_RELEASE_FILE_NAME = "NovaRehab_previous_restorable_release.apk"
+        private const val DOWNLOADED_RELEASE_FILE_NAME = "rehab-release.apk"
     }
 
     private lateinit var txtCurrentVersion: TextView
@@ -83,6 +84,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         txtCurrentVersion.text = "Trenutna verzija: $currentVersionName ($currentVersionCode)"
         txtLatestVersion.text = "Zadnja verzija: -"
         txtUpdateStatus.text = ""
+        syncCurrentInstalledReleaseIfNeeded()
         updateReleaseNotes()
 
         findViewById<Button>(R.id.btnBackBackupSettings).setOnClickListener {
@@ -107,6 +109,7 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        syncCurrentInstalledReleaseIfNeeded()
         refreshRestoreButtonState()
     }
 
@@ -169,7 +172,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             mainHandler.post {
                 val downloadedFile = result.file
                 if (result.success && downloadedFile != null) {
-                    val backupPrepared = rotateDownloadedReleaseBackups(downloadedFile)
+                    val backupPrepared = preparePreviousRestorableFromCurrentInstalled()
                     txtUpdateStatus.text = if (backupPrepared) {
                         "Varnostna kopija pripravljena.\nPrenos kon\u010dan. Odpiram namestitev ..."
                     } else {
@@ -203,89 +206,71 @@ class BackupSettingsActivity : AppCompatActivity() {
         }, RESTORE_RESULT_HINT_DELAY_MS)
     }
 
-    private fun rotateDownloadedReleaseBackups(downloadedFile: File): Boolean {
+    private fun syncCurrentInstalledReleaseIfNeeded() {
+        try {
+            val downloadedReleaseFile = getDownloadedReleaseApkFile()
+            if (!downloadedReleaseFile.exists() || downloadedReleaseFile.length() <= 0L) {
+                return
+            }
+
+            val downloadedReleaseInfo = readApkArchiveInfo(downloadedReleaseFile) ?: return
+            if (downloadedReleaseInfo.packageName != packageName ||
+                downloadedReleaseInfo.versionCode != currentVersionCode
+            ) {
+                return
+            }
+
+            val currentInstalledFile = getCurrentInstalledReleaseApkFile()
+            val currentInstalledInfo = readApkArchiveInfo(currentInstalledFile)
+            if (currentInstalledInfo?.packageName == packageName &&
+                currentInstalledInfo.versionCode == currentVersionCode
+            ) {
+                return
+            }
+
+            copyFileAtomically(
+                sourceFile = downloadedReleaseFile,
+                targetFile = currentInstalledFile,
+                copyLabel = "Current installed release"
+            )
+        } catch (error: IOException) {
+            Log.e("NovaRehabUpdater", "Current installed release sync failed", error)
+        } catch (error: SecurityException) {
+            Log.e("NovaRehabUpdater", "Current installed release sync blocked", error)
+        }
+    }
+
+    private fun preparePreviousRestorableFromCurrentInstalled(): Boolean {
         return try {
-            Log.i("NovaRehabUpdater", "Downloaded release APK: ${downloadedFile.absolutePath}")
-            if (!downloadedFile.exists() || downloadedFile.length() <= 0L) {
-                Log.e("NovaRehabUpdater", "Downloaded release APK missing or empty")
+            val currentInstalledFile = getCurrentInstalledReleaseApkFile()
+            Log.i("NovaRehabUpdater", "Current installed cache APK: ${currentInstalledFile.absolutePath}")
+            if (!currentInstalledFile.exists() || currentInstalledFile.length() <= 0L) {
+                Log.e("NovaRehabUpdater", "Current installed cache APK missing or empty")
                 return false
             }
 
-            val backupDir = getBackupDirectory().apply { mkdirs() }
-            if (!backupDir.exists()) {
-                Log.e("NovaRehabUpdater", "Backup directory could not be created")
+            val currentInstalledInfo = readApkArchiveInfo(currentInstalledFile)
+            if (currentInstalledInfo?.packageName != packageName ||
+                currentInstalledInfo.versionCode == null ||
+                currentInstalledInfo.versionCode != currentVersionCode
+            ) {
+                Log.e("NovaRehabUpdater", "Current installed cache APK does not match the currently installed version")
                 return false
             }
 
-            val currentFile = getCurrentBackupApkFile()
-            val previousFile = getPreviousBackupApkFile()
-
-            if (currentFile.exists() && currentFile.length() > 0L) {
-                val previousTempFile = File(backupDir, "${previousFile.name}.tmp")
-                if (previousTempFile.exists()) {
-                    previousTempFile.delete()
-                }
-
-                currentFile.inputStream().use { input ->
-                    previousTempFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
-                }
-
-                if (!previousTempFile.exists() || previousTempFile.length() <= 0L) {
-                    previousTempFile.delete()
-                    Log.e("NovaRehabUpdater", "Previous backup temp file missing or empty")
-                    return false
-                }
-
-                if (previousFile.exists() && !previousFile.delete()) {
-                    previousTempFile.delete()
-                    Log.e("NovaRehabUpdater", "Previous backup could not be replaced")
-                    return false
-                }
-
-                if (!previousTempFile.renameTo(previousFile)) {
-                    previousTempFile.copyTo(previousFile, overwrite = true)
-                    previousTempFile.delete()
-                }
-            }
-
-            val currentTempFile = File(backupDir, "${currentFile.name}.tmp")
-            if (currentTempFile.exists()) {
-                currentTempFile.delete()
-            }
-
-            downloadedFile.inputStream().use { input ->
-                currentTempFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-
-            if (!currentTempFile.exists() || currentTempFile.length() <= 0L) {
-                currentTempFile.delete()
-                Log.e("NovaRehabUpdater", "Current backup temp file missing or empty")
-                return false
-            }
-
-            if (currentFile.exists() && !currentFile.delete()) {
-                currentTempFile.delete()
-                Log.e("NovaRehabUpdater", "Current backup could not be replaced")
-                return false
-            }
-
-            if (!currentTempFile.renameTo(currentFile)) {
-                currentTempFile.copyTo(currentFile, overwrite = true)
-                currentTempFile.delete()
-            }
-
-            val success = currentFile.exists() && currentFile.length() > 0L
+            val previousRestorableFile = getPreviousRestorableReleaseApkFile()
+            val success = copyFileAtomically(
+                sourceFile = currentInstalledFile,
+                targetFile = previousRestorableFile,
+                copyLabel = "Previous restorable release"
+            )
             if (success) {
                 Log.i(
                     "NovaRehabUpdater",
-                    "Backup rotation success, current=${currentFile.length()}, previous=${if (previousFile.exists()) previousFile.length() else 0L}"
+                    "Prepared previous restorable release, size=${previousRestorableFile.length()}"
                 )
             } else {
-                Log.e("NovaRehabUpdater", "Backup rotation failed, current file missing or empty")
+                Log.e("NovaRehabUpdater", "Preparing previous restorable release failed")
             }
             success
         } catch (error: IOException) {
@@ -301,16 +286,20 @@ class BackupSettingsActivity : AppCompatActivity() {
         return File(filesDir, "backups")
     }
 
-    private fun getCurrentBackupApkFile(): File {
-        return File(getBackupDirectory(), CURRENT_BACKUP_RELEASE_FILE_NAME)
+    private fun getCurrentInstalledReleaseApkFile(): File {
+        return File(getBackupDirectory(), CURRENT_INSTALLED_RELEASE_FILE_NAME)
     }
 
-    private fun getPreviousBackupApkFile(): File {
-        return File(getBackupDirectory(), PREVIOUS_BACKUP_RELEASE_FILE_NAME)
+    private fun getPreviousRestorableReleaseApkFile(): File {
+        return File(getBackupDirectory(), PREVIOUS_RESTORABLE_RELEASE_FILE_NAME)
     }
 
     private fun getBackupApkFile(): File {
-        return getPreviousBackupApkFile()
+        return getPreviousRestorableReleaseApkFile()
+    }
+
+    private fun getDownloadedReleaseApkFile(): File {
+        return File(File(filesDir, "updates"), DOWNLOADED_RELEASE_FILE_NAME)
     }
 
     private fun refreshRestoreButtonState() {
@@ -474,25 +463,33 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun readBackupApkInfo(): BackupApkInfo {
         val backupFile = getBackupApkFile()
-        if (!backupFile.exists() || backupFile.length() <= 0L) {
-            return BackupApkInfo(
-                exists = false,
-                sizeBytes = 0L,
-                packageName = null,
-                versionName = null,
-                versionCode = null,
-                canRestore = false
-            )
+        val archiveInfo = readApkArchiveInfo(backupFile)
+        val backupVersionCode = archiveInfo?.versionCode
+        return BackupApkInfo(
+            exists = backupFile.exists() && backupFile.length() > 0L,
+            sizeBytes = if (backupFile.exists()) backupFile.length() else 0L,
+            packageName = archiveInfo?.packageName,
+            versionName = archiveInfo?.versionName,
+            versionCode = backupVersionCode,
+            canRestore = archiveInfo?.packageName == packageName &&
+                backupVersionCode != null &&
+                backupVersionCode < currentVersionCode
+        )
+    }
+
+    private fun readApkArchiveInfo(apkFile: File): BackupApkInfo? {
+        if (!apkFile.exists() || apkFile.length() <= 0L) {
+            return null
         }
 
         val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             packageManager.getPackageArchiveInfo(
-                backupFile.absolutePath,
+                apkFile.absolutePath,
                 PackageManager.PackageInfoFlags.of(0)
             )
         } else {
             @Suppress("DEPRECATION")
-            packageManager.getPackageArchiveInfo(backupFile.absolutePath, 0)
+            packageManager.getPackageArchiveInfo(apkFile.absolutePath, 0)
         }
 
         val backupPackageName = packageInfo?.packageName
@@ -506,17 +503,52 @@ class BackupSettingsActivity : AppCompatActivity() {
             packageInfo.versionCode.toLong()
         }
 
-        val canRestore = backupPackageName == packageName &&
-            backupVersionCode != null &&
-            backupVersionCode < currentVersionCode
         return BackupApkInfo(
-            exists = true,
-            sizeBytes = backupFile.length(),
+            exists = apkFile.exists() && apkFile.length() > 0L,
+            sizeBytes = apkFile.length(),
             packageName = backupPackageName,
             versionName = backupVersionName,
             versionCode = backupVersionCode,
-            canRestore = canRestore
+            canRestore = false
         )
+    }
+
+    private fun copyFileAtomically(sourceFile: File, targetFile: File, copyLabel: String): Boolean {
+        val parentDir = targetFile.parentFile?.apply { mkdirs() } ?: return false
+        if (!parentDir.exists()) {
+            Log.e("NovaRehabUpdater", "$copyLabel directory could not be created")
+            return false
+        }
+
+        val tempFile = File(parentDir, "${targetFile.name}.tmp")
+        if (tempFile.exists()) {
+            tempFile.delete()
+        }
+
+        sourceFile.inputStream().use { input ->
+            tempFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        if (!tempFile.exists() || tempFile.length() <= 0L) {
+            tempFile.delete()
+            Log.e("NovaRehabUpdater", "$copyLabel temp file missing or empty")
+            return false
+        }
+
+        if (targetFile.exists() && !targetFile.delete()) {
+            tempFile.delete()
+            Log.e("NovaRehabUpdater", "$copyLabel could not replace existing file")
+            return false
+        }
+
+        if (!tempFile.renameTo(targetFile)) {
+            tempFile.copyTo(targetFile, overwrite = true)
+            tempFile.delete()
+        }
+
+        return targetFile.exists() && targetFile.length() > 0L
     }
 
     private fun formatSizeInMb(sizeBytes: Long): String {
