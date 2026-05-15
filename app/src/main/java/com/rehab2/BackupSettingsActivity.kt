@@ -28,7 +28,8 @@ class BackupSettingsActivity : AppCompatActivity() {
         val packageName: String?,
         val versionName: String?,
         val versionCode: Long?,
-        val canRestore: Boolean
+        val canRestore: Boolean,
+        val downgradeBlocked: Boolean
     )
 
     data class ApkDiagnosticInfo(
@@ -199,8 +200,15 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun restorePreviousVersion() {
         val backupFile = getBackupApkFile()
+        val backupInfo = readBackupApkInfo()
         if (!backupFile.exists() || backupFile.length() <= 0L) {
             txtUpdateStatus.text = "Prej\u0161nja verzija ni na voljo."
+            refreshRestoreButtonState()
+            return
+        }
+        if (backupInfo.downgradeBlocked) {
+            txtUpdateStatus.text =
+                "Android ne dovoli neposredne namestitve starej\u0161e verzije. Za obnovitev je potrebna ro\u010dna odstranitev aplikacije ali posebna rollback izdaja."
             refreshRestoreButtonState()
             return
         }
@@ -464,6 +472,10 @@ class BackupSettingsActivity : AppCompatActivity() {
                     append("Backup APK ni bilo mogo\u010de prebrati.")
                 } else if (backupInfo.packageName != packageName) {
                     append("Backup APK ni za to aplikacijo.")
+                } else if (backupInfo.downgradeBlocked) {
+                    append(
+                        "Android ne dovoli neposredne namestitve starej\u0161e verzije. Za obnovitev je potrebna ro\u010dna odstranitev aplikacije ali posebna rollback izdaja."
+                    )
                 } else if (backupInfo.versionCode != null &&
                     backupInfo.versionCode >= currentVersionCode
                 ) {
@@ -483,15 +495,20 @@ class BackupSettingsActivity : AppCompatActivity() {
         val backupFile = getBackupApkFile()
         val archiveInfo = readApkArchiveInfo(backupFile)
         val backupVersionCode = archiveInfo?.versionCode
+        val samePackage = archiveInfo?.packageName == packageName
+        val downgradeBlocked = samePackage &&
+            backupVersionCode != null &&
+            backupVersionCode < currentVersionCode
         return BackupApkInfo(
             exists = backupFile.exists() && backupFile.length() > 0L,
             sizeBytes = if (backupFile.exists()) backupFile.length() else 0L,
             packageName = archiveInfo?.packageName,
             versionName = archiveInfo?.versionName,
             versionCode = backupVersionCode,
-            canRestore = archiveInfo?.packageName == packageName &&
+            canRestore = samePackage &&
                 backupVersionCode != null &&
-                backupVersionCode < currentVersionCode
+                backupVersionCode == currentVersionCode,
+            downgradeBlocked = downgradeBlocked
         )
     }
 
@@ -550,7 +567,8 @@ class BackupSettingsActivity : AppCompatActivity() {
             packageName = backupPackageName,
             versionName = backupVersionName,
             versionCode = backupVersionCode,
-            canRestore = false
+            canRestore = false,
+            downgradeBlocked = false
         )
     }
 
