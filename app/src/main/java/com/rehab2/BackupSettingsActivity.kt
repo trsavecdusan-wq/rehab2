@@ -222,8 +222,9 @@ class BackupSettingsActivity : AppCompatActivity() {
 
             val currentInstalledFile = getCurrentInstalledReleaseApkFile()
             val currentInstalledInfo = readApkArchiveInfo(currentInstalledFile)
+            val currentInstalledVersionCode = currentInstalledInfo?.versionCode
             if (currentInstalledInfo?.packageName == packageName &&
-                currentInstalledInfo.versionCode == currentVersionCode
+                currentInstalledVersionCode == currentVersionCode
             ) {
                 return
             }
@@ -250,9 +251,10 @@ class BackupSettingsActivity : AppCompatActivity() {
             }
 
             val currentInstalledInfo = readApkArchiveInfo(currentInstalledFile)
+            val currentInstalledVersionCode = currentInstalledInfo?.versionCode
             if (currentInstalledInfo?.packageName != packageName ||
-                currentInstalledInfo.versionCode == null ||
-                currentInstalledInfo.versionCode != currentVersionCode
+                currentInstalledVersionCode == null ||
+                currentInstalledVersionCode != currentVersionCode
             ) {
                 Log.e("NovaRehabUpdater", "Current installed cache APK does not match the currently installed version")
                 return false
