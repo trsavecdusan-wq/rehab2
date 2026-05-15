@@ -19,8 +19,8 @@ android {
         minSdk 21
         targetSdk 34
         // versionCode must increase for every future release.
-        versionCode 23
-        versionName "1.0.23"
+        versionCode 24
+        versionName "1.0.24"
     }
 
     signingConfigs {

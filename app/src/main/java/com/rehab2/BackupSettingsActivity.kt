@@ -26,7 +26,8 @@ class BackupSettingsActivity : AppCompatActivity() {
         private const val RESTORE_BUTTON_COLOR = 0xFF7A5A2A.toInt()
         private const val BUSY_BUTTON_COLOR = 0xFF5B6672.toInt()
         private const val RESTORE_RESULT_HINT_DELAY_MS = 3000L
-        private const val BACKUP_RELEASE_FILE_NAME = "NovaRehab_last_downloaded_release.apk"
+        private const val CURRENT_BACKUP_RELEASE_FILE_NAME = "NovaRehab_current_downloaded_release.apk"
+        private const val PREVIOUS_BACKUP_RELEASE_FILE_NAME = "NovaRehab_previous_downloaded_release.apk"
     }
 
     private lateinit var txtCurrentVersion: TextView
@@ -157,7 +158,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             mainHandler.post {
                 val downloadedFile = result.file
                 if (result.success && downloadedFile != null) {
-                    val backupPrepared = saveDownloadedReleaseBackup(downloadedFile)
+                    val backupPrepared = rotateDownloadedReleaseBackups(downloadedFile)
                     txtUpdateStatus.text = if (backupPrepared) {
                         "Varnostna kopija pripravljena.\nPrenos kon\u010dan. Odpiram namestitev ..."
                     } else {
@@ -191,7 +192,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         }, RESTORE_RESULT_HINT_DELAY_MS)
     }
 
-    private fun saveDownloadedReleaseBackup(downloadedFile: File): Boolean {
+    private fun rotateDownloadedReleaseBackups(downloadedFile: File): Boolean {
         return try {
             Log.i("NovaRehabUpdater", "Downloaded release APK: ${downloadedFile.absolutePath}")
             if (!downloadedFile.exists() || downloadedFile.length() <= 0L) {
@@ -205,40 +206,75 @@ class BackupSettingsActivity : AppCompatActivity() {
                 return false
             }
 
-            val backupFile = getBackupApkFile()
-            val tempFile = File(backupDir, "${backupFile.name}.tmp")
-            if (tempFile.exists()) {
-                tempFile.delete()
+            val currentFile = getCurrentBackupApkFile()
+            val previousFile = getPreviousBackupApkFile()
+
+            if (currentFile.exists() && currentFile.length() > 0L) {
+                val previousTempFile = File(backupDir, "${previousFile.name}.tmp")
+                if (previousTempFile.exists()) {
+                    previousTempFile.delete()
+                }
+
+                currentFile.inputStream().use { input ->
+                    previousTempFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+
+                if (!previousTempFile.exists() || previousTempFile.length() <= 0L) {
+                    previousTempFile.delete()
+                    Log.e("NovaRehabUpdater", "Previous backup temp file missing or empty")
+                    return false
+                }
+
+                if (previousFile.exists() && !previousFile.delete()) {
+                    previousTempFile.delete()
+                    Log.e("NovaRehabUpdater", "Previous backup could not be replaced")
+                    return false
+                }
+
+                if (!previousTempFile.renameTo(previousFile)) {
+                    previousTempFile.copyTo(previousFile, overwrite = true)
+                    previousTempFile.delete()
+                }
+            }
+
+            val currentTempFile = File(backupDir, "${currentFile.name}.tmp")
+            if (currentTempFile.exists()) {
+                currentTempFile.delete()
             }
 
             downloadedFile.inputStream().use { input ->
-                tempFile.outputStream().use { output ->
+                currentTempFile.outputStream().use { output ->
                     input.copyTo(output)
                 }
             }
 
-            if (!tempFile.exists() || tempFile.length() <= 0L) {
-                tempFile.delete()
-                Log.e("NovaRehabUpdater", "Backup temp file missing or empty")
+            if (!currentTempFile.exists() || currentTempFile.length() <= 0L) {
+                currentTempFile.delete()
+                Log.e("NovaRehabUpdater", "Current backup temp file missing or empty")
                 return false
             }
 
-            if (backupFile.exists() && !backupFile.delete()) {
-                tempFile.delete()
-                Log.e("NovaRehabUpdater", "Previous backup could not be replaced")
+            if (currentFile.exists() && !currentFile.delete()) {
+                currentTempFile.delete()
+                Log.e("NovaRehabUpdater", "Current backup could not be replaced")
                 return false
             }
 
-            if (!tempFile.renameTo(backupFile)) {
-                tempFile.copyTo(backupFile, overwrite = true)
-                tempFile.delete()
+            if (!currentTempFile.renameTo(currentFile)) {
+                currentTempFile.copyTo(currentFile, overwrite = true)
+                currentTempFile.delete()
             }
 
-            val success = backupFile.exists() && backupFile.length() > 0L
+            val success = currentFile.exists() && currentFile.length() > 0L
             if (success) {
-                Log.i("NovaRehabUpdater", "Backup success, file length=${backupFile.length()}")
+                Log.i(
+                    "NovaRehabUpdater",
+                    "Backup rotation success, current=${currentFile.length()}, previous=${if (previousFile.exists()) previousFile.length() else 0L}"
+                )
             } else {
-                Log.e("NovaRehabUpdater", "Backup failed, resulting file missing or empty")
+                Log.e("NovaRehabUpdater", "Backup rotation failed, current file missing or empty")
             }
             success
         } catch (error: IOException) {
@@ -254,8 +290,16 @@ class BackupSettingsActivity : AppCompatActivity() {
         return File(filesDir, "backups")
     }
 
+    private fun getCurrentBackupApkFile(): File {
+        return File(getBackupDirectory(), CURRENT_BACKUP_RELEASE_FILE_NAME)
+    }
+
+    private fun getPreviousBackupApkFile(): File {
+        return File(getBackupDirectory(), PREVIOUS_BACKUP_RELEASE_FILE_NAME)
+    }
+
     private fun getBackupApkFile(): File {
-        return File(getBackupDirectory(), BACKUP_RELEASE_FILE_NAME)
+        return getPreviousBackupApkFile()
     }
 
     private fun refreshRestoreButtonState() {
