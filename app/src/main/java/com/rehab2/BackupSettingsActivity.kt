@@ -291,23 +291,38 @@ class BackupSettingsActivity : AppCompatActivity() {
             return
         }
 
-        val apkUri: Uri = FileProvider.getUriForFile(
-            this,
-            "${packageName}.fileprovider",
-            apkFile
-        )
-
-        val installIntent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(apkUri, "application/vnd.android.package-archive")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (!apkFile.exists() || apkFile.length() <= 0L) {
+            Log.e("NovaRehabUpdater", "Installer handoff aborted, APK missing or empty")
+            txtUpdateStatus.text = "APK datoteka ni pripravljena."
+            restoreDownloadButtonState()
+            return
         }
 
         try {
+            val apkUri: Uri = FileProvider.getUriForFile(
+                this,
+                "${packageName}.fileprovider",
+                apkFile
+            )
+
+            val installIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(apkUri, "application/vnd.android.package-archive")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
             startActivity(installIntent)
             restoreDownloadButtonState()
         } catch (error: ActivityNotFoundException) {
             Log.e("NovaRehabUpdater", "Installer handoff failed", error)
+            txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
+            restoreDownloadButtonState()
+        } catch (error: SecurityException) {
+            Log.e("NovaRehabUpdater", "Installer handoff blocked by security policy", error)
+            txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
+            restoreDownloadButtonState()
+        } catch (error: Exception) {
+            Log.e("NovaRehabUpdater", "Installer handoff failed with unexpected error", error)
             txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
             restoreDownloadButtonState()
         }
