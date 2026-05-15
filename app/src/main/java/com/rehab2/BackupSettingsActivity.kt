@@ -2,6 +2,7 @@ package com.rehab2
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Build
@@ -18,8 +19,18 @@ import com.rehab2.update.ApkDownloadManager
 import com.rehab2.update.GitHubUpdateClient
 import java.io.File
 import java.io.IOException
+import java.util.Locale
 
 class BackupSettingsActivity : AppCompatActivity() {
+    data class BackupApkInfo(
+        val exists: Boolean,
+        val sizeBytes: Long,
+        val packageName: String?,
+        val versionName: String?,
+        val versionCode: Long?,
+        val canRestore: Boolean
+    )
+
     companion object {
         private const val CHECK_BUTTON_COLOR = 0xFF214A78.toInt()
         private const val DOWNLOAD_BUTTON_COLOR = 0xFF3E7C4A.toInt()
@@ -303,11 +314,10 @@ class BackupSettingsActivity : AppCompatActivity() {
     }
 
     private fun refreshRestoreButtonState() {
-        val backupFile = getBackupApkFile()
-        val hasBackup = backupFile.exists() && backupFile.length() > 0L
-        btnRestorePreviousVersion.isEnabled = true
+        val backupInfo = readBackupApkInfo()
+        btnRestorePreviousVersion.isEnabled = backupInfo.canRestore
         btnRestorePreviousVersion.backgroundTintList = ColorStateList.valueOf(
-            if (hasBackup) RESTORE_BUTTON_COLOR else BUSY_BUTTON_COLOR
+            if (backupInfo.canRestore) RESTORE_BUTTON_COLOR else BUSY_BUTTON_COLOR
         )
         updateReleaseNotes()
     }
@@ -430,11 +440,29 @@ class BackupSettingsActivity : AppCompatActivity() {
     }
 
     private fun updateReleaseNotes() {
-        val backupFile = getBackupApkFile()
-        val backupSummary = if (backupFile.exists() && backupFile.length() > 0L) {
-            "Backup obstaja.\nVelikost backup APK: da"
+        val backupInfo = readBackupApkInfo()
+        val backupSummary = if (backupInfo.exists) {
+            buildString {
+                appendLine("Backup obstaja.")
+                appendLine("Velikost backup APK: ${formatSizeInMb(backupInfo.sizeBytes)} MB")
+                if (backupInfo.packageName == null) {
+                    append("Backup APK ni bilo mogo\u010de prebrati.")
+                } else if (backupInfo.packageName != packageName) {
+                    append("Backup APK ni za to aplikacijo.")
+                } else if (!backupInfo.versionName.isNullOrBlank() && backupInfo.versionCode != null) {
+                    append("Backup verzija: ${backupInfo.versionName} (${backupInfo.versionCode})")
+                } else {
+                    append("Backup verzija: neznana")
+                }
+                if (backupInfo.packageName == packageName &&
+                    backupInfo.versionCode != null &&
+                    backupInfo.versionCode >= currentVersionCode
+                ) {
+                    append("\nBackup ni starej\u0161a verzija. Obnovitev ne bo vrnila prej\u0161nje verzije.")
+                }
+            }
         } else {
-            "Backup ne obstaja.\nVelikost backup APK: ne"
+            "Backup ne obstaja.\nVelikost backup APK: 0.0 MB"
         }
 
         txtReleaseNotes.text = if (latestReleaseBody.isNotBlank()) {
@@ -442,5 +470,57 @@ class BackupSettingsActivity : AppCompatActivity() {
         } else {
             backupSummary
         }
+    }
+
+    private fun readBackupApkInfo(): BackupApkInfo {
+        val backupFile = getBackupApkFile()
+        if (!backupFile.exists() || backupFile.length() <= 0L) {
+            return BackupApkInfo(
+                exists = false,
+                sizeBytes = 0L,
+                packageName = null,
+                versionName = null,
+                versionCode = null,
+                canRestore = false
+            )
+        }
+
+        val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getPackageArchiveInfo(
+                backupFile.absolutePath,
+                PackageManager.PackageInfoFlags.of(0)
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.getPackageArchiveInfo(backupFile.absolutePath, 0)
+        }
+
+        val backupPackageName = packageInfo?.packageName
+        val backupVersionName = packageInfo?.versionName
+        val backupVersionCode = if (packageInfo == null) {
+            null
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            packageInfo.longVersionCode
+        } else {
+            @Suppress("DEPRECATION")
+            packageInfo.versionCode.toLong()
+        }
+
+        val canRestore = backupPackageName == packageName &&
+            backupVersionCode != null &&
+            backupVersionCode < currentVersionCode
+        return BackupApkInfo(
+            exists = true,
+            sizeBytes = backupFile.length(),
+            packageName = backupPackageName,
+            versionName = backupVersionName,
+            versionCode = backupVersionCode,
+            canRestore = canRestore
+        )
+    }
+
+    private fun formatSizeInMb(sizeBytes: Long): String {
+        val sizeMb = sizeBytes.toDouble() / (1024.0 * 1024.0)
+        return String.format(Locale.US, "%.1f", sizeMb)
     }
 }
