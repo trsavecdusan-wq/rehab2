@@ -31,6 +31,15 @@ class BackupSettingsActivity : AppCompatActivity() {
         val canRestore: Boolean
     )
 
+    data class ApkDiagnosticInfo(
+        val exists: Boolean,
+        val sizeBytes: Long,
+        val packageName: String?,
+        val versionName: String?,
+        val versionCode: Long?,
+        val readable: Boolean
+    )
+
     companion object {
         private const val CHECK_BUTTON_COLOR = 0xFF214A78.toInt()
         private const val DOWNLOAD_BUTTON_COLOR = 0xFF3E7C4A.toInt()
@@ -431,30 +440,37 @@ class BackupSettingsActivity : AppCompatActivity() {
     }
 
     private fun updateReleaseNotes() {
+        val currentCacheInfo = readApkDiagnosticInfo(getCurrentInstalledReleaseApkFile())
+        val downloadedApkInfo = readApkDiagnosticInfo(getDownloadedReleaseApkFile())
         val backupInfo = readBackupApkInfo()
-        val backupSummary = if (backupInfo.exists) {
-            buildString {
-                appendLine("Backup obstaja.")
-                appendLine("Velikost backup APK: ${formatSizeInMb(backupInfo.sizeBytes)} MB")
+        val restoreTargetInfo = readApkDiagnosticInfo(getBackupApkFile())
+        val backupSummary = buildString {
+            appendLine("CURRENT CACHE:")
+            appendLine("Current cache obstaja: ${yesNo(currentCacheInfo.exists)}")
+            appendLine("Current cache velikost: ${formatSizeInMb(currentCacheInfo.sizeBytes)} MB")
+            appendLine("Current cache verzija: ${formatVersionLabel(currentCacheInfo)}")
+            appendLine()
+            appendLine("DOWNLOADED APK:")
+            appendLine("Downloaded APK obstaja: ${yesNo(downloadedApkInfo.exists)}")
+            appendLine("Downloaded APK velikost: ${formatSizeInMb(downloadedApkInfo.sizeBytes)} MB")
+            appendLine("Downloaded APK verzija: ${formatVersionLabel(downloadedApkInfo)}")
+            appendLine()
+            appendLine("RESTORE TARGET:")
+            appendLine("Restore target obstaja: ${yesNo(restoreTargetInfo.exists)}")
+            appendLine("Restore target verzija: ${formatVersionLabel(restoreTargetInfo)}")
+            if (backupInfo.exists) {
+                appendLine()
                 if (backupInfo.packageName == null) {
                     append("Backup APK ni bilo mogo\u010de prebrati.")
                 } else if (backupInfo.packageName != packageName) {
                     append("Backup APK ni za to aplikacijo.")
-                } else if (!backupInfo.versionName.isNullOrBlank() && backupInfo.versionCode != null) {
-                    append("Backup verzija: ${backupInfo.versionName} (${backupInfo.versionCode})")
-                } else {
-                    append("Backup verzija: neznana")
-                }
-                if (backupInfo.packageName == packageName &&
-                    backupInfo.versionCode != null &&
+                } else if (backupInfo.versionCode != null &&
                     backupInfo.versionCode >= currentVersionCode
                 ) {
-                    append("\nBackup ni starej\u0161a verzija. Obnovitev ne bo vrnila prej\u0161nje verzije.")
+                    append("Backup ni starej\u0161a verzija. Obnovitev ne bo vrnila prej\u0161nje verzije.")
                 }
             }
-        } else {
-            "Backup ne obstaja.\nVelikost backup APK: 0.0 MB"
-        }
+        }.trim()
 
         txtReleaseNotes.text = if (latestReleaseBody.isNotBlank()) {
             latestReleaseBody + "\n\n" + backupSummary
@@ -476,6 +492,29 @@ class BackupSettingsActivity : AppCompatActivity() {
             canRestore = archiveInfo?.packageName == packageName &&
                 backupVersionCode != null &&
                 backupVersionCode < currentVersionCode
+        )
+    }
+
+    private fun readApkDiagnosticInfo(apkFile: File): ApkDiagnosticInfo {
+        if (!apkFile.exists() || apkFile.length() <= 0L) {
+            return ApkDiagnosticInfo(
+                exists = false,
+                sizeBytes = 0L,
+                packageName = null,
+                versionName = null,
+                versionCode = null,
+                readable = false
+            )
+        }
+
+        val archiveInfo = readApkArchiveInfo(apkFile)
+        return ApkDiagnosticInfo(
+            exists = true,
+            sizeBytes = apkFile.length(),
+            packageName = archiveInfo?.packageName,
+            versionName = archiveInfo?.versionName,
+            versionCode = archiveInfo?.versionCode,
+            readable = archiveInfo != null
         )
     }
 
@@ -553,8 +592,22 @@ class BackupSettingsActivity : AppCompatActivity() {
         return targetFile.exists() && targetFile.length() > 0L
     }
 
+    private fun formatVersionLabel(info: ApkDiagnosticInfo): String {
+        return when {
+            !info.exists -> "neznana"
+            !info.readable -> "ni berljivo"
+            !info.versionName.isNullOrBlank() && info.versionCode != null ->
+                "${info.versionName} (${info.versionCode})"
+            else -> "neznana"
+        }
+    }
+
     private fun formatSizeInMb(sizeBytes: Long): String {
         val sizeMb = sizeBytes.toDouble() / (1024.0 * 1024.0)
         return String.format(Locale.US, "%.1f", sizeMb)
+    }
+
+    private fun yesNo(value: Boolean): String {
+        return if (value) "da" else "ne"
     }
 }
