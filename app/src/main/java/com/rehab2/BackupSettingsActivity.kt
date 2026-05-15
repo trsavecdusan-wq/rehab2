@@ -27,6 +27,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         private const val BUSY_BUTTON_COLOR = 0xFF5B6672.toInt()
         private const val CURRENT_RELEASE_FILE_NAME = "current_release.apk"
         private const val RESTORE_STAGED_FILE_NAME = "NovaRehab_restore.apk"
+        private const val RESTORE_RESULT_HINT_DELAY_MS = 3000L
     }
 
     private lateinit var txtCurrentVersion: TextView
@@ -197,6 +198,12 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
 
         openInstallHandoff(stagedRestoreFile)
+        mainHandler.postDelayed({
+            if (txtUpdateStatus.text.toString() == "Odpiram obnovitev prej\u0161nje verzije ...") {
+                txtUpdateStatus.text =
+                    "Če se namestitev ni odprla ali ni uspela, prejšnje verzije ni bilo mogoče obnoviti."
+            }
+        }, RESTORE_RESULT_HINT_DELAY_MS)
     }
 
     private fun rotateReleaseBackupIfAvailable(): Boolean {
