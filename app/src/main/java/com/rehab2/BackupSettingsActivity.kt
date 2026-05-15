@@ -170,7 +170,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                         "Varnostne kopije ni bilo mogo\u010de pripraviti.\nPrenos kon\u010dan. Odpiram namestitev ..."
                     }
                     refreshRestoreButtonState()
-                    openInstallHandoff(currentReleaseFile)
+                    openInstallHandoff(result.file)
                 } else {
                     txtUpdateStatus.text = toUserFriendlyDownloadStatus(result.message)
                     restoreDownloadButtonState()
