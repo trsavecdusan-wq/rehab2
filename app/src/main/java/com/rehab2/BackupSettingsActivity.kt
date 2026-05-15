@@ -155,9 +155,10 @@ class BackupSettingsActivity : AppCompatActivity() {
             }
 
             mainHandler.post {
-                if (result.success && result.file != null) {
+                val downloadedFile = result.file
+                if (result.success && downloadedFile != null) {
                     val backupPrepared = rotateReleaseBackupIfAvailable()
-                    val currentReleaseFile = promoteDownloadedRelease(result.file)
+                    val currentReleaseFile = promoteDownloadedRelease(downloadedFile)
                     if (currentReleaseFile == null) {
                         txtUpdateStatus.text = "Napaka pri prenosu APK."
                         restoreDownloadButtonState()
@@ -170,7 +171,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                         "Varnostne kopije ni bilo mogo\u010de pripraviti.\nPrenos kon\u010dan. Odpiram namestitev ..."
                     }
                     refreshRestoreButtonState()
-                    openInstallHandoff(result.file)
+                    openInstallHandoff(downloadedFile)
                 } else {
                     txtUpdateStatus.text = toUserFriendlyDownloadStatus(result.message)
                     restoreDownloadButtonState()
