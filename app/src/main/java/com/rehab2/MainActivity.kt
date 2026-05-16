@@ -1,15 +1,34 @@
 package com.rehab2
 
+import android.Manifest
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.media.AudioManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.BatteryManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.InputType
+import android.text.method.PasswordTransformationMethod
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,11 +36,22 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.rehab2.radio.RadioPlayerController
 import com.rehab2.radio.SavedRadioStation
 import com.rehab2.radio.RadioStationStore
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
     companion object {
         private const val RADIO_TILE_BLUE = 0xFF2F5F9E.toInt()
         private const val RADIO_TILE_GREEN = 0xFF2E8B57.toInt()
+        private const val PREFS_FILE = "rehab2_prefs"
+        private const val PREF_PATIENT_LANGUAGE_1 = "patient_language_1"
+        private const val PREF_PATIENT_LANGUAGE_2 = "patient_language_2"
+        private const val PREF_ACTIVE_SPEECH_LANGUAGE = "active_speech_language"
+        private const val PREF_ADMIN_PIN = "admin_pin"
+        private const val DEFAULT_ADMIN_PIN = "0416"
+        private const val STATUS_REFRESH_INTERVAL_MS = 1000L
     }
 
     private lateinit var radioTiles: List<TextView>
@@ -29,15 +59,54 @@ class MainActivity : AppCompatActivity() {
     private lateinit var seekVolume: SeekBar
     private lateinit var audioManager: AudioManager
     private lateinit var radioPlayerController: RadioPlayerController
+    private lateinit var prefs: SharedPreferences
+    private lateinit var locationManager: LocationManager
+    private lateinit var txtStatusLanguageFlag: TextView
+    private lateinit var txtStatusBattery: TextView
+    private lateinit var txtStatusNetwork: TextView
+    private lateinit var txtStatusDay: TextView
+    private lateinit var txtStatusDate: TextView
+    private lateinit var txtStatusYear: TextView
+    private lateinit var txtStatusSpeed: TextView
     private var visibleRadioStations: List<SavedRadioStation?> = List(6) { null }
     private var activeStationKey: String? = null
+    private var currentSpeedKmh = 0
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("dd.MM.", Locale.getDefault())
+    private val yearFormat = SimpleDateFormat("yyyy", Locale.getDefault())
+    private val statusRefreshRunnable = object : Runnable {
+        override fun run() {
+            refreshStatusModule()
+            mainHandler.postDelayed(this, STATUS_REFRESH_INTERVAL_MS)
+        }
+    }
+    private val speedLocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            currentSpeedKmh = if (location.hasSpeed()) {
+                (location.speed * 3.6f).roundToInt().coerceAtLeast(0)
+            } else {
+                0
+            }
+            txtStatusSpeed.text = currentSpeedKmh.toString()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
+        prefs = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         seekVolume = findViewById(R.id.seekVolume)
+        txtStatusLanguageFlag = findViewById(R.id.txtStatusLanguageFlag)
+        txtStatusBattery = findViewById(R.id.txtStatusBattery)
+        txtStatusNetwork = findViewById(R.id.txtStatusNetwork)
+        txtStatusDay = findViewById(R.id.txtStatusDay)
+        txtStatusDate = findViewById(R.id.txtStatusDate)
+        txtStatusYear = findViewById(R.id.txtStatusYear)
+        txtStatusSpeed = findViewById(R.id.txtStatusSpeed)
         WindowInsetsControllerCompat(window, window.decorView).hide(WindowInsetsCompat.Type.statusBars())
         val content: ViewGroup = findViewById(android.R.id.content)
         val root = content.getChildAt(0)
@@ -78,8 +147,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<View>(R.id.statusModule).setOnLongClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+        txtStatusLanguageFlag.setOnLongClickListener {
+            showLanguagePicker()
+            true
+        }
+        txtStatusSpeed.setOnLongClickListener {
+            showAdminPinDialog()
             true
         }
 
@@ -107,6 +180,8 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, label, Toast.LENGTH_SHORT).show()
             }
         }
+
+        refreshStatusModule()
     }
 
     override fun onResume() {
@@ -114,9 +189,20 @@ class MainActivity : AppCompatActivity() {
         setVolumeControlStream(AudioManager.STREAM_MUSIC)
         syncVolumeSlider()
         refreshRadioTiles()
+        refreshStatusModule()
+        startStatusUpdates()
+        startSpeedUpdates()
+    }
+
+    override fun onPause() {
+        stopStatusUpdates()
+        stopSpeedUpdates()
+        super.onPause()
     }
 
     override fun onDestroy() {
+        stopStatusUpdates()
+        stopSpeedUpdates()
         radioPlayerController.release()
         super.onDestroy()
     }
@@ -130,6 +216,172 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.dispatchKeyEvent(event)
+    }
+
+    private fun startStatusUpdates() {
+        mainHandler.removeCallbacks(statusRefreshRunnable)
+        mainHandler.post(statusRefreshRunnable)
+    }
+
+    private fun stopStatusUpdates() {
+        mainHandler.removeCallbacks(statusRefreshRunnable)
+    }
+
+    private fun startSpeedUpdates() {
+        if (!hasLocationPermission()) {
+            currentSpeedKmh = 0
+            txtStatusSpeed.text = "0"
+            return
+        }
+
+        val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+        var lastLocation: Location? = null
+        for (provider in providers) {
+            if (!locationManager.isProviderEnabled(provider)) {
+                continue
+            }
+            try {
+                locationManager.requestLocationUpdates(provider, 1000L, 0f, speedLocationListener, Looper.getMainLooper())
+                val candidate = locationManager.getLastKnownLocation(provider)
+                if (candidate != null && (lastLocation == null || candidate.time > lastLocation.time)) {
+                    lastLocation = candidate
+                }
+            } catch (_: SecurityException) {
+                currentSpeedKmh = 0
+            } catch (_: IllegalArgumentException) {
+            }
+        }
+
+        currentSpeedKmh = lastLocation?.let {
+            if (it.hasSpeed()) (it.speed * 3.6f).roundToInt().coerceAtLeast(0) else 0
+        } ?: 0
+        txtStatusSpeed.text = currentSpeedKmh.toString()
+    }
+
+    private fun stopSpeedUpdates() {
+        try {
+            locationManager.removeUpdates(speedLocationListener)
+        } catch (_: SecurityException) {
+        } catch (_: IllegalArgumentException) {
+        }
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun refreshStatusModule() {
+        txtStatusLanguageFlag.text = flagForLanguage(getActiveSpeechLanguage())
+        txtStatusBattery.text = "${readBatteryPercentage()}%"
+        txtStatusNetwork.text = readNetworkLabel()
+        val now = Date()
+        txtStatusDay.text = dayFormat.format(now).replaceFirstChar { it.titlecase(Locale.getDefault()) }
+        txtStatusDate.text = dateFormat.format(now)
+        txtStatusYear.text = yearFormat.format(now)
+        txtStatusSpeed.text = currentSpeedKmh.toString()
+    }
+
+    private fun readBatteryPercentage(): Int {
+        val batteryManager = getSystemService(BATTERY_SERVICE) as BatteryManager
+        val propertyValue = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        if (propertyValue in 1..100) {
+            return propertyValue
+        }
+
+        val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val level = batteryIntent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val scale = batteryIntent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+        return if (level >= 0 && scale > 0) {
+            ((level * 100f) / scale).roundToInt().coerceIn(0, 100)
+        } else {
+            0
+        }
+    }
+
+    private fun readNetworkLabel(): String {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            @Suppress("DEPRECATION")
+            val networkInfo = connectivityManager.activeNetworkInfo ?: return "OFF"
+            @Suppress("DEPRECATION")
+            return when (networkInfo.type) {
+                ConnectivityManager.TYPE_WIFI -> "WiFi"
+                ConnectivityManager.TYPE_MOBILE -> "4G"
+                else -> "OFF"
+            }
+        }
+
+        val activeNetwork = connectivityManager.activeNetwork ?: return "OFF"
+        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return "OFF"
+        return when {
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "WiFi"
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "4G"
+            else -> "OFF"
+        }
+    }
+
+    private fun getActiveSpeechLanguage(): String {
+        return prefs.getString(PREF_ACTIVE_SPEECH_LANGUAGE, null)
+            ?.trim()
+            ?.lowercase(Locale.ROOT)
+            ?.takeIf { it.isNotBlank() }
+            ?: "sl"
+    }
+
+    private fun getConfiguredSpeechLanguages(): List<String> {
+        val first = prefs.getString(PREF_PATIENT_LANGUAGE_1, "sl").orEmpty().trim().lowercase(Locale.ROOT)
+        val second = prefs.getString(PREF_PATIENT_LANGUAGE_2, "uk").orEmpty().trim().lowercase(Locale.ROOT)
+        return listOf(first.ifBlank { "sl" }, second.ifBlank { "uk" }).distinct()
+    }
+
+    private fun flagForLanguage(languageCode: String): String {
+        return when (languageCode.lowercase(Locale.ROOT)) {
+            "sl" -> "🇸🇮"
+            "uk" -> "🇺🇦"
+            "en" -> "🇬🇧"
+            "de" -> "🇩🇪"
+            "hr" -> "🇭🇷"
+            "sr" -> "🇷🇸"
+            else -> "🇸🇮"
+        }
+    }
+
+    private fun showLanguagePicker() {
+        val configuredLanguages = getConfiguredSpeechLanguages()
+        val labels = configuredLanguages.map { flagForLanguage(it) }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("Izbira govornega jezika")
+            .setItems(labels) { _, which ->
+                prefs.edit().putString(PREF_ACTIVE_SPEECH_LANGUAGE, configuredLanguages[which]).apply()
+                refreshStatusModule()
+            }
+            .setNegativeButton("Prekliči", null)
+            .show()
+    }
+
+    private fun showAdminPinDialog() {
+        val input = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            transformationMethod = PasswordTransformationMethod.getInstance()
+            hint = "PIN"
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Vnesite PIN")
+            .setView(input)
+            .setPositiveButton("V redu") { _, _ ->
+                val enteredPin = input.text?.toString().orEmpty()
+                val expectedPin = prefs.getString(PREF_ADMIN_PIN, DEFAULT_ADMIN_PIN).orEmpty().ifBlank { DEFAULT_ADMIN_PIN }
+                if (enteredPin == expectedPin) {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                } else {
+                    Toast.makeText(this, "Napačen PIN", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Prekliči", null)
+            .show()
     }
 
     private fun refreshRadioTiles() {
