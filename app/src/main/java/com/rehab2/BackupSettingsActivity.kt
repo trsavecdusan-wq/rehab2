@@ -133,7 +133,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             try {
                 val release = updateClient.fetchLatestRelease()
                 val remoteVersion = release.tagName.removePrefix("v")
-                val comparison = compareVersions(remoteVersion, currentVersionName)
+                val latestVersionCode = extractReleaseVersionCode(remoteVersion)
 
                 mainHandler.post {
                     latestRelease = release
@@ -141,9 +141,16 @@ class BackupSettingsActivity : AppCompatActivity() {
                     txtLatestVersion.text = "Zadnja verzija: $remoteVersion"
                     updateReleaseNotes()
 
-                    if (comparison > 0 && !release.apkUrl.isNullOrBlank()) {
+                    if (latestVersionCode != null &&
+                        latestVersionCode > currentVersionCode &&
+                        !release.apkUrl.isNullOrBlank()
+                    ) {
                         txtUpdateStatus.text = "Posodobitev je na voljo: $remoteVersion"
                         btnDownloadApk.isEnabled = true
+                    } else if (latestVersionCode != null && latestVersionCode <= currentVersionCode) {
+                        txtUpdateStatus.text =
+                            "Ta posodobitev ni primerna za trenutno nameščeno rollback verzijo. Počakajte na novejšo normalno izdajo."
+                        btnDownloadApk.isEnabled = false
                     } else {
                         txtUpdateStatus.text = "Ni nove posodobitve."
                         btnDownloadApk.isEnabled = false
@@ -411,6 +418,10 @@ class BackupSettingsActivity : AppCompatActivity() {
             }
         }
         return 0
+    }
+
+    private fun extractReleaseVersionCode(versionName: String): Long? {
+        return versionName.substringAfterLast('.', "").toLongOrNull()
     }
 
     private fun openInstallHandoff(apkFile: File) {
