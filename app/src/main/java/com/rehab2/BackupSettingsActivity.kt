@@ -328,7 +328,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             if (downloadedReleaseInfo?.packageName != packageName ||
                 downloadedReleaseVersionCode == null ||
                 downloadedReleaseVersionCode <= currentVersionCode ||
-                downloadedReleaseVersionCode % 2L != 0L
+                !isNormalReleaseVersion(downloadedReleaseVersionCode, downloadedReleaseInfo.versionName)
             ) {
                 Log.e("NovaRehabUpdater", "Downloaded APK is not a valid newer normal release for backup rotation")
                 return false
@@ -345,9 +345,10 @@ class BackupSettingsActivity : AppCompatActivity() {
             val currentInstalledVersionCode = currentInstalledInfo?.versionCode
             if (currentInstalledInfo?.packageName != packageName ||
                 currentInstalledVersionCode == null ||
-                currentInstalledVersionCode != currentVersionCode
+                currentInstalledVersionCode != currentVersionCode ||
+                !isNormalReleaseVersion(currentInstalledVersionCode, currentInstalledInfo.versionName)
             ) {
-                Log.e("NovaRehabUpdater", "Current installed cache APK does not match the currently installed version")
+                Log.e("NovaRehabUpdater", "Current installed cache APK is not a valid normal restore source")
                 return false
             }
 
@@ -373,6 +374,10 @@ class BackupSettingsActivity : AppCompatActivity() {
             Log.e("NovaRehabUpdater", "Backup copy blocked", error)
             false
         }
+    }
+
+    private fun isNormalReleaseVersion(versionCode: Long, versionName: String?): Boolean {
+        return versionCode % 2L == 0L && !versionName.orEmpty().contains("-rollback", ignoreCase = true)
     }
 
     private fun getBackupDirectory(): File {
