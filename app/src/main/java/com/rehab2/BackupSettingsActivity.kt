@@ -207,9 +207,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             return
         }
         if (backupInfo.downgradeBlocked) {
-            txtUpdateStatus.text =
-                "Android ne dovoli neposredne namestitve starej\u0161e verzije. Za obnovitev je potrebna ro\u010dna odstranitev aplikacije ali posebna rollback izdaja."
-            refreshRestoreButtonState()
+            downloadRollbackRelease(backupInfo)
             return
         }
 
@@ -221,6 +219,50 @@ class BackupSettingsActivity : AppCompatActivity() {
                     "\u010ce se namestitev ni odprla ali ni uspela, prej\u0161nje verzije ni bilo mogo\u010de obnoviti."
             }
         }, RESTORE_RESULT_HINT_DELAY_MS)
+    }
+
+    private fun downloadRollbackRelease(backupInfo: BackupApkInfo) {
+        val restoreTargetVersionName = backupInfo.versionName ?: run {
+            txtUpdateStatus.text = "Posebna rollback izdaja ni na voljo."
+            refreshRestoreButtonState()
+            return
+        }
+
+        txtUpdateStatus.text = "I\u0161\u010dem rollback izdajo ..."
+        setDownloadButtonLoading(true)
+
+        Thread {
+            try {
+                val rollbackRelease =
+                    updateClient.fetchRollbackRelease(currentVersionCode, restoreTargetVersionName)
+                val rollbackUrl = rollbackRelease.apkUrl
+                    ?: throw IllegalStateException("Rollback APK manjka")
+                val result = downloadManager.downloadLatestApk(rollbackUrl) { status ->
+                    mainHandler.post {
+                        if (status.contains("Prena", ignoreCase = true)) {
+                            txtUpdateStatus.text = "Prena\u0161am rollback APK ..."
+                        }
+                    }
+                }
+
+                mainHandler.post {
+                    val rollbackFile = result.file
+                    if (result.success && rollbackFile != null) {
+                        txtUpdateStatus.text = "Rollback APK prenesen. Odpiram namestitev ..."
+                        openInstallHandoff(rollbackFile)
+                    } else {
+                        txtUpdateStatus.text = "Posebna rollback izdaja ni na voljo."
+                        restoreDownloadButtonState()
+                    }
+                }
+            } catch (error: Exception) {
+                Log.e("NovaRehabUpdater", "Rollback release lookup failed", error)
+                mainHandler.post {
+                    txtUpdateStatus.text = "Posebna rollback izdaja ni na voljo."
+                    restoreDownloadButtonState()
+                }
+            }
+        }.start()
     }
 
     private fun syncCurrentInstalledReleaseIfNeeded() {
