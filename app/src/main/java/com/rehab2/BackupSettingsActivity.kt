@@ -248,8 +248,13 @@ class BackupSettingsActivity : AppCompatActivity() {
                 mainHandler.post {
                     val rollbackFile = result.file
                     if (result.success && rollbackFile != null) {
-                        txtUpdateStatus.text = "Rollback APK prenesen. Odpiram namestitev ..."
-                        openInstallHandoff(rollbackFile)
+                        if (isValidRollbackApk(rollbackFile)) {
+                            txtUpdateStatus.text = "Rollback APK prenesen. Odpiram namestitev ..."
+                            openInstallHandoff(rollbackFile)
+                        } else {
+                            txtUpdateStatus.text = "Rollback izdaja ni veljavna za to aplikacijo."
+                            restoreDownloadButtonState()
+                        }
                     } else {
                         txtUpdateStatus.text = "Posebna rollback izdaja ni na voljo."
                         restoreDownloadButtonState()
@@ -263,6 +268,15 @@ class BackupSettingsActivity : AppCompatActivity() {
                 }
             }
         }.start()
+    }
+
+    private fun isValidRollbackApk(apkFile: File): Boolean {
+        val rollbackInfo = readApkArchiveInfo(apkFile)
+        val rollbackVersionCode = rollbackInfo?.versionCode
+        return rollbackInfo?.packageName == packageName &&
+            rollbackVersionCode != null &&
+            rollbackVersionCode > currentVersionCode &&
+            rollbackVersionCode % 2L == 1L
     }
 
     private fun syncCurrentInstalledReleaseIfNeeded() {
@@ -365,9 +379,10 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun refreshRestoreButtonState() {
         val backupInfo = readBackupApkInfo()
-        btnRestorePreviousVersion.isEnabled = backupInfo.canRestore
+        val canTriggerRestore = backupInfo.canRestore || backupInfo.downgradeBlocked
+        btnRestorePreviousVersion.isEnabled = canTriggerRestore
         btnRestorePreviousVersion.backgroundTintList = ColorStateList.valueOf(
-            if (backupInfo.canRestore) RESTORE_BUTTON_COLOR else BUSY_BUTTON_COLOR
+            if (canTriggerRestore) RESTORE_BUTTON_COLOR else BUSY_BUTTON_COLOR
         )
         updateReleaseNotes()
     }

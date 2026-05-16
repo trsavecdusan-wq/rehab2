@@ -38,7 +38,8 @@ class GitHubUpdateClient {
     }
 
     fun fetchRollbackRelease(currentVersionCode: Long, restoreTargetVersionName: String): ReleaseInfo {
-        val expectedTag = "v${currentVersionCode + 1}-rollback-to-$restoreTargetVersionName"
+        val rollbackCode = computeNextOddVersionCode(currentVersionCode)
+        val expectedTag = "v1.0.$rollbackCode-rollback-to-$restoreTargetVersionName"
         val releases = fetchReleases()
         val root = findReleaseByExactTag(releases, expectedTag)
             ?: throw UpdateCheckException(
@@ -70,11 +71,20 @@ class GitHubUpdateClient {
     private fun findReleaseByExactTag(releases: JSONArray, expectedTag: String): JSONObject? {
         for (index in 0 until releases.length()) {
             val release = releases.optJSONObject(index) ?: continue
-            if (release.optString("tag_name") == expectedTag) {
+            val tagName = release.optString("tag_name")
+            if (tagName == expectedTag && ROLLBACK_RELEASE_TAG_REGEX.matcher(tagName).matches()) {
                 return release
             }
         }
         return null
+    }
+
+    private fun computeNextOddVersionCode(currentVersionCode: Long): Long {
+        return if (currentVersionCode % 2L == 0L) {
+            currentVersionCode + 1L
+        } else {
+            currentVersionCode + 2L
+        }
     }
 
     private fun fetchReleases(): JSONArray {
@@ -200,5 +210,7 @@ class GitHubUpdateClient {
             "rehab-release.apk"
         )
         private val STABLE_RELEASE_TAG_REGEX = Pattern.compile("^v\\d+\\.\\d+\\.\\d+$")
+        private val ROLLBACK_RELEASE_TAG_REGEX =
+            Pattern.compile("^v\\d+\\.\\d+\\.\\d+-rollback-to-\\d+\\.\\d+\\.\\d+$")
     }
 }

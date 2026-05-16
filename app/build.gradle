@@ -18,9 +18,9 @@ android {
         applicationId "com.rehab2"
         minSdk 21
         targetSdk 34
-        // versionCode must increase for every future release.
-        versionCode 33
-        versionName "1.0.33"
+        // Normal releases on main use even versionCode values only. Rollback releases use odd versionCode values only.
+        versionCode 34
+        versionName "1.0.34"
     }
 
     signingConfigs {
