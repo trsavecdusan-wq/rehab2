@@ -8,6 +8,7 @@ import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.URL
 import java.net.UnknownHostException
+import java.util.regex.Pattern
 
 class GitHubUpdateClient {
     data class ReleaseInfo(
@@ -23,7 +24,7 @@ class GitHubUpdateClient {
     ) : IllegalStateException(message)
 
     fun fetchLatestRelease(): ReleaseInfo {
-        val releaseUrl = URL(LATEST_RELEASE_URL)
+        val releaseUrl = URL(RELEASES_URL)
         val connection = releaseUrl.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.connectTimeout = 15000
@@ -37,10 +38,10 @@ class GitHubUpdateClient {
             if (responseCode !in 200..299) {
                 val errorBody = readPreview(connection.errorStream)
                 val debugSummary = buildString {
-                    appendLine("URL: $LATEST_RELEASE_URL")
+                    appendLine("URL: $RELEASES_URL")
                     appendLine("HTTP: $responseCode ${responseMessage.ifBlank { "Unknown" }}")
                     appendLine("Napaka: HTTP")
-                    appendLine("Sporočilo: GitHub release endpoint ni vrnil uspešnega odgovora.")
+                    appendLine("Sporocilo: GitHub release endpoint ni vrnil uspesnega odgovora.")
                     if (errorBody.isNotBlank()) {
                         append("Body: ").append(errorBody)
                     }
@@ -52,15 +53,27 @@ class GitHubUpdateClient {
             }
 
             val responseText = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
-            val root = JSONObject(responseText)
+            val releases = JSONArray(responseText)
+            val root = findLatestStableRelease(releases)
+                ?: throw UpdateCheckException(
+                    debugSummary = buildString {
+                        appendLine("URL: $RELEASES_URL")
+                        appendLine("HTTP: $responseCode ${responseMessage.ifBlank { "OK" }}")
+                        appendLine("Releases: ${releases.length()}")
+                        append("Napaka: Veljaven navaden release ni bil najden.")
+                    }.trim(),
+                    message = "Navaden GitHub release ni na voljo."
+                )
+
             val tagName = root.optString("tag_name")
             val body = root.optString("body")
             val assets = root.optJSONArray("assets") ?: JSONArray()
             val assetNames = mutableListOf<String>()
             val apkUrl = findApkUrl(assets, assetNames)
             val debugSummary = buildString {
-                appendLine("URL: $LATEST_RELEASE_URL")
+                appendLine("URL: $RELEASES_URL")
                 appendLine("HTTP: $responseCode ${responseMessage.ifBlank { "OK" }}")
+                appendLine("Releases: ${releases.length()}")
                 appendLine("JSON tag_name: ${if (tagName.isNotBlank()) "da" else "ne"}")
                 appendLine("tag_name: ${if (tagName.isNotBlank()) tagName else "-"}")
                 appendLine("Assets: ${assets.length()}")
@@ -101,7 +114,18 @@ class GitHubUpdateClient {
     }
 
     fun getLatestReleaseUrl(): String {
-        return LATEST_RELEASE_URL
+        return RELEASES_URL
+    }
+
+    private fun findLatestStableRelease(releases: JSONArray): JSONObject? {
+        for (index in 0 until releases.length()) {
+            val release = releases.optJSONObject(index) ?: continue
+            val tagName = release.optString("tag_name")
+            if (STABLE_RELEASE_TAG_REGEX.matcher(tagName).matches()) {
+                return release
+            }
+        }
+        return null
     }
 
     private fun findApkUrl(assets: JSONArray, assetNames: MutableList<String>): String? {
@@ -129,21 +153,22 @@ class GitHubUpdateClient {
 
     private fun throwUpdateException(message: String, error: Exception): Nothing {
         val debugSummary = buildString {
-            appendLine("URL: $LATEST_RELEASE_URL")
+            appendLine("URL: $RELEASES_URL")
             appendLine("Napaka: ${error.javaClass.name}")
-            appendLine("Sporočilo: ${error.message ?: "-"}")
+            appendLine("Sporocilo: ${error.message ?: "-"}")
         }.trim()
         throw UpdateCheckException(debugSummary = debugSummary, message = message)
     }
 
     companion object {
-        private const val LATEST_RELEASE_URL =
-            "https://api.github.com/repos/trsavecdusan-wq/rehab2/releases/latest"
+        private const val RELEASES_URL =
+            "https://api.github.com/repos/trsavecdusan-wq/rehab2/releases"
         private val APK_ASSET_NAMES = setOf(
             "app-debug.apk",
             "app-release.apk",
             "rehab-debug.apk",
             "rehab-release.apk"
         )
+        private val STABLE_RELEASE_TAG_REGEX = Pattern.compile("^v\\d+\\.\\d+\\.\\d+$")
     }
 }
