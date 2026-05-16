@@ -182,7 +182,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             mainHandler.post {
                 val downloadedFile = result.file
                 if (result.success && downloadedFile != null) {
-                    val backupPrepared = preparePreviousRestorableFromCurrentInstalled()
+                    val backupPrepared = preparePreviousRestorableFromCurrentInstalled(downloadedFile)
                     txtUpdateStatus.text = if (backupPrepared) {
                         "Varnostna kopija pripravljena.\nPrenos kon\u010dan. Odpiram namestitev ..."
                     } else {
@@ -314,8 +314,19 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun preparePreviousRestorableFromCurrentInstalled(): Boolean {
+    private fun preparePreviousRestorableFromCurrentInstalled(downloadedFile: File): Boolean {
         return try {
+            val downloadedReleaseInfo = readApkArchiveInfo(downloadedFile)
+            val downloadedReleaseVersionCode = downloadedReleaseInfo?.versionCode
+            if (downloadedReleaseInfo?.packageName != packageName ||
+                downloadedReleaseVersionCode == null ||
+                downloadedReleaseVersionCode <= currentVersionCode ||
+                downloadedReleaseVersionCode % 2L != 0L
+            ) {
+                Log.e("NovaRehabUpdater", "Downloaded APK is not a valid newer normal release for backup rotation")
+                return false
+            }
+
             val currentInstalledFile = getCurrentInstalledReleaseApkFile()
             Log.i("NovaRehabUpdater", "Current installed cache APK: ${currentInstalledFile.absolutePath}")
             if (!currentInstalledFile.exists() || currentInstalledFile.length() <= 0L) {
