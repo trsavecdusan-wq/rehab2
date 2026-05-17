@@ -442,14 +442,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun languageLabel(languageCode: String): String {
         return when (languageCode.lowercase(Locale.ROOT)) {
-            "sl" -> "đź‡¸đź‡® SlovenĹˇÄŤina"
-            "uk" -> "đź‡şđź‡¦ ĐŁĐşŃ€Đ°Ń—Đ˝ŃŃŚĐşĐ°"
-            "en" -> "đź‡¬đź‡§ English"
-            "de" -> "đź‡©đź‡Ş Deutsch"
-            "hr" -> "đź‡­đź‡· Hrvatski"
-            "sr" -> "đź‡·đź‡¸ ĐˇŃ€ĐżŃĐşĐ¸"
-            else -> "đź‡¸đź‡® SlovenĹˇÄŤina"
+            "sl" -> "SI Slovenscina"
+            "uk" -> "UA Ukrainian"
+            "en" -> "EN English"
+            "de" -> "DE German"
+            "hr" -> "HR Croatian"
+            "sr" -> "RS Serbian"
+            else -> "SI Slovenscina"
         }
+    }
     }
 
     private fun showLanguagePicker() {
