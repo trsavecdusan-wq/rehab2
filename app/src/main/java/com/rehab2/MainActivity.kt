@@ -20,9 +20,11 @@ import android.os.Handler
 import android.os.Looper
 import android.text.InputType
 import android.text.method.PasswordTransformationMethod
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
@@ -235,6 +237,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+        val anyProviderEnabled = providers.any { provider ->
+            try {
+                locationManager.isProviderEnabled(provider)
+            } catch (_: Exception) {
+                false
+            }
+        }
+        if (!anyProviderEnabled) {
+            currentSpeedKmh = 0
+            txtStatusSpeed.text = "0"
+            return
+        }
+
         var lastLocation: Location? = null
         for (provider in providers) {
             if (!locationManager.isProviderEnabled(provider)) {
@@ -349,12 +364,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun languageLabel(languageCode: String): String {
+        return when (languageCode.lowercase(Locale.ROOT)) {
+            "sl" -> "🇸🇮 Slovenščina"
+            "uk" -> "🇺🇦 Українська"
+            "en" -> "🇬🇧 English"
+            "de" -> "🇩🇪 Deutsch"
+            "hr" -> "🇭🇷 Hrvatski"
+            "sr" -> "🇷🇸 Српски"
+            else -> "🇸🇮 Slovenščina"
+        }
+    }
+
     private fun showLanguagePicker() {
         val configuredLanguages = getConfiguredSpeechLanguages()
-        val labels = configuredLanguages.map { flagForLanguage(it) }.toTypedArray()
+        val labels = configuredLanguages.map { languageLabel(it) }
+        val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, labels) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                (view as? TextView)?.apply {
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
+                    setPadding(paddingLeft, 24, paddingRight, 24)
+                }
+                return view
+            }
+        }
         AlertDialog.Builder(this)
-            .setTitle("Izbira govornega jezika")
-            .setItems(labels) { _, which ->
+            .setTitle("Izberi govorni jezik")
+            .setAdapter(adapter) { _, which ->
                 prefs.edit().putString(PREF_ACTIVE_SPEECH_LANGUAGE, configuredLanguages[which]).apply()
                 refreshStatusModule()
             }
@@ -366,10 +403,11 @@ class MainActivity : AppCompatActivity() {
         val input = EditText(this).apply {
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
             transformationMethod = PasswordTransformationMethod.getInstance()
-            hint = "PIN"
+            hint = "Administratorski PIN"
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
         }
         AlertDialog.Builder(this)
-            .setTitle("Vnesite PIN")
+            .setTitle("Vnesite administratorski PIN")
             .setView(input)
             .setPositiveButton("V redu") { _, _ ->
                 val enteredPin = input.text?.toString().orEmpty()

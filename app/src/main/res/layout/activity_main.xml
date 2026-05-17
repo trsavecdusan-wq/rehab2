@@ -200,9 +200,11 @@
                     android:id="@+id/txtStatusLanguageFlag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
                     android:text="SI"
                     android:textColor="#F4F7FA"
-                    android:textSize="16sp" />
+                    android:textSize="20sp" />
 
                 <Space
                     android:layout_width="0dp"
