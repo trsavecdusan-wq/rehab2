@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_picker_title">Izberi govorni jezik</string>
+    <string name="language_label_sl">SI Sloven&#353;&#269;ina</string>
+    <string name="language_label_uk">UA &#x423;&#x43A;&#x440;&#x430;&#x457;&#x43D;&#x441;&#x44C;&#x43A;&#x430;</string>
+    <string name="language_label_en">EN English</string>
+    <string name="language_label_de">DE Deutsch</string>
+    <string name="language_label_hr">HR Hrvatski</string>
+    <string name="language_label_sr">RS Srpski</string>
+    <string name="admin_pin_title">Vnesite administratorski PIN</string>
+    <string name="admin_pin_hint">Administratorski PIN</string>
+    <string name="dialog_ok">V redu</string>
+    <string name="dialog_cancel">Prekli&#269;i</string>
+    <string name="wrong_pin">Napa&#269;en PIN</string>
+    <string name="mp3_tile_label">MP3</string>
+    <string name="mp3_settings_label">MP3 / LOKALNA GLASBA</string>
+    <string name="mp3_open_label">ODPRI</string>
+    <string name="mp3_settings_button_label">NASTAVI</string>
+    <string name="mp3_section_title">MP3 / LOKALNA GLASBA</string>
+    <string name="mp3_section_description">MP3 tipka na glavnem zaslonu vedno odpre lokalni predvajalnik.</string>
+    <string name="mp3_open_settings_button">ODPRI MP3 / LOKALNO GLASBO</string>
+    <string name="radio_empty_label">Radio</string>
+    <string name="radio_station_missing">Ni postaje</string>
+</resources>
