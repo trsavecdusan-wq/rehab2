@@ -435,10 +435,9 @@ class MainActivity : AppCompatActivity() {
             "en" -> "EN"
             "de" -> "DE"
             "hr" -> "HR"
-            "sr" -> "SR"
+            "sr" -> "RS"
             else -> "SI"
         }
-    }
     }
 
     private fun languageLabel(languageCode: String): String {
