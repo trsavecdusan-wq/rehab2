@@ -119,7 +119,9 @@ class MainActivity : AppCompatActivity() {
             refreshStatusModule()
             mainHandler.postDelayed(this, STATUS_REFRESH_INTERVAL_MS)
         }
-    }    // TODO 1.0.54+: derive daily/weekly/monthly/yearly/total GPS distance from these updates with distanceTo() and ignore unrealistic jumps.
+    }
+
+    // TODO 1.0.54+: derive daily/weekly/monthly/yearly/total GPS distance from these updates with distanceTo() and ignore unrealistic jumps.
 
     private val speedLocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
@@ -450,7 +452,6 @@ class MainActivity : AppCompatActivity() {
             "sr" -> "RS Serbian"
             else -> "SI Slovenscina"
         }
-    }
     }
 
     private fun showLanguagePicker() {
