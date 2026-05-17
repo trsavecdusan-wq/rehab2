@@ -28,6 +28,7 @@
         <activity android:name=".RadioPreviewActivity" />
         <activity android:name=".AddRadioStationActivity" />
         <activity android:name=".RadioSettingsActivity" />
+        <activity android:name=".PowerSettingsActivity" />
         <activity android:name=".SettingsActivity" />
         <activity
             android:name=".MainActivity"

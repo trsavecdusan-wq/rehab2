@@ -28,7 +28,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnStatusSettings).setOnClickListener {
-            Toast.makeText(this, "Funkcija še ni pripravljena", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, PowerSettingsActivity::class.java))
         }
     }
 }

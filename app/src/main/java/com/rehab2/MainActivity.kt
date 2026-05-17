@@ -2,6 +2,7 @@ package com.rehab2
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -24,6 +25,7 @@ import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.SeekBar
@@ -54,6 +56,25 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_ADMIN_PIN = "admin_pin"
         private const val DEFAULT_ADMIN_PIN = "0416"
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
+
+        private const val PREF_POWER_MODE = "power_mode"
+        private const val PREF_POWER_ALLOWED_UNPLUG_MINUTES = "power_allowed_unplug_minutes"
+        private const val PREF_POWER_WARNING_GRACE_MINUTES = "power_warning_grace_minutes"
+        private const val PREF_POWER_CRITICAL_BATTERY_PERCENT = "power_critical_battery_percent"
+        private const val PREF_POWER_ADMIN_BYPASS_UNTIL = "power_admin_bypass_until"
+
+        private const val POWER_MODE_ALWAYS_ON = "ALWAYS_ON"
+        private const val POWER_MODE_BATTERY_SAVER = "BATTERY_SAVER"
+        private const val POWER_MODE_POWER_SLEEP = "POWER_SLEEP"
+
+        private const val DEFAULT_POWER_MODE = POWER_MODE_ALWAYS_ON
+        private const val DEFAULT_POWER_ALLOWED_UNPLUG_MINUTES = 15
+        private const val DEFAULT_POWER_WARNING_GRACE_MINUTES = 5
+        private const val DEFAULT_POWER_CRITICAL_BATTERY_PERCENT = 20
+        private const val DEFAULT_POWER_ADMIN_BYPASS_UNTIL = 0L
+
+        private const val POWER_BYPASS_DURATION_MS = 15 * 60 * 1000L
+        private const val POWER_CHECK_INTERVAL_MS = 1000L
     }
 
     private lateinit var radioTiles: List<TextView>
@@ -70,9 +91,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtStatusDate: TextView
     private lateinit var txtStatusYear: TextView
     private lateinit var txtStatusSpeed: TextView
+    private lateinit var powerOverlay: View
+    private lateinit var txtPowerOverlayTitle: TextView
+    private lateinit var txtPowerOverlaySubtitle: TextView
     private var visibleRadioStations: List<SavedRadioStation?> = List(6) { null }
     private var activeStationKey: String? = null
     private var currentSpeedKmh = 0
+    private var isPowerConnected = true
+    private var powerDisconnectedAtMs = 0L
+    private var powerWarningShownAtMs = 0L
+    private var isPowerOverlayVisible = false
+    private var isSleepDimActive = false
+    private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+    private var isPowerReceiverRegistered = false
     private val mainHandler = Handler(Looper.getMainLooper())
     private val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
     private val dateFormat = SimpleDateFormat("dd.MM.", Locale.getDefault())
@@ -93,6 +124,20 @@ class MainActivity : AppCompatActivity() {
             txtStatusSpeed.text = currentSpeedKmh.toString()
         }
     }
+    private val powerReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Intent.ACTION_POWER_CONNECTED -> updatePowerConnectedState(true)
+                Intent.ACTION_POWER_DISCONNECTED -> updatePowerConnectedState(false)
+            }
+        }
+    }
+    private val powerMonitorRunnable = object : Runnable {
+        override fun run() {
+            evaluatePowerState()
+            mainHandler.postDelayed(this, POWER_CHECK_INTERVAL_MS)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,6 +154,9 @@ class MainActivity : AppCompatActivity() {
         txtStatusDate = findViewById(R.id.txtStatusDate)
         txtStatusYear = findViewById(R.id.txtStatusYear)
         txtStatusSpeed = findViewById(R.id.txtStatusSpeed)
+        powerOverlay = findViewById(R.id.powerOverlay)
+        txtPowerOverlayTitle = findViewById(R.id.txtPowerOverlayTitle)
+        txtPowerOverlaySubtitle = findViewById(R.id.txtPowerOverlaySubtitle)
         WindowInsetsControllerCompat(window, window.decorView).hide(WindowInsetsCompat.Type.statusBars())
         val content: ViewGroup = findViewById(android.R.id.content)
         val root = content.getChildAt(0)
@@ -157,6 +205,12 @@ class MainActivity : AppCompatActivity() {
             showAdminPinDialog()
             true
         }
+        powerOverlay.setOnLongClickListener {
+            showAdminPinDialog {
+                activatePowerBypass()
+            }
+            true
+        }
 
         val aacTiles = listOf(
             R.id.tileAacZejna to "ŽEJNA",
@@ -184,6 +238,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         refreshStatusModule()
+        refreshInitialPowerState()
+        evaluatePowerState()
     }
 
     override fun onResume() {
@@ -194,17 +250,24 @@ class MainActivity : AppCompatActivity() {
         refreshStatusModule()
         startStatusUpdates()
         startSpeedUpdates()
+        registerPowerReceiver()
+        refreshInitialPowerState()
+        startPowerMonitoring()
     }
 
     override fun onPause() {
         stopStatusUpdates()
         stopSpeedUpdates()
+        stopPowerMonitoring()
+        unregisterPowerReceiver()
         super.onPause()
     }
 
     override fun onDestroy() {
         stopStatusUpdates()
         stopSpeedUpdates()
+        stopPowerMonitoring()
+        unregisterPowerReceiver()
         radioPlayerController.release()
         super.onDestroy()
     }
@@ -399,7 +462,7 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showAdminPinDialog() {
+    private fun showAdminPinDialog(onSuccess: (() -> Unit)? = null) {
         val input = EditText(this).apply {
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
             transformationMethod = PasswordTransformationMethod.getInstance()
@@ -413,13 +476,197 @@ class MainActivity : AppCompatActivity() {
                 val enteredPin = input.text?.toString().orEmpty()
                 val expectedPin = prefs.getString(PREF_ADMIN_PIN, DEFAULT_ADMIN_PIN).orEmpty().ifBlank { DEFAULT_ADMIN_PIN }
                 if (enteredPin == expectedPin) {
-                    startActivity(Intent(this, SettingsActivity::class.java))
+                    if (onSuccess != null) {
+                        onSuccess()
+                    } else {
+                        startActivity(Intent(this, SettingsActivity::class.java))
+                    }
                 } else {
                     Toast.makeText(this, "Napačen PIN", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Prekliči", null)
             .show()
+    }
+
+    private fun getPowerMode(): String =
+        prefs.getString(PREF_POWER_MODE, DEFAULT_POWER_MODE).orEmpty().ifBlank { DEFAULT_POWER_MODE }
+
+    private fun getAllowedUnplugMinutes(): Int =
+        prefs.getInt(PREF_POWER_ALLOWED_UNPLUG_MINUTES, DEFAULT_POWER_ALLOWED_UNPLUG_MINUTES)
+
+    private fun getWarningGraceMinutes(): Int =
+        prefs.getInt(PREF_POWER_WARNING_GRACE_MINUTES, DEFAULT_POWER_WARNING_GRACE_MINUTES)
+
+    private fun getCriticalBatteryPercent(): Int =
+        prefs.getInt(PREF_POWER_CRITICAL_BATTERY_PERCENT, DEFAULT_POWER_CRITICAL_BATTERY_PERCENT)
+
+    private fun getPowerBypassUntil(): Long =
+        prefs.getLong(PREF_POWER_ADMIN_BYPASS_UNTIL, DEFAULT_POWER_ADMIN_BYPASS_UNTIL)
+
+    private fun isPowerBypassActive(): Boolean =
+        System.currentTimeMillis() < getPowerBypassUntil()
+
+    private fun activatePowerBypass() {
+        prefs.edit()
+            .putLong(PREF_POWER_ADMIN_BYPASS_UNTIL, System.currentTimeMillis() + POWER_BYPASS_DURATION_MS)
+            .apply()
+        hidePowerOverlay()
+        setScreenDimmed(false)
+    }
+
+    private fun registerPowerReceiver() {
+        if (isPowerReceiverRegistered) {
+            return
+        }
+
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_POWER_CONNECTED)
+            addAction(Intent.ACTION_POWER_DISCONNECTED)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(powerReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            @Suppress("DEPRECATION")
+            registerReceiver(powerReceiver, filter)
+        }
+        isPowerReceiverRegistered = true
+    }
+
+    private fun unregisterPowerReceiver() {
+        if (!isPowerReceiverRegistered) {
+            return
+        }
+        try {
+            unregisterReceiver(powerReceiver)
+        } catch (_: IllegalArgumentException) {
+        } finally {
+            isPowerReceiverRegistered = false
+        }
+    }
+
+    private fun refreshInitialPowerState() {
+        val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        updatePowerConnectedState(isPluggedFromBatteryIntent(batteryIntent))
+    }
+
+    private fun isPluggedFromBatteryIntent(intent: Intent?): Boolean {
+        val plugged = intent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0
+        return plugged != 0
+    }
+
+    private fun startPowerMonitoring() {
+        mainHandler.removeCallbacks(powerMonitorRunnable)
+        mainHandler.post(powerMonitorRunnable)
+    }
+
+    private fun stopPowerMonitoring() {
+        mainHandler.removeCallbacks(powerMonitorRunnable)
+    }
+
+    private fun updatePowerConnectedState(isConnected: Boolean) {
+        if (isConnected) {
+            isPowerConnected = true
+            powerDisconnectedAtMs = 0L
+            powerWarningShownAtMs = 0L
+            hidePowerOverlay()
+            setScreenDimmed(false)
+        } else {
+            if (isPowerConnected) {
+                powerDisconnectedAtMs = System.currentTimeMillis()
+                powerWarningShownAtMs = 0L
+            }
+            isPowerConnected = false
+        }
+    }
+
+    private fun evaluatePowerState() {
+        if (isPowerConnected) {
+            hidePowerOverlay()
+            setScreenDimmed(false)
+            return
+        }
+
+        if (isPowerBypassActive()) {
+            hidePowerOverlay()
+            setScreenDimmed(false)
+            return
+        }
+
+        if (getPowerMode() == POWER_MODE_ALWAYS_ON) {
+            hidePowerOverlay()
+            setScreenDimmed(false)
+            return
+        }
+
+        val now = System.currentTimeMillis()
+        if (powerDisconnectedAtMs == 0L) {
+            powerDisconnectedAtMs = now
+        }
+
+        val warningAt = powerDisconnectedAtMs + getAllowedUnplugMinutes() * 60_000L
+        val sleepAt = warningAt + getWarningGraceMinutes() * 60_000L
+
+        if (now < warningAt) {
+            hidePowerOverlay()
+            setScreenDimmed(false)
+            return
+        }
+
+        if (powerWarningShownAtMs == 0L) {
+            powerWarningShownAtMs = now
+        }
+
+        if (now < sleepAt) {
+            showPowerOverlay(
+                "PRIKLOPITE NAPAJANJE",
+                "NAPAJANJE NI PRIKLOPLJENO"
+            )
+            setScreenDimmed(false)
+            return
+        }
+
+        val secondaryText = if (getPowerMode() == POWER_MODE_BATTERY_SAVER) {
+            "VARČEVALNI NAČIN AKTIVEN"
+        } else {
+            "SLEEP NAČIN AKTIVEN"
+        }
+        showPowerOverlay(
+            "PRIKLOPITE NAPAJANJE",
+            secondaryText
+        )
+        setScreenDimmed(true)
+    }
+
+    private fun showPowerOverlay(primaryText: String, secondaryText: String) {
+        txtPowerOverlayTitle.text = primaryText
+        txtPowerOverlaySubtitle.text = secondaryText
+        powerOverlay.visibility = View.VISIBLE
+        isPowerOverlayVisible = true
+    }
+
+    private fun hidePowerOverlay() {
+        powerOverlay.visibility = View.GONE
+        isPowerOverlayVisible = false
+    }
+
+    private fun setScreenDimmed(dimmed: Boolean) {
+        if (isSleepDimActive == dimmed) {
+            return
+        }
+
+        val attributes = window.attributes
+        if (dimmed) {
+            savedScreenBrightness = attributes.screenBrightness
+            attributes.screenBrightness = 0.05f
+            window.attributes = attributes
+            isSleepDimActive = true
+        } else {
+            attributes.screenBrightness = savedScreenBrightness
+            window.attributes = attributes
+            isSleepDimActive = false
+        }
     }
 
     private fun refreshRadioTiles() {

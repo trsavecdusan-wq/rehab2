@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121417"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:text="POWER NASTAVITVE"
+        android:textColor="#F4F7FA"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="POWER MODE"
+        android:textColor="#F4F7FA"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinnerPowerMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="BREZ NAPAJANJA (MIN)"
+        android:textColor="#F4F7FA"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinnerAllowedUnplug"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ČAS PO OPOZORILU (MIN)"
+        android:textColor="#F4F7FA"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinnerWarningGrace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="KRITIČNA BATERIJA (%)"
+        android:textColor="#F4F7FA"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinnerCriticalBattery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/btnSavePowerSettings"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginBottom="16dp"
+        android:text="SHRANI" />
+
+    <Button
+        android:id="@+id/btnBackPowerSettings"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:text="NAZAJ" />
+
+</LinearLayout>
