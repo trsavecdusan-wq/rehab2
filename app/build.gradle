@@ -1,4 +1,4 @@
-plugins {
+﻿plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
 }
@@ -19,8 +19,8 @@ android {
         minSdk 21
         targetSdk 34
         // Normal releases on main use even versionCode values only. Rollback releases use odd versionCode values only.
-        versionCode 48
-        versionName "1.0.48"
+        versionCode 50
+        versionName "1.0.50"
     }
 
     signingConfigs {
@@ -73,3 +73,4 @@ gradle.taskGraph.whenReady { graph ->
         )
     }
 }
+

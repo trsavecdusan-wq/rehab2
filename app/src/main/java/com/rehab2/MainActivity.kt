@@ -1,4 +1,4 @@
-package com.rehab2
+﻿package com.rehab2
 
 import android.Manifest
 import android.app.AlertDialog
@@ -75,6 +75,8 @@ class MainActivity : AppCompatActivity() {
 
         private const val POWER_BYPASS_DURATION_MS = 15 * 60 * 1000L
         private const val POWER_CHECK_INTERVAL_MS = 1000L
+        private const val RADIO_STATION_TILE_COUNT = 5
+        private const val MP3_TILE_INDEX = 5
     }
 
     private lateinit var radioTiles: List<TextView>
@@ -213,9 +215,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         val aacTiles = listOf(
-            R.id.tileAacZejna to "ŽEJNA",
-            R.id.tileAacLacna to "LAČNA",
-            R.id.tileAacPomoc to "POMOČ",
+            R.id.tileAacZejna to "Ĺ˝EJNA",
+            R.id.tileAacLacna to "LAÄŚNA",
+            R.id.tileAacPomoc to "POMOÄŚ",
             R.id.tileAacDa to "DA",
             R.id.tileAacWc to "WC",
             R.id.tileAacDobro to "DOBRO",
@@ -223,11 +225,11 @@ class MainActivity : AppCompatActivity() {
             R.id.tileAacNe to "NE",
             R.id.tileAacUtrujena to "UTRUJENA",
             R.id.tileAacMraz to "MRAZ",
-            R.id.tileAacVroce to "VROČE",
-            R.id.tileAacBolecina to "BOLEČINA",
+            R.id.tileAacVroce to "VROÄŚE",
+            R.id.tileAacBolecina to "BOLEÄŚINA",
             R.id.tileAacDomov to "DOMOV",
             R.id.tileAacZdravnik to "ZDRAVNIK",
-            R.id.tileAacDruzina to "DRUŽINA",
+            R.id.tileAacDruzina to "DRUĹ˝INA",
             R.id.tileAacStop to "STOP"
         )
 
@@ -256,6 +258,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        radioPlayerController.stop()
+        activeStationKey = null
+        updateRadioTileColors()
         stopStatusUpdates()
         stopSpeedUpdates()
         stopPowerMonitoring()
@@ -417,25 +422,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun flagForLanguage(languageCode: String): String {
         return when (languageCode.lowercase(Locale.ROOT)) {
-            "sl" -> "🇸🇮"
-            "uk" -> "🇺🇦"
-            "en" -> "🇬🇧"
-            "de" -> "🇩🇪"
-            "hr" -> "🇭🇷"
-            "sr" -> "🇷🇸"
-            else -> "🇸🇮"
+            "sl" -> "đź‡¸đź‡®"
+            "uk" -> "đź‡şđź‡¦"
+            "en" -> "đź‡¬đź‡§"
+            "de" -> "đź‡©đź‡Ş"
+            "hr" -> "đź‡­đź‡·"
+            "sr" -> "đź‡·đź‡¸"
+            else -> "đź‡¸đź‡®"
         }
     }
 
     private fun languageLabel(languageCode: String): String {
         return when (languageCode.lowercase(Locale.ROOT)) {
-            "sl" -> "🇸🇮 Slovenščina"
-            "uk" -> "🇺🇦 Українська"
-            "en" -> "🇬🇧 English"
-            "de" -> "🇩🇪 Deutsch"
-            "hr" -> "🇭🇷 Hrvatski"
-            "sr" -> "🇷🇸 Српски"
-            else -> "🇸🇮 Slovenščina"
+            "sl" -> "đź‡¸đź‡® SlovenĹˇÄŤina"
+            "uk" -> "đź‡şđź‡¦ ĐŁĐşŃ€Đ°Ń—Đ˝ŃŃŚĐşĐ°"
+            "en" -> "đź‡¬đź‡§ English"
+            "de" -> "đź‡©đź‡Ş Deutsch"
+            "hr" -> "đź‡­đź‡· Hrvatski"
+            "sr" -> "đź‡·đź‡¸ ĐˇŃ€ĐżŃĐşĐ¸"
+            else -> "đź‡¸đź‡® SlovenĹˇÄŤina"
         }
     }
 
@@ -458,7 +463,7 @@ class MainActivity : AppCompatActivity() {
                 prefs.edit().putString(PREF_ACTIVE_SPEECH_LANGUAGE, configuredLanguages[which]).apply()
                 refreshStatusModule()
             }
-            .setNegativeButton("Prekliči", null)
+            .setNegativeButton("PrekliÄŤi", null)
             .show()
     }
 
@@ -482,10 +487,10 @@ class MainActivity : AppCompatActivity() {
                         startActivity(Intent(this, SettingsActivity::class.java))
                     }
                 } else {
-                    Toast.makeText(this, "Napačen PIN", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "NapaÄŤen PIN", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Prekliči", null)
+            .setNegativeButton("PrekliÄŤi", null)
             .show()
     }
 
@@ -628,9 +633,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         val secondaryText = if (getPowerMode() == POWER_MODE_BATTERY_SAVER) {
-            "VARČEVALNI NAČIN AKTIVEN"
+            "VARÄŚEVALNI NAÄŚIN AKTIVEN"
         } else {
-            "SLEEP NAČIN AKTIVEN"
+            "SLEEP NAÄŚIN AKTIVEN"
         }
         showPowerOverlay(
             "PRIKLOPITE NAPAJANJE",
@@ -675,12 +680,20 @@ class MainActivity : AppCompatActivity() {
             .filter { it.visible }
 
         visibleRadioStations = List(6) { index ->
-            stations.firstOrNull { it.position == index + 1 }
+            if (index < RADIO_STATION_TILE_COUNT) {
+                stations.firstOrNull { it.position == index + 1 }
+            } else {
+                null
+            }
         }
 
         radioTiles.forEachIndexed { index, textView ->
-            val station = visibleRadioStations[index]
-            textView.text = station?.buttonLabel?.ifBlank { station.name } ?: fallbackRadioLabels[index]
+            if (index == MP3_TILE_INDEX) {
+                textView.text = "MP3"
+            } else {
+                val station = visibleRadioStations[index]
+                textView.text = station?.buttonLabel?.ifBlank { station.name } ?: fallbackRadioLabels[index]
+            }
         }
 
         if (activeStationKey != null) {
@@ -697,6 +710,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleRadioTileClick(index: Int) {
+        if (index == MP3_TILE_INDEX) {
+            radioPlayerController.stop()
+            activeStationKey = null
+            updateRadioTileColors()
+            startActivity(Intent(this, LocalMusicActivity::class.java))
+            return
+        }
+
         val station = visibleRadioStations.getOrNull(index)
         if (station == null) {
             Toast.makeText(this, "Ni postaje", Toast.LENGTH_SHORT).show()
@@ -722,6 +743,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateRadioTileColors() {
         radioTiles.forEachIndexed { index, textView ->
+            if (index == MP3_TILE_INDEX) {
+                textView.setBackgroundColor(RADIO_TILE_BLUE)
+                return@forEachIndexed
+            }
             val station = visibleRadioStations.getOrNull(index)
             val isActive = station != null && activeStationKey == stationKey(station)
             textView.setBackgroundColor(if (isActive) RADIO_TILE_GREEN else RADIO_TILE_BLUE)
@@ -767,3 +792,4 @@ class MainActivity : AppCompatActivity() {
         seekVolume.isEnabled = !audioManager.isVolumeFixed
     }
 }
+
