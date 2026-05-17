@@ -1,4 +1,4 @@
-﻿package com.rehab2
+package com.rehab2
 
 import android.Manifest
 import android.app.AlertDialog
@@ -23,6 +23,7 @@ import android.text.InputType
 import android.text.method.PasswordTransformationMethod
 import android.util.TypedValue
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -77,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         private const val POWER_CHECK_INTERVAL_MS = 1000L
         private const val RADIO_STATION_TILE_COUNT = 5
         private const val MP3_TILE_INDEX = 5
+        private const val RADIO_SWIPE_THRESHOLD_PX = 80f
     }
 
     private lateinit var radioTiles: List<TextView>
@@ -98,6 +100,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtPowerOverlaySubtitle: TextView
     private var visibleRadioStations: List<SavedRadioStation?> = List(6) { null }
     private var activeStationKey: String? = null
+    private var currentRadioPage = 1
+    private var radioTouchStartX = 0f
     private var currentSpeedKmh = 0
     private var isPowerConnected = true
     private var powerDisconnectedAtMs = 0L
@@ -115,7 +119,8 @@ class MainActivity : AppCompatActivity() {
             refreshStatusModule()
             mainHandler.postDelayed(this, STATUS_REFRESH_INTERVAL_MS)
         }
-    }
+    }    // TODO 1.0.54+: derive daily/weekly/monthly/yearly/total GPS distance from these updates with distanceTo() and ignore unrealistic jumps.
+
     private val speedLocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             currentSpeedKmh = if (location.hasSpeed()) {
@@ -196,6 +201,9 @@ class MainActivity : AppCompatActivity() {
         radioTiles.forEachIndexed { index, textView ->
             textView.setOnClickListener {
                 handleRadioTileClick(index)
+            }
+            textView.setOnTouchListener { _, event ->
+                handleRadioSwipe(event)
             }
         }
 
@@ -422,14 +430,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun flagForLanguage(languageCode: String): String {
         return when (languageCode.lowercase(Locale.ROOT)) {
-            "sl" -> "đź‡¸đź‡®"
-            "uk" -> "đź‡şđź‡¦"
-            "en" -> "đź‡¬đź‡§"
-            "de" -> "đź‡©đź‡Ş"
-            "hr" -> "đź‡­đź‡·"
-            "sr" -> "đź‡·đź‡¸"
-            else -> "đź‡¸đź‡®"
+            "sl" -> "SI"
+            "uk" -> "UA"
+            "en" -> "EN"
+            "de" -> "DE"
+            "hr" -> "HR"
+            "sr" -> "SR"
+            else -> "SI"
         }
+    }
     }
 
     private fun languageLabel(languageCode: String): String {
@@ -676,7 +685,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshRadioTiles() {
         val stations = RadioStationStore(this)
-            .getStationsForPage(1)
+            .getStationsForPage(currentRadioPage)
             .filter { it.visible }
 
         visibleRadioStations = List(6) { index ->
@@ -708,6 +717,33 @@ class MainActivity : AppCompatActivity() {
 
         updateRadioTileColors()
     }
+    private fun handleRadioSwipe(event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                radioTouchStartX = event.x
+            }
+
+            MotionEvent.ACTION_UP -> {
+                val deltaX = event.x - radioTouchStartX
+                if (deltaX <= -RADIO_SWIPE_THRESHOLD_PX) {
+                    currentRadioPage += 1
+                    refreshRadioTiles()
+                    return true
+                }
+                if (deltaX >= RADIO_SWIPE_THRESHOLD_PX) {
+                    currentRadioPage = (currentRadioPage - 1).coerceAtLeast(1)
+                    refreshRadioTiles()
+                    return true
+                }
+            }
+
+            MotionEvent.ACTION_CANCEL -> {
+                radioTouchStartX = 0f
+            }
+        }
+        return false
+    }
+
 
     private fun handleRadioTileClick(index: Int) {
         if (index == MP3_TILE_INDEX) {
