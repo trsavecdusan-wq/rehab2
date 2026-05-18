@@ -1,11 +1,18 @@
 package com.rehab2
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.BatteryManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.InputType
+import android.text.method.PasswordTransformationMethod
+import android.util.TypedValue
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,9 +29,15 @@ class SettingsActivity : AppCompatActivity() {
         private const val PREF_KEEP_SCREEN_ON_WHILE_CHARGING = "keep_screen_on_while_charging"
         private const val PREF_DISTANCE_TODAY_METERS = "distance_today_meters"
         private const val PREF_DISTANCE_TOTAL_METERS = "distance_total_meters"
+        private const val PREF_GPS_LAST_ACCURACY_METERS = "gps_last_accuracy_meters"
+        private const val PREF_GPS_LAST_SIGNAL = "gps_last_signal"
+        private const val PREF_GPS_LAST_IGNORED_REASON = "gps_last_ignored_reason"
+        private const val PREF_GPS_RESET_BASELINE_REQUESTED = "gps_reset_baseline_requested"
+        private const val PREF_ADMIN_PIN = "admin_pin"
         private const val PREF_DISTANCE_WEEK_METERS = "distance_week_meters"
         private const val PREF_DISTANCE_MONTH_METERS = "distance_month_meters"
         private const val PREF_DISTANCE_YEAR_METERS = "distance_year_meters"
+        private const val DEFAULT_ADMIN_PIN = "0416"
 
         private const val POWER_MODE_ALWAYS_ON = "ALWAYS_ON"
         private const val POWER_MODE_BATTERY_SAVER = "BATTERY_SAVER"
@@ -48,6 +61,18 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtPowerStatusValue: TextView
     private lateinit var txtTodayDistanceValue: TextView
     private lateinit var txtTotalDistanceValue: TextView
+    private lateinit var txtGpsSignalValue: TextView
+    private lateinit var txtGpsAccuracyValue: TextView
+    private lateinit var txtGpsIgnoredReasonValue: TextView
+    private lateinit var btnResetGpsStatistics: Button
+    private val gpsDiagnosticsRefreshHandler = Handler(Looper.getMainLooper())
+    private val gpsDiagnosticsRefreshRunnable = object : Runnable {
+        override fun run() {
+            refreshGpsDiagnosticsSection()
+            refreshStatisticsSection()
+            gpsDiagnosticsRefreshHandler.postDelayed(this, 1500L)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +89,10 @@ class SettingsActivity : AppCompatActivity() {
         txtPowerStatusValue = findViewById(R.id.txtPowerStatusValue)
         txtTodayDistanceValue = findViewById(R.id.txtTodayDistanceValue)
         txtTotalDistanceValue = findViewById(R.id.txtTotalDistanceValue)
+        txtGpsSignalValue = findViewById(R.id.txtGpsSignalValue)
+        txtGpsAccuracyValue = findViewById(R.id.txtGpsAccuracyValue)
+        txtGpsIgnoredReasonValue = findViewById(R.id.txtGpsIgnoredReasonValue)
+        btnResetGpsStatistics = findViewById(R.id.btnResetGpsStatistics)
 
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
@@ -128,8 +157,22 @@ class SettingsActivity : AppCompatActivity() {
             adjustIntPreference(PREF_POWER_CRITICAL_BATTERY_PERCENT, 1, 5, 50, DEFAULT_CRITICAL_BATTERY_PERCENT)
         }
 
+        btnResetGpsStatistics.setOnClickListener {
+            showAdminPinDialog {
+                prefs.edit()
+                    .putLong(PREF_DISTANCE_TODAY_METERS, 0L)
+                    .putLong(PREF_DISTANCE_TOTAL_METERS, 0L)
+                    .putBoolean(PREF_GPS_RESET_BASELINE_REQUESTED, true)
+                    .apply()
+                refreshStatisticsSection()
+                refreshGpsDiagnosticsSection()
+                Toast.makeText(this, R.string.gps_statistics_reset_done, Toast.LENGTH_SHORT).show()
+            }
+        }
+
         refreshPowerSection()
         refreshStatisticsSection()
+        refreshGpsDiagnosticsSection()
         applyKeepScreenOnWhileCharging()
     }
 
@@ -137,7 +180,14 @@ class SettingsActivity : AppCompatActivity() {
         super.onResume()
         refreshPowerSection()
         refreshStatisticsSection()
+        refreshGpsDiagnosticsSection()
         applyKeepScreenOnWhileCharging()
+        startGpsDiagnosticsRefresh()
+    }
+
+    override fun onPause() {
+        stopGpsDiagnosticsRefresh()
+        super.onPause()
     }
 
     private fun setPowerMode(mode: String) {
@@ -189,6 +239,20 @@ class SettingsActivity : AppCompatActivity() {
         val totalMeters = prefs.getLong(PREF_DISTANCE_TOTAL_METERS, 0L)
         txtTodayDistanceValue.text = formatDistance(todayMeters)
         txtTotalDistanceValue.text = formatDistance(totalMeters)
+    }
+
+    private fun refreshGpsDiagnosticsSection() {
+        val signal = prefs.getString(PREF_GPS_LAST_SIGNAL, "WEAK").orEmpty().ifBlank { "WEAK" }
+        val accuracyMeters = prefs.getFloat(PREF_GPS_LAST_ACCURACY_METERS, -1f)
+        val ignoredReason = prefs.getString(PREF_GPS_LAST_IGNORED_REASON, "NONE").orEmpty().ifBlank { "NONE" }
+
+        txtGpsSignalValue.text = signal
+        txtGpsAccuracyValue.text = if (accuracyMeters >= 0f) {
+            String.format(Locale.ROOT, "%.1f M", accuracyMeters)
+        } else {
+            getString(R.string.gps_no_accuracy)
+        }
+        txtGpsIgnoredReasonValue.text = ignoredReason
     }
 
     private fun updateModeButtonStyles(powerMode: String) {
@@ -265,5 +329,37 @@ class SettingsActivity : AppCompatActivity() {
     private fun isCurrentlyPluggedIn(): Boolean {
         val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         return (batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0
+    }
+
+    private fun startGpsDiagnosticsRefresh() {
+        gpsDiagnosticsRefreshHandler.removeCallbacks(gpsDiagnosticsRefreshRunnable)
+        gpsDiagnosticsRefreshHandler.post(gpsDiagnosticsRefreshRunnable)
+    }
+
+    private fun stopGpsDiagnosticsRefresh() {
+        gpsDiagnosticsRefreshHandler.removeCallbacks(gpsDiagnosticsRefreshRunnable)
+    }
+
+    private fun showAdminPinDialog(onSuccess: () -> Unit) {
+        val input = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            transformationMethod = PasswordTransformationMethod.getInstance()
+            hint = getString(R.string.admin_pin_hint)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.admin_pin_title)
+            .setView(input)
+            .setPositiveButton(R.string.dialog_ok) { _, _ ->
+                val enteredPin = input.text?.toString().orEmpty()
+                val expectedPin = prefs.getString(PREF_ADMIN_PIN, DEFAULT_ADMIN_PIN).orEmpty().ifBlank { DEFAULT_ADMIN_PIN }
+                if (enteredPin == expectedPin) {
+                    onSuccess()
+                } else {
+                    Toast.makeText(this, getString(R.string.wrong_pin), Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .show()
     }
 }

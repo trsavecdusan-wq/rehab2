@@ -176,7 +176,7 @@
                 android:layout_width="72dp"
                 android:layout_height="60dp"
                 android:backgroundTint="#214A78"
-                android:text="-"
+                android:text="&#8722;"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
                 android:textSize="32sp"
@@ -226,7 +226,7 @@
                 android:layout_width="72dp"
                 android:layout_height="60dp"
                 android:backgroundTint="#214A78"
-                android:text="-"
+                android:text="&#8722;"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
                 android:textSize="32sp"
@@ -276,7 +276,7 @@
                 android:layout_width="72dp"
                 android:layout_height="60dp"
                 android:backgroundTint="#214A78"
-                android:text="-"
+                android:text="&#8722;"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA"
                 android:textSize="32sp"
@@ -374,6 +374,90 @@
             android:text="0 M"
             android:textColor="#F4F7FA"
             android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/gps_diagnostics_title"
+            android:textColor="#F4F7FA"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/gps_signal_label"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtGpsSignalValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="#1E2329"
+            android:padding="16dp"
+            android:text="WEAK"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/gps_accuracy_label"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtGpsAccuracyValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="#1E2329"
+            android:padding="16dp"
+            android:text="-"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/gps_last_ignored_reason_label"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtGpsIgnoredReasonValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="#1E2329"
+            android:padding="16dp"
+            android:text="NONE"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnResetGpsStatistics"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:backgroundTint="#A64040"
+            android:text="@string/gps_reset_button_label"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
     </LinearLayout>

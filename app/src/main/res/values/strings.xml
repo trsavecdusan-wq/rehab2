@@ -58,4 +58,12 @@
     <string name="power_overlay_connect_power">PRIKLOPITE NAPAJANJE</string>
     <string name="power_overlay_power_disconnected">NAPAJANJE NI PRIKLOPLJENO</string>
     <string name="power_overlay_battery_saver_active">VAR&#268;EVALNI NA&#268;IN AKTIVEN</string>
-    <string name="power_overlay_sleep_mode_active">SLEEP NA&#268;IN AKTIVEN</string></resources>
+    <string name="power_overlay_sleep_mode_active">SLEEP NA&#268;IN AKTIVEN</string>
+    <string name="gps_diagnostics_title">GPS DIAGNOSTIKA</string>
+    <string name="gps_signal_label">GPS SIGNAL</string>
+    <string name="gps_accuracy_label">LAST ACCURACY</string>
+    <string name="gps_last_ignored_reason_label">LAST IGNORED REASON</string>
+    <string name="gps_reset_button_label">RESET GPS STATISTIKE</string>
+    <string name="gps_statistics_reset_done">GPS STATISTIKE SO RESETIRANE</string>
+    <string name="gps_no_accuracy">NO ACCURACY</string>
+</resources>

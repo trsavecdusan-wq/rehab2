@@ -67,8 +67,20 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_DISTANCE_WEEK_METERS = "distance_week_meters"
         private const val PREF_DISTANCE_MONTH_METERS = "distance_month_meters"
         private const val PREF_DISTANCE_YEAR_METERS = "distance_year_meters"
+        private const val PREF_GPS_LAST_ACCURACY_METERS = "gps_last_accuracy_meters"
+        private const val PREF_GPS_LAST_SIGNAL = "gps_last_signal"
+        private const val PREF_GPS_LAST_IGNORED_REASON = "gps_last_ignored_reason"
+        private const val PREF_GPS_RESET_BASELINE_REQUESTED = "gps_reset_baseline_requested"
         private const val MAX_REASONABLE_DISTANCE_METERS = 250f
+        private const val MAX_REASONABLE_ACCURACY_METERS = 30f
         private const val MAX_REASONABLE_SPEED_KMH = 10f
+        private const val GPS_SIGNAL_GOOD = "GOOD"
+        private const val GPS_SIGNAL_WEAK = "WEAK"
+        private const val GPS_REASON_NONE = "NONE"
+        private const val GPS_REASON_NO_ACCURACY = "NO_ACCURACY"
+        private const val GPS_REASON_POOR_ACCURACY = "POOR_ACCURACY"
+        private const val GPS_REASON_INVALID_TIME = "INVALID_TIME"
+        private const val GPS_REASON_TOO_FAST = "TOO_FAST"
 
         private const val PREF_POWER_MODE = "power_mode"
         private const val PREF_POWER_ALLOWED_UNPLUG_MINUTES = "power_allowed_unplug_minutes"
@@ -554,9 +566,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun trackDistance(location: Location) {
         resetDailyDistanceIfNeeded()
+        if (consumePendingGpsBaselineReset()) {
+            previousTrackedLocation = null
+        }
+        if (!location.hasAccuracy()) {
+            updateGpsDiagnostics(location, GPS_SIGNAL_WEAK, GPS_REASON_NO_ACCURACY)
+            return
+        }
+        if (location.accuracy > MAX_REASONABLE_ACCURACY_METERS) {
+            updateGpsDiagnostics(location, GPS_SIGNAL_WEAK, GPS_REASON_POOR_ACCURACY)
+            return
+        }
         val previousLocation = previousTrackedLocation
-        previousTrackedLocation = location
         if (previousLocation == null) {
+            previousTrackedLocation = location
+            updateGpsDiagnostics(location, GPS_SIGNAL_GOOD, GPS_REASON_NONE)
             return
         }
 
@@ -565,6 +589,8 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        previousTrackedLocation = location
+        updateGpsDiagnostics(location, GPS_SIGNAL_GOOD, GPS_REASON_NONE)
         val roundedDistance = distanceMeters.roundToLong().coerceAtLeast(0L)
         if (roundedDistance <= 0L) {
             return
@@ -578,14 +604,45 @@ class MainActivity : AppCompatActivity() {
 
     private fun isReasonableDistance(previousLocation: Location, location: Location, distanceMeters: Float): Boolean {
         if (distanceMeters <= 0f || distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
+            updateGpsDiagnostics(location, GPS_SIGNAL_WEAK, GPS_REASON_TOO_FAST)
             return false
         }
         val elapsedSeconds = (location.time - previousLocation.time) / 1000f
         if (elapsedSeconds <= 0f) {
+            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME)
             return false
         }
         val speedKmh = (distanceMeters / elapsedSeconds) * 3.6f
-        return speedKmh <= MAX_REASONABLE_SPEED_KMH
+        if (speedKmh > MAX_REASONABLE_SPEED_KMH) {
+            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_TOO_FAST)
+            return false
+        }
+        return true
+    }
+
+    private fun updateGpsDiagnostics(location: Location, signal: String, ignoredReason: String) {
+        val accuracyMeters = if (location.hasAccuracy()) location.accuracy else -1f
+        prefs.edit()
+            .putFloat(PREF_GPS_LAST_ACCURACY_METERS, accuracyMeters)
+            .putString(PREF_GPS_LAST_SIGNAL, signal)
+            .putString(PREF_GPS_LAST_IGNORED_REASON, ignoredReason)
+            .apply()
+    }
+
+    private fun gpsSignalForAccuracy(location: Location): String {
+        return if (location.hasAccuracy() && location.accuracy <= MAX_REASONABLE_ACCURACY_METERS) {
+            GPS_SIGNAL_GOOD
+        } else {
+            GPS_SIGNAL_WEAK
+        }
+    }
+
+    private fun consumePendingGpsBaselineReset(): Boolean {
+        if (!prefs.getBoolean(PREF_GPS_RESET_BASELINE_REQUESTED, false)) {
+            return false
+        }
+        prefs.edit().putBoolean(PREF_GPS_RESET_BASELINE_REQUESTED, false).apply()
+        return true
     }
 
     private fun resetDailyDistanceIfNeeded() {
