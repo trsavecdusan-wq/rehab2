@@ -27,6 +27,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.SeekBar
@@ -50,6 +51,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val RADIO_TILE_BLUE = 0xFF2F5F9E.toInt()
         private const val RADIO_TILE_GREEN = 0xFF2E8B57.toInt()
+        private const val RADIO_TILE_EMPTY = 0xFF3A3F45.toInt()
+        private const val RADIO_TILE_MP3 = 0xFF356B73.toInt()
         private const val PREFS_FILE = "rehab2_prefs"
         private const val PREF_PATIENT_LANGUAGE_1 = "patient_language_1"
         private const val PREF_PATIENT_LANGUAGE_2 = "patient_language_2"
@@ -444,13 +447,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun languageLabel(languageCode: String): String {
         return when (languageCode.lowercase(Locale.ROOT)) {
-            "sl" -> "SI Slovenscina"
-            "uk" -> "UA Ukrainian"
-            "en" -> "EN English"
-            "de" -> "DE German"
-            "hr" -> "HR Croatian"
-            "sr" -> "RS Serbian"
-            else -> "SI Slovenscina"
+            "sl" -> getString(R.string.language_label_sl)
+            "uk" -> getString(R.string.language_label_uk)
+            "en" -> getString(R.string.language_label_en)
+            "de" -> getString(R.string.language_label_de)
+            "hr" -> getString(R.string.language_label_hr)
+            "sr" -> getString(R.string.language_label_sr)
+            else -> getString(R.string.language_label_sl)
         }
     }
 
@@ -468,12 +471,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
         AlertDialog.Builder(this)
-            .setTitle("Izberi govorni jezik")
+            .setTitle(R.string.language_picker_title)
             .setAdapter(adapter) { _, which ->
                 prefs.edit().putString(PREF_ACTIVE_SPEECH_LANGUAGE, configuredLanguages[which]).apply()
                 refreshStatusModule()
             }
-            .setNegativeButton("PrekliÄŤi", null)
+            .setNegativeButton(R.string.dialog_cancel, null)
             .show()
     }
 
@@ -481,13 +484,13 @@ class MainActivity : AppCompatActivity() {
         val input = EditText(this).apply {
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
             transformationMethod = PasswordTransformationMethod.getInstance()
-            hint = "Administratorski PIN"
+            hint = getString(R.string.admin_pin_hint)
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
         }
-        AlertDialog.Builder(this)
-            .setTitle("Vnesite administratorski PIN")
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.admin_pin_title)
             .setView(input)
-            .setPositiveButton("V redu") { _, _ ->
+            .setPositiveButton(R.string.dialog_ok) { _, _ ->
                 val enteredPin = input.text?.toString().orEmpty()
                 val expectedPin = prefs.getString(PREF_ADMIN_PIN, DEFAULT_ADMIN_PIN).orEmpty().ifBlank { DEFAULT_ADMIN_PIN }
                 if (enteredPin == expectedPin) {
@@ -497,13 +500,16 @@ class MainActivity : AppCompatActivity() {
                         startActivity(Intent(this, SettingsActivity::class.java))
                     }
                 } else {
-                    Toast.makeText(this, "NapaÄŤen PIN", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.wrong_pin), Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("PrekliÄŤi", null)
+            .setNegativeButton(R.string.dialog_cancel, null)
             .show()
+        input.requestFocus()
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        inputMethodManager?.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
     }
-
     private fun getPowerMode(): String =
         prefs.getString(PREF_POWER_MODE, DEFAULT_POWER_MODE).orEmpty().ifBlank { DEFAULT_POWER_MODE }
 
@@ -699,10 +705,10 @@ class MainActivity : AppCompatActivity() {
 
         radioTiles.forEachIndexed { index, textView ->
             if (index == MP3_TILE_INDEX) {
-                textView.text = "MP3"
+                textView.text = getString(R.string.mp3_tile_label)
             } else {
                 val station = visibleRadioStations[index]
-                textView.text = station?.buttonLabel?.ifBlank { station.name } ?: fallbackRadioLabels[index]
+                textView.text = station?.buttonLabel?.ifBlank { station.name } ?: getString(R.string.radio_empty_label)
             }
         }
 
@@ -757,7 +763,7 @@ class MainActivity : AppCompatActivity() {
 
         val station = visibleRadioStations.getOrNull(index)
         if (station == null) {
-            Toast.makeText(this, "Ni postaje", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.radio_station_missing), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -781,12 +787,16 @@ class MainActivity : AppCompatActivity() {
     private fun updateRadioTileColors() {
         radioTiles.forEachIndexed { index, textView ->
             if (index == MP3_TILE_INDEX) {
-                textView.setBackgroundColor(RADIO_TILE_BLUE)
+                textView.setBackgroundColor(RADIO_TILE_MP3)
                 return@forEachIndexed
             }
             val station = visibleRadioStations.getOrNull(index)
-            val isActive = station != null && activeStationKey == stationKey(station)
-            textView.setBackgroundColor(if (isActive) RADIO_TILE_GREEN else RADIO_TILE_BLUE)
+            if (station == null) {
+                textView.setBackgroundColor(RADIO_TILE_EMPTY)
+            } else {
+                val isActive = activeStationKey == stationKey(station)
+                textView.setBackgroundColor(if (isActive) RADIO_TILE_GREEN else RADIO_TILE_BLUE)
+            }
         }
     }
 
