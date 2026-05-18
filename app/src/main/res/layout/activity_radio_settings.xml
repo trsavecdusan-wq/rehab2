@@ -310,8 +310,37 @@
             android:id="@+id/btnAddStation"
             android:layout_width="match_parent"
             android:layout_height="64dp"
+            android:layout_marginBottom="24dp"
             android:backgroundTint="#3E7C4A"
             android:text="DODAJ POSTAJO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="@string/mp3_section_title"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="@string/mp3_section_description"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnOpenLocalMusicSettings"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:backgroundTint="#356B73"
+            android:text="@string/mp3_open_settings_button"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="18sp"

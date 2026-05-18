@@ -11,6 +11,10 @@ import com.rehab2.radio.SavedRadioStation
 import com.rehab2.radio.RadioStationStore
 
 class RadioSettingsActivity : AppCompatActivity() {
+    companion object {
+        private const val MP3_SLOT_INDEX = 5
+    }
+
     private var currentPage = 1
     private lateinit var pageLabel: TextView
     private lateinit var stationLabels: List<TextView>
@@ -68,6 +72,10 @@ class RadioSettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnAddStation).setOnClickListener {
             startActivity(Intent(this, AddRadioStationActivity::class.java))
         }
+
+        findViewById<Button>(R.id.btnOpenLocalMusicSettings).setOnClickListener {
+            startActivity(Intent(this, LocalMusicActivity::class.java))
+        }
     }
 
     override fun onResume() {
@@ -80,10 +88,31 @@ class RadioSettingsActivity : AppCompatActivity() {
 
         pageLabel.text = "STRAN $currentPage"
         stationLabels.forEachIndexed { index, textView ->
-            val station = stationsOnPage.firstOrNull { it.position == index + 1 }
-            textView.text = station?.buttonLabel?.ifBlank { station.name } ?: "PRAZNO"
-            bindVisibleButton(index, station)
-            bindEditButton(index, station)
+            if (index == MP3_SLOT_INDEX) {
+                textView.text = getString(R.string.mp3_settings_label)
+                bindMp3ButtonState(index)
+            } else {
+                val station = stationsOnPage.firstOrNull { it.position == index + 1 }
+                textView.text = station?.buttonLabel?.ifBlank { station.name } ?: getString(R.string.radio_empty_label)
+                bindVisibleButton(index, station)
+                bindEditButton(index, station)
+            }
+        }
+    }
+
+    private fun bindMp3ButtonState(index: Int) {
+        val visibleButton = visibleButtons[index]
+        visibleButton.text = getString(R.string.mp3_open_label)
+        visibleButton.isEnabled = true
+        visibleButton.backgroundTintList = ColorStateList.valueOf(0xFF356B73.toInt())
+        visibleButton.setOnClickListener {
+            startActivity(Intent(this, LocalMusicActivity::class.java))
+        }
+
+        val editButton = editButtons[index]
+        editButton.text = getString(R.string.mp3_settings_button_label)
+        editButton.setOnClickListener {
+            startActivity(Intent(this, LocalMusicActivity::class.java))
         }
     }
 
@@ -94,7 +123,7 @@ class RadioSettingsActivity : AppCompatActivity() {
             button.isEnabled = true
             button.backgroundTintList = ColorStateList.valueOf(0xFF3A3F45.toInt())
             button.setOnClickListener {
-                Toast.makeText(this, "Ni postaje", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.radio_station_missing), Toast.LENGTH_SHORT).show()
             }
             return
         }
@@ -116,7 +145,7 @@ class RadioSettingsActivity : AppCompatActivity() {
         val button = editButtons[index]
         button.setOnClickListener {
             if (station == null) {
-                Toast.makeText(this, "Ni postaje", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.radio_station_missing), Toast.LENGTH_SHORT).show()
             } else {
                 val intent = Intent(this, RadioStationEditActivity::class.java).apply {
                     putExtra(RadioStationEditActivity.EXTRA_STATION_UUID, station.stationUuid)
