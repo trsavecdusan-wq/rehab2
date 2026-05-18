@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:width="48dp"
-        android:height="32dp">
+        android:width="54dp"
+        android:height="30dp">
         <shape android:shape="rectangle">
             <solid android:color="#FFFFFF" />
+            <corners android:radius="2dp" />
             <stroke
                 android:width="1dp"
                 android:color="#334455" />
@@ -12,21 +13,21 @@
     </item>
 
     <item
-        android:width="48dp"
-        android:height="32dp"
+        android:width="54dp"
+        android:height="30dp"
         android:top="10dp">
         <shape android:shape="rectangle">
-            <size android:height="11dp" />
+            <size android:height="10dp" />
             <solid android:color="#1F57A4" />
         </shape>
     </item>
 
     <item
-        android:width="48dp"
-        android:height="32dp"
-        android:top="21dp">
+        android:width="54dp"
+        android:height="30dp"
+        android:top="20dp">
         <shape android:shape="rectangle">
-            <size android:height="11dp" />
+            <size android:height="10dp" />
             <solid android:color="#D04545" />
         </shape>
     </item>

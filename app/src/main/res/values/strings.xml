@@ -55,4 +55,7 @@
     <string name="aac_label_zdravnik">ZDRAVNIK</string>
     <string name="aac_label_druzina">DRU&#381;INA</string>
     <string name="aac_label_stop">STOP</string>
-</resources>
+    <string name="power_overlay_connect_power">PRIKLOPITE NAPAJANJE</string>
+    <string name="power_overlay_power_disconnected">NAPAJANJE NI PRIKLOPLJENO</string>
+    <string name="power_overlay_battery_saver_active">VAR&#268;EVALNI NA&#268;IN AKTIVEN</string>
+    <string name="power_overlay_sleep_mode_active">SLEEP NA&#268;IN AKTIVEN</string></resources>

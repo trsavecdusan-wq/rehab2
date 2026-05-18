@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_DISTANCE_MONTH_METERS = "distance_month_meters"
         private const val PREF_DISTANCE_YEAR_METERS = "distance_year_meters"
         private const val MAX_REASONABLE_DISTANCE_METERS = 250f
-        private const val MAX_REASONABLE_SPEED_MPS = 15f
+        private const val MAX_REASONABLE_SPEED_KMH = 10f
 
         private const val PREF_POWER_MODE = "power_mode"
         private const val PREF_POWER_ALLOWED_UNPLUG_MINUTES = "power_allowed_unplug_minutes"
@@ -580,12 +580,12 @@ class MainActivity : AppCompatActivity() {
         if (distanceMeters <= 0f || distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
             return false
         }
-        val deltaMs = (location.time - previousLocation.time).coerceAtLeast(0L)
-        if (deltaMs == 0L) {
-            return distanceMeters <= 25f
+        val elapsedSeconds = (location.time - previousLocation.time) / 1000f
+        if (elapsedSeconds <= 0f) {
+            return false
         }
-        val speedMps = distanceMeters / (deltaMs / 1000f)
-        return speedMps <= MAX_REASONABLE_SPEED_MPS
+        val speedKmh = (distanceMeters / elapsedSeconds) * 3.6f
+        return speedKmh <= MAX_REASONABLE_SPEED_KMH
     }
 
     private fun resetDailyDistanceIfNeeded() {
@@ -753,20 +753,20 @@ class MainActivity : AppCompatActivity() {
 
         if (now < sleepAt) {
             showPowerOverlay(
-                "PRIKLOPITE NAPAJANJE",
-                "NAPAJANJE NI PRIKLOPLJENO"
+                getString(R.string.power_overlay_connect_power),
+                getString(R.string.power_overlay_power_disconnected)
             )
             setScreenDimmed(false)
             return
         }
 
         val secondaryText = if (getPowerMode() == POWER_MODE_BATTERY_SAVER) {
-            "VARÄ‚â€žÄąĹˇEVALNI NAÄ‚â€žÄąĹˇIN AKTIVEN"
+            getString(R.string.power_overlay_battery_saver_active)
         } else {
-            "SLEEP NAÄ‚â€žÄąĹˇIN AKTIVEN"
+            getString(R.string.power_overlay_sleep_mode_active)
         }
         showPowerOverlay(
-            "PRIKLOPITE NAPAJANJE",
+            getString(R.string.power_overlay_connect_power),
             secondaryText
         )
         setScreenDimmed(true)
