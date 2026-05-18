@@ -12,6 +12,9 @@
     <string name="dialog_ok">V REDU</string>
     <string name="dialog_cancel">PREKLI&#268;I</string>
     <string name="wrong_pin">NAPA&#268;EN PIN</string>
+    <string name="keep_screen_on_charging_label">ZASLON VEDNO VKLOPLJEN MED NAPAJANJEM</string>
+    <string name="keep_screen_on_charging_enabled">VKLOPLJENO</string>
+    <string name="keep_screen_on_charging_disabled">IZKLOPLJENO</string>
     <string name="mp3_tile_label">MP3</string>
     <string name="mp3_settings_label">MP3 / LOKALNA GLASBA</string>
     <string name="mp3_open_label">ODPRI</string>

@@ -202,13 +202,15 @@
 
                 <TextView
                     android:id="@+id/txtStatusLanguageFlag"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
+                    android:layout_width="36dp"
+                    android:layout_height="24dp"
+                    android:gravity="center"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
                     android:text="SI"
                     android:textColor="#F4F7FA"
-                    android:textSize="20sp" />
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
                 <Space
                     android:layout_width="0dp"

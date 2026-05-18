@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_POWER_WARNING_GRACE_MINUTES = "power_warning_grace_minutes"
         private const val PREF_POWER_CRITICAL_BATTERY_PERCENT = "power_critical_battery_percent"
         private const val PREF_POWER_ADMIN_BYPASS_UNTIL = "power_admin_bypass_until"
+        private const val PREF_KEEP_SCREEN_ON_WHILE_CHARGING = "keep_screen_on_while_charging"
 
         private const val POWER_MODE_ALWAYS_ON = "ALWAYS_ON"
         private const val POWER_MODE_BATTERY_SAVER = "BATTERY_SAVER"
@@ -85,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         private const val DEFAULT_POWER_WARNING_GRACE_MINUTES = 5
         private const val DEFAULT_POWER_CRITICAL_BATTERY_PERCENT = 20
         private const val DEFAULT_POWER_ADMIN_BYPASS_UNTIL = 0L
+        private const val DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING = true
 
         private const val POWER_BYPASS_DURATION_MS = 15 * 60 * 1000L
         private const val POWER_CHECK_INTERVAL_MS = 1000L
@@ -151,8 +153,14 @@ class MainActivity : AppCompatActivity() {
     private val powerReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Intent.ACTION_POWER_CONNECTED -> updatePowerConnectedState(true)
-                Intent.ACTION_POWER_DISCONNECTED -> updatePowerConnectedState(false)
+                Intent.ACTION_POWER_CONNECTED,
+                Intent.ACTION_POWER_DISCONNECTED,
+                Intent.ACTION_BATTERY_CHANGED -> {
+                    updatePowerConnectedState(isPluggedFromBatteryIntent(intent))
+                    refreshStatusModule()
+                    applyKeepScreenOnPolicy()
+                    evaluatePowerState()
+                }
             }
         }
     }
@@ -266,6 +274,7 @@ class MainActivity : AppCompatActivity() {
 
         refreshStatusModule()
         refreshInitialPowerState()
+        applyKeepScreenOnPolicy()
         evaluatePowerState()
     }
 
@@ -275,6 +284,7 @@ class MainActivity : AppCompatActivity() {
         syncVolumeSlider()
         refreshRadioTiles()
         refreshStatusModule()
+        applyKeepScreenOnPolicy()
         startStatusUpdates()
         startSpeedUpdates()
         registerPowerReceiver()
@@ -388,13 +398,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshStatusModule() {
         val activeLanguage = getActiveSpeechLanguage()
-        txtStatusLanguageFlag.text = flagForLanguage(activeLanguage)
-        txtStatusLanguageFlag.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            flagDrawableForLanguage(activeLanguage),
-            0,
-            0,
-            0
-        )
+        val flagDrawable = flagDrawableForLanguage(activeLanguage)
+        txtStatusLanguageFlag.text = if (flagDrawable != 0) "" else flagForLanguage(activeLanguage)
+        txtStatusLanguageFlag.setCompoundDrawablesRelativeWithIntrinsicBounds(flagDrawable, 0, 0, 0)
         txtStatusLanguageFlag.compoundDrawablePadding = dpToPx(6)
         txtStatusBattery.text = "${readBatteryPercentage()}%"
         txtStatusNetwork.text = readNetworkLabel()
@@ -608,6 +614,9 @@ class MainActivity : AppCompatActivity() {
     private fun getPowerBypassUntil(): Long =
         prefs.getLong(PREF_POWER_ADMIN_BYPASS_UNTIL, DEFAULT_POWER_ADMIN_BYPASS_UNTIL)
 
+    private fun isKeepScreenOnWhileChargingEnabled(): Boolean =
+        prefs.getBoolean(PREF_KEEP_SCREEN_ON_WHILE_CHARGING, DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING)
+
     private fun isPowerBypassActive(): Boolean =
         System.currentTimeMillis() < getPowerBypassUntil()
 
@@ -627,6 +636,7 @@ class MainActivity : AppCompatActivity() {
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_POWER_CONNECTED)
             addAction(Intent.ACTION_POWER_DISCONNECTED)
+            addAction(Intent.ACTION_BATTERY_CHANGED)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -682,6 +692,16 @@ class MainActivity : AppCompatActivity() {
                 powerWarningShownAtMs = 0L
             }
             isPowerConnected = false
+        }
+        applyKeepScreenOnPolicy()
+    }
+
+    private fun applyKeepScreenOnPolicy() {
+        val keepScreenOn = isPowerConnected && isKeepScreenOnWhileChargingEnabled()
+        if (keepScreenOn) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
     }
 

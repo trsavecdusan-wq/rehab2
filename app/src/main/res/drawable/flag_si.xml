@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:width="22dp"
-        android:height="16dp">
+        android:width="28dp"
+        android:height="20dp">
         <shape android:shape="rectangle">
             <solid android:color="#FFFFFF" />
             <stroke
@@ -12,21 +12,21 @@
     </item>
 
     <item
-        android:width="22dp"
-        android:height="16dp"
-        android:top="5dp">
+        android:width="28dp"
+        android:height="20dp"
+        android:top="6dp">
         <shape android:shape="rectangle">
-            <size android:height="5dp" />
+            <size android:height="7dp" />
             <solid android:color="#1F57A4" />
         </shape>
     </item>
 
     <item
-        android:width="22dp"
-        android:height="16dp"
-        android:top="10dp">
+        android:width="28dp"
+        android:height="20dp"
+        android:top="13dp">
         <shape android:shape="rectangle">
-            <size android:height="6dp" />
+            <size android:height="7dp" />
             <solid android:color="#D04545" />
         </shape>
     </item>

@@ -19,6 +19,7 @@ class SettingsActivity : AppCompatActivity() {
         private const val PREF_POWER_WARNING_GRACE_MINUTES = "power_warning_grace_minutes"
         private const val PREF_POWER_CRITICAL_BATTERY_PERCENT = "power_critical_battery_percent"
         private const val PREF_POWER_ADMIN_BYPASS_UNTIL = "power_admin_bypass_until"
+        private const val PREF_KEEP_SCREEN_ON_WHILE_CHARGING = "keep_screen_on_while_charging"
         private const val PREF_DISTANCE_TODAY_METERS = "distance_today_meters"
         private const val PREF_DISTANCE_TOTAL_METERS = "distance_total_meters"
         private const val PREF_DISTANCE_WEEK_METERS = "distance_week_meters"
@@ -33,12 +34,14 @@ class SettingsActivity : AppCompatActivity() {
         private const val DEFAULT_ALLOWED_UNPLUG_MINUTES = 15
         private const val DEFAULT_WARNING_GRACE_MINUTES = 5
         private const val DEFAULT_CRITICAL_BATTERY_PERCENT = 20
+        private const val DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING = true
     }
 
     private lateinit var prefs: SharedPreferences
     private lateinit var btnPowerOff: Button
     private lateinit var btnPowerWarning: Button
     private lateinit var btnPowerSleep: Button
+    private lateinit var btnKeepScreenOnWhileCharging: Button
     private lateinit var txtAllowedUnplugValue: TextView
     private lateinit var txtWarningGraceValue: TextView
     private lateinit var txtCriticalBatteryValue: TextView
@@ -54,6 +57,7 @@ class SettingsActivity : AppCompatActivity() {
         btnPowerOff = findViewById(R.id.btnPowerModeOff)
         btnPowerWarning = findViewById(R.id.btnPowerModeWarning)
         btnPowerSleep = findViewById(R.id.btnPowerModeSleep)
+        btnKeepScreenOnWhileCharging = findViewById(R.id.btnKeepScreenOnWhileCharging)
         txtAllowedUnplugValue = findViewById(R.id.txtAllowedUnplugValue)
         txtWarningGraceValue = findViewById(R.id.txtWarningGraceValue)
         txtCriticalBatteryValue = findViewById(R.id.txtCriticalBatteryValue)
@@ -91,6 +95,12 @@ class SettingsActivity : AppCompatActivity() {
 
         btnPowerSleep.setOnClickListener {
             setPowerMode(POWER_MODE_POWER_SLEEP)
+        }
+
+        btnKeepScreenOnWhileCharging.setOnClickListener {
+            val enabled = prefs.getBoolean(PREF_KEEP_SCREEN_ON_WHILE_CHARGING, DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING)
+            prefs.edit().putBoolean(PREF_KEEP_SCREEN_ON_WHILE_CHARGING, !enabled).apply()
+            refreshPowerSection()
         }
 
         findViewById<Button>(R.id.btnAllowedUnplugMinus).setOnClickListener {
@@ -150,11 +160,23 @@ class SettingsActivity : AppCompatActivity() {
         val allowedUnplugMinutes = prefs.getInt(PREF_POWER_ALLOWED_UNPLUG_MINUTES, DEFAULT_ALLOWED_UNPLUG_MINUTES)
         val warningGraceMinutes = prefs.getInt(PREF_POWER_WARNING_GRACE_MINUTES, DEFAULT_WARNING_GRACE_MINUTES)
         val criticalBatteryPercent = prefs.getInt(PREF_POWER_CRITICAL_BATTERY_PERCENT, DEFAULT_CRITICAL_BATTERY_PERCENT)
+        val keepScreenOnWhileCharging = prefs.getBoolean(
+            PREF_KEEP_SCREEN_ON_WHILE_CHARGING,
+            DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING
+        )
 
         txtAllowedUnplugValue.text = "$allowedUnplugMinutes MIN"
         txtWarningGraceValue.text = "$warningGraceMinutes MIN"
         txtCriticalBatteryValue.text = "$criticalBatteryPercent %"
         txtPowerStatusValue.text = buildPowerStatus(powerMode)
+        btnKeepScreenOnWhileCharging.text = if (keepScreenOnWhileCharging) {
+            getString(R.string.keep_screen_on_charging_enabled)
+        } else {
+            getString(R.string.keep_screen_on_charging_disabled)
+        }
+        btnKeepScreenOnWhileCharging.setBackgroundColor(
+            if (keepScreenOnWhileCharging) 0xFF2E8B57.toInt() else 0xFF3A3F45.toInt()
+        )
 
         updateModeButtonStyles(powerMode)
     }
