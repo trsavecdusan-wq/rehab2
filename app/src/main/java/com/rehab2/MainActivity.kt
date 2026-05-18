@@ -420,6 +420,7 @@ class MainActivity : AppCompatActivity() {
             txtStatusLanguageFlag.background = null
             txtStatusLanguageFlag.text = flagForLanguage(activeLanguage)
         }
+        txtStatusBattery.text = readBatteryPercentage()?.let { "$it%" } ?: getString(R.string.battery_unknown_short)
         txtStatusNetwork.text = readNetworkLabel()
         val now = Date()
         txtStatusDay.text = dayFormat.format(now).replaceFirstChar { it.titlecase(Locale.getDefault()) }
@@ -428,20 +429,14 @@ class MainActivity : AppCompatActivity() {
         txtStatusSpeed.text = currentSpeedKmh.toString()
     }
 
-    private fun readBatteryPercentage(): Int {
-        val batteryManager = getSystemService(BATTERY_SERVICE) as BatteryManager
-        val propertyValue = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-        if (propertyValue in 1..100) {
-            return propertyValue
-        }
-
+    private fun readBatteryPercentage(): Int? {
         val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         val level = batteryIntent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
         val scale = batteryIntent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
         return if (level >= 0 && scale > 0) {
             ((level * 100f) / scale).roundToInt().coerceIn(0, 100)
         } else {
-            0
+            null
         }
     }
 

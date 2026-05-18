@@ -76,4 +76,5 @@
     <string name="power_status_battery_unknown">BATERIJA: NEZNANO</string>
     <string name="power_status_battery_percent_format">BATERIJA: %1$d%%</string>
     <string name="power_status_sleep_active">POWER SLEEP AKTIVEN</string>
+    <string name="battery_unknown_short">NEZNANO</string>
 </resources>

@@ -20,6 +20,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.util.Locale
+import kotlin.math.roundToInt
 
 class SettingsActivity : AppCompatActivity() {
     companion object {
@@ -246,7 +247,7 @@ class SettingsActivity : AppCompatActivity() {
         } else {
             getString(R.string.keep_screen_on_charging_disabled)
         }
-        btnKeepScreenOnWhileCharging.setBackgroundColor(
+        btnKeepScreenOnWhileCharging.backgroundTintList = ColorStateList.valueOf(
             if (keepScreenOnWhileCharging) 0xFF2E8B57.toInt() else 0xFF3A3F45.toInt()
         )
 
@@ -289,49 +290,19 @@ class SettingsActivity : AppCompatActivity() {
     private fun buildPowerStatus(powerMode: String): String {
         val selectedModeText = getString(R.string.power_selected_mode_format, powerModeLabel(powerMode))
 
-        if (latestPluggedIn) {
-            return "$selectedModeText\n${getString(R.string.power_status_plugged)}\n${batteryStatusLine()}"
-        }
-
-        val batteryPercent = latestBatteryPercent
-        if (batteryPercent == null) {
-            return "$selectedModeText\n${getString(R.string.power_status_battery_unknown)}"
-        }
-
-        if (powerMode == POWER_MODE_ALWAYS_ON) {
-            return "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
-        }
-
-        val bypassUntil = prefs.getLong(PREF_POWER_ADMIN_BYPASS_UNTIL, 0L)
-        if (System.currentTimeMillis() < bypassUntil) {
-            return "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
-        }
-
-        val warningMinutes = prefs.getInt(PREF_POWER_ALLOWED_UNPLUG_MINUTES, DEFAULT_ALLOWED_UNPLUG_MINUTES)
-        val graceMinutes = prefs.getInt(PREF_POWER_WARNING_GRACE_MINUTES, DEFAULT_WARNING_GRACE_MINUTES)
-        val warningWindowMs = (warningMinutes + graceMinutes) * 60_000L
-        val criticalBatteryPercent = prefs.getInt(PREF_POWER_CRITICAL_BATTERY_PERCENT, DEFAULT_CRITICAL_BATTERY_PERCENT)
-
-        return if (powerMode == POWER_MODE_POWER_SLEEP && batteryPercent <= criticalBatteryPercent) {
-            "$selectedModeText\n${getString(R.string.power_status_sleep_active)}\n${batteryStatusLine()}"
-        } else if (powerMode == POWER_MODE_BATTERY_SAVER && batteryPercent <= criticalBatteryPercent) {
-            "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
-        } else if (warningWindowMs > 0L && batteryPercent <= criticalBatteryPercent && powerMode != POWER_MODE_ALWAYS_ON) {
-            if (powerMode == POWER_MODE_POWER_SLEEP) {
-                "$selectedModeText\n${getString(R.string.power_status_sleep_active)}\n${batteryStatusLine()}"
-            } else {
-                "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
-            }
+        val powerSourceText = if (latestPluggedIn) {
+            getString(R.string.power_status_plugged)
         } else {
-            "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
+            getString(R.string.power_status_on_battery)
         }
+        return "$selectedModeText\n$powerSourceText\n${batteryStatusLine()}"
     }
 
     private fun readBatteryPercent(batteryIntent: Intent?): Int? {
         val level = batteryIntent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
         val scale = batteryIntent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
         return if (level >= 0 && scale > 0) {
-            ((level * 100f) / scale).toInt().coerceIn(0, 100)
+            ((level * 100f) / scale).roundToInt().coerceIn(0, 100)
         } else {
             null
         }
