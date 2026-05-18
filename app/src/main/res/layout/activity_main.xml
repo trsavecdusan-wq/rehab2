@@ -202,12 +202,12 @@
 
                 <TextView
                     android:id="@+id/txtStatusLanguageFlag"
-                    android:layout_width="72dp"
-                    android:layout_height="44dp"
+                    android:layout_width="84dp"
+                    android:layout_height="52dp"
                     android:gravity="center"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
-                    android:text="SI"
+                    android:text=""
                     android:textColor="#F4F7FA"
                     android:textSize="16sp"
                     android:textStyle="bold" />
