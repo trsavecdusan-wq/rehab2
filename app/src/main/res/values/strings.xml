@@ -39,4 +39,20 @@
     <string name="radio_previous_page">PREJŠNJA STRAN</string>
     <string name="radio_next_page">NASLEDNJA STRAN</string>
     <string name="radio_add_station">DODAJ POSTAJO</string>
+    <string name="aac_label_zejna">&#381;EJNA</string>
+    <string name="aac_label_lacna">LA&#268;NA</string>
+    <string name="aac_label_pomoc">POMO&#268;</string>
+    <string name="aac_label_da">DA</string>
+    <string name="aac_label_wc">WC</string>
+    <string name="aac_label_dobro">DOBRO</string>
+    <string name="aac_label_slabo">SLABO</string>
+    <string name="aac_label_ne">NE</string>
+    <string name="aac_label_utrujena">UTRUJENA</string>
+    <string name="aac_label_mraz">MRAZ</string>
+    <string name="aac_label_vroce">VRO&#268;E</string>
+    <string name="aac_label_bolecina">BOLE&#268;INA</string>
+    <string name="aac_label_domov">DOMOV</string>
+    <string name="aac_label_zdravnik">ZDRAVNIK</string>
+    <string name="aac_label_druzina">DRU&#381;INA</string>
+    <string name="aac_label_stop">STOP</string>
 </resources>

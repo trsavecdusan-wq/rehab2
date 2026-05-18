@@ -101,6 +101,7 @@ class SettingsActivity : AppCompatActivity() {
             val enabled = prefs.getBoolean(PREF_KEEP_SCREEN_ON_WHILE_CHARGING, DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING)
             prefs.edit().putBoolean(PREF_KEEP_SCREEN_ON_WHILE_CHARGING, !enabled).apply()
             refreshPowerSection()
+            applyKeepScreenOnWhileCharging()
         }
 
         findViewById<Button>(R.id.btnAllowedUnplugMinus).setOnClickListener {
@@ -129,12 +130,14 @@ class SettingsActivity : AppCompatActivity() {
 
         refreshPowerSection()
         refreshStatisticsSection()
+        applyKeepScreenOnWhileCharging()
     }
 
     override fun onResume() {
         super.onResume()
         refreshPowerSection()
         refreshStatisticsSection()
+        applyKeepScreenOnWhileCharging()
     }
 
     private fun setPowerMode(mode: String) {
@@ -247,5 +250,20 @@ class SettingsActivity : AppCompatActivity() {
         } else {
             "$meters M"
         }
+    }
+
+    private fun applyKeepScreenOnWhileCharging() {
+        val keepScreenOn = isCurrentlyPluggedIn() &&
+            prefs.getBoolean(PREF_KEEP_SCREEN_ON_WHILE_CHARGING, DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING)
+        if (keepScreenOn) {
+            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
+    private fun isCurrentlyPluggedIn(): Boolean {
+        val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        return (batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0
     }
 }

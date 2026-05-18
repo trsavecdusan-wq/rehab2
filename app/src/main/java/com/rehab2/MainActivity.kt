@@ -123,6 +123,7 @@ class MainActivity : AppCompatActivity() {
     private var powerWarningShownAtMs = 0L
     private var isPowerOverlayVisible = false
     private var isSleepDimActive = false
+    private var isKeepScreenOnApplied = false
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -248,27 +249,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         val aacTiles = listOf(
-            R.id.tileAacZejna to "Ĺ˝EJNA",
-            R.id.tileAacLacna to "LAÄŚNA",
-            R.id.tileAacPomoc to "POMOÄŚ",
-            R.id.tileAacDa to "DA",
-            R.id.tileAacWc to "WC",
-            R.id.tileAacDobro to "DOBRO",
-            R.id.tileAacSlabo to "SLABO",
-            R.id.tileAacNe to "NE",
-            R.id.tileAacUtrujena to "UTRUJENA",
-            R.id.tileAacMraz to "MRAZ",
-            R.id.tileAacVroce to "VROÄŚE",
-            R.id.tileAacBolecina to "BOLEÄŚINA",
-            R.id.tileAacDomov to "DOMOV",
-            R.id.tileAacZdravnik to "ZDRAVNIK",
-            R.id.tileAacDruzina to "DRUĹ˝INA",
-            R.id.tileAacStop to "STOP"
+            R.id.tileAacZejna to R.string.aac_label_zejna,
+            R.id.tileAacLacna to R.string.aac_label_lacna,
+            R.id.tileAacPomoc to R.string.aac_label_pomoc,
+            R.id.tileAacDa to R.string.aac_label_da,
+            R.id.tileAacWc to R.string.aac_label_wc,
+            R.id.tileAacDobro to R.string.aac_label_dobro,
+            R.id.tileAacSlabo to R.string.aac_label_slabo,
+            R.id.tileAacNe to R.string.aac_label_ne,
+            R.id.tileAacUtrujena to R.string.aac_label_utrujena,
+            R.id.tileAacMraz to R.string.aac_label_mraz,
+            R.id.tileAacVroce to R.string.aac_label_vroce,
+            R.id.tileAacBolecina to R.string.aac_label_bolecina,
+            R.id.tileAacDomov to R.string.aac_label_domov,
+            R.id.tileAacZdravnik to R.string.aac_label_zdravnik,
+            R.id.tileAacDruzina to R.string.aac_label_druzina,
+            R.id.tileAacStop to R.string.aac_label_stop
         )
 
-        aacTiles.forEach { (tileId, label) ->
+        aacTiles.forEach { (tileId, labelRes) ->
             findViewById<View>(tileId).setOnClickListener {
-                Toast.makeText(this, label, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(labelRes), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -399,10 +400,14 @@ class MainActivity : AppCompatActivity() {
     private fun refreshStatusModule() {
         val activeLanguage = getActiveSpeechLanguage()
         val flagDrawable = flagDrawableForLanguage(activeLanguage)
-        txtStatusLanguageFlag.text = if (flagDrawable != 0) "" else flagForLanguage(activeLanguage)
-        txtStatusLanguageFlag.setCompoundDrawablesRelativeWithIntrinsicBounds(flagDrawable, 0, 0, 0)
-        txtStatusLanguageFlag.compoundDrawablePadding = dpToPx(6)
-        txtStatusBattery.text = "${readBatteryPercentage()}%"
+        if (flagDrawable != 0) {
+            txtStatusLanguageFlag.text = ""
+            txtStatusLanguageFlag.background = ContextCompat.getDrawable(this, flagDrawable)
+            txtStatusLanguageFlag.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
+        } else {
+            txtStatusLanguageFlag.background = null
+            txtStatusLanguageFlag.text = flagForLanguage(activeLanguage)
+        }
         txtStatusNetwork.text = readNetworkLabel()
         val now = Date()
         txtStatusDay.text = dayFormat.format(now).replaceFirstChar { it.titlecase(Locale.getDefault()) }
@@ -697,12 +702,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyKeepScreenOnPolicy() {
-        val keepScreenOn = isPowerConnected && isKeepScreenOnWhileChargingEnabled()
-        if (keepScreenOn) {
+        val shouldKeepScreenOn = isPowerConnected && isKeepScreenOnWhileChargingEnabled()
+        if (shouldKeepScreenOn == isKeepScreenOnApplied) {
+            return
+        }
+        if (shouldKeepScreenOn) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
+        isKeepScreenOnApplied = shouldKeepScreenOn
     }
 
     private fun evaluatePowerState() {
@@ -752,9 +761,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         val secondaryText = if (getPowerMode() == POWER_MODE_BATTERY_SAVER) {
-            "VARÄŚEVALNI NAÄŚIN AKTIVEN"
+            "VARÄ‚â€žÄąĹˇEVALNI NAÄ‚â€žÄąĹˇIN AKTIVEN"
         } else {
-            "SLEEP NAÄŚIN AKTIVEN"
+            "SLEEP NAÄ‚â€žÄąĹˇIN AKTIVEN"
         }
         showPowerOverlay(
             "PRIKLOPITE NAPAJANJE",

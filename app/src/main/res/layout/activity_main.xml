@@ -202,14 +202,14 @@
 
                 <TextView
                     android:id="@+id/txtStatusLanguageFlag"
-                    android:layout_width="36dp"
-                    android:layout_height="24dp"
+                    android:layout_width="56dp"
+                    android:layout_height="40dp"
                     android:gravity="center"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
                     android:text="SI"
                     android:textColor="#F4F7FA"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <Space
@@ -233,7 +233,7 @@
                     android:layout_height="wrap_content"
                     android:text="o"
                     android:textColor="#6FD38A"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -261,7 +261,7 @@
                         android:layout_height="wrap_content"
                         android:text="Torek"
                         android:textColor="#B8C0C8"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
