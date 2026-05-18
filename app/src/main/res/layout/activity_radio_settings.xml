@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:gravity="center"
-            android:text="RADIO NASTAVITVE"
+            android:text="@string/radio_settings_title"
             android:textColor="#F4F7FA"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -26,7 +26,7 @@
             android:layout_height="72dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="#2F5F9E"
-            android:text="NAZAJ"
+            android:text="@string/back_button_label"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="20sp"
@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="STRAN 1"
+            android:text="@string/radio_page_preview"
             android:textColor="#F4F7FA"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -56,7 +56,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="1. Radio 1"
+                android:text="@string/radio_slot_1_preview"
                 android:textColor="#F4F7FA"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="#3E7C4A"
-                android:text="VIDNO"
+                android:text="@string/radio_visibility_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#214A78"
-                android:text="UREDI"
+                android:text="@string/radio_edit_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -96,7 +96,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="2. Radio 2"
+                android:text="@string/radio_slot_2_preview"
                 android:textColor="#F4F7FA"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -107,7 +107,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="#3E7C4A"
-                android:text="VIDNO"
+                android:text="@string/radio_visibility_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -116,7 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#214A78"
-                android:text="UREDI"
+                android:text="@string/radio_edit_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -136,7 +136,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="3. ROKS UA"
+                android:text="@string/radio_slot_3_preview"
                 android:textColor="#F4F7FA"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -147,7 +147,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="#3E7C4A"
-                android:text="VIDNO"
+                android:text="@string/radio_visibility_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -156,7 +156,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#214A78"
-                android:text="UREDI"
+                android:text="@string/radio_edit_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -176,7 +176,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="4. Kiss FM"
+                android:text="@string/radio_slot_4_preview"
                 android:textColor="#F4F7FA"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -187,7 +187,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="#3E7C4A"
-                android:text="VIDNO"
+                android:text="@string/radio_visibility_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -196,7 +196,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#214A78"
-                android:text="UREDI"
+                android:text="@string/radio_edit_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -216,7 +216,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="5. Nashe UA"
+                android:text="@string/radio_slot_5_preview"
                 android:textColor="#F4F7FA"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -227,7 +227,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="#3E7C4A"
-                android:text="VIDNO"
+                android:text="@string/radio_visibility_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -236,7 +236,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#214A78"
-                android:text="UREDI"
+                android:text="@string/radio_edit_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -256,7 +256,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="6. MP3"
+                android:text="@string/radio_slot_6_preview"
                 android:textColor="#F4F7FA"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -267,7 +267,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="#3E7C4A"
-                android:text="VIDNO"
+                android:text="@string/radio_visibility_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -276,7 +276,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#214A78"
-                android:text="UREDI"
+                android:text="@string/radio_edit_label"
                 android:textAllCaps="false"
                 android:textColor="#F4F7FA" />
 
@@ -288,7 +288,7 @@
             android:layout_height="64dp"
             android:layout_marginBottom="12dp"
             android:backgroundTint="#2F5F9E"
-            android:text="PREJŠNJA STRAN"
+            android:text="@string/radio_previous_page"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="18sp"
@@ -300,7 +300,7 @@
             android:layout_height="64dp"
             android:layout_marginBottom="12dp"
             android:backgroundTint="#2F5F9E"
-            android:text="NASLEDNJA STRAN"
+            android:text="@string/radio_next_page"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="18sp"
@@ -312,7 +312,7 @@
             android:layout_height="64dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="#3E7C4A"
-            android:text="DODAJ POSTAJO"
+            android:text="@string/radio_add_station"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="18sp"

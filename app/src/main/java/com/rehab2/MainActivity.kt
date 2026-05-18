@@ -46,6 +46,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -60,6 +61,14 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_ADMIN_PIN = "admin_pin"
         private const val DEFAULT_ADMIN_PIN = "0416"
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
+        private const val PREF_DISTANCE_TODAY_METERS = "distance_today_meters"
+        private const val PREF_DISTANCE_TOTAL_METERS = "distance_total_meters"
+        private const val PREF_DISTANCE_DAY_STAMP = "distance_day_stamp"
+        private const val PREF_DISTANCE_WEEK_METERS = "distance_week_meters"
+        private const val PREF_DISTANCE_MONTH_METERS = "distance_month_meters"
+        private const val PREF_DISTANCE_YEAR_METERS = "distance_year_meters"
+        private const val MAX_REASONABLE_DISTANCE_METERS = 250f
+        private const val MAX_REASONABLE_SPEED_MPS = 15f
 
         private const val PREF_POWER_MODE = "power_mode"
         private const val PREF_POWER_ALLOWED_UNPLUG_MINUTES = "power_allowed_unplug_minutes"
@@ -106,6 +115,7 @@ class MainActivity : AppCompatActivity() {
     private var currentRadioPage = 1
     private var radioTouchStartX = 0f
     private var currentSpeedKmh = 0
+    private var previousTrackedLocation: Location? = null
     private var isPowerConnected = true
     private var powerDisconnectedAtMs = 0L
     private var powerWarningShownAtMs = 0L
@@ -117,6 +127,7 @@ class MainActivity : AppCompatActivity() {
     private val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
     private val dateFormat = SimpleDateFormat("dd.MM.", Locale.getDefault())
     private val yearFormat = SimpleDateFormat("yyyy", Locale.getDefault())
+    private val distanceDayFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
     private val statusRefreshRunnable = object : Runnable {
         override fun run() {
             refreshStatusModule()
@@ -128,6 +139,7 @@ class MainActivity : AppCompatActivity() {
 
     private val speedLocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
+            trackDistance(location)
             currentSpeedKmh = if (location.hasSpeed()) {
                 (location.speed * 3.6f).roundToInt().coerceAtLeast(0)
             } else {
@@ -312,6 +324,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startSpeedUpdates() {
         if (!hasLocationPermission()) {
+            previousTrackedLocation = null
             currentSpeedKmh = 0
             txtStatusSpeed.text = "0"
             return
@@ -326,11 +339,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
         if (!anyProviderEnabled) {
+            previousTrackedLocation = null
             currentSpeedKmh = 0
             txtStatusSpeed.text = "0"
             return
         }
 
+        resetDailyDistanceIfNeeded()
         var lastLocation: Location? = null
         for (provider in providers) {
             if (!locationManager.isProviderEnabled(provider)) {
@@ -351,10 +366,12 @@ class MainActivity : AppCompatActivity() {
         currentSpeedKmh = lastLocation?.let {
             if (it.hasSpeed()) (it.speed * 3.6f).roundToInt().coerceAtLeast(0) else 0
         } ?: 0
+        previousTrackedLocation = lastLocation
         txtStatusSpeed.text = currentSpeedKmh.toString()
     }
 
     private fun stopSpeedUpdates() {
+        previousTrackedLocation = null
         try {
             locationManager.removeUpdates(speedLocationListener)
         } catch (_: SecurityException) {
@@ -370,7 +387,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshStatusModule() {
-        txtStatusLanguageFlag.text = flagForLanguage(getActiveSpeechLanguage())
+        val activeLanguage = getActiveSpeechLanguage()
+        txtStatusLanguageFlag.text = flagForLanguage(activeLanguage)
+        txtStatusLanguageFlag.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            flagDrawableForLanguage(activeLanguage),
+            0,
+            0,
+            0
+        )
+        txtStatusLanguageFlag.compoundDrawablePadding = dpToPx(6)
         txtStatusBattery.text = "${readBatteryPercentage()}%"
         txtStatusNetwork.text = readNetworkLabel()
         val now = Date()
@@ -504,12 +529,70 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton(R.string.dialog_cancel, null)
-            .show()
-        input.requestFocus()
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        inputMethodManager?.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+            .create()
+        dialog.setOnShowListener {
+            input.requestFocus()
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            input.postDelayed({
+                val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                inputMethodManager?.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+            }, 120L)
+        }
+        dialog.show()
     }
+
+    private fun trackDistance(location: Location) {
+        resetDailyDistanceIfNeeded()
+        val previousLocation = previousTrackedLocation
+        previousTrackedLocation = location
+        if (previousLocation == null) {
+            return
+        }
+
+        val distanceMeters = previousLocation.distanceTo(location)
+        if (!isReasonableDistance(previousLocation, location, distanceMeters)) {
+            return
+        }
+
+        val roundedDistance = distanceMeters.roundToLong().coerceAtLeast(0L)
+        if (roundedDistance <= 0L) {
+            return
+        }
+
+        prefs.edit()
+            .putLong(PREF_DISTANCE_TODAY_METERS, prefs.getLong(PREF_DISTANCE_TODAY_METERS, 0L) + roundedDistance)
+            .putLong(PREF_DISTANCE_TOTAL_METERS, prefs.getLong(PREF_DISTANCE_TOTAL_METERS, 0L) + roundedDistance)
+            .apply()
+    }
+
+    private fun isReasonableDistance(previousLocation: Location, location: Location, distanceMeters: Float): Boolean {
+        if (distanceMeters <= 0f || distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
+            return false
+        }
+        val deltaMs = (location.time - previousLocation.time).coerceAtLeast(0L)
+        if (deltaMs == 0L) {
+            return distanceMeters <= 25f
+        }
+        val speedMps = distanceMeters / (deltaMs / 1000f)
+        return speedMps <= MAX_REASONABLE_SPEED_MPS
+    }
+
+    private fun resetDailyDistanceIfNeeded() {
+        val todayStamp = distanceDayFormat.format(Date())
+        val storedStamp = prefs.getString(PREF_DISTANCE_DAY_STAMP, null)
+        if (storedStamp == todayStamp) {
+            return
+        }
+        prefs.edit()
+            .putString(PREF_DISTANCE_DAY_STAMP, todayStamp)
+            .putLong(PREF_DISTANCE_TODAY_METERS, 0L)
+            .apply()
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).roundToInt()
+    }
+
     private fun getPowerMode(): String =
         prefs.getString(PREF_POWER_MODE, DEFAULT_POWER_MODE).orEmpty().ifBlank { DEFAULT_POWER_MODE }
 
@@ -797,6 +880,14 @@ class MainActivity : AppCompatActivity() {
                 val isActive = activeStationKey == stationKey(station)
                 textView.setBackgroundColor(if (isActive) RADIO_TILE_GREEN else RADIO_TILE_BLUE)
             }
+        }
+    }
+
+    private fun flagDrawableForLanguage(languageCode: String): Int {
+        return when (languageCode.lowercase(Locale.ROOT)) {
+            "sl" -> R.drawable.flag_si
+            "uk" -> R.drawable.flag_ua
+            else -> 0
         }
     }
 

@@ -86,7 +86,7 @@ class RadioSettingsActivity : AppCompatActivity() {
     private fun renderCurrentPage() {
         val stationsOnPage = store.getStationsForPage(currentPage)
 
-        pageLabel.text = "STRAN $currentPage"
+        pageLabel.text = getString(R.string.radio_page_format, currentPage)
         stationLabels.forEachIndexed { index, textView ->
             if (index == MP3_SLOT_INDEX) {
                 textView.text = getString(R.string.mp3_settings_label)

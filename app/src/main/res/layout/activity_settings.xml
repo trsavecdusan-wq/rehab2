@@ -1,78 +1,360 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121417"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="#121417">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:gravity="center"
-        android:text="NASTAVITVE"
-        android:textColor="#F4F7FA"
-        android:textSize="28sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <Button
-        android:id="@+id/btnBackSettings"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:layout_marginBottom="24dp"
-        android:backgroundTint="#2F5F9E"
-        android:text="NAZAJ"
-        android:textAllCaps="false"
-        android:textColor="#F4F7FA"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:text="NASTAVITVE"
+            android:textColor="#F4F7FA"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/btnRadioSettings"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="#214A78"
-        android:text="Radio nastavitve"
-        android:textAllCaps="false"
-        android:textColor="#F4F7FA"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        <Button
+            android:id="@+id/btnBackSettings"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="#2F5F9E"
+            android:text="NAZAJ"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/btnAacSettings"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="#3A3F45"
-        android:text="AAC nastavitve"
-        android:textAllCaps="false"
-        android:textColor="#F4F7FA"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        <Button
+            android:id="@+id/btnRadioSettings"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#214A78"
+            android:text="Radio nastavitve"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/btnStatusSettings"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="#3A3F45"
-        android:text="Status nastavitve"
-        android:textAllCaps="false"
-        android:textColor="#F4F7FA"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        <Button
+            android:id="@+id/btnAacSettings"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#3A3F45"
+            android:text="AAC nastavitve"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/btnBackupSettings"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:backgroundTint="#214A78"
-        android:text="Nadgradnje"
-        android:textAllCaps="false"
-        android:textColor="#F4F7FA"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        <Button
+            android:id="@+id/btnStatusSettings"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#3A3F45"
+            android:text="Status nastavitve"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btnBackupSettings"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="#214A78"
+            android:text="Nadgradnje"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="NAPAJANJE"
+            android:textColor="#F4F7FA"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="POWER ZAŠČITA"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnPowerModeOff"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#3A3F45"
+            android:text="IZKLOPLJENA"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnPowerModeWarning"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#3A3F45"
+            android:text="OPOZORILO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnPowerModeSleep"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="#3A3F45"
+            android:text="AVTOMATSKI SLEEP"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="KOLIKO ČASA BREZ NAPAJANJA"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnAllowedUnplugMinus"
+                android:layout_width="64dp"
+                android:layout_height="56dp"
+                android:backgroundTint="#214A78"
+                android:text="-"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtAllowedUnplugValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="15 MIN"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnAllowedUnplugPlus"
+                android:layout_width="64dp"
+                android:layout_height="56dp"
+                android:backgroundTint="#214A78"
+                android:text="+"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="KRITIČNA BATERIJA"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnCriticalBatteryMinus"
+                android:layout_width="64dp"
+                android:layout_height="56dp"
+                android:backgroundTint="#214A78"
+                android:text="-"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtCriticalBatteryValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="20 %"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnCriticalBatteryPlus"
+                android:layout_width="64dp"
+                android:layout_height="56dp"
+                android:backgroundTint="#214A78"
+                android:text="+"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="OPOZORILO PRED SLEEP"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnWarningGraceMinus"
+                android:layout_width="64dp"
+                android:layout_height="56dp"
+                android:backgroundTint="#214A78"
+                android:text="-"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtWarningGraceValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="5 MIN"
+                android:textColor="#F4F7FA"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnWarningGracePlus"
+                android:layout_width="64dp"
+                android:layout_height="56dp"
+                android:backgroundTint="#214A78"
+                android:text="+"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="STATUS"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtPowerStatusValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1E2329"
+            android:padding="16dp"
+            android:text="NAPAJANJE PRIKLOPLJENO"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="STATISTIKA GPS"
+            android:textColor="#F4F7FA"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="DANES"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtTodayDistanceValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="#1E2329"
+            android:padding="16dp"
+            android:text="0 M"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="SKUPAJ"
+            android:textColor="#D6DDE4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtTotalDistanceValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1E2329"
+            android:padding="16dp"
+            android:text="0 M"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</ScrollView>
