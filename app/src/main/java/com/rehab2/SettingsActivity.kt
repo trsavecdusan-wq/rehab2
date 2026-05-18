@@ -4,6 +4,9 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.res.ColorStateList
 import android.os.BatteryManager
 import android.os.Bundle
 import android.os.Handler
@@ -65,12 +68,23 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtGpsAccuracyValue: TextView
     private lateinit var txtGpsIgnoredReasonValue: TextView
     private lateinit var btnResetGpsStatistics: Button
+    private var latestBatteryPercent: Int? = null
+    private var latestPluggedIn = false
+    private var isBatteryReceiverRegistered = false
     private val gpsDiagnosticsRefreshHandler = Handler(Looper.getMainLooper())
+    private val powerFeedbackHandler = Handler(Looper.getMainLooper())
     private val gpsDiagnosticsRefreshRunnable = object : Runnable {
         override fun run() {
             refreshGpsDiagnosticsSection()
             refreshStatisticsSection()
             gpsDiagnosticsRefreshHandler.postDelayed(this, 1500L)
+        }
+    }
+    private var pendingPowerStatusRefresh: Runnable? = null
+    private val batteryStatusReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            updateBatterySnapshot(intent)
+            refreshPowerSection()
         }
     }
 
@@ -170,6 +184,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        refreshBatterySnapshot()
         refreshPowerSection()
         refreshStatisticsSection()
         refreshGpsDiagnosticsSection()
@@ -178,6 +193,8 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        registerBatteryReceiver()
+        refreshBatterySnapshot()
         refreshPowerSection()
         refreshStatisticsSection()
         refreshGpsDiagnosticsSection()
@@ -187,12 +204,14 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onPause() {
         stopGpsDiagnosticsRefresh()
+        unregisterBatteryReceiver()
         super.onPause()
     }
 
     private fun setPowerMode(mode: String) {
         prefs.edit().putString(PREF_POWER_MODE, mode).apply()
-        refreshPowerSection()
+        showPowerClickFeedback(mode)
+        updateModeButtonStyles(mode)
     }
 
     private fun adjustIntPreference(
@@ -256,55 +275,65 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun updateModeButtonStyles(powerMode: String) {
-        val activeColor = 0xFF2E8B57.toInt()
+        val activeColor = 0xFF3AAE63.toInt()
         val inactiveColor = 0xFF3A3F45.toInt()
 
-        btnPowerOff.setBackgroundColor(if (powerMode == POWER_MODE_ALWAYS_ON) activeColor else inactiveColor)
-        btnPowerWarning.setBackgroundColor(if (powerMode == POWER_MODE_BATTERY_SAVER) activeColor else inactiveColor)
-        btnPowerSleep.setBackgroundColor(if (powerMode == POWER_MODE_POWER_SLEEP) activeColor else inactiveColor)
+        btnPowerOff.backgroundTintList =
+            ColorStateList.valueOf(if (powerMode == POWER_MODE_ALWAYS_ON) activeColor else inactiveColor)
+        btnPowerWarning.backgroundTintList =
+            ColorStateList.valueOf(if (powerMode == POWER_MODE_BATTERY_SAVER) activeColor else inactiveColor)
+        btnPowerSleep.backgroundTintList =
+            ColorStateList.valueOf(if (powerMode == POWER_MODE_POWER_SLEEP) activeColor else inactiveColor)
     }
 
     private fun buildPowerStatus(powerMode: String): String {
-        val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        val plugged = (batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0
+        val selectedModeText = getString(R.string.power_selected_mode_format, powerModeLabel(powerMode))
 
-        if (plugged) {
-            return "NAPAJANJE PRIKLOPLJENO"
+        if (latestPluggedIn) {
+            return "$selectedModeText\n${getString(R.string.power_status_plugged)}\n${batteryStatusLine()}"
+        }
+
+        val batteryPercent = latestBatteryPercent
+        if (batteryPercent == null) {
+            return "$selectedModeText\n${getString(R.string.power_status_battery_unknown)}"
         }
 
         if (powerMode == POWER_MODE_ALWAYS_ON) {
-            return "DELO NA BATERIJI"
+            return "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
         }
 
         val bypassUntil = prefs.getLong(PREF_POWER_ADMIN_BYPASS_UNTIL, 0L)
         if (System.currentTimeMillis() < bypassUntil) {
-            return "DELO NA BATERIJI"
+            return "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
         }
 
         val warningMinutes = prefs.getInt(PREF_POWER_ALLOWED_UNPLUG_MINUTES, DEFAULT_ALLOWED_UNPLUG_MINUTES)
         val graceMinutes = prefs.getInt(PREF_POWER_WARNING_GRACE_MINUTES, DEFAULT_WARNING_GRACE_MINUTES)
         val warningWindowMs = (warningMinutes + graceMinutes) * 60_000L
         val criticalBatteryPercent = prefs.getInt(PREF_POWER_CRITICAL_BATTERY_PERCENT, DEFAULT_CRITICAL_BATTERY_PERCENT)
-        val batteryPercent = readBatteryPercent(batteryIntent)
 
         return if (powerMode == POWER_MODE_POWER_SLEEP && batteryPercent <= criticalBatteryPercent) {
-            "POWER SLEEP AKTIVEN"
+            "$selectedModeText\n${getString(R.string.power_status_sleep_active)}\n${batteryStatusLine()}"
         } else if (powerMode == POWER_MODE_BATTERY_SAVER && batteryPercent <= criticalBatteryPercent) {
-            "DELO NA BATERIJI"
+            "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
         } else if (warningWindowMs > 0L && batteryPercent <= criticalBatteryPercent && powerMode != POWER_MODE_ALWAYS_ON) {
-            if (powerMode == POWER_MODE_POWER_SLEEP) "POWER SLEEP AKTIVEN" else "DELO NA BATERIJI"
+            if (powerMode == POWER_MODE_POWER_SLEEP) {
+                "$selectedModeText\n${getString(R.string.power_status_sleep_active)}\n${batteryStatusLine()}"
+            } else {
+                "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
+            }
         } else {
-            "DELO NA BATERIJI"
+            "$selectedModeText\n${getString(R.string.power_status_on_battery)}\n${batteryStatusLine()}"
         }
     }
 
-    private fun readBatteryPercent(batteryIntent: Intent?): Int {
+    private fun readBatteryPercent(batteryIntent: Intent?): Int? {
         val level = batteryIntent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
         val scale = batteryIntent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
         return if (level >= 0 && scale > 0) {
             ((level * 100f) / scale).toInt().coerceIn(0, 100)
         } else {
-            0
+            null
         }
     }
 
@@ -327,8 +356,39 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun isCurrentlyPluggedIn(): Boolean {
-        val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        return (batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0
+        return latestPluggedIn
+    }
+
+    private fun registerBatteryReceiver() {
+        if (isBatteryReceiverRegistered) {
+            return
+        }
+        registerReceiver(batteryStatusReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        isBatteryReceiverRegistered = true
+    }
+
+    private fun unregisterBatteryReceiver() {
+        if (!isBatteryReceiverRegistered) {
+            return
+        }
+        try {
+            unregisterReceiver(batteryStatusReceiver)
+        } catch (_: IllegalArgumentException) {
+        } finally {
+            isBatteryReceiverRegistered = false
+        }
+    }
+
+    private fun refreshBatterySnapshot() {
+        updateBatterySnapshot(registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED)))
+    }
+
+    private fun updateBatterySnapshot(batteryIntent: Intent?) {
+        latestPluggedIn = (batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0
+        val freshPercent = readBatteryPercent(batteryIntent)
+        if (freshPercent != null) {
+            latestBatteryPercent = freshPercent
+        }
     }
 
     private fun startGpsDiagnosticsRefresh() {
@@ -338,6 +398,31 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun stopGpsDiagnosticsRefresh() {
         gpsDiagnosticsRefreshHandler.removeCallbacks(gpsDiagnosticsRefreshRunnable)
+    }
+
+    private fun showPowerClickFeedback(mode: String) {
+        txtPowerStatusValue.text = getString(R.string.power_click_feedback_format, powerModeLabel(mode))
+        pendingPowerStatusRefresh?.let { powerFeedbackHandler.removeCallbacks(it) }
+        val refreshRunnable = Runnable {
+            refreshPowerSection()
+            pendingPowerStatusRefresh = null
+        }
+        pendingPowerStatusRefresh = refreshRunnable
+        powerFeedbackHandler.postDelayed(refreshRunnable, 450L)
+    }
+
+    private fun powerModeLabel(mode: String): String {
+        return when (mode) {
+            POWER_MODE_BATTERY_SAVER -> getString(R.string.power_mode_warning_label)
+            POWER_MODE_POWER_SLEEP -> getString(R.string.power_mode_sleep_label)
+            else -> getString(R.string.power_mode_off_label)
+        }
+    }
+
+    private fun batteryStatusLine(): String {
+        return latestBatteryPercent?.let {
+            getString(R.string.power_status_battery_percent_format, it)
+        } ?: getString(R.string.power_status_battery_unknown)
     }
 
     private fun showAdminPinDialog(onSuccess: () -> Unit) {

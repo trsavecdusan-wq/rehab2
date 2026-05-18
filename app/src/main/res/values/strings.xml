@@ -66,4 +66,14 @@
     <string name="gps_reset_button_label">RESET GPS STATISTIKE</string>
     <string name="gps_statistics_reset_done">GPS STATISTIKE SO RESETIRANE</string>
     <string name="gps_no_accuracy">NO ACCURACY</string>
+    <string name="power_mode_off_label">IZKLOPLJENA</string>
+    <string name="power_mode_warning_label">OPOZORILO</string>
+    <string name="power_mode_sleep_label">AVTOMATSKI SLEEP</string>
+    <string name="power_click_feedback_format">KLIK: %1$s</string>
+    <string name="power_selected_mode_format">IZBRANI NA&#268;IN: %1$s</string>
+    <string name="power_status_plugged">NAPAJANJE PRIKLOPLJENO</string>
+    <string name="power_status_on_battery">DELO NA BATERIJI</string>
+    <string name="power_status_battery_unknown">BATERIJA: NEZNANO</string>
+    <string name="power_status_battery_percent_format">BATERIJA: %1$d%%</string>
+    <string name="power_status_sleep_active">POWER SLEEP AKTIVEN</string>
 </resources>
