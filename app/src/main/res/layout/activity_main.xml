@@ -248,7 +248,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     android:gravity="start"
                     android:orientation="vertical">
@@ -257,30 +257,30 @@
                         android:id="@+id/txtStatusDay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="3dp"
+                        android:layout_marginBottom="0dp"
                         android:text="Pon"
                         android:textColor="#E1E7EE"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtStatusDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="2dp"
+                        android:layout_marginBottom="0dp"
                         android:text="12.05."
                         android:textColor="#D0D9E2"
-                        android:textSize="13sp"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtStatusYear"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="2dp"
+                        android:layout_marginBottom="0dp"
                         android:text="2026"
                         android:textColor="#B2BCC6"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -289,7 +289,7 @@
                         android:layout_height="wrap_content"
                         android:text="20:57"
                         android:textColor="#AFC3D8"
-                        android:textSize="11sp"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
