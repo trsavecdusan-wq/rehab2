@@ -93,7 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="POWER ZAŠČITA"
+            android:text="POWER ZAÄąÂ Ă„ĹšITA"
             android:textColor="#D6DDE4"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -159,7 +159,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="KOLIKO ČASA BREZ NAPAJANJA"
+            android:text="KOLIKO Ă„ĹšASA BREZ NAPAJANJA"
             android:textColor="#D6DDE4"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -171,16 +171,21 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btnAllowedUnplugMinus"
-                android:layout_width="110dp"
-                android:layout_height="76dp"
-                android:background="#00000000"
+                android:layout_width="120dp"
+                android:layout_height="82dp"
+                android:background="@drawable/bg_power_minus_button"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
+                android:includeFontPadding="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
                 android:text="-"
-                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="46sp"
+                android:textSize="56sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -194,16 +199,21 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btnAllowedUnplugPlus"
-                android:layout_width="110dp"
-                android:layout_height="76dp"
-                android:background="#00000000"
+                android:layout_width="120dp"
+                android:layout_height="82dp"
+                android:background="@drawable/bg_power_plus_button"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
+                android:includeFontPadding="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
                 android:text="+"
-                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="46sp"
+                android:textSize="56sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -211,7 +221,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="KRITIČNA BATERIJA"
+            android:text="KRITIĂ„ĹšNA BATERIJA"
             android:textColor="#D6DDE4"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -223,16 +233,21 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btnCriticalBatteryMinus"
-                android:layout_width="110dp"
-                android:layout_height="76dp"
-                android:background="#00000000"
+                android:layout_width="120dp"
+                android:layout_height="82dp"
+                android:background="@drawable/bg_power_minus_button"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
+                android:includeFontPadding="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
                 android:text="-"
-                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="46sp"
+                android:textSize="56sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -246,16 +261,21 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btnCriticalBatteryPlus"
-                android:layout_width="110dp"
-                android:layout_height="76dp"
-                android:background="#00000000"
+                android:layout_width="120dp"
+                android:layout_height="82dp"
+                android:background="@drawable/bg_power_plus_button"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
+                android:includeFontPadding="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
                 android:text="+"
-                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="46sp"
+                android:textSize="56sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -275,16 +295,21 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btnWarningGraceMinus"
-                android:layout_width="110dp"
-                android:layout_height="76dp"
-                android:background="#00000000"
+                android:layout_width="120dp"
+                android:layout_height="82dp"
+                android:background="@drawable/bg_power_minus_button"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
+                android:includeFontPadding="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
                 android:text="-"
-                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="46sp"
+                android:textSize="56sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -298,16 +323,21 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/btnWarningGracePlus"
-                android:layout_width="110dp"
-                android:layout_height="76dp"
-                android:background="#00000000"
+                android:layout_width="120dp"
+                android:layout_height="82dp"
+                android:background="@drawable/bg_power_plus_button"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
+                android:includeFontPadding="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
                 android:text="+"
-                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="46sp"
+                android:textSize="56sp"
                 android:textStyle="bold" />
         </LinearLayout>
 

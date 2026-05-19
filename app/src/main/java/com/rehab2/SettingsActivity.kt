@@ -7,8 +7,6 @@ import android.content.SharedPreferences
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.os.BatteryManager
 import android.os.Bundle
 import android.os.Handler
@@ -110,14 +108,6 @@ class SettingsActivity : AppCompatActivity() {
         txtGpsAccuracyValue = findViewById(R.id.txtGpsAccuracyValue)
         txtGpsIgnoredReasonValue = findViewById(R.id.txtGpsIgnoredReasonValue)
         btnResetGpsStatistics = findViewById(R.id.btnResetGpsStatistics)
-        styleStepperButtons(
-            findViewById(R.id.btnAllowedUnplugMinus),
-            findViewById(R.id.btnAllowedUnplugPlus),
-            findViewById(R.id.btnWarningGraceMinus),
-            findViewById(R.id.btnWarningGracePlus),
-            findViewById(R.id.btnCriticalBatteryMinus),
-            findViewById(R.id.btnCriticalBatteryPlus)
-        )
 
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
@@ -132,7 +122,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnAacSettings).setOnClickListener {
-            Toast.makeText(this, "Funkcija še ni pripravljena", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Funkcija ÄąË‡e ni pripravljena", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btnStatusSettings).setOnClickListener {
@@ -158,27 +148,27 @@ class SettingsActivity : AppCompatActivity() {
             applyKeepScreenOnWhileCharging()
         }
 
-        findViewById<Button>(R.id.btnAllowedUnplugMinus).setOnClickListener {
+        findViewById<TextView>(R.id.btnAllowedUnplugMinus).setOnClickListener {
             adjustIntPreference(PREF_POWER_ALLOWED_UNPLUG_MINUTES, -1, 1, 180, DEFAULT_ALLOWED_UNPLUG_MINUTES)
         }
 
-        findViewById<Button>(R.id.btnAllowedUnplugPlus).setOnClickListener {
+        findViewById<TextView>(R.id.btnAllowedUnplugPlus).setOnClickListener {
             adjustIntPreference(PREF_POWER_ALLOWED_UNPLUG_MINUTES, 1, 1, 180, DEFAULT_ALLOWED_UNPLUG_MINUTES)
         }
 
-        findViewById<Button>(R.id.btnWarningGraceMinus).setOnClickListener {
+        findViewById<TextView>(R.id.btnWarningGraceMinus).setOnClickListener {
             adjustIntPreference(PREF_POWER_WARNING_GRACE_MINUTES, -1, 1, 60, DEFAULT_WARNING_GRACE_MINUTES)
         }
 
-        findViewById<Button>(R.id.btnWarningGracePlus).setOnClickListener {
+        findViewById<TextView>(R.id.btnWarningGracePlus).setOnClickListener {
             adjustIntPreference(PREF_POWER_WARNING_GRACE_MINUTES, 1, 1, 60, DEFAULT_WARNING_GRACE_MINUTES)
         }
 
-        findViewById<Button>(R.id.btnCriticalBatteryMinus).setOnClickListener {
+        findViewById<TextView>(R.id.btnCriticalBatteryMinus).setOnClickListener {
             adjustIntPreference(PREF_POWER_CRITICAL_BATTERY_PERCENT, -1, 5, 50, DEFAULT_CRITICAL_BATTERY_PERCENT)
         }
 
-        findViewById<Button>(R.id.btnCriticalBatteryPlus).setOnClickListener {
+        findViewById<TextView>(R.id.btnCriticalBatteryPlus).setOnClickListener {
             adjustIntPreference(PREF_POWER_CRITICAL_BATTERY_PERCENT, 1, 5, 50, DEFAULT_CRITICAL_BATTERY_PERCENT)
         }
 
@@ -424,26 +414,6 @@ class SettingsActivity : AppCompatActivity() {
             getString(R.string.power_status_battery_percent_format, it)
         } ?: getString(R.string.power_status_battery_unknown)
     }
-
-    private fun styleStepperButtons(vararg buttons: Button) {
-        val strokeColor = Color.parseColor("#D6DDE4")
-        val fillColor = Color.parseColor("#3A3F45")
-        val horizontalPadding = dpToPx(20)
-        val verticalPadding = dpToPx(8)
-        buttons.forEach { button ->
-            val background = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = dpToPx(10).toFloat()
-                setColor(fillColor)
-                setStroke(dpToPx(2), strokeColor)
-            }
-            button.background = background
-            button.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
-        }
-    }
-
-    private fun dpToPx(dp: Int): Int =
-        (dp * resources.displayMetrics.density).roundToInt()
 
     private fun showAdminPinDialog(onSuccess: () -> Unit) {
         val input = EditText(this).apply {
