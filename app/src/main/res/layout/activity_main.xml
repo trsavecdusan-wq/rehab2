@@ -202,8 +202,8 @@
 
                 <TextView
                     android:id="@+id/txtStatusLanguageFlag"
-                    android:layout_width="84dp"
-                    android:layout_height="52dp"
+                    android:layout_width="63dp"
+                    android:layout_height="39dp"
                     android:gravity="center"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
@@ -260,7 +260,7 @@
                         android:layout_marginBottom="0dp"
                         android:text="Pon"
                         android:textColor="#E1E7EE"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -270,7 +270,7 @@
                         android:layout_marginBottom="0dp"
                         android:text="12.05."
                         android:textColor="#D0D9E2"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -280,7 +280,7 @@
                         android:layout_marginBottom="0dp"
                         android:text="2026"
                         android:textColor="#B2BCC6"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -289,7 +289,7 @@
                         android:layout_height="wrap_content"
                         android:text="20:57"
                         android:textColor="#AFC3D8"
-                        android:textSize="13sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
