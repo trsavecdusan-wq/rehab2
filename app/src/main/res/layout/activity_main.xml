@@ -289,6 +289,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:gravity="bottom|end"
                     android:orientation="vertical">
 
                     <Space
@@ -300,17 +301,25 @@
                         android:id="@+id/txtStatusSpeed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:gravity="center"
                         android:includeFontPadding="false"
-                        android:text="5"
+                        android:minWidth="120dp"
+                        android:text="0 KM/H"
                         android:textColor="#F4F7FA"
-                        android:textSize="32sp"
+                        android:textSize="30sp"
                         android:textStyle="bold" />
 
-                    <Space
-                        android:layout_width="1dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
+                    <TextView
+                        android:id="@+id/txtStatusTodayDistance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="4dp"
+                        android:text="DANES: 0 m"
+                        android:textColor="#D6DDE4"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 

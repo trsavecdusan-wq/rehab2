@@ -124,6 +124,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtStatusDate: TextView
     private lateinit var txtStatusYear: TextView
     private lateinit var txtStatusSpeed: TextView
+    private lateinit var txtStatusTodayDistance: TextView
     private lateinit var powerOverlay: View
     private lateinit var txtPowerOverlayTitle: TextView
     private lateinit var txtPowerOverlaySubtitle: TextView
@@ -131,7 +132,7 @@ class MainActivity : AppCompatActivity() {
     private var activeStationKey: String? = null
     private var currentRadioPage = 1
     private var radioTouchStartX = 0f
-    private var currentSpeedKmh = 0
+    private var currentSpeedKmh = 0f
     private var previousTrackedLocation: Location? = null
     private var isPowerConnected = true
     private var powerDisconnectedAtMs = 0L
@@ -198,6 +199,7 @@ class MainActivity : AppCompatActivity() {
         txtStatusDate = findViewById(R.id.txtStatusDate)
         txtStatusYear = findViewById(R.id.txtStatusYear)
         txtStatusSpeed = findViewById(R.id.txtStatusSpeed)
+        txtStatusTodayDistance = findViewById(R.id.txtStatusTodayDistance)
         powerOverlay = findViewById(R.id.powerOverlay)
         txtPowerOverlayTitle = findViewById(R.id.txtPowerOverlayTitle)
         txtPowerOverlaySubtitle = findViewById(R.id.txtPowerOverlaySubtitle)
@@ -347,7 +349,7 @@ class MainActivity : AppCompatActivity() {
     private fun startSpeedUpdates() {
         if (!hasLocationPermission()) {
             previousTrackedLocation = null
-            currentSpeedKmh = 0
+            currentSpeedKmh = 0f
             txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
             return
         }
@@ -362,7 +364,7 @@ class MainActivity : AppCompatActivity() {
         }
         if (!anyProviderEnabled) {
             previousTrackedLocation = null
-            currentSpeedKmh = 0
+            currentSpeedKmh = 0f
             txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
             return
         }
@@ -380,12 +382,12 @@ class MainActivity : AppCompatActivity() {
                     lastLocation = candidate
                 }
             } catch (_: SecurityException) {
-                currentSpeedKmh = 0
+                currentSpeedKmh = 0f
             } catch (_: IllegalArgumentException) {
             }
         }
 
-        currentSpeedKmh = 0
+        currentSpeedKmh = 0f
         previousTrackedLocation = lastLocation
         txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
     }
@@ -424,6 +426,7 @@ class MainActivity : AppCompatActivity() {
         txtStatusDate.text = dateFormat.format(now)
         txtStatusYear.text = yearFormat.format(now)
         txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
+        txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
     }
 
     private fun readBatteryPercentage(): Int? {
@@ -639,34 +642,34 @@ class MainActivity : AppCompatActivity() {
             .apply()
     }
 
-    private fun resolveSpeedKmh(previousLocation: Location?, location: Location): Int {
+    private fun resolveSpeedKmh(previousLocation: Location?, location: Location): Float {
         if (!location.hasAccuracy() || location.accuracy > MAX_REASONABLE_ACCURACY_METERS) {
-            return 0
+            return 0f
         }
         if (location.hasSpeed()) {
             val speedKmh = location.speed * 3.6f
             return if (speedKmh <= MAX_REASONABLE_SPEED_KMH) {
-                speedKmh.roundToInt().coerceAtLeast(0)
+                speedKmh.coerceAtLeast(0f)
             } else {
-                0
+                0f
             }
         }
         if (previousLocation == null || !previousLocation.hasAccuracy() || previousLocation.accuracy > MAX_REASONABLE_ACCURACY_METERS) {
-            return 0
+            return 0f
         }
         val distanceMeters = previousLocation.distanceTo(location)
         if (distanceMeters < MIN_REASONABLE_DISTANCE_METERS || distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
-            return 0
+            return 0f
         }
         val elapsedSeconds = (location.time - previousLocation.time) / 1000f
         if (elapsedSeconds <= 0f) {
-            return 0
+            return 0f
         }
         val speedKmh = resolveCalculatedSpeedKmh(distanceMeters, elapsedSeconds)
         return if (speedKmh <= MAX_REASONABLE_SPEED_KMH) {
-            speedKmh.roundToInt().coerceAtLeast(0)
+            speedKmh.coerceAtLeast(0f)
         } else {
-            0
+            0f
         }
     }
 
@@ -674,8 +677,29 @@ class MainActivity : AppCompatActivity() {
         return (distanceMeters / elapsedSeconds) * 3.6f
     }
 
-    private fun formatSpeedKmh(speedKmh: Int): String {
-        return "$speedKmh KM/H"
+    private fun formatSpeedKmh(speedKmh: Float): String {
+        if (speedKmh < 0.05f) {
+            return "0 KM/H"
+        }
+        val roundedToOneDecimal = (speedKmh * 10f).roundToInt() / 10f
+        val wholePart = roundedToOneDecimal.roundToInt().toFloat()
+        return if (kotlin.math.abs(roundedToOneDecimal - wholePart) < 0.05f) {
+            "${wholePart.toInt()} KM/H"
+        } else {
+            String.format(Locale.US, "%.1f KM/H", roundedToOneDecimal)
+        }
+    }
+
+    private fun readTodayDistanceMeters(): Long {
+        return prefs.getLong(PREF_DISTANCE_TODAY_METERS, 0L).coerceAtLeast(0L)
+    }
+
+    private fun formatTodayDistance(distanceMeters: Long): String {
+        return if (distanceMeters < 1000L) {
+            "DANES: ${distanceMeters} m"
+        } else {
+            String.format(Locale.US, "DANES: %.2f km", distanceMeters / 1000f)
+        }
     }
 
     private fun gpsSignalForAccuracy(location: Location): String {
