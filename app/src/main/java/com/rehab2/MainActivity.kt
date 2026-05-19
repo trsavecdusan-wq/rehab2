@@ -118,8 +118,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var prefs: SharedPreferences
     private lateinit var locationManager: LocationManager
     private lateinit var txtStatusLanguageFlag: TextView
-    private lateinit var txtStatusBattery: TextView
-    private lateinit var txtStatusNetwork: TextView
+    private lateinit var txtStatusBatteryNetwork: TextView
     private lateinit var txtStatusDay: TextView
     private lateinit var txtStatusDate: TextView
     private lateinit var txtStatusYearTime: TextView
@@ -193,8 +192,7 @@ class MainActivity : AppCompatActivity() {
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         seekVolume = findViewById(R.id.seekVolume)
         txtStatusLanguageFlag = findViewById(R.id.txtStatusLanguageFlag)
-        txtStatusBattery = findViewById(R.id.txtStatusBattery)
-        txtStatusNetwork = findViewById(R.id.txtStatusNetwork)
+        txtStatusBatteryNetwork = findViewById(R.id.txtStatusBatteryNetwork)
         txtStatusDay = findViewById(R.id.txtStatusDay)
         txtStatusDate = findViewById(R.id.txtStatusDate)
         txtStatusYearTime = findViewById(R.id.txtStatusYearTime)
@@ -419,8 +417,8 @@ class MainActivity : AppCompatActivity() {
             txtStatusLanguageFlag.background = null
             txtStatusLanguageFlag.text = flagForLanguage(activeLanguage)
         }
-        txtStatusBattery.text = readBatteryPercentage()?.let { "$it%" } ?: getString(R.string.battery_unknown_short)
-        txtStatusNetwork.text = readNetworkLabel()
+        val batteryLabel = readBatteryPercentage()?.let { "$it%" } ?: getString(R.string.battery_unknown_short)
+        txtStatusBatteryNetwork.text = "$batteryLabel ${readNetworkLabel()}"
         val now = Date()
         txtStatusDay.text = shortDayLabel(now)
         txtStatusDate.text = dateFormat.format(now)

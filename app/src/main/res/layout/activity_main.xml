@@ -212,28 +212,19 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1" />
-
                 <TextView
-                    android:id="@+id/txtStatusBattery"
+                    android:id="@+id/txtStatusBatteryNetwork"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:text="100%"
+                    android:layout_gravity="end"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:text="100% 4G"
                     android:textColor="#F4F7FA"
                     android:textSize="16sp"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtStatusNetwork"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="o"
-                    android:textColor="#6FD38A"
-                    android:textSize="16sp" />
 
             </LinearLayout>
 
