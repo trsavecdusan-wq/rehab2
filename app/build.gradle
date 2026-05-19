@@ -19,8 +19,8 @@ android {
         minSdk 21
         targetSdk 34
         // Normal releases on main use even versionCode values only. Rollback releases use odd versionCode values only.
-        versionCode 116
-        versionName "1.1.16"
+        versionCode 118
+        versionName "1.1.18"
     }
 
     signingConfigs {

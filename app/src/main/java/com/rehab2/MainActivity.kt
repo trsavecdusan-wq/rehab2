@@ -8,6 +8,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -31,6 +33,9 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
@@ -244,9 +249,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        txtStatusLanguageFlag.setOnLongClickListener {
+        txtStatusLanguageFlag.setOnClickListener {
             showLanguagePicker()
-            true
         }
         txtStatusSpeed.setOnLongClickListener {
             showAdminPinDialog()
@@ -513,25 +517,105 @@ class MainActivity : AppCompatActivity() {
 
     private fun showLanguagePicker() {
         val configuredLanguages = getConfiguredSpeechLanguages()
-        val labels = configuredLanguages.map { languageLabel(it) }
-        val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, labels) {
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getView(position, convertView, parent)
-                (view as? TextView)?.apply {
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
-                    setPadding(paddingLeft, 24, paddingRight, 24)
-                }
-                return view
-            }
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), dp(16), dp(20), dp(8))
         }
-        AlertDialog.Builder(this)
+        val content = ScrollView(this).apply {
+            addView(container)
+        }
+
+        val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.language_picker_title)
-            .setAdapter(adapter) { _, which ->
-                prefs.edit().putString(PREF_ACTIVE_SPEECH_LANGUAGE, configuredLanguages[which]).apply()
-                refreshStatusModule()
-            }
+            .setView(content)
             .setNegativeButton(R.string.dialog_cancel, null)
-            .show()
+            .create()
+
+        configuredLanguages.forEach { languageCode ->
+            container.addView(createLanguageOptionView(languageCode) {
+                prefs.edit().putString(PREF_ACTIVE_SPEECH_LANGUAGE, languageCode).apply()
+                refreshStatusModule()
+                dialog.dismiss()
+            })
+        }
+
+        dialog.show()
+    }
+
+    private fun createLanguageOptionView(languageCode: String, onClick: () -> Unit): View {
+        val option = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            minimumHeight = dp(120)
+            setPadding(dp(18), dp(16), dp(18), dp(16))
+            val params = ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            params.bottomMargin = dp(12)
+            layoutParams = params
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = dp(18).toFloat()
+                setColor(0xFF1E2329.toInt())
+                setStroke(dp(2), 0xFF5B6773.toInt())
+            }
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { onClick() }
+        }
+
+        val flagDrawable = flagDrawableForLanguage(languageCode)
+        if (flagDrawable != 0) {
+            option.addView(ImageView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(dp(120), dp(72)).apply {
+                    marginEnd = dp(18)
+                }
+                scaleType = ImageView.ScaleType.FIT_XY
+                setImageResource(flagDrawable)
+            })
+        } else {
+            option.addView(TextView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(dp(120), dp(72)).apply {
+                    marginEnd = dp(18)
+                }
+                gravity = android.view.Gravity.CENTER
+                setTextColor(0xFFF4F7FA.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 32f)
+                setTypeface(typeface, Typeface.BOLD)
+                text = flagForLanguage(languageCode)
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = dp(12).toFloat()
+                    setColor(0xFF2B3138.toInt())
+                }
+            })
+        }
+
+        val labels = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+        }
+
+        labels.addView(TextView(this).apply {
+            setTextColor(0xFFF4F7FA.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 28f)
+            setTypeface(typeface, Typeface.BOLD)
+            text = flagForLanguage(languageCode)
+        })
+
+        labels.addView(TextView(this).apply {
+            setTextColor(0xFFD6DDE4.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+            text = languageLabel(languageCode).substringAfter(' ', languageLabel(languageCode))
+        })
+
+        option.addView(labels)
+        return option
+    }
+
+    private fun dp(value: Int): Int {
+        return (value * resources.displayMetrics.density).roundToInt()
     }
 
     private fun showAdminPinDialog(onSuccess: (() -> Unit)? = null) {
