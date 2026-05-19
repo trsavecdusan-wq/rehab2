@@ -241,25 +241,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:gravity="bottom|center_vertical"
                 android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:gravity="bottom|start"
+                    android:gravity="start"
                     android:orientation="vertical">
-
-                    <Space
-                        android:layout_width="1dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
 
                     <TextView
                         android:id="@+id/txtStatusDay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="3dp"
+                        android:layout_marginBottom="4dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:text="Torek"
                         android:textColor="#E1E7EE"
                         android:textSize="16sp"
@@ -270,6 +270,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="3dp"
+                        android:maxLines="1"
                         android:text="12.05."
                         android:textColor="#D0D9E2"
                         android:textSize="14sp"
@@ -288,14 +289,10 @@
 
                 <LinearLayout
                     android:layout_width="132dp"
-                    android:layout_height="match_parent"
-                    android:gravity="bottom|end"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:gravity="end"
                     android:orientation="vertical">
-
-                    <Space
-                        android:layout_width="1dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
 
                     <TextView
                         android:id="@+id/txtStatusSpeed"
@@ -312,7 +309,7 @@
                         android:id="@+id/txtStatusTodayDistance"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
+                        android:layout_marginTop="4dp"
                         android:gravity="end"
                         android:includeFontPadding="false"
                         android:text="0 m"
