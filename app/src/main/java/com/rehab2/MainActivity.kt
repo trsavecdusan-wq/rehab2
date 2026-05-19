@@ -21,6 +21,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.InputType
 import android.text.method.PasswordTransformationMethod
+import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -72,7 +73,8 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_GPS_LAST_IGNORED_REASON = "gps_last_ignored_reason"
         private const val PREF_GPS_RESET_BASELINE_REQUESTED = "gps_reset_baseline_requested"
         private const val MAX_REASONABLE_DISTANCE_METERS = 250f
-        private const val MAX_REASONABLE_ACCURACY_METERS = 30f
+        private const val MAX_REASONABLE_ACCURACY_METERS = 25f
+        private const val MIN_REASONABLE_DISTANCE_METERS = 5f
         private const val MAX_REASONABLE_SPEED_KMH = 10f
         private const val GPS_SIGNAL_GOOD = "GOOD"
         private const val GPS_SIGNAL_WEAK = "WEAK"
@@ -81,6 +83,7 @@ class MainActivity : AppCompatActivity() {
         private const val GPS_REASON_POOR_ACCURACY = "POOR_ACCURACY"
         private const val GPS_REASON_INVALID_TIME = "INVALID_TIME"
         private const val GPS_REASON_TOO_FAST = "TOO_FAST"
+        private const val GPS_REASON_JITTER = "JITTER"
 
         private const val PREF_POWER_MODE = "power_mode"
         private const val PREF_POWER_ALLOWED_UNPLUG_MINUTES = "power_allowed_unplug_minutes"
@@ -154,13 +157,9 @@ class MainActivity : AppCompatActivity() {
 
     private val speedLocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
+            currentSpeedKmh = resolveSpeedKmh(previousTrackedLocation, location)
             trackDistance(location)
-            currentSpeedKmh = if (location.hasSpeed()) {
-                (location.speed * 3.6f).roundToInt().coerceAtLeast(0)
-            } else {
-                0
-            }
-            txtStatusSpeed.text = currentSpeedKmh.toString()
+            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
         }
     }
     private val powerReceiver = object : BroadcastReceiver() {
@@ -349,7 +348,7 @@ class MainActivity : AppCompatActivity() {
         if (!hasLocationPermission()) {
             previousTrackedLocation = null
             currentSpeedKmh = 0
-            txtStatusSpeed.text = "0"
+            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
             return
         }
 
@@ -364,7 +363,7 @@ class MainActivity : AppCompatActivity() {
         if (!anyProviderEnabled) {
             previousTrackedLocation = null
             currentSpeedKmh = 0
-            txtStatusSpeed.text = "0"
+            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
             return
         }
 
@@ -386,11 +385,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        currentSpeedKmh = lastLocation?.let {
-            if (it.hasSpeed()) (it.speed * 3.6f).roundToInt().coerceAtLeast(0) else 0
-        } ?: 0
+        currentSpeedKmh = 0
         previousTrackedLocation = lastLocation
-        txtStatusSpeed.text = currentSpeedKmh.toString()
+        txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
     }
 
     private fun stopSpeedUpdates() {
@@ -426,7 +423,7 @@ class MainActivity : AppCompatActivity() {
         txtStatusDay.text = dayFormat.format(now).replaceFirstChar { it.titlecase(Locale.getDefault()) }
         txtStatusDate.text = dateFormat.format(now)
         txtStatusYear.text = yearFormat.format(now)
-        txtStatusSpeed.text = currentSpeedKmh.toString()
+        txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
     }
 
     private fun readBatteryPercentage(): Int? {
@@ -581,6 +578,7 @@ class MainActivity : AppCompatActivity() {
 
         val distanceMeters = previousLocation.distanceTo(location)
         if (!isReasonableDistance(previousLocation, location, distanceMeters)) {
+            previousTrackedLocation = location
             return
         }
 
@@ -598,7 +596,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isReasonableDistance(previousLocation: Location, location: Location, distanceMeters: Float): Boolean {
-        if (distanceMeters <= 0f || distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
+        if (distanceMeters <= 0f) {
+            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME)
+            return false
+        }
+        if (distanceMeters < MIN_REASONABLE_DISTANCE_METERS) {
+            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_JITTER)
+            return false
+        }
+        if (distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
             updateGpsDiagnostics(location, GPS_SIGNAL_WEAK, GPS_REASON_TOO_FAST)
             return false
         }
@@ -607,7 +613,7 @@ class MainActivity : AppCompatActivity() {
             updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME)
             return false
         }
-        val speedKmh = (distanceMeters / elapsedSeconds) * 3.6f
+        val speedKmh = resolveCalculatedSpeedKmh(distanceMeters, elapsedSeconds)
         if (speedKmh > MAX_REASONABLE_SPEED_KMH) {
             updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_TOO_FAST)
             return false
@@ -617,11 +623,55 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateGpsDiagnostics(location: Location, signal: String, ignoredReason: String) {
         val accuracyMeters = if (location.hasAccuracy()) location.accuracy else -1f
+        Log.d(
+            "Rehab2Gps",
+            "decision=${if (ignoredReason == GPS_REASON_NONE) "ACCEPTED" else "REJECTED"} " +
+                "signal=$signal accuracy=$accuracyMeters reason=$ignoredReason"
+        )
         prefs.edit()
             .putFloat(PREF_GPS_LAST_ACCURACY_METERS, accuracyMeters)
             .putString(PREF_GPS_LAST_SIGNAL, signal)
             .putString(PREF_GPS_LAST_IGNORED_REASON, ignoredReason)
             .apply()
+    }
+
+    private fun resolveSpeedKmh(previousLocation: Location?, location: Location): Int {
+        if (!location.hasAccuracy() || location.accuracy > MAX_REASONABLE_ACCURACY_METERS) {
+            return 0
+        }
+        if (location.hasSpeed()) {
+            val speedKmh = location.speed * 3.6f
+            return if (speedKmh <= MAX_REASONABLE_SPEED_KMH) {
+                speedKmh.roundToInt().coerceAtLeast(0)
+            } else {
+                0
+            }
+        }
+        if (previousLocation == null || !previousLocation.hasAccuracy() || previousLocation.accuracy > MAX_REASONABLE_ACCURACY_METERS) {
+            return 0
+        }
+        val distanceMeters = previousLocation.distanceTo(location)
+        if (distanceMeters < MIN_REASONABLE_DISTANCE_METERS || distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
+            return 0
+        }
+        val elapsedSeconds = (location.time - previousLocation.time) / 1000f
+        if (elapsedSeconds <= 0f) {
+            return 0
+        }
+        val speedKmh = resolveCalculatedSpeedKmh(distanceMeters, elapsedSeconds)
+        return if (speedKmh <= MAX_REASONABLE_SPEED_KMH) {
+            speedKmh.roundToInt().coerceAtLeast(0)
+        } else {
+            0
+        }
+    }
+
+    private fun resolveCalculatedSpeedKmh(distanceMeters: Float, elapsedSeconds: Float): Float {
+        return (distanceMeters / elapsedSeconds) * 3.6f
+    }
+
+    private fun formatSpeedKmh(speedKmh: Int): String {
+        return "$speedKmh KM/H"
     }
 
     private fun gpsSignalForAccuracy(location: Location): String {
