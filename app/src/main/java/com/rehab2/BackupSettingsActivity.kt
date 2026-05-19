@@ -147,7 +147,10 @@ class BackupSettingsActivity : AppCompatActivity() {
                     ) {
                         txtUpdateStatus.text = "Posodobitev je na voljo: $remoteVersion"
                         btnDownloadApk.isEnabled = true
-                    } else if (latestVersionCode != null && latestVersionCode <= currentVersionCode) {
+                    } else if (latestVersionCode != null &&
+                        latestVersionCode <= currentVersionCode &&
+                        currentVersionCode % 2L == 1L
+                    ) {
                         txtUpdateStatus.text =
                             "Ta posodobitev ni primerna za trenutno nameščeno rollback verzijo. Počakajte na novejšo normalno izdajo."
                         btnDownloadApk.isEnabled = false

@@ -123,6 +123,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtStatusDay: TextView
     private lateinit var txtStatusDate: TextView
     private lateinit var txtStatusYear: TextView
+    private lateinit var txtStatusTime: TextView
     private lateinit var txtStatusSpeed: TextView
     private lateinit var txtStatusTodayDistance: TextView
     private lateinit var powerOverlay: View
@@ -144,6 +145,7 @@ class MainActivity : AppCompatActivity() {
     private var isPowerReceiverRegistered = false
     private val mainHandler = Handler(Looper.getMainLooper())
     private val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
+    private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     private val dateFormat = SimpleDateFormat("dd.MM.", Locale.getDefault())
     private val yearFormat = SimpleDateFormat("yyyy", Locale.getDefault())
     private val distanceDayFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
@@ -198,6 +200,7 @@ class MainActivity : AppCompatActivity() {
         txtStatusDay = findViewById(R.id.txtStatusDay)
         txtStatusDate = findViewById(R.id.txtStatusDate)
         txtStatusYear = findViewById(R.id.txtStatusYear)
+        txtStatusTime = findViewById(R.id.txtStatusTime)
         txtStatusSpeed = findViewById(R.id.txtStatusSpeed)
         txtStatusTodayDistance = findViewById(R.id.txtStatusTodayDistance)
         powerOverlay = findViewById(R.id.powerOverlay)
@@ -422,11 +425,25 @@ class MainActivity : AppCompatActivity() {
         txtStatusBattery.text = readBatteryPercentage()?.let { "$it%" } ?: getString(R.string.battery_unknown_short)
         txtStatusNetwork.text = readNetworkLabel()
         val now = Date()
-        txtStatusDay.text = dayFormat.format(now).replaceFirstChar { it.titlecase(Locale.getDefault()) }
+        txtStatusDay.text = shortDayLabel(now)
         txtStatusDate.text = dateFormat.format(now)
         txtStatusYear.text = yearFormat.format(now)
+        txtStatusTime.text = timeFormat.format(now)
         txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
         txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
+    }
+
+    private fun shortDayLabel(now: Date): String {
+        return when (dayFormat.format(now).lowercase(Locale.getDefault())) {
+            "monday", "ponedeljek" -> "Pon"
+            "tuesday", "torek" -> "Tor"
+            "wednesday", "sreda" -> "Sre"
+            "thursday", "četrtek", "cetrtek" -> "Čet"
+            "friday", "petek" -> "Pet"
+            "saturday", "sobota" -> "Sob"
+            "sunday", "nedelja" -> "Ned"
+            else -> dayFormat.format(now).take(3).replaceFirstChar { it.titlecase(Locale.getDefault()) }
+        }
     }
 
     private fun readBatteryPercentage(): Int? {
