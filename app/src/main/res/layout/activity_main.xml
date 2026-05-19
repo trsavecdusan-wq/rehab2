@@ -258,9 +258,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="0dp"
+                        android:ellipsize="none"
+                        android:includeFontPadding="false"
+                        android:singleLine="true"
                         android:text="Pon"
                         android:textColor="#E1E7EE"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -268,28 +271,24 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="0dp"
+                        android:ellipsize="none"
+                        android:includeFontPadding="false"
+                        android:singleLine="true"
                         android:text="12.05."
                         android:textColor="#D0D9E2"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/txtStatusYear"
+                        android:id="@+id/txtStatusYearTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="0dp"
-                        android:text="2026"
-                        android:textColor="#B2BCC6"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtStatusTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="20:57"
+                        android:ellipsize="none"
                         android:textColor="#AFC3D8"
-                        android:textSize="11sp"
+                        android:includeFontPadding="false"
+                        android:singleLine="true"
+                        android:text="2026 20:57"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>

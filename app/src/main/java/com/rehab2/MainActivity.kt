@@ -122,8 +122,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtStatusNetwork: TextView
     private lateinit var txtStatusDay: TextView
     private lateinit var txtStatusDate: TextView
-    private lateinit var txtStatusYear: TextView
-    private lateinit var txtStatusTime: TextView
+    private lateinit var txtStatusYearTime: TextView
     private lateinit var txtStatusSpeed: TextView
     private lateinit var txtStatusTodayDistance: TextView
     private lateinit var powerOverlay: View
@@ -145,9 +144,8 @@ class MainActivity : AppCompatActivity() {
     private var isPowerReceiverRegistered = false
     private val mainHandler = Handler(Looper.getMainLooper())
     private val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-    private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     private val dateFormat = SimpleDateFormat("dd.MM.", Locale.getDefault())
-    private val yearFormat = SimpleDateFormat("yyyy", Locale.getDefault())
+    private val yearTimeFormat = SimpleDateFormat("yyyy HH:mm", Locale.getDefault())
     private val distanceDayFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
     private val statusRefreshRunnable = object : Runnable {
         override fun run() {
@@ -199,8 +197,7 @@ class MainActivity : AppCompatActivity() {
         txtStatusNetwork = findViewById(R.id.txtStatusNetwork)
         txtStatusDay = findViewById(R.id.txtStatusDay)
         txtStatusDate = findViewById(R.id.txtStatusDate)
-        txtStatusYear = findViewById(R.id.txtStatusYear)
-        txtStatusTime = findViewById(R.id.txtStatusTime)
+        txtStatusYearTime = findViewById(R.id.txtStatusYearTime)
         txtStatusSpeed = findViewById(R.id.txtStatusSpeed)
         txtStatusTodayDistance = findViewById(R.id.txtStatusTodayDistance)
         powerOverlay = findViewById(R.id.powerOverlay)
@@ -427,8 +424,7 @@ class MainActivity : AppCompatActivity() {
         val now = Date()
         txtStatusDay.text = shortDayLabel(now)
         txtStatusDate.text = dateFormat.format(now)
-        txtStatusYear.text = yearFormat.format(now)
-        txtStatusTime.text = timeFormat.format(now)
+        txtStatusYearTime.text = yearTimeFormat.format(now)
         txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
         txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
     }
