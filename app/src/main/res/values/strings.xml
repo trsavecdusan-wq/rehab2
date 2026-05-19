@@ -15,6 +15,10 @@
     <string name="keep_screen_on_charging_label">ZASLON VEDNO VKLOPLJEN MED NAPAJANJEM</string>
     <string name="keep_screen_on_charging_enabled">VKLOPLJENO</string>
     <string name="keep_screen_on_charging_disabled">IZKLOPLJENO</string>
+    <string name="power_protection_title">POWER ZA&#352;&#268;ITA</string>
+    <string name="power_unplugged_duration_label">KOLIKO &#268;ASA BREZ NAPAJANJA</string>
+    <string name="power_critical_battery_label">KRITI&#268;NA BATERIJA</string>
+    <string name="aac_settings_not_ready">FUNKCIJA &#352;E NI PRIPRAVLJENA</string>
     <string name="mp3_tile_label">MP3</string>
     <string name="mp3_settings_label">MP3 / LOKALNA GLASBA</string>
     <string name="mp3_open_label">ODPRI</string>

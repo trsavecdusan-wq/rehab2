@@ -108,7 +108,6 @@ class SettingsActivity : AppCompatActivity() {
         txtGpsAccuracyValue = findViewById(R.id.txtGpsAccuracyValue)
         txtGpsIgnoredReasonValue = findViewById(R.id.txtGpsIgnoredReasonValue)
         btnResetGpsStatistics = findViewById(R.id.btnResetGpsStatistics)
-
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -122,7 +121,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnAacSettings).setOnClickListener {
-            Toast.makeText(this, "Funkcija ÄąË‡e ni pripravljena", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.aac_settings_not_ready), Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btnStatusSettings).setOnClickListener {
@@ -265,7 +264,6 @@ class SettingsActivity : AppCompatActivity() {
         val signal = prefs.getString(PREF_GPS_LAST_SIGNAL, "WEAK").orEmpty().ifBlank { "WEAK" }
         val accuracyMeters = prefs.getFloat(PREF_GPS_LAST_ACCURACY_METERS, -1f)
         val ignoredReason = prefs.getString(PREF_GPS_LAST_IGNORED_REASON, "NONE").orEmpty().ifBlank { "NONE" }
-
         txtGpsSignalValue.text = signal
         txtGpsAccuracyValue.text = if (accuracyMeters >= 0f) {
             String.format(Locale.ROOT, "%.1f M", accuracyMeters)

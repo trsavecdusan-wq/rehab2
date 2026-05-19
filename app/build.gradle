@@ -19,8 +19,8 @@ android {
         minSdk 21
         targetSdk 34
         // Normal releases on main use even versionCode values only. Rollback releases use odd versionCode values only.
-        versionCode 88
-        versionName "1.0.88"
+        versionCode 90
+        versionName "1.0.90"
     }
 
     signingConfigs {
@@ -73,3 +73,4 @@ gradle.taskGraph.whenReady { graph ->
         )
     }
 }
+
