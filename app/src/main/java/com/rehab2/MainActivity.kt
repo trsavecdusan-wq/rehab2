@@ -420,7 +420,7 @@ class MainActivity : AppCompatActivity() {
         val batteryLabel = readBatteryPercentage()?.let { "$it%" } ?: getString(R.string.battery_unknown_short)
         txtStatusBatteryNetwork.text = "$batteryLabel ${readNetworkLabel()}"
         val now = Date()
-        txtStatusDay.text = shortDayLabel(now)
+        txtStatusDay.text = dayFormat.format(now).replaceFirstChar { it.titlecase(Locale.getDefault()) }
         txtStatusDate.text = dateFormat.format(now)
         txtStatusYearTime.text = yearTimeFormat.format(now)
         txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
