@@ -7,6 +7,8 @@ import android.content.SharedPreferences
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.BatteryManager
 import android.os.Bundle
 import android.os.Handler
@@ -108,6 +110,14 @@ class SettingsActivity : AppCompatActivity() {
         txtGpsAccuracyValue = findViewById(R.id.txtGpsAccuracyValue)
         txtGpsIgnoredReasonValue = findViewById(R.id.txtGpsIgnoredReasonValue)
         btnResetGpsStatistics = findViewById(R.id.btnResetGpsStatistics)
+        styleStepperButtons(
+            findViewById(R.id.btnAllowedUnplugMinus),
+            findViewById(R.id.btnAllowedUnplugPlus),
+            findViewById(R.id.btnWarningGraceMinus),
+            findViewById(R.id.btnWarningGracePlus),
+            findViewById(R.id.btnCriticalBatteryMinus),
+            findViewById(R.id.btnCriticalBatteryPlus)
+        )
 
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
@@ -289,13 +299,14 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun buildPowerStatus(powerMode: String): String {
         val selectedModeText = getString(R.string.power_selected_mode_format, powerModeLabel(powerMode))
+        val descriptionText = powerModeDescription(powerMode)
 
         val powerSourceText = if (latestPluggedIn) {
             getString(R.string.power_status_plugged)
         } else {
             getString(R.string.power_status_on_battery)
         }
-        return "$selectedModeText\n$powerSourceText\n${batteryStatusLine()}"
+        return "$selectedModeText\n$descriptionText\n$powerSourceText\n${batteryStatusLine()}"
     }
 
     private fun readBatteryPercent(batteryIntent: Intent?): Int? {
@@ -372,7 +383,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun showPowerClickFeedback(mode: String) {
-        txtPowerStatusValue.text = getString(R.string.power_click_feedback_format, powerModeLabel(mode))
+        txtPowerStatusValue.text = buildSavedPowerStatus(mode)
         pendingPowerStatusRefresh?.let { powerFeedbackHandler.removeCallbacks(it) }
         val refreshRunnable = Runnable {
             refreshPowerSection()
@@ -390,11 +401,49 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun powerModeDescription(mode: String): String {
+        return when (mode) {
+            POWER_MODE_BATTERY_SAVER -> getString(R.string.power_mode_warning_description)
+            POWER_MODE_POWER_SLEEP -> getString(R.string.power_mode_sleep_description)
+            else -> getString(R.string.power_mode_off_description)
+        }
+    }
+
+    private fun buildSavedPowerStatus(mode: String): String {
+        return buildString {
+            append(getString(R.string.power_mode_saved))
+            append('\n')
+            append(getString(R.string.power_selected_mode_format, powerModeLabel(mode)))
+            append('\n')
+            append(powerModeDescription(mode))
+        }
+    }
+
     private fun batteryStatusLine(): String {
         return latestBatteryPercent?.let {
             getString(R.string.power_status_battery_percent_format, it)
         } ?: getString(R.string.power_status_battery_unknown)
     }
+
+    private fun styleStepperButtons(vararg buttons: Button) {
+        val strokeColor = Color.parseColor("#D6DDE4")
+        val fillColor = Color.parseColor("#3A3F45")
+        val horizontalPadding = dpToPx(20)
+        val verticalPadding = dpToPx(8)
+        buttons.forEach { button ->
+            val background = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = dpToPx(10).toFloat()
+                setColor(fillColor)
+                setStroke(dpToPx(2), strokeColor)
+            }
+            button.background = background
+            button.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
+        }
+    }
+
+    private fun dpToPx(dp: Int): Int =
+        (dp * resources.displayMetrics.density).roundToInt()
 
     private fun showAdminPinDialog(onSuccess: () -> Unit) {
         val input = EditText(this).apply {

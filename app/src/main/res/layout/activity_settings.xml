@@ -173,14 +173,14 @@
 
             <Button
                 android:id="@+id/btnAllowedUnplugMinus"
-                android:layout_width="96dp"
-                android:layout_height="72dp"
-                android:background="#3A3F45"
+                android:layout_width="110dp"
+                android:layout_height="76dp"
+                android:background="#00000000"
                 android:gravity="center"
                 android:text="-"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="42sp"
+                android:textSize="46sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -196,14 +196,14 @@
 
             <Button
                 android:id="@+id/btnAllowedUnplugPlus"
-                android:layout_width="96dp"
-                android:layout_height="72dp"
-                android:background="#3A3F45"
+                android:layout_width="110dp"
+                android:layout_height="76dp"
+                android:background="#00000000"
                 android:gravity="center"
                 android:text="+"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="42sp"
+                android:textSize="46sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -225,14 +225,14 @@
 
             <Button
                 android:id="@+id/btnCriticalBatteryMinus"
-                android:layout_width="96dp"
-                android:layout_height="72dp"
-                android:background="#3A3F45"
+                android:layout_width="110dp"
+                android:layout_height="76dp"
+                android:background="#00000000"
                 android:gravity="center"
                 android:text="-"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="42sp"
+                android:textSize="46sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -248,14 +248,14 @@
 
             <Button
                 android:id="@+id/btnCriticalBatteryPlus"
-                android:layout_width="96dp"
-                android:layout_height="72dp"
-                android:background="#3A3F45"
+                android:layout_width="110dp"
+                android:layout_height="76dp"
+                android:background="#00000000"
                 android:gravity="center"
                 android:text="+"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="42sp"
+                android:textSize="46sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -277,14 +277,14 @@
 
             <Button
                 android:id="@+id/btnWarningGraceMinus"
-                android:layout_width="96dp"
-                android:layout_height="72dp"
-                android:background="#3A3F45"
+                android:layout_width="110dp"
+                android:layout_height="76dp"
+                android:background="#00000000"
                 android:gravity="center"
                 android:text="-"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="42sp"
+                android:textSize="46sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -300,14 +300,14 @@
 
             <Button
                 android:id="@+id/btnWarningGracePlus"
-                android:layout_width="96dp"
-                android:layout_height="72dp"
-                android:background="#3A3F45"
+                android:layout_width="110dp"
+                android:layout_height="76dp"
+                android:background="#00000000"
                 android:gravity="center"
                 android:text="+"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="42sp"
+                android:textSize="46sp"
                 android:textStyle="bold" />
         </LinearLayout>
 

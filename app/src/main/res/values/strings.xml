@@ -69,8 +69,11 @@
     <string name="power_mode_off_label">IZKLOPLJENA</string>
     <string name="power_mode_warning_label">OPOZORILO</string>
     <string name="power_mode_sleep_label">AVTOMATSKI SLEEP</string>
-    <string name="power_click_feedback_format">KLIK: %1$s</string>
     <string name="power_selected_mode_format">IZBRANI NA&#268;IN: %1$s</string>
+    <string name="power_mode_saved">NA&#268;IN SHRANJEN</string>
+    <string name="power_mode_off_description">Power za&#353;&#269;ita ne izvaja ukrepov.</string>
+    <string name="power_mode_warning_description">Ob izklopu napajanja bo prikazano opozorilo.</string>
+    <string name="power_mode_sleep_description">Ob izklopu napajanja bo po nastavljenem &#269;asu predlagan sleep.</string>
     <string name="power_status_plugged">NAPAJANJE PRIKLOPLJENO</string>
     <string name="power_status_on_battery">DELO NA BATERIJI</string>
     <string name="power_status_battery_unknown">BATERIJA: NEZNANO</string>
