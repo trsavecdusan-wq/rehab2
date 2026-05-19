@@ -259,20 +259,20 @@
                         android:id="@+id/txtStatusDay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="2dp"
+                        android:layout_marginBottom="3dp"
                         android:text="Torek"
                         android:textColor="#E1E7EE"
-                        android:textSize="18sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtStatusDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="2dp"
+                        android:layout_marginBottom="3dp"
                         android:text="12.05."
                         android:textColor="#D0D9E2"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -281,13 +281,13 @@
                         android:layout_height="wrap_content"
                         android:text="2026"
                         android:textColor="#B2BCC6"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="132dp"
                     android:layout_height="match_parent"
                     android:gravity="bottom|end"
                     android:orientation="vertical">
@@ -299,26 +299,25 @@
 
                     <TextView
                         android:id="@+id/txtStatusSpeed"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:gravity="center"
+                        android:gravity="end|center_vertical"
                         android:includeFontPadding="false"
-                        android:minWidth="120dp"
-                        android:text="0 KM/H"
+                        android:text="0"
                         android:textColor="#F4F7FA"
-                        android:textSize="30sp"
+                        android:textSize="28sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtStatusTodayDistance"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="4dp"
-                        android:text="DANES: 0 m"
+                        android:layout_marginTop="2dp"
+                        android:gravity="end"
+                        android:includeFontPadding="false"
+                        android:text="0 m"
                         android:textColor="#D6DDE4"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>

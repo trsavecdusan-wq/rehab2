@@ -679,14 +679,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun formatSpeedKmh(speedKmh: Float): String {
         if (speedKmh < 0.05f) {
-            return "0 KM/H"
+            return "0"
         }
         val roundedToOneDecimal = (speedKmh * 10f).roundToInt() / 10f
         val wholePart = roundedToOneDecimal.roundToInt().toFloat()
         return if (kotlin.math.abs(roundedToOneDecimal - wholePart) < 0.05f) {
-            "${wholePart.toInt()} KM/H"
+            wholePart.toInt().toString()
         } else {
-            String.format(Locale.US, "%.1f KM/H", roundedToOneDecimal)
+            String.format(Locale.US, "%.1f", roundedToOneDecimal)
         }
     }
 
@@ -696,9 +696,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun formatTodayDistance(distanceMeters: Long): String {
         return if (distanceMeters < 1000L) {
-            "DANES: ${distanceMeters} m"
+            "${distanceMeters} m"
         } else {
-            String.format(Locale.US, "DANES: %.2f km", distanceMeters / 1000f)
+            String.format(Locale.US, "%.2f km", distanceMeters / 1000f)
         }
     }
 
