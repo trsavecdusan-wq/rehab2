@@ -73,8 +73,8 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_GPS_LAST_IGNORED_REASON = "gps_last_ignored_reason"
         private const val PREF_GPS_RESET_BASELINE_REQUESTED = "gps_reset_baseline_requested"
         private const val MAX_REASONABLE_DISTANCE_METERS = 250f
-        private const val MAX_REASONABLE_ACCURACY_METERS = 25f
-        private const val MIN_REASONABLE_DISTANCE_METERS = 5f
+        private const val MAX_REASONABLE_ACCURACY_METERS = 30f
+        private const val MIN_REASONABLE_DISTANCE_METERS = 3f
         private const val MAX_REASONABLE_SPEED_KMH = 10f
         private const val GPS_SIGNAL_GOOD = "GOOD"
         private const val GPS_SIGNAL_WEAK = "WEAK"
@@ -578,7 +578,6 @@ class MainActivity : AppCompatActivity() {
 
         val distanceMeters = previousLocation.distanceTo(location)
         if (!isReasonableDistance(previousLocation, location, distanceMeters)) {
-            previousTrackedLocation = location
             return
         }
 
@@ -597,36 +596,41 @@ class MainActivity : AppCompatActivity() {
 
     private fun isReasonableDistance(previousLocation: Location, location: Location, distanceMeters: Float): Boolean {
         if (distanceMeters <= 0f) {
-            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME)
+            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME, distanceMeters)
             return false
         }
         if (distanceMeters < MIN_REASONABLE_DISTANCE_METERS) {
-            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_JITTER)
+            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_JITTER, distanceMeters)
             return false
         }
         if (distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
-            updateGpsDiagnostics(location, GPS_SIGNAL_WEAK, GPS_REASON_TOO_FAST)
+            updateGpsDiagnostics(location, GPS_SIGNAL_WEAK, GPS_REASON_TOO_FAST, distanceMeters)
             return false
         }
         val elapsedSeconds = (location.time - previousLocation.time) / 1000f
         if (elapsedSeconds <= 0f) {
-            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME)
+            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME, distanceMeters)
             return false
         }
         val speedKmh = resolveCalculatedSpeedKmh(distanceMeters, elapsedSeconds)
         if (speedKmh > MAX_REASONABLE_SPEED_KMH) {
-            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_TOO_FAST)
+            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_TOO_FAST, distanceMeters)
             return false
         }
         return true
     }
 
-    private fun updateGpsDiagnostics(location: Location, signal: String, ignoredReason: String) {
+    private fun updateGpsDiagnostics(
+        location: Location,
+        signal: String,
+        ignoredReason: String,
+        rawDistanceMeters: Float = -1f
+    ) {
         val accuracyMeters = if (location.hasAccuracy()) location.accuracy else -1f
         Log.d(
             "Rehab2Gps",
             "decision=${if (ignoredReason == GPS_REASON_NONE) "ACCEPTED" else "REJECTED"} " +
-                "signal=$signal accuracy=$accuracyMeters reason=$ignoredReason"
+                "signal=$signal accuracy=$accuracyMeters rawDistance=$rawDistanceMeters reason=$ignoredReason"
         )
         prefs.edit()
             .putFloat(PREF_GPS_LAST_ACCURACY_METERS, accuracyMeters)

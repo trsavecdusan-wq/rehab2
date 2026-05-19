@@ -259,18 +259,20 @@
                         android:id="@+id/txtStatusDay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="2dp"
                         android:text="Torek"
-                        android:textColor="#B8C0C8"
-                        android:textSize="16sp"
+                        android:textColor="#E1E7EE"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtStatusDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="2dp"
                         android:text="12.05."
-                        android:textColor="#B8C0C8"
-                        android:textSize="12sp"
+                        android:textColor="#D0D9E2"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -278,8 +280,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="2026"
-                        android:textColor="#8E99A3"
-                        android:textSize="11sp"
+                        android:textColor="#B2BCC6"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -302,7 +304,7 @@
                         android:includeFontPadding="false"
                         android:text="5"
                         android:textColor="#F4F7FA"
-                        android:textSize="40sp"
+                        android:textSize="32sp"
                         android:textStyle="bold" />
 
                     <Space
