@@ -7,20 +7,22 @@ import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacRepository
 import java.io.File
 
 class AacCommunicatorActivity : AppCompatActivity() {
     private val repository = AacRepository()
+    private lateinit var audioPlayer: AacAudioPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_aac_communicator)
+        audioPlayer = AacAudioPlayer(this)
 
         val txtTitle: TextView = findViewById(R.id.txtAacTitle)
         val recycler: RecyclerView = findViewById(R.id.recyclerAacTiles)
@@ -29,8 +31,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtTitle.text = page.title
         recycler.layoutManager = GridLayoutManager(this, 5)
         recycler.adapter = AacAdapter(page.items) { item ->
-            Toast.makeText(this, item.labelSl, Toast.LENGTH_SHORT).show()
+            audioPlayer.playOrSpeak(item)
         }
+    }
+
+    override fun onDestroy() {
+        audioPlayer.release()
+        super.onDestroy()
     }
 
     private class AacAdapter(

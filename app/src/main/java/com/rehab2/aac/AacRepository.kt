@@ -38,6 +38,7 @@ class AacRepository {
                         id = itemJson.optString("id").ifBlank { "item_$index" },
                         labelSl = itemJson.optString("labelSl").ifBlank { "Brez oznake" },
                         imagePath = itemJson.optString("imagePath"),
+                        audioSl = itemJson.optString("audioSl"),
                         actionType = itemJson.optString("actionType"),
                         targetPageId = itemJson.optString("targetPageId")
                     )
@@ -57,11 +58,11 @@ class AacRepository {
             pageId = "home",
             title = "AAC V1",
             items = listOf(
-                AacItem("water", "VODA", "", "speak", ""),
-                AacItem("juice", "SOK", "", "speak", ""),
-                AacItem("food", "HRANA", "", "speak", ""),
-                AacItem("wc", "WC", "", "speak", ""),
-                AacItem("help", "POMOČ", "", "speak", "")
+                AacItem("water", "VODA", "", "", "speak", ""),
+                AacItem("juice", "SOK", "", "", "speak", ""),
+                AacItem("food", "HRANA", "", "", "speak", ""),
+                AacItem("wc", "WC", "", "", "speak", ""),
+                AacItem("help", "POMOČ", "", "", "speak", "")
             )
         )
     }
