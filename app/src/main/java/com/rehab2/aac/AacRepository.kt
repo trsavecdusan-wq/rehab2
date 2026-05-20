@@ -8,25 +8,35 @@ import java.io.File
 class AacRepository {
     companion object {
         private const val TAG = "AacRepository"
-        private const val HOME_PAGE_PATH = "/storage/emulated/0/NovaRehab2/aac/pages/home.json"
+        private const val PAGES_DIR_PATH = "/storage/emulated/0/NovaRehab2/aac/pages"
     }
 
     fun loadHomePage(): AacPage {
-        val file = File(HOME_PAGE_PATH)
+        return loadPage("home") ?: fallbackPage()
+    }
+
+    fun loadPage(pageId: String): AacPage? {
+        val normalizedPageId = pageId.trim()
+        if (normalizedPageId.isBlank()) {
+            return null
+        }
+
+        val fileName = if (normalizedPageId == "home") "home.json" else "$normalizedPageId.json"
+        val file = File(PAGES_DIR_PATH, fileName)
         if (!file.exists() || !file.isFile) {
-            return fallbackPage()
+            return null
         }
 
         return try {
             val json = JSONObject(file.readText())
             parsePage(json)
         } catch (error: Exception) {
-            Log.w(TAG, "Failed to parse AAC home page, using fallback", error)
-            fallbackPage()
+            Log.w(TAG, "Failed to parse AAC page: $normalizedPageId", error)
+            null
         }
     }
 
-    private fun parsePage(json: JSONObject): AacPage {
+    private fun parsePage(json: JSONObject): AacPage? {
         val pageId = json.optString("pageId").ifBlank { "home" }
         val title = json.optString("title").ifBlank { "AAC V1" }
         val itemsJson = json.optJSONArray("items") ?: JSONArray()
@@ -46,10 +56,14 @@ class AacRepository {
             }
         }
 
+        if (items.isEmpty()) {
+            return null
+        }
+
         return AacPage(
             pageId = pageId,
             title = title,
-            items = if (items.isEmpty()) fallbackPage().items else items
+            items = items
         )
     }
 
@@ -62,7 +76,7 @@ class AacRepository {
                 AacItem("juice", "SOK", "", "", "speak", ""),
                 AacItem("food", "HRANA", "", "", "speak", ""),
                 AacItem("wc", "WC", "", "", "speak", ""),
-                AacItem("help", "POMOČ", "", "", "speak", "")
+                AacItem("help", "POMO\u010C", "", "", "speak", "")
             )
         )
     }

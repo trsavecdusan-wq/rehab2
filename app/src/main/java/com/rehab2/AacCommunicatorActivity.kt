@@ -7,37 +7,100 @@ import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacItem
+import com.rehab2.aac.AacPage
 import com.rehab2.aac.AacRepository
 import java.io.File
 
 class AacCommunicatorActivity : AppCompatActivity() {
     private val repository = AacRepository()
+    private val pageHistory = ArrayDeque<String>()
     private lateinit var audioPlayer: AacAudioPlayer
+    private lateinit var txtTitle: TextView
+    private lateinit var recycler: RecyclerView
+    private var currentPageId: String = "home"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_aac_communicator)
         audioPlayer = AacAudioPlayer(this)
 
-        val txtTitle: TextView = findViewById(R.id.txtAacTitle)
-        val recycler: RecyclerView = findViewById(R.id.recyclerAacTiles)
-        val page = repository.loadHomePage()
-
-        txtTitle.text = page.title
+        txtTitle = findViewById(R.id.txtAacTitle)
+        recycler = findViewById(R.id.recyclerAacTiles)
         recycler.layoutManager = GridLayoutManager(this, 5)
-        recycler.adapter = AacAdapter(page.items) { item ->
-            audioPlayer.playOrSpeak(item)
-        }
+
+        showPage(repository.loadHomePage())
     }
 
     override fun onDestroy() {
         audioPlayer.release()
         super.onDestroy()
+    }
+
+    private fun showPage(page: AacPage) {
+        currentPageId = page.pageId
+        txtTitle.text = page.title
+        recycler.adapter = AacAdapter(page.items) { item ->
+            handleItemClick(item)
+        }
+    }
+
+    private fun handleItemClick(item: AacItem) {
+        when (item.actionType) {
+            "open_page" -> openTargetPage(item.targetPageId)
+            "go_home" -> goHome()
+            "go_back" -> goBack()
+            else -> audioPlayer.playOrSpeak(item)
+        }
+    }
+
+    private fun openTargetPage(targetPageId: String) {
+        val normalizedTargetPageId = targetPageId.trim()
+        if (normalizedTargetPageId.isBlank()) {
+            Toast.makeText(this, "Stran ni dolo\u010Dena", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val page = repository.loadPage(normalizedTargetPageId)
+        if (page == null) {
+            Toast.makeText(this, "Stran ni na voljo", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        pageHistory.addLast(currentPageId)
+        showPage(page)
+    }
+
+    private fun goHome() {
+        val page = repository.loadPage("home")
+        if (page == null) {
+            Toast.makeText(this, "Stran ni na voljo", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        pageHistory.clear()
+        showPage(page)
+    }
+
+    private fun goBack() {
+        if (pageHistory.isEmpty()) {
+            return
+        }
+
+        val previousPageId = pageHistory.last()
+        val page = repository.loadPage(previousPageId)
+        if (page == null) {
+            Toast.makeText(this, "Stran ni na voljo", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        pageHistory.removeLast()
+        showPage(page)
     }
 
     private class AacAdapter(
