@@ -34,7 +34,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
         recycler = findViewById(R.id.recyclerAacTiles)
         recycler.layoutManager = GridLayoutManager(this, 5)
 
-        showPage(repository.loadHomePage())
+        val homePage = repository.loadHomePage()
+        showPage(homePage)
+        showRepositoryDebugStatus()
     }
 
     override fun onDestroy() {
@@ -44,7 +46,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun showPage(page: AacPage) {
         currentPageId = page.pageId
-        txtTitle.text = page.title
+        txtTitle.text = buildTitleText(page.title)
         recycler.adapter = AacAdapter(page.items) { item ->
             handleItemClick(item)
         }
@@ -68,7 +70,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         val page = repository.loadPage(normalizedTargetPageId)
         if (page == null) {
-            Toast.makeText(this, "Stran ni na voljo", Toast.LENGTH_SHORT).show()
+            showRepositoryDebugStatus()
             return
         }
 
@@ -79,7 +81,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun goHome() {
         val page = repository.loadPage("home")
         if (page == null) {
-            Toast.makeText(this, "Stran ni na voljo", Toast.LENGTH_SHORT).show()
+            showRepositoryDebugStatus()
             return
         }
 
@@ -95,12 +97,29 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val previousPageId = pageHistory.last()
         val page = repository.loadPage(previousPageId)
         if (page == null) {
-            Toast.makeText(this, "Stran ni na voljo", Toast.LENGTH_SHORT).show()
+            showRepositoryDebugStatus()
             return
         }
 
         pageHistory.removeLast()
         showPage(page)
+    }
+
+    private fun buildTitleText(baseTitle: String): String {
+        return if (repository.lastDebugCode == "OK") {
+            baseTitle
+        } else {
+            "$baseTitle\n${repository.lastDebugCode}"
+        }
+    }
+
+    private fun showRepositoryDebugStatus() {
+        if (repository.lastDebugCode == "OK") {
+            return
+        }
+
+        txtTitle.text = buildTitleText(txtTitle.text.toString().lineSequence().firstOrNull().orEmpty())
+        Toast.makeText(this, repository.lastDebugStatus, Toast.LENGTH_LONG).show()
     }
 
     private class AacAdapter(
