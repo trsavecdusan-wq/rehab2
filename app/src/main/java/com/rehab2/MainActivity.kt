@@ -288,6 +288,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        findViewById<View>(R.id.tileAacDomov).setOnLongClickListener {
+            startActivity(Intent(this, AacCommunicatorActivity::class.java))
+            true
+        }
+
         refreshStatusModule()
         refreshInitialPowerState()
         applyKeepScreenOnPolicy()

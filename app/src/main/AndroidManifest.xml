@@ -22,6 +22,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <activity android:name=".AacCommunicatorActivity" />
         <activity android:name=".BackupSettingsActivity" />
         <activity android:name=".LocalMusicActivity" />
         <activity android:name=".RadioStationEditActivity" />
