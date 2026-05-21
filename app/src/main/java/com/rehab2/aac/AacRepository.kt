@@ -25,10 +25,13 @@ class AacRepository(private val context: Context) {
 
     fun loadPage(pageId: String): AacPage? {
         val normalizedPageId = pageId.trim()
+        val externalFilesDirPath = context.getExternalFilesDir(null)?.absolutePath.orEmpty()
         if (normalizedPageId.isBlank()) {
             updateDebugStatus(
                 code = "UNKNOWN_ERROR",
                 path = "",
+                runtimePagesDir = "",
+                externalFilesDir = externalFilesDirPath,
                 exists = false,
                 isFile = false,
                 canRead = false,
@@ -42,6 +45,8 @@ class AacRepository(private val context: Context) {
             updateDebugStatus(
                 code = "UNKNOWN_ERROR",
                 path = "",
+                runtimePagesDir = "",
+                externalFilesDir = externalFilesDirPath,
                 exists = false,
                 isFile = false,
                 canRead = false,
@@ -52,21 +57,22 @@ class AacRepository(private val context: Context) {
 
         val fileName = if (normalizedPageId == "home") "home.json" else "$normalizedPageId.json"
         val file = File(pagesDir, fileName)
+        val runtimePagesDir = pagesDir.absolutePath
         val exists = file.exists()
         val isFile = file.isFile
         val canRead = file.canRead()
         if (!exists) {
-            updateDebugStatus("FILE_NOT_FOUND", file.absolutePath, exists, isFile, canRead, null)
+            updateDebugStatus("FILE_NOT_FOUND", file.absolutePath, runtimePagesDir, externalFilesDirPath, exists, isFile, canRead, null)
             return null
         }
 
         if (!isFile) {
-            updateDebugStatus("UNKNOWN_ERROR", file.absolutePath, exists, isFile, canRead, "Path is not a file")
+            updateDebugStatus("UNKNOWN_ERROR", file.absolutePath, runtimePagesDir, externalFilesDirPath, exists, isFile, canRead, "Path is not a file")
             return null
         }
 
         if (!canRead) {
-            updateDebugStatus("NOT_READABLE", file.absolutePath, exists, isFile, canRead, null)
+            updateDebugStatus("NOT_READABLE", file.absolutePath, runtimePagesDir, externalFilesDirPath, exists, isFile, canRead, null)
             return null
         }
 
@@ -74,14 +80,14 @@ class AacRepository(private val context: Context) {
             val json = JSONObject(file.readText())
             val page = parsePage(json)
             if (page == null) {
-                updateDebugStatus("JSON_ERROR", file.absolutePath, exists, isFile, canRead, "Page has no items")
+                updateDebugStatus("JSON_ERROR", file.absolutePath, runtimePagesDir, externalFilesDirPath, exists, isFile, canRead, "Page has no items")
             } else {
-                updateDebugStatus("OK", file.absolutePath, exists, isFile, canRead, null)
+                updateDebugStatus("OK", file.absolutePath, runtimePagesDir, externalFilesDirPath, exists, isFile, canRead, null)
             }
             page
         } catch (error: SecurityException) {
             Log.w(TAG, "Permission denied while reading AAC page: $normalizedPageId", error)
-            updateDebugStatus("PERMISSION_DENIED", file.absolutePath, exists, isFile, canRead, error.message)
+            updateDebugStatus("PERMISSION_DENIED", file.absolutePath, runtimePagesDir, externalFilesDirPath, exists, isFile, canRead, error.message)
             null
         } catch (error: Exception) {
             Log.w(TAG, "Failed to parse AAC page: $normalizedPageId", error)
@@ -90,7 +96,7 @@ class AacRepository(private val context: Context) {
             } else {
                 "JSON_ERROR"
             }
-            updateDebugStatus(code, file.absolutePath, exists, isFile, canRead, error.message)
+            updateDebugStatus(code, file.absolutePath, runtimePagesDir, externalFilesDirPath, exists, isFile, canRead, error.message)
             null
         }
     }
@@ -153,13 +159,15 @@ class AacRepository(private val context: Context) {
     private fun updateDebugStatus(
         code: String,
         path: String,
+        runtimePagesDir: String,
+        externalFilesDir: String,
         exists: Boolean,
         isFile: Boolean,
         canRead: Boolean,
         errorMessage: String?
     ) {
         lastDebugCode = code
-        val base = "code=$code path=$path exists=$exists isFile=$isFile canRead=$canRead"
+        val base = "code=$code externalFilesDir=$externalFilesDir runtimePagesDir=$runtimePagesDir path=$path exists=$exists isFile=$isFile canRead=$canRead"
         lastDebugStatus = if (errorMessage.isNullOrBlank()) {
             base
         } else {
