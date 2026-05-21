@@ -18,7 +18,7 @@ import com.rehab2.aac.AacRepository
 import java.io.File
 
 class AacCommunicatorActivity : AppCompatActivity() {
-    private val repository = AacRepository()
+    private lateinit var repository: AacRepository
     private val pageHistory = ArrayDeque<String>()
     private lateinit var audioPlayer: AacAudioPlayer
     private lateinit var txtTitle: TextView
@@ -28,6 +28,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_aac_communicator)
+        repository = AacRepository(this)
         audioPlayer = AacAudioPlayer(this)
 
         txtTitle = findViewById(R.id.txtAacTitle)

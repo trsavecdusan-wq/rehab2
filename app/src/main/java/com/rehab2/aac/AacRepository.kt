@@ -1,14 +1,16 @@
 package com.rehab2.aac
 
+import android.content.Context
 import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
-class AacRepository {
+class AacRepository(private val context: Context) {
     companion object {
         private const val TAG = "AacRepository"
-        private const val PAGES_DIR_PATH = "/storage/emulated/0/NovaRehab2/aac/pages"
+        private const val AAC_ROOT_DIR_NAME = "NovaRehab2/aac"
+        private const val PAGES_DIR_NAME = "pages"
     }
 
     var lastDebugCode: String = "OK"
@@ -35,8 +37,21 @@ class AacRepository {
             return null
         }
 
+        val pagesDir = getPagesDir()
+        if (pagesDir == null) {
+            updateDebugStatus(
+                code = "UNKNOWN_ERROR",
+                path = "",
+                exists = false,
+                isFile = false,
+                canRead = false,
+                errorMessage = "External files dir is null"
+            )
+            return null
+        }
+
         val fileName = if (normalizedPageId == "home") "home.json" else "$normalizedPageId.json"
-        val file = File(PAGES_DIR_PATH, fileName)
+        val file = File(pagesDir, fileName)
         val exists = file.exists()
         val isFile = file.isFile
         val canRead = file.canRead()
@@ -123,6 +138,16 @@ class AacRepository {
                 AacItem("help", "POMO\u010C", "", "", "speak", "")
             )
         )
+    }
+
+    fun getAacRootDir(): File? {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        return File(externalFilesDir, AAC_ROOT_DIR_NAME)
+    }
+
+    fun getPagesDir(): File? {
+        val aacRootDir = getAacRootDir() ?: return null
+        return File(aacRootDir, PAGES_DIR_NAME)
     }
 
     private fun updateDebugStatus(
