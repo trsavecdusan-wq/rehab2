@@ -9,8 +9,6 @@ import java.io.File
 class AacRepository(private val context: Context) {
     companion object {
         private const val TAG = "AacRepository"
-        private const val AAC_ROOT_DIR_NAME = "NovaRehab2/aac"
-        private const val PAGES_DIR_NAME = "pages"
     }
 
     var lastDebugCode: String = "OK"
@@ -40,7 +38,7 @@ class AacRepository(private val context: Context) {
             return null
         }
 
-        val pagesDir = getPagesDir()
+        val pagesDir = AacLocalStorage.getPagesDir(context)
         if (pagesDir == null) {
             updateDebugStatus(
                 code = "UNKNOWN_ERROR",
@@ -144,16 +142,6 @@ class AacRepository(private val context: Context) {
                 AacItem("help", "POMO\u010C", "", "", "speak", "")
             )
         )
-    }
-
-    fun getAacRootDir(): File? {
-        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
-        return File(externalFilesDir, AAC_ROOT_DIR_NAME)
-    }
-
-    fun getPagesDir(): File? {
-        val aacRootDir = getAacRootDir() ?: return null
-        return File(aacRootDir, PAGES_DIR_NAME)
     }
 
     private fun updateDebugStatus(

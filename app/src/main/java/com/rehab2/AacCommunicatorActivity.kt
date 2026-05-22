@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacItem
+import com.rehab2.aac.AacLocalStorage
 import com.rehab2.aac.AacPage
 import com.rehab2.aac.AacRepository
 import java.io.File
@@ -30,6 +31,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
         setContentView(R.layout.activity_aac_communicator)
         repository = AacRepository(this)
         audioPlayer = AacAudioPlayer(this)
+
+        if (AacLocalStorage.ensureStructure(this)) {
+            Toast.makeText(this, "AAC MAPE PRIPRAVLJENE", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "AAC MAP NI MOGO\u010CE USTVARITI", Toast.LENGTH_SHORT).show()
+        }
+
+        AacLocalStorage.seedBundledTestAudio(this)
 
         txtTitle = findViewById(R.id.txtAacTitle)
         recycler = findViewById(R.id.recyclerAacTiles)
