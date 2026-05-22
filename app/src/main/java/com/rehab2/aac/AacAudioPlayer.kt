@@ -8,6 +8,7 @@ import java.io.File
 import java.util.Locale
 
 class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener {
+    private val speechCache = AacSpeechCache(context)
     private var mediaPlayer: MediaPlayer? = null
     private var textToSpeech: TextToSpeech? = TextToSpeech(context, this)
     private var isTtsReady = false
@@ -28,32 +29,49 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     fun playOrSpeak(item: AacItem) {
         stopPlayback()
 
-        val audioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
-        if (audioFile != null && audioFile.exists() && audioFile.isFile) {
-            try {
-                mediaPlayer = MediaPlayer().apply {
-                    setDataSource(audioFile.absolutePath)
-                    setOnCompletionListener {
-                        releaseMediaPlayer()
-                    }
-                    prepare()
-                    start()
-                }
-                return
-            } catch (_: Exception) {
-                releaseMediaPlayer()
-            }
+        val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
+        if (playAudioFileIfAvailable(directAudioFile)) {
+            Toast.makeText(context, "AUDIO DIRECT: ${item.id}", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val cachedAudioFile = speechCache.getExistingCacheFile(item.id)
+        if (playAudioFileIfAvailable(cachedAudioFile)) {
+            Toast.makeText(context, "AUDIO CACHE: ${item.id}", Toast.LENGTH_SHORT).show()
+            return
         }
 
         speak(item.labelSl)
     }
 
+    private fun playAudioFileIfAvailable(audioFile: File?): Boolean {
+        if (audioFile == null || !audioFile.exists() || !audioFile.isFile) {
+            return false
+        }
+
+        return try {
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(audioFile.absolutePath)
+                setOnCompletionListener {
+                    releaseMediaPlayer()
+                }
+                prepare()
+                start()
+            }
+            true
+        } catch (_: Exception) {
+            releaseMediaPlayer()
+            false
+        }
+    }
+
     private fun speak(text: String) {
         if (!isTtsReady || isTtsFailed) {
-            Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "GOVOR NI NA VOLJO", Toast.LENGTH_SHORT).show()
             return
         }
 
+        Toast.makeText(context, "TTS: ${text}", Toast.LENGTH_SHORT).show()
         textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "aac_$text")
     }
 
