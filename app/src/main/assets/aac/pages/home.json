@@ -1,0 +1,21 @@
+{
+  "pageId": "home",
+  "title": "DOMOV",
+  "items": [
+    { "id": "drinks", "labelSl": "PIJA\u010CA", "imagePath": "", "audioSl": "", "actionType": "open_page", "targetPageId": "drinks" },
+    { "id": "food", "labelSl": "HRANA", "imagePath": "", "audioSl": "", "actionType": "open_page", "targetPageId": "food" },
+    { "id": "pain", "labelSl": "BOLE\u010CINA", "imagePath": "", "audioSl": "", "actionType": "open_page", "targetPageId": "pain" },
+    { "id": "wc", "labelSl": "WC", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "help", "labelSl": "POMO\u010C", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "yes", "labelSl": "DA", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "no", "labelSl": "NE", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "good", "labelSl": "DOBRO", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "bad", "labelSl": "SLABO", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "tired", "labelSl": "UTRUJENA", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "cold", "labelSl": "MRAZ", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "hot", "labelSl": "VRO\u010CE", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "family", "labelSl": "DRU\u017DINA", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "doctor", "labelSl": "ZDRAVNIK", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "stop", "labelSl": "STOP", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" }
+  ]
+}

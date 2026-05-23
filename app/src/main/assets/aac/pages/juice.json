@@ -1,0 +1,12 @@
+{
+  "pageId": "juice",
+  "title": "SOK",
+  "items": [
+    { "id": "home", "labelSl": "DOMOV", "imagePath": "", "audioSl": "", "actionType": "go_home", "targetPageId": "" },
+    { "id": "back", "labelSl": "NAZAJ", "imagePath": "", "audioSl": "", "actionType": "go_back", "targetPageId": "" },
+    { "id": "orange_juice", "labelSl": "POMARAN\u010CNI SOK", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "apple_juice", "labelSl": "JABOL\u010CNI SOK", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "natural_juice", "labelSl": "NARAVNI SOK", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "cola", "labelSl": "KOKA-KOLA", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" }
+  ]
+}

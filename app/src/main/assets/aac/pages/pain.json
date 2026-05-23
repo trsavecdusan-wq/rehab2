@@ -1,0 +1,16 @@
+{
+  "pageId": "pain",
+  "title": "BOLE\u010CINA",
+  "items": [
+    { "id": "home", "labelSl": "DOMOV", "imagePath": "", "audioSl": "", "actionType": "go_home", "targetPageId": "" },
+    { "id": "back", "labelSl": "NAZAJ", "imagePath": "", "audioSl": "", "actionType": "go_back", "targetPageId": "" },
+    { "id": "headache", "labelSl": "GLAVOBOL", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "toothache", "labelSl": "ZOBOBOL", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "throat", "labelSl": "GRLO", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "arm", "labelSl": "ROKA", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "leg", "labelSl": "NOGA", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "stomach", "labelSl": "TREBUH", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "strong", "labelSl": "MO\u010CNO", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "little", "labelSl": "MALO", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" }
+  ]
+}

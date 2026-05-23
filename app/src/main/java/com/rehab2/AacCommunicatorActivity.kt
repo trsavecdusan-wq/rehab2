@@ -38,7 +38,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
             Toast.makeText(this, "AAC MAP NI MOGO\u010CE USTVARITI", Toast.LENGTH_SHORT).show()
         }
 
-        AacLocalStorage.seedBundledTestAudio(this)
+        if (AacLocalStorage.seedBundledDefaultPages(this)) {
+            Toast.makeText(this, "AAC STRANI PRIPRAVLJENE", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "AAC STRANI NISO PRIPRAVLJENE", Toast.LENGTH_SHORT).show()
+        }
+
+        if (AacLocalStorage.seedBundledTestAudio(this)) {
+            Toast.makeText(this, "AAC TEST AUDIO PRIPRAVLJEN", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "AAC TEST AUDIO NI PRIPRAVLJEN", Toast.LENGTH_SHORT).show()
+        }
 
         txtTitle = findViewById(R.id.txtAacTitle)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -119,7 +129,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         return if (repository.lastDebugCode == "OK") {
             baseTitle
         } else {
-            "$baseTitle\n${repository.lastDebugCode}"
+            "4baseTitle\n4{repository.lastDebugCode}"
         }
     }
 
@@ -130,6 +140,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         txtTitle.text = buildTitleText(txtTitle.text.toString().lineSequence().firstOrNull().orEmpty())
         Toast.makeText(this, repository.lastDebugStatus, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, AacLocalStorage.lastStorageDebugStatus, Toast.LENGTH_LONG).show()
     }
 
     private class AacAdapter(

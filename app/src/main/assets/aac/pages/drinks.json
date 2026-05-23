@@ -1,0 +1,16 @@
+{
+  "pageId": "drinks",
+  "title": "PIJA\u010CA",
+  "items": [
+    { "id": "home", "labelSl": "DOMOV", "imagePath": "", "audioSl": "", "actionType": "go_home", "targetPageId": "" },
+    { "id": "back", "labelSl": "NAZAJ", "imagePath": "", "audioSl": "", "actionType": "go_back", "targetPageId": "" },
+    { "id": "water", "labelSl": "VODA", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "juice", "labelSl": "SOK", "imagePath": "", "audioSl": "", "actionType": "open_page", "targetPageId": "juice" },
+    { "id": "tea", "labelSl": "\u010CAJ", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "coffee", "labelSl": "KAVA", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "milk", "labelSl": "MLEKO", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "lemonade", "labelSl": "LIMONADA", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "cocoa", "labelSl": "KAKAV", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" },
+    { "id": "beer", "labelSl": "PIVO", "imagePath": "", "audioSl": "", "actionType": "speak", "targetPageId": "" }
+  ]
+}
