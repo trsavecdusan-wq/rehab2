@@ -1,4 +1,4 @@
-package com.rehab2
+﻿package com.rehab2
 
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
@@ -35,7 +35,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         if (AacLocalStorage.ensureStructure(this)) {
             Toast.makeText(this, "AAC MAPE PRIPRAVLJENE", Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "AAC MAP NI MOGO\u010CE USTVARITI", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "AAC MAP NI MOGOČE USTVARITI", Toast.LENGTH_SHORT).show()
         }
 
         if (AacLocalStorage.seedBundledDefaultPages(this)) {
@@ -84,7 +84,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun openTargetPage(targetPageId: String) {
         val normalizedTargetPageId = targetPageId.trim()
         if (normalizedTargetPageId.isBlank()) {
-            Toast.makeText(this, "Stran ni dolo\u010Dena", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Stran ni določena", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -129,7 +129,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         return if (repository.lastDebugCode == "OK") {
             baseTitle
         } else {
-            "4baseTitle\n4{repository.lastDebugCode}"
+            "$baseTitle\n${repository.lastDebugCode}"
         }
     }
 

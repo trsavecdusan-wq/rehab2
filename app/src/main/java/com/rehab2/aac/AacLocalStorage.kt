@@ -1,4 +1,4 @@
-package com.rehab2.aac
+﻿package com.rehab2.aac
 
 import android.content.Context
 import java.io.File
@@ -71,7 +71,7 @@ object AacLocalStorage {
             DEFAULT_PAGE_ASSET_NAMES.all { assetName ->
                 copyAssetIfMissingOrEmpty(
                     context = context,
-                    assetPath = "aac/pages/4assetName",
+                    assetPath = "aac/pages/$assetName",
                     targetFile = File(pagesDir, assetName)
                 )
             }
@@ -133,6 +133,6 @@ object AacLocalStorage {
         val rootPath = getRootDir(context)?.absolutePath.orEmpty()
         val pagesPath = getPagesDir(context)?.absolutePath.orEmpty()
         val audioSlPath = getAudioSlDir(context)?.absolutePath.orEmpty()
-        lastStorageDebugStatus = "root=4rootPath pages=4pagesPath audioSl=4audioSlPath ensure=4lastEnsureResult seedPages=4lastSeedPagesResult seedAudio=4lastSeedAudioResult"
+        lastStorageDebugStatus = "root=$rootPath pages=$pagesPath audioSl=$audioSlPath ensure=$lastEnsureResult seedPages=$lastSeedPagesResult seedAudio=$lastSeedAudioResult"
     }
 }
