@@ -1,4 +1,4 @@
-package com.rehab2
+﻿package com.rehab2
 
 import android.Manifest
 import android.app.AlertDialog

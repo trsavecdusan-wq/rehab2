@@ -6,6 +6,8 @@ import org.json.JSONObject
 import java.io.File
 
 class RadioStationStore(private val context: Context) {
+    private val backup = RadioSettingsBackup(context)
+
     data class SaveResult(
         val duplicate: Boolean,
         val page: Int,
@@ -17,8 +19,13 @@ class RadioStationStore(private val context: Context) {
         val invalidSlot: Boolean = false
     )
 
+    fun restoreFromExternalBackupIfNeeded() {
+        backup.restoreToInternalIfNeeded(getStoreFile())
+    }
+
     fun loadStations(): List<SavedRadioStation> {
         val file = getStoreFile()
+        backup.restoreToInternalIfNeeded(file)
         if (!file.exists()) {
             return emptyList()
         }
@@ -202,6 +209,7 @@ class RadioStationStore(private val context: Context) {
         val file = getStoreFile()
         file.parentFile?.mkdirs()
         file.writeText(root.toString(2), Charsets.UTF_8)
+        backup.saveInternalStationsBackup(file)
     }
 
     private fun getStoreFile(): File {
