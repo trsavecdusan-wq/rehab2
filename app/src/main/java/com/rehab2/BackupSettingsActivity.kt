@@ -15,6 +15,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.rehab2.update.ApkDownloadManager
@@ -119,7 +120,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
 
         btnRestorePreviousVersion.setOnClickListener {
-            restorePreviousVersion()
+            showRestoreConfirmationDialog()
         }
 
         refreshRestoreButtonState()
@@ -242,11 +243,25 @@ class BackupSettingsActivity : AppCompatActivity() {
         }.start()
     }
 
+    private fun showRestoreConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Obnovitev prejšnje verzije")
+            .setMessage("Ali res želite obnoviti prejšnjo verzijo aplikacije? To uporabite samo, če nova verzija ne deluje pravilno.")
+            .setNegativeButton("PREKLIČI") { dialog, _ ->
+                txtUpdateStatus.text = "Obnovitev preklicana."
+                dialog.dismiss()
+            }
+            .setPositiveButton("OBNOVI") { _, _ ->
+                restorePreviousVersion()
+            }
+            .show()
+    }
+
     private fun restorePreviousVersion() {
         val backupFile = getBackupApkFile()
         val backupInfo = readBackupApkInfo()
         if (!backupFile.exists() || backupFile.length() <= 0L) {
-            txtUpdateStatus.text = "Prej\u0161nja verzija ni na voljo."
+            txtUpdateStatus.text = "Prejšnja verzija ni na voljo."
             refreshRestoreButtonState()
             return
         }
@@ -255,12 +270,12 @@ class BackupSettingsActivity : AppCompatActivity() {
             return
         }
 
-        txtUpdateStatus.text = "Odpiram obnovitev prej\u0161nje verzije ..."
+        txtUpdateStatus.text = "Odpiram obnovitev prejšnje verzije ..."
         openInstallHandoff(backupFile)
         mainHandler.postDelayed({
-            if (txtUpdateStatus.text.toString() == "Odpiram obnovitev prej\u0161nje verzije ...") {
+            if (txtUpdateStatus.text.toString() == "Odpiram obnovitev prejšnje verzije ...") {
                 txtUpdateStatus.text =
-                    "\u010ce se namestitev ni odprla ali ni uspela, prej\u0161nje verzije ni bilo mogo\u010de obnoviti."
+                    "Če se namestitev ni odprla ali ni uspela, prejšnje verzije ni bilo mogoče obnoviti."
             }
         }, RESTORE_RESULT_HINT_DELAY_MS)
     }
@@ -444,6 +459,15 @@ class BackupSettingsActivity : AppCompatActivity() {
         btnRestorePreviousVersion.backgroundTintList = ColorStateList.valueOf(
             if (canTriggerRestore) RESTORE_BUTTON_COLOR else BUSY_BUTTON_COLOR
         )
+        if (canTriggerRestore) {
+            val currentStatus = txtUpdateStatus.text.toString()
+            if (currentStatus.isBlank() ||
+                currentStatus == "Prejšnja verzija ni na voljo." ||
+                currentStatus == "Obnovitev preklicana." ||
+                currentStatus == "Prejšnja verzija je pripravljena za obnovitev.") {
+                txtUpdateStatus.text = "Prejšnja verzija je pripravljena za obnovitev."
+            }
+        }
         updateReleaseNotes()
     }
 
