@@ -38,20 +38,35 @@ class GitHubUpdateClient {
         return releaseInfoFromJson(root, releases.length())
     }
 
-    fun fetchRollbackRelease(currentVersionCode: Long, restoreTargetVersionName: String): ReleaseInfo {
-        val rollbackCode = computeNextOddVersionCode(currentVersionCode)
-        val expectedTag = "v1.0.$rollbackCode-rollback-to-$restoreTargetVersionName"
+    fun fetchRollbackRelease(currentVersionCode: Long): ReleaseInfo {
         val releases = fetchReleases()
-        val root = findReleaseByExactTag(releases, expectedTag)
+        val root = findLatestRollbackRelease(releases)
             ?: throw UpdateCheckException(
                 debugSummary = buildString {
                     appendLine("URL: $RELEASES_URL")
                     appendLine("Releases: ${releases.length()}")
-                    append("Rollback tag ni bil najden: $expectedTag")
+                    append("Napaka: Veljaven rollback release ni bil najden.")
                 }.trim(),
-                message = "Posebna rollback izdaja ni na voljo."
+                message = "Rollback izdaja ni na voljo."
             )
-        return releaseInfoFromJson(root, releases.length())
+
+        val releaseInfo = releaseInfoFromJson(root, releases.length())
+        val rollbackVersionName = releaseInfo.tagName.removePrefix(ROLLBACK_TAG_PREFIX)
+        val rollbackVersionCode = extractReleaseVersionCode(rollbackVersionName)
+        if (rollbackVersionCode == null || rollbackVersionCode <= currentVersionCode || rollbackVersionCode % 2L != 1L) {
+            throw UpdateCheckException(
+                debugSummary = buildString {
+                    appendLine("URL: $RELEASES_URL")
+                    appendLine("Releases: ${releases.length()}")
+                    appendLine("Rollback tag: ${releaseInfo.tagName}")
+                    appendLine("Rollback versionCode: ${rollbackVersionCode ?: -1}")
+                    append("Napaka: Rollback izdaja ni veljavna za trenutno verzijo $currentVersionCode.")
+                }.trim(),
+                message = "Rollback izdaja ni veljavna."
+            )
+        }
+
+        return releaseInfo
     }
 
     fun getLatestReleaseUrl(): String {
@@ -69,23 +84,23 @@ class GitHubUpdateClient {
         return null
     }
 
-    private fun findReleaseByExactTag(releases: JSONArray, expectedTag: String): JSONObject? {
+    private fun findLatestRollbackRelease(releases: JSONArray): JSONObject? {
         for (index in 0 until releases.length()) {
             val release = releases.optJSONObject(index) ?: continue
             val tagName = release.optString("tag_name")
-            if (tagName == expectedTag && ROLLBACK_RELEASE_TAG_REGEX.matcher(tagName).matches()) {
+            if (ROLLBACK_RELEASE_TAG_REGEX.matcher(tagName).matches()) {
                 return release
             }
         }
         return null
     }
 
-    private fun computeNextOddVersionCode(currentVersionCode: Long): Long {
-        return if (currentVersionCode % 2L == 0L) {
-            currentVersionCode + 1L
-        } else {
-            currentVersionCode + 2L
+    private fun extractReleaseVersionCode(versionName: String): Long? {
+        val parts = versionName.split('.').filter { it.isNotBlank() }
+        if (parts.size >= 2) {
+            return (parts.first() + parts.last()).toLongOrNull()
         }
+        return parts.lastOrNull()?.toLongOrNull()
     }
 
     private fun fetchReleases(): JSONArray {
@@ -213,7 +228,8 @@ class GitHubUpdateClient {
             "rehab-release.apk"
         )
         private val STABLE_RELEASE_TAG_REGEX = Pattern.compile("^v\\d+\\.\\d+\\.\\d+$")
+        private const val ROLLBACK_TAG_PREFIX = "rollback-v"
         private val ROLLBACK_RELEASE_TAG_REGEX =
-            Pattern.compile("^v\\d+\\.\\d+\\.\\d+-rollback-to-\\d+\\.\\d+\\.\\d+$")
+            Pattern.compile("^rollback-v\\d+\\.\\d+\\.\\d+$")
     }
 }

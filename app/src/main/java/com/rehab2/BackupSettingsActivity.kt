@@ -266,8 +266,8 @@ class BackupSettingsActivity : AppCompatActivity() {
     }
 
     private fun downloadRollbackRelease(backupInfo: BackupApkInfo) {
-        val restoreTargetVersionName = backupInfo.versionName ?: run {
-            txtUpdateStatus.text = "Posebna rollback izdaja ni na voljo."
+        if (!backupInfo.downgradeBlocked) {
+            txtUpdateStatus.text = "Rollback izdaja ni na voljo."
             refreshRestoreButtonState()
             return
         }
@@ -278,7 +278,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         Thread {
             try {
                 val rollbackRelease =
-                    updateClient.fetchRollbackRelease(currentVersionCode, restoreTargetVersionName)
+                    updateClient.fetchRollbackRelease(currentVersionCode)
                 val rollbackUrl = rollbackRelease.apkUrl
                     ?: throw IllegalStateException("Rollback APK manjka")
                 val result = downloadManager.downloadLatestApk(rollbackUrl) { status ->
@@ -293,21 +293,21 @@ class BackupSettingsActivity : AppCompatActivity() {
                     val rollbackFile = result.file
                     if (result.success && rollbackFile != null) {
                         if (isValidRollbackApk(rollbackFile)) {
-                            txtUpdateStatus.text = "Rollback APK prenesen. Odpiram namestitev ..."
+                            txtUpdateStatus.text = "Odpiram rollback namestitev ..."
                             openInstallHandoff(rollbackFile)
                         } else {
-                            txtUpdateStatus.text = "Rollback izdaja ni veljavna za to aplikacijo."
+                            txtUpdateStatus.text = "Rollback izdaja ni veljavna."
                             refreshPrimaryActionButtonState()
                         }
                     } else {
-                        txtUpdateStatus.text = "Posebna rollback izdaja ni na voljo."
+                        txtUpdateStatus.text = "Rollback izdaja ni na voljo."
                         refreshPrimaryActionButtonState()
                     }
                 }
             } catch (error: Exception) {
                 Log.e("NovaRehabUpdater", "Rollback release lookup failed", error)
                 mainHandler.post {
-                    txtUpdateStatus.text = "Posebna rollback izdaja ni na voljo."
+                    txtUpdateStatus.text = "Rollback izdaja ni na voljo."
                     refreshPrimaryActionButtonState()
                 }
             }
