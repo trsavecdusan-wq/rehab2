@@ -108,7 +108,21 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
 
         btnDownloadApk.setOnClickListener {
-            val release = latestRelease ?: return@setOnClickListener
+            diagnosticToast("DOWNLOAD BUTTON CLICKED")
+            if (!btnDownloadApk.isEnabled) {
+                diagnosticToast("DOWNLOAD BUTTON DISABLED")
+                diagnosticToast("DOWNLOAD FLOW STOPPED")
+                return@setOnClickListener
+            }
+
+            val release = latestRelease
+            if (release == null) {
+                diagnosticToast("LATEST RELEASE NULL")
+                diagnosticToast("DOWNLOAD FLOW STOPPED")
+                return@setOnClickListener
+            }
+
+            diagnosticToast("CALLING DOWNLOAD MANAGER")
             downloadLatestApk(release)
         }
 
