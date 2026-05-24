@@ -168,6 +168,8 @@ class BackupSettingsActivity : AppCompatActivity() {
                     latestRelease = release
                     latestReleaseBody = release.body
                     txtLatestVersion.text = "Zadnja verzija: $remoteVersion"
+                    Toast.makeText(this, "REMOTE VERSION CODE = $latestVersionCode", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "CURRENT VERSION CODE = $currentVersionCode", Toast.LENGTH_SHORT).show()
                     updateReleaseNotes()
 
                     if (latestVersionCode != null &&
@@ -463,7 +465,11 @@ class BackupSettingsActivity : AppCompatActivity() {
     }
 
     private fun extractReleaseVersionCode(versionName: String): Long? {
-        return versionName.substringAfterLast('.', "").toLongOrNull()
+        val parts = versionName.split('.').filter { it.isNotBlank() }
+        if (parts.size >= 2) {
+            return (parts.first() + parts.last()).toLongOrNull()
+        }
+        return parts.lastOrNull()?.toLongOrNull()
     }
 
     private fun openInstallHandoff(apkFile: File) {
