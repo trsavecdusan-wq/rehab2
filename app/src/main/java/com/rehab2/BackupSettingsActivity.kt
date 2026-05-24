@@ -59,6 +59,7 @@ class BackupSettingsActivity : AppCompatActivity() {
     private lateinit var txtReleaseNotes: TextView
     private lateinit var btnCheckUpdate: Button
     private lateinit var btnDownloadApk: Button
+    private lateinit var btnDownloadApkTest: Button
     private lateinit var btnRestorePreviousVersion: Button
     private lateinit var currentVersionName: String
     private var currentVersionCode: Long = 0L
