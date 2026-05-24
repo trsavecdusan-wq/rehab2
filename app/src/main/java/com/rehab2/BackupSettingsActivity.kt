@@ -108,10 +108,17 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
 
         btnDownloadApk.setOnClickListener {
+            txtUpdateStatus.text = "Začenjam prenos APK ..."
+            Toast.makeText(this, "Začenjam prenos APK ...", Toast.LENGTH_SHORT).show()
+
             val release = latestRelease
-            if (release == null || !canDownloadLatestRelease()) {
-                txtUpdateStatus.text = "Aplikacija je \u017ee posodobljena."
-                btnDownloadApk.isEnabled = false
+            if (release == null) {
+                txtUpdateStatus.text = "Najprej preveri posodobitev."
+                return@setOnClickListener
+            }
+
+            if (!canDownloadLatestRelease()) {
+                txtUpdateStatus.text = "Aplikacija je že posodobljena."
                 return@setOnClickListener
             }
 
