@@ -87,6 +87,19 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
             updateSentenceBar()
         }
+        txtTitle.setOnLongClickListener {
+            if (!BuildConfig.DEBUG) {
+                return@setOnLongClickListener false
+            }
+
+            val seeded = AacLocalStorage.seedBundledTestV2Page(this)
+            if (seeded) {
+                openTargetPage("drinks_v2_test")
+            } else {
+                Toast.makeText(this, "V2 test page unavailable", Toast.LENGTH_SHORT).show()
+            }
+            true
+        }
 
         val homePage = repository.loadHomePage()
         showPage(homePage)

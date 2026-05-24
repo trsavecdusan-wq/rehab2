@@ -7,6 +7,8 @@ object AacLocalStorage {
     private const val AAC_ROOT_DIR_NAME = "NovaRehab2/aac"
     private const val SEEDED_TEST_AUDIO_ASSET_PATH = "aac/audio/sl/water.wav"
     private const val SEEDED_TEST_AUDIO_FILE_NAME = "water.wav"
+    private const val SEEDED_TEST_V2_PAGE_ASSET_PATH = "aac/pages/drinks_v2_test.json"
+    private const val SEEDED_TEST_V2_PAGE_FILE_NAME = "drinks_v2_test.json"
     private val DEFAULT_PAGE_ASSET_NAMES = listOf(
         "home.json",
         "drinks.json",
@@ -82,6 +84,24 @@ object AacLocalStorage {
         lastSeedPagesResult = if (result) "OK" else "FAIL"
         refreshDebugStatus(context)
         return result
+    }
+
+    fun seedBundledTestV2Page(context: Context): Boolean {
+        val pagesDir = getPagesDir(context)
+        if (pagesDir == null || (!pagesDir.exists() && !pagesDir.mkdirs())) {
+            refreshDebugStatus(context)
+            return false
+        }
+
+        return try {
+            copyAssetIfMissingOrEmpty(
+                context = context,
+                assetPath = SEEDED_TEST_V2_PAGE_ASSET_PATH,
+                targetFile = File(pagesDir, SEEDED_TEST_V2_PAGE_FILE_NAME)
+            )
+        } catch (_: Exception) {
+            false
+        }
     }
 
     fun seedBundledTestAudio(context: Context): Boolean {
