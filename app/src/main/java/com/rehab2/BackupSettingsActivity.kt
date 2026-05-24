@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.view.View
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
@@ -81,6 +82,9 @@ class BackupSettingsActivity : AppCompatActivity() {
         txtReleaseNotes = findViewById(R.id.txtReleaseNotes)
         btnCheckUpdate = findViewById(R.id.btnCheckUpdate)
         btnDownloadApk = findViewById(R.id.btnDownloadApk)
+        btnDownloadApk.visibility = View.GONE
+        btnDownloadApk.isEnabled = false
+        btnDownloadApk.isClickable = false
         btnRestorePreviousVersion = findViewById(R.id.btnRestorePreviousVersion)
 
         @Suppress("DEPRECATION")
@@ -104,34 +108,14 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
 
         btnCheckUpdate.setOnClickListener {
-            checkForUpdate()
-        }
-
-        btnDownloadApk.setOnClickListener {
-            txtUpdateStatus.text = "Za\u010denjam prenos APK ..."
-            Toast.makeText(this, "Za\u010denjam prenos APK ...", Toast.LENGTH_SHORT).show()
-
             val release = latestRelease
-            if (release == null) {
-                txtUpdateStatus.text = "Najprej preveri posodobitev."
-                return@setOnClickListener
+            if (release != null && canDownloadLatestRelease()) {
+                txtUpdateStatus.text = "Za\u010denjam prenos APK ..."
+                Toast.makeText(this, "Za\u010denjam prenos APK ...", Toast.LENGTH_SHORT).show()
+                downloadLatestApk(release)
+            } else {
+                checkForUpdate()
             }
-
-            if (release.apkUrl.isNullOrBlank()) {
-                txtUpdateStatus.text = "APK datoteka ni najdena v GitHub Release."
-                return@setOnClickListener
-            }
-
-            val remoteVersion = release.tagName.removePrefix("v")
-            val latestVersionCode = extractReleaseVersionCode(remoteVersion)
-            if (latestVersionCode == null || latestVersionCode <= currentVersionCode) {
-                txtUpdateStatus.text = "Aplikacija je \u017ee posodobljena."
-                btnDownloadApk.isEnabled = false
-                btnDownloadApk.isClickable = false
-                return@setOnClickListener
-            }
-
-            downloadLatestApk(release)
         }
 
         btnRestorePreviousVersion.setOnClickListener {
@@ -167,8 +151,9 @@ class BackupSettingsActivity : AppCompatActivity() {
         openInstallHandoff(pendingFile)
     }
     private fun checkForUpdate() {
-        setCheckButtonLoading(true)
+        setPrimaryButtonChecking()
         btnDownloadApk.isEnabled = false
+        btnDownloadApk.isClickable = false
         txtUpdateStatus.text = "Preverjam posodobitev ..."
         txtReleaseNotes.text = ""
 
@@ -189,21 +174,17 @@ class BackupSettingsActivity : AppCompatActivity() {
                         !release.apkUrl.isNullOrBlank()
                     ) {
                         txtUpdateStatus.text = "Na voljo je nova posodobitev."
-                        btnDownloadApk.isEnabled = true
-                        btnDownloadApk.isClickable = true
+                        setPrimaryButtonReadyForDownload()
                     } else if (latestVersionCode != null &&
                         latestVersionCode <= currentVersionCode &&
                         currentVersionCode % 2L == 1L
                     ) {
                         txtUpdateStatus.text = "Ta posodobitev ni primerna za trenutno name\u0161\u010deno rollback verzijo. Po\u010dakajte na novej\u0161o normalno izdajo."
-                        btnDownloadApk.isEnabled = false
-                        btnDownloadApk.isClickable = false
+                        setPrimaryButtonReadyForCheck()
                     } else {
                         txtUpdateStatus.text = "Aplikacija je \u017ee posodobljena."
-                        btnDownloadApk.isEnabled = false
-                        btnDownloadApk.isClickable = false
+                        setPrimaryButtonReadyForCheck()
                     }
-                    setCheckButtonLoading(false)
                 }
             } catch (error: Exception) {
                 val message = error.message?.takeIf { it.isNotBlank() } ?: "Preverjanje ni uspelo"
@@ -211,11 +192,9 @@ class BackupSettingsActivity : AppCompatActivity() {
                 mainHandler.post {
                     latestRelease = null
                     latestReleaseBody = ""
-                    btnDownloadApk.isEnabled = false
-                    btnDownloadApk.isClickable = false
                     txtUpdateStatus.text = toUserFriendlyCheckStatus(message)
                     updateReleaseNotes()
-                    setCheckButtonLoading(false)
+                    setPrimaryButtonReadyForCheck()
                 }
             }
         }.start()
@@ -223,8 +202,12 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun downloadLatestApk(release: GitHubUpdateClient.ReleaseInfo) {
         diagnosticToast("Prenos se je za\u010del.")
-        val apkUrl = release.apkUrl ?: return
-        setDownloadButtonLoading(true)
+        val apkUrl = release.apkUrl ?: run {
+            txtUpdateStatus.text = "APK datoteka ni najdena v GitHub Release."
+            refreshPrimaryActionButtonState()
+            return
+        }
+        setPrimaryButtonDownloading()
         txtUpdateStatus.text = "Prena\u0161am APK ..."
 
         Thread {
@@ -252,7 +235,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                 } else {
                     diagnosticToast("Napaka pri prenosu APK.")
                     txtUpdateStatus.text = toUserFriendlyDownloadStatus(result.message)
-                    restoreDownloadButtonState()
+                    refreshPrimaryActionButtonState()
                 }
             }
         }.start()
@@ -289,7 +272,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
 
         txtUpdateStatus.text = "I\u0161\u010dem rollback izdajo ..."
-        setDownloadButtonLoading(true)
+        setPrimaryButtonDownloading()
 
         Thread {
             try {
@@ -313,18 +296,18 @@ class BackupSettingsActivity : AppCompatActivity() {
                             openInstallHandoff(rollbackFile)
                         } else {
                             txtUpdateStatus.text = "Rollback izdaja ni veljavna za to aplikacijo."
-                            restoreDownloadButtonState()
+                            refreshPrimaryActionButtonState()
                         }
                     } else {
                         txtUpdateStatus.text = "Posebna rollback izdaja ni na voljo."
-                        restoreDownloadButtonState()
+                        refreshPrimaryActionButtonState()
                     }
                 }
             } catch (error: Exception) {
                 Log.e("NovaRehabUpdater", "Rollback release lookup failed", error)
                 mainHandler.post {
                     txtUpdateStatus.text = "Posebna rollback izdaja ni na voljo."
-                    restoreDownloadButtonState()
+                    refreshPrimaryActionButtonState()
                 }
             }
         }.start()
@@ -487,7 +470,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             pendingInstallApkPath = apkFile.absolutePath
             diagnosticToast("DOVOLI NAMESTITEV IZ TE APLIKACIJE")
             txtUpdateStatus.text = "DOVOLI NAMESTITEV IZ TE APLIKACIJE"
-            restoreDownloadButtonState()
+            refreshPrimaryActionButtonState()
             openUnknownAppsSettings()
             return
         }
@@ -496,7 +479,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             Log.e("NovaRehabUpdater", "Installer handoff aborted, APK missing or empty")
             diagnosticToast("APK FILE MISSING")
             txtUpdateStatus.text = "APK datoteka ni pripravljena."
-            restoreDownloadButtonState()
+            refreshPrimaryActionButtonState()
             return
         }
 
@@ -516,19 +499,19 @@ class BackupSettingsActivity : AppCompatActivity() {
 
             diagnosticToast("Odpiram namestitev.")
             startActivity(installIntent)
-            restoreDownloadButtonState()
+            refreshPrimaryActionButtonState()
         } catch (error: ActivityNotFoundException) {
             Log.e("NovaRehabUpdater", "Installer handoff failed", error)
             txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
-            restoreDownloadButtonState()
+            refreshPrimaryActionButtonState()
         } catch (error: SecurityException) {
             Log.e("NovaRehabUpdater", "Installer handoff blocked by security policy", error)
             txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
-            restoreDownloadButtonState()
+            refreshPrimaryActionButtonState()
         } catch (error: Exception) {
             Log.e("NovaRehabUpdater", "Installer handoff failed with unexpected error", error)
             txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
-            restoreDownloadButtonState()
+            refreshPrimaryActionButtonState()
         }
     }
 
@@ -544,28 +527,36 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setCheckButtonLoading(isLoading: Boolean) {
-        btnCheckUpdate.isEnabled = !isLoading
-        btnCheckUpdate.text = if (isLoading) "PREVERJANJE..." else "PREVERI POSODOBITEV"
-        btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(
-            if (isLoading) BUSY_BUTTON_COLOR else CHECK_BUTTON_COLOR
-        )
+    private fun setPrimaryButtonChecking() {
+        btnCheckUpdate.isEnabled = false
+        btnCheckUpdate.text = "PREVERJANJE..."
+        btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(BUSY_BUTTON_COLOR)
     }
 
-    private fun setDownloadButtonLoading(isLoading: Boolean) {
-        btnDownloadApk.isEnabled = !isLoading
-        btnDownloadApk.isClickable = !isLoading
-        btnDownloadApk.text = if (isLoading) "PRENA\u0160ANJE..." else "PRENESI APK"
-        btnDownloadApk.backgroundTintList = ColorStateList.valueOf(
-            if (isLoading) BUSY_BUTTON_COLOR else DOWNLOAD_BUTTON_COLOR
-        )
+    private fun setPrimaryButtonDownloading() {
+        btnCheckUpdate.isEnabled = false
+        btnCheckUpdate.text = "PRENA\u0160ANJE..."
+        btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(BUSY_BUTTON_COLOR)
     }
 
-    private fun restoreDownloadButtonState() {
-        setDownloadButtonLoading(false)
-        val canDownload = canDownloadLatestRelease()
-        btnDownloadApk.isEnabled = canDownload
-        btnDownloadApk.isClickable = canDownload
+    private fun setPrimaryButtonReadyForCheck() {
+        btnCheckUpdate.isEnabled = true
+        btnCheckUpdate.text = "PREVERI POSODOBITEV"
+        btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(CHECK_BUTTON_COLOR)
+    }
+
+    private fun setPrimaryButtonReadyForDownload() {
+        btnCheckUpdate.isEnabled = true
+        btnCheckUpdate.text = "PRENESI APK"
+        btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(DOWNLOAD_BUTTON_COLOR)
+    }
+
+    private fun refreshPrimaryActionButtonState() {
+        if (canDownloadLatestRelease()) {
+            setPrimaryButtonReadyForDownload()
+        } else {
+            setPrimaryButtonReadyForCheck()
+        }
     }
 
     private fun canDownloadLatestRelease(): Boolean {
