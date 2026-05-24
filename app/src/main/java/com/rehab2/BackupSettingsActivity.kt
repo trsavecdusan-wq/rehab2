@@ -68,6 +68,7 @@ class BackupSettingsActivity : AppCompatActivity() {
     private val updateClient = GitHubUpdateClient()
     private lateinit var downloadManager: ApkDownloadManager
     private var latestRelease: GitHubUpdateClient.ReleaseInfo? = null
+    private var pendingInstallApkPath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,9 +122,28 @@ class BackupSettingsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         syncCurrentInstalledReleaseIfNeeded()
+        resumePendingInstallIfAllowed()
         refreshRestoreButtonState()
     }
 
+    private fun resumePendingInstallIfAllowed() {
+        val pendingPath = pendingInstallApkPath ?: return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
+            return
+        }
+
+        val pendingFile = File(pendingPath)
+        if (!pendingFile.exists() || pendingFile.length() <= 0L) {
+            diagnosticToast("APK FILE MISSING")
+            txtUpdateStatus.text = "APK datoteka ni pripravljena."
+            pendingInstallApkPath = null
+            return
+        }
+
+        pendingInstallApkPath = null
+        txtUpdateStatus.text = "Dovoljenje potrjeno. Odpiram namestitev ..."
+        openInstallHandoff(pendingFile)
+    }
     private fun checkForUpdate() {
         setCheckButtonLoading(true)
         btnDownloadApk.isEnabled = false
@@ -444,7 +464,9 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun openInstallHandoff(apkFile: File) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
-            txtUpdateStatus.text = "Dovoli name\u0161\u010danje iz te aplikacije in poskusi znova."
+            pendingInstallApkPath = apkFile.absolutePath
+            diagnosticToast("DOVOLI NAMESTITEV IZ TE APLIKACIJE")
+            txtUpdateStatus.text = "DOVOLI NAMESTITEV IZ TE APLIKACIJE"
             restoreDownloadButtonState()
             openUnknownAppsSettings()
             return
@@ -467,10 +489,11 @@ class BackupSettingsActivity : AppCompatActivity() {
                 apkFile
             )
 
-            val installIntent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(apkUri, "application/vnd.android.package-archive")
+            val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
+                data = apkUri
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
             }
 
             diagnosticToast("INSTALL INTENT START")

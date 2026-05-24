@@ -24,20 +24,17 @@ class ApkDownloadManager(private val context: Context) {
             targetFile.delete()
         }
 
-        val connection = URL(apkUrl).openConnection() as HttpURLConnection
-        connection.requestMethod = "GET"
-        connection.connectTimeout = 15000
-        connection.readTimeout = 30000
-        connection.setRequestProperty("User-Agent", "rehab2-apk-download")
+        var connection: HttpURLConnection? = null
 
         return try {
             onStatus("DOWNLOAD URL: $apkUrl")
             onStatus("HTTP START")
             onStatus("Prena\u0161am APK...")
             Log.i("NovaRehabUpdater", "Download target path: ${targetFile.absolutePath}")
-            connection.connect()
 
+            connection = openConnectionFollowingRedirects(apkUrl, onStatus)
             onStatus("HTTP CODE: ${connection.responseCode}")
+
             if (connection.responseCode !in 200..299) {
                 val suffix = connection.responseMessage?.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""
                 return DownloadResult(
@@ -107,11 +104,53 @@ class ApkDownloadManager(private val context: Context) {
                 message = "Prenos ni uspel: neznana napaka"
             )
         } finally {
-            connection.disconnect()
+            connection?.disconnect()
         }
+    }
+
+    private fun openConnectionFollowingRedirects(
+        initialUrl: String,
+        onStatus: (String) -> Unit
+    ): HttpURLConnection {
+        var currentUrl = initialUrl
+        var redirectCount = 0
+
+        while (redirectCount <= MAX_REDIRECTS) {
+            val currentConnection = (URL(currentUrl).openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 15000
+                readTimeout = 30000
+                setRequestProperty("User-Agent", "rehab2-apk-download")
+                instanceFollowRedirects = false
+            }
+
+            currentConnection.connect()
+            val responseCode = currentConnection.responseCode
+            Log.i("NovaRehabUpdater", "HTTP ${responseCode} for $currentUrl")
+
+            if (responseCode in REDIRECT_CODES) {
+                val location = currentConnection.getHeaderField("Location")
+                if (location.isNullOrBlank()) {
+                    return currentConnection
+                }
+                val redirectedUrl = URL(URL(currentUrl), location).toString()
+                Log.i("NovaRehabUpdater", "Redirecting download to $redirectedUrl")
+                onStatus("HTTP CODE: $responseCode")
+                currentConnection.disconnect()
+                currentUrl = redirectedUrl
+                redirectCount += 1
+                continue
+            }
+
+            return currentConnection
+        }
+
+        throw IOException("Prevec preusmeritev pri prenosu APK")
     }
 
     companion object {
         private const val APK_FILE_NAME = "rehab-release.apk"
+        private const val MAX_REDIRECTS = 5
+        private val REDIRECT_CODES = setOf(301, 302, 303, 307, 308)
     }
 }
