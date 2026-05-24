@@ -16,11 +16,17 @@ import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacLocalStorage
 import com.rehab2.aac.AacPage
 import com.rehab2.aac.AacRepository
+import com.rehab2.aac.AacSentenceItem
+import com.rehab2.aac.AacSentenceStateManager
 import java.io.File
 
 class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var repository: AacRepository
     private val pageHistory = ArrayDeque<String>()
+    private val sentenceManager = AacSentenceStateManager()
+    private var currentV2ItemsById: Map<String, AacItem> = emptyMap()
+    private val currentV2VisibleHistory: ArrayDeque<List<AacItem>> = ArrayDeque()
+    private var currentVisibleItems: List<AacItem> = emptyList()
     private lateinit var audioPlayer: AacAudioPlayer
     private lateinit var txtTitle: TextView
     private lateinit var recycler: RecyclerView
@@ -67,18 +73,59 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun showPage(page: AacPage) {
         currentPageId = page.pageId
         txtTitle.text = buildTitleText(page.title)
-        recycler.adapter = AacAdapter(page.items) { item ->
+        if (isV2Page(page)) {
+            currentV2ItemsById = page.items.associateBy { it.id }
+            currentV2VisibleHistory.clear()
+        } else {
+            clearV2State()
+        }
+        showItems(page.items)
+    }
+
+    private fun showItems(items: List<AacItem>) {
+        currentVisibleItems = items
+        recycler.adapter = AacAdapter(items) { item ->
             handleItemClick(item)
         }
     }
 
     private fun handleItemClick(item: AacItem) {
         when (item.actionType) {
-            "open_page" -> openTargetPage(item.targetPageId)
-            "go_home" -> goHome()
-            "go_back" -> goBack()
-            else -> audioPlayer.playOrSpeak(item)
+            "open_page" -> {
+                openTargetPage(item.targetPageId)
+                return
+            }
+            "go_home" -> {
+                goHome()
+                return
+            }
+            "go_back" -> {
+                goBack()
+                return
+            }
         }
+
+        if (isV2Item(item)) {
+            audioPlayer.playOrSpeak(item)
+            sentenceManager.addItem(
+                AacSentenceItem(
+                    conceptId = item.conceptId ?: item.id,
+                    text = item.speakTextSl ?: item.labelSl,
+                    role = item.sentenceRole
+                )
+            )
+
+            val childItems = item.children.mapNotNull { childId ->
+                currentV2ItemsById[childId]
+            }
+            if (childItems.isNotEmpty()) {
+                currentV2VisibleHistory.addLast(currentVisibleItems)
+                showItems(childItems)
+            }
+            return
+        }
+
+        audioPlayer.playOrSpeak(item)
     }
 
     private fun openTargetPage(targetPageId: String) {
@@ -99,6 +146,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun goHome() {
+        clearV2State()
         val page = repository.loadPage("home")
         if (page == null) {
             showRepositoryDebugStatus()
@@ -110,6 +158,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun goBack() {
+        if (currentV2VisibleHistory.isNotEmpty()) {
+            val previousItems = currentV2VisibleHistory.removeLast()
+            showItems(previousItems)
+            return
+        }
+
         if (pageHistory.isEmpty()) {
             return
         }
@@ -123,6 +177,21 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         pageHistory.removeLast()
         showPage(page)
+    }
+
+    private fun clearV2State() {
+        sentenceManager.clear()
+        currentV2ItemsById = emptyMap()
+        currentV2VisibleHistory.clear()
+        currentVisibleItems = emptyList()
+    }
+
+    private fun isV2Page(page: AacPage): Boolean {
+        return page.items.any { item -> isV2Item(item) }
+    }
+
+    private fun isV2Item(item: AacItem): Boolean {
+        return item.conceptId != null || item.children.isNotEmpty() || item.sentenceRole != null
     }
 
     private fun buildTitleText(baseTitle: String): String {
