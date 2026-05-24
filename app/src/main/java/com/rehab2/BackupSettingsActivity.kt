@@ -83,6 +83,9 @@ class BackupSettingsActivity : AppCompatActivity() {
         btnDownloadApk = findViewById(R.id.btnDownloadApk)
         btnDownloadApk.isClickable = true
         btnDownloadApk.isEnabled = true
+        btnDownloadApkTest = findViewById(R.id.btnDownloadApkTest)
+        btnDownloadApkTest.isClickable = true
+        btnDownloadApkTest.isEnabled = true
         btnRestorePreviousVersion = findViewById(R.id.btnRestorePreviousVersion)
 
         @Suppress("DEPRECATION")
@@ -128,6 +131,20 @@ class BackupSettingsActivity : AppCompatActivity() {
             }
 
             diagnosticToast("CALLING DOWNLOAD MANAGER")
+            downloadLatestApk(release)
+        }
+
+        btnDownloadApkTest.setOnClickListener {
+            txtUpdateStatus.text = "TEST DOWNLOAD BUTTON CLICKED"
+            Toast.makeText(this, "TEST DOWNLOAD BUTTON CLICKED", Toast.LENGTH_SHORT).show()
+
+            val release = latestRelease
+            if (release == null) {
+                txtUpdateStatus.text = "LATEST RELEASE NULL"
+                Toast.makeText(this, "LATEST RELEASE NULL", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             downloadLatestApk(release)
         }
 

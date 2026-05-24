@@ -75,12 +75,27 @@
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/btnDownloadApkTest"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#2E8B57"
+            android:clickable="true"
+            android:enabled="true"
+            android:text="TEST PRENESI APK"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+        <Button
             android:id="@+id/btnRestorePreviousVersion"
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="#7A5A2A"
-            android:text="OBNOVI PREJŠNJO VERZIJO"
+            android:text="OBNOVI PREJ&#352;NJO VERZIJO"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="20sp"
