@@ -45,6 +45,16 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         speak(fallbackText)
     }
 
+    fun speakText(text: String) {
+        val trimmed = text.trim()
+        if (trimmed.isEmpty()) {
+            return
+        }
+
+        stopPlayback()
+        speak(trimmed)
+    }
+
     private fun playAudioFileIfAvailable(audioFile: File?): Boolean {
         if (audioFile == null || !audioFile.exists() || !audioFile.isFile) {
             return false

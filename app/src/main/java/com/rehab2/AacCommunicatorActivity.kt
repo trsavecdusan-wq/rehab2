@@ -5,6 +5,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -27,8 +28,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var currentV2ItemsById: Map<String, AacItem> = emptyMap()
     private val currentV2VisibleHistory: ArrayDeque<List<AacItem>> = ArrayDeque()
     private var currentVisibleItems: List<AacItem> = emptyList()
+    private var currentV2RootItems: List<AacItem> = emptyList()
     private lateinit var audioPlayer: AacAudioPlayer
     private lateinit var txtTitle: TextView
+    private lateinit var sentenceBar: View
+    private lateinit var txtSentence: TextView
+    private lateinit var btnSpeakSentence: Button
+    private lateinit var btnClearSentence: Button
     private lateinit var recycler: RecyclerView
     private var currentPageId: String = "home"
 
@@ -57,8 +63,27 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
 
         txtTitle = findViewById(R.id.txtAacTitle)
+        sentenceBar = findViewById(R.id.aacSentenceBar)
+        txtSentence = findViewById(R.id.txtAacSentence)
+        btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
+        btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
         recycler.layoutManager = GridLayoutManager(this, 5)
+
+        btnSpeakSentence.setOnClickListener {
+            val text = sentenceManager.getSpeakText()
+            if (text.isNotBlank()) {
+                audioPlayer.speakText(text)
+            }
+        }
+        btnClearSentence.setOnClickListener {
+            sentenceManager.clear()
+            currentV2VisibleHistory.clear()
+            if (currentV2RootItems.isNotEmpty()) {
+                showItems(currentV2RootItems)
+            }
+            updateSentenceBar()
+        }
 
         val homePage = repository.loadHomePage()
         showPage(homePage)
@@ -75,7 +100,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtTitle.text = buildTitleText(page.title)
         if (isV2Page(page)) {
             currentV2ItemsById = page.items.associateBy { it.id }
+            currentV2RootItems = page.items
             currentV2VisibleHistory.clear()
+            sentenceBar.visibility = View.VISIBLE
+            updateSentenceBar()
         } else {
             clearV2State()
         }
@@ -114,6 +142,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     role = item.sentenceRole
                 )
             )
+            updateSentenceBar()
 
             val childItems = item.children.mapNotNull { childId ->
                 currentV2ItemsById[childId]
@@ -184,6 +213,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
         currentV2ItemsById = emptyMap()
         currentV2VisibleHistory.clear()
         currentVisibleItems = emptyList()
+        currentV2RootItems = emptyList()
+        sentenceBar.visibility = View.GONE
+        txtSentence.text = ""
+        updateSentenceBar()
     }
 
     private fun isV2Page(page: AacPage): Boolean {
@@ -192,6 +225,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun isV2Item(item: AacItem): Boolean {
         return item.conceptId != null || item.children.isNotEmpty() || item.sentenceRole != null
+    }
+
+    private fun updateSentenceBar() {
+        val displayText = sentenceManager.getDisplayText()
+        txtSentence.text = displayText
+        val hasSentence = displayText.isNotBlank()
+        btnSpeakSentence.isEnabled = hasSentence
+        btnClearSentence.isEnabled = hasSentence
     }
 
     private fun buildTitleText(baseTitle: String): String {
