@@ -108,8 +108,8 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
 
         btnDownloadApk.setOnClickListener {
-            txtUpdateStatus.text = "Začenjam prenos APK ..."
-            Toast.makeText(this, "Začenjam prenos APK ...", Toast.LENGTH_SHORT).show()
+            txtUpdateStatus.text = "Za\u010denjam prenos APK ..."
+            Toast.makeText(this, "Za\u010denjam prenos APK ...", Toast.LENGTH_SHORT).show()
 
             val release = latestRelease
             if (release == null) {
@@ -117,8 +117,17 @@ class BackupSettingsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (!canDownloadLatestRelease()) {
-                txtUpdateStatus.text = "Aplikacija je že posodobljena."
+            if (release.apkUrl.isNullOrBlank()) {
+                txtUpdateStatus.text = "APK datoteka ni najdena v GitHub Release."
+                return@setOnClickListener
+            }
+
+            val remoteVersion = release.tagName.removePrefix("v")
+            val latestVersionCode = extractReleaseVersionCode(remoteVersion)
+            if (latestVersionCode == null || latestVersionCode <= currentVersionCode) {
+                txtUpdateStatus.text = "Aplikacija je \u017ee posodobljena."
+                btnDownloadApk.isEnabled = false
+                btnDownloadApk.isClickable = false
                 return@setOnClickListener
             }
 
@@ -179,17 +188,20 @@ class BackupSettingsActivity : AppCompatActivity() {
                         latestVersionCode > currentVersionCode &&
                         !release.apkUrl.isNullOrBlank()
                     ) {
-                        txtUpdateStatus.text = "Posodobitev je na voljo: $remoteVersion"
+                        txtUpdateStatus.text = "Na voljo je nova posodobitev."
                         btnDownloadApk.isEnabled = true
+                        btnDownloadApk.isClickable = true
                     } else if (latestVersionCode != null &&
                         latestVersionCode <= currentVersionCode &&
                         currentVersionCode % 2L == 1L
                     ) {
                         txtUpdateStatus.text = "Ta posodobitev ni primerna za trenutno name\u0161\u010deno rollback verzijo. Po\u010dakajte na novej\u0161o normalno izdajo."
                         btnDownloadApk.isEnabled = false
+                        btnDownloadApk.isClickable = false
                     } else {
                         txtUpdateStatus.text = "Aplikacija je \u017ee posodobljena."
                         btnDownloadApk.isEnabled = false
+                        btnDownloadApk.isClickable = false
                     }
                     setCheckButtonLoading(false)
                 }
@@ -200,6 +212,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                     latestRelease = null
                     latestReleaseBody = ""
                     btnDownloadApk.isEnabled = false
+                    btnDownloadApk.isClickable = false
                     txtUpdateStatus.text = toUserFriendlyCheckStatus(message)
                     updateReleaseNotes()
                     setCheckButtonLoading(false)
@@ -541,6 +554,7 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun setDownloadButtonLoading(isLoading: Boolean) {
         btnDownloadApk.isEnabled = !isLoading
+        btnDownloadApk.isClickable = !isLoading
         btnDownloadApk.text = if (isLoading) "PRENA\u0160ANJE..." else "PRENESI APK"
         btnDownloadApk.backgroundTintList = ColorStateList.valueOf(
             if (isLoading) BUSY_BUTTON_COLOR else DOWNLOAD_BUTTON_COLOR
@@ -549,7 +563,9 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun restoreDownloadButtonState() {
         setDownloadButtonLoading(false)
-        btnDownloadApk.isEnabled = canDownloadLatestRelease()
+        val canDownload = canDownloadLatestRelease()
+        btnDownloadApk.isEnabled = canDownload
+        btnDownloadApk.isClickable = canDownload
     }
 
     private fun canDownloadLatestRelease(): Boolean {
