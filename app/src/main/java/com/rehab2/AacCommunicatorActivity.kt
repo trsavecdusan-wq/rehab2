@@ -32,6 +32,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var audioPlayer: AacAudioPlayer
     private lateinit var txtTitle: TextView
     private lateinit var sentenceBar: View
+    private lateinit var txtPrompt: TextView
     private lateinit var txtSentence: TextView
     private lateinit var btnSpeakSentence: Button
     private lateinit var btnClearSentence: Button
@@ -64,6 +65,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         txtTitle = findViewById(R.id.txtAacTitle)
         sentenceBar = findViewById(R.id.aacSentenceBar)
+        txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
@@ -79,6 +81,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         btnClearSentence.setOnClickListener {
             sentenceManager.clear()
             currentV2VisibleHistory.clear()
+            clearPromptText()
             if (currentV2RootItems.isNotEmpty()) {
                 showItems(currentV2RootItems)
             }
@@ -103,6 +106,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             currentV2RootItems = page.items
             currentV2VisibleHistory.clear()
             sentenceBar.visibility = View.VISIBLE
+            clearPromptText()
             updateSentenceBar()
         } else {
             clearV2State()
@@ -148,8 +152,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 currentV2ItemsById[childId]
             }
             if (childItems.isNotEmpty()) {
+                setPromptText(item.questionSl)
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
+            } else {
+                clearPromptText()
             }
             return
         }
@@ -189,6 +196,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun goBack() {
         if (currentV2VisibleHistory.isNotEmpty()) {
             val previousItems = currentV2VisibleHistory.removeLast()
+            clearPromptText()
             showItems(previousItems)
             return
         }
@@ -214,6 +222,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         currentV2VisibleHistory.clear()
         currentVisibleItems = emptyList()
         currentV2RootItems = emptyList()
+        clearPromptText()
         sentenceBar.visibility = View.GONE
         txtSentence.text = ""
         updateSentenceBar()
@@ -233,6 +242,16 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val hasSentence = displayText.isNotBlank()
         btnSpeakSentence.isEnabled = hasSentence
         btnClearSentence.isEnabled = hasSentence
+    }
+
+    private fun setPromptText(text: String?) {
+        val value = text?.trim().orEmpty()
+        txtPrompt.text = value
+        txtPrompt.visibility = if (value.isNotEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun clearPromptText() {
+        setPromptText(null)
     }
 
     private fun buildTitleText(baseTitle: String): String {

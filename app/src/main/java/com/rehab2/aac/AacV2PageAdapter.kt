@@ -20,7 +20,9 @@ object AacV2PageAdapter {
                 speakTextUk = node.speakTextUk,
                 conceptId = node.conceptId,
                 children = node.children,
-                sentenceRole = node.sentenceRole
+                sentenceRole = node.sentenceRole,
+                questionSl = node.questionSl,
+                questionUk = node.questionUk
             )
         }
 

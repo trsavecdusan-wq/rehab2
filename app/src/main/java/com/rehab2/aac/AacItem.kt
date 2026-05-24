@@ -11,5 +11,7 @@ data class AacItem(
     val speakTextUk: String? = null,
     val conceptId: String? = null,
     val children: List<String> = emptyList(),
-    val sentenceRole: String? = null
+    val sentenceRole: String? = null,
+    val questionSl: String? = null,
+    val questionUk: String? = null
 )
