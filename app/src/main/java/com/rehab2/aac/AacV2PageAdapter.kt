@@ -17,7 +17,10 @@ object AacV2PageAdapter {
                 actionType = "speak",
                 targetPageId = "",
                 speakTextSl = node.speakTextSl,
-                speakTextUk = node.speakTextUk
+                speakTextUk = node.speakTextUk,
+                conceptId = node.conceptId,
+                children = node.children,
+                sentenceRole = node.sentenceRole
             )
         }
 

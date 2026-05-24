@@ -8,5 +8,8 @@ data class AacItem(
     val actionType: String,
     val targetPageId: String,
     val speakTextSl: String? = null,
-    val speakTextUk: String? = null
+    val speakTextUk: String? = null,
+    val conceptId: String? = null,
+    val children: List<String> = emptyList(),
+    val sentenceRole: String? = null
 )
