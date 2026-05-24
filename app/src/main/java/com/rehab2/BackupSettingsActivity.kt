@@ -81,6 +81,8 @@ class BackupSettingsActivity : AppCompatActivity() {
         txtReleaseNotes = findViewById(R.id.txtReleaseNotes)
         btnCheckUpdate = findViewById(R.id.btnCheckUpdate)
         btnDownloadApk = findViewById(R.id.btnDownloadApk)
+        btnDownloadApk.isClickable = true
+        btnDownloadApk.isEnabled = true
         btnRestorePreviousVersion = findViewById(R.id.btnRestorePreviousVersion)
 
         @Suppress("DEPRECATION")
@@ -108,6 +110,8 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
 
         btnDownloadApk.setOnClickListener {
+            txtUpdateStatus.text = "DOWNLOAD BUTTON CLICKED"
+            Toast.makeText(this, "DOWNLOAD BUTTON CLICKED", Toast.LENGTH_SHORT).show()
             diagnosticToast("DOWNLOAD BUTTON CLICKED")
             if (!btnDownloadApk.isEnabled) {
                 diagnosticToast("DOWNLOAD BUTTON DISABLED")
@@ -117,6 +121,7 @@ class BackupSettingsActivity : AppCompatActivity() {
 
             val release = latestRelease
             if (release == null) {
+                txtUpdateStatus.text = "LATEST RELEASE NULL"
                 diagnosticToast("LATEST RELEASE NULL")
                 diagnosticToast("DOWNLOAD FLOW STOPPED")
                 return@setOnClickListener
