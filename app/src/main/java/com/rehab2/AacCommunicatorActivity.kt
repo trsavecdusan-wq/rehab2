@@ -2,6 +2,7 @@
 
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
+import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -88,7 +89,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             updateSentenceBar()
         }
         txtTitle.setOnLongClickListener {
-            if (!BuildConfig.DEBUG) {
+            if (!isDebugBuild()) {
                 return@setOnLongClickListener false
             }
 
@@ -116,15 +117,16 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtTitle.text = buildTitleText(page.title)
         if (isV2Page(page)) {
             currentV2ItemsById = page.items.associateBy { it.id }
-            currentV2RootItems = page.items
+            currentV2RootItems = getV2RootItems(page.items)
             currentV2VisibleHistory.clear()
             sentenceBar.visibility = View.VISIBLE
             clearPromptText()
             updateSentenceBar()
+            showItems(currentV2RootItems)
         } else {
             clearV2State()
+            showItems(page.items)
         }
-        showItems(page.items)
     }
 
     private fun showItems(items: List<AacItem>) {
@@ -247,6 +249,16 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun isV2Item(item: AacItem): Boolean {
         return item.conceptId != null || item.children.isNotEmpty() || item.sentenceRole != null
+    }
+
+    private fun isDebugBuild(): Boolean {
+        return (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+    }
+
+    private fun getV2RootItems(items: List<AacItem>): List<AacItem> {
+        val childIds = items.flatMap { it.children }.toSet()
+        val rootItems = items.filter { it.id !in childIds }
+        return rootItems.ifEmpty { items }
     }
 
     private fun updateSentenceBar() {
