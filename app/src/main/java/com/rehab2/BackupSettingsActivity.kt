@@ -168,8 +168,6 @@ class BackupSettingsActivity : AppCompatActivity() {
                     latestRelease = release
                     latestReleaseBody = release.body
                     txtLatestVersion.text = "Zadnja verzija: $remoteVersion"
-                    Toast.makeText(this, "REMOTE VERSION CODE = $latestVersionCode", Toast.LENGTH_SHORT).show()
-                    Toast.makeText(this, "CURRENT VERSION CODE = $currentVersionCode", Toast.LENGTH_SHORT).show()
                     updateReleaseNotes()
 
                     if (latestVersionCode != null &&
@@ -550,14 +548,12 @@ class BackupSettingsActivity : AppCompatActivity() {
         btnCheckUpdate.isEnabled = true
         btnCheckUpdate.text = "PREVERI POSODOBITEV"
         btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(CHECK_BUTTON_COLOR)
-        Toast.makeText(this, "BUTTON STATE = CHECK", Toast.LENGTH_SHORT).show()
     }
 
     private fun setPrimaryButtonReadyForDownload() {
         btnCheckUpdate.isEnabled = true
         btnCheckUpdate.text = "PRENESI APK"
         btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(DOWNLOAD_BUTTON_COLOR)
-        Toast.makeText(this, "BUTTON STATE = DOWNLOAD", Toast.LENGTH_SHORT).show()
     }
 
     private fun refreshPrimaryActionButtonState() {
