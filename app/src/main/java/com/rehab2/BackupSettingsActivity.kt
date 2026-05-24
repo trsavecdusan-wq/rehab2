@@ -123,6 +123,7 @@ class BackupSettingsActivity : AppCompatActivity() {
         }
 
         refreshRestoreButtonState()
+        refreshPrimaryActionButtonState()
     }
 
     override fun onResume() {
@@ -543,12 +544,14 @@ class BackupSettingsActivity : AppCompatActivity() {
         btnCheckUpdate.isEnabled = true
         btnCheckUpdate.text = "PREVERI POSODOBITEV"
         btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(CHECK_BUTTON_COLOR)
+        Toast.makeText(this, "BUTTON STATE = CHECK", Toast.LENGTH_SHORT).show()
     }
 
     private fun setPrimaryButtonReadyForDownload() {
         btnCheckUpdate.isEnabled = true
         btnCheckUpdate.text = "PRENESI APK"
         btnCheckUpdate.backgroundTintList = ColorStateList.valueOf(DOWNLOAD_BUTTON_COLOR)
+        Toast.makeText(this, "BUTTON STATE = DOWNLOAD", Toast.LENGTH_SHORT).show()
     }
 
     private fun refreshPrimaryActionButtonState() {
