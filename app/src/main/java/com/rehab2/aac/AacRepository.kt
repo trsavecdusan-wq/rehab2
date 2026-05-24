@@ -100,6 +100,13 @@ class AacRepository(private val context: Context) {
     }
 
     private fun parsePage(json: JSONObject): AacPage? {
+        if (json.optInt("version", 1) == 2 && json.has("nodes")) {
+            val v2Page = AacV2JsonParser.parse(json)
+            val adaptedPage = AacV2PageAdapter.toAacPage(v2Page)
+
+            return adaptedPage.takeIf { it.items.isNotEmpty() }
+        }
+
         val pageId = json.optString("pageId").ifBlank { "home" }
         val title = json.optString("title").ifBlank { "AAC V1" }
         val itemsJson = json.optJSONArray("items") ?: JSONArray()

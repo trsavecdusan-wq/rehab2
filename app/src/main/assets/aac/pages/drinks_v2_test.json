@@ -1,0 +1,69 @@
+{
+  "version": 2,
+  "pageId": "drinks_v2_test",
+  "title": "PIJAČA V2 TEST",
+  "promptSl": "Kaj želiš piti?",
+  "promptUk": "Що хочеш пити?",
+  "concepts": [
+    {
+      "id": "drink",
+      "baseText": "PIJAČA",
+      "category": "needs",
+      "activeIconId": null,
+      "speakTextSl": "Kaj želiš piti?",
+      "speakTextUk": "Що хочеш пити?"
+    },
+    {
+      "id": "water",
+      "baseText": "VODA",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "voda",
+      "speakTextUk": "вода"
+    },
+    {
+      "id": "cold_water",
+      "baseText": "MRZLA VODA",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "mrzla voda",
+      "speakTextUk": "холодна вода"
+    }
+  ],
+  "icons": [],
+  "nodes": [
+    {
+      "id": "drink",
+      "conceptId": "drink",
+      "title": "PIJAČA",
+      "speakTextSl": "Kaj želiš piti?",
+      "speakTextUk": "Що хочеш пити?",
+      "questionSl": "Kaj želiš piti?",
+      "questionUk": "Що хочеш пити?",
+      "children": ["water"],
+      "sentenceRole": "intent"
+    },
+    {
+      "id": "water",
+      "conceptId": "water",
+      "title": "VODA",
+      "speakTextSl": "voda",
+      "speakTextUk": "вода",
+      "questionSl": "Kakšno vodo želiš?",
+      "questionUk": "Яку воду хочеш?",
+      "children": ["cold_water"],
+      "sentenceRole": "object"
+    },
+    {
+      "id": "cold_water",
+      "conceptId": "cold_water",
+      "title": "MRZLA VODA",
+      "speakTextSl": "mrzla voda",
+      "speakTextUk": "холодна вода",
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "modifier"
+    }
+  ]
+}

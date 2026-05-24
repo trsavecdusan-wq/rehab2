@@ -6,5 +6,7 @@ data class AacItem(
     val imagePath: String,
     val audioSl: String = "",
     val actionType: String,
-    val targetPageId: String
+    val targetPageId: String,
+    val speakTextSl: String? = null,
+    val speakTextUk: String? = null
 )

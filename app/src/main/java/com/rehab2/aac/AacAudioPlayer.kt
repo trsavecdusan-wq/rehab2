@@ -41,7 +41,8 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             return
         }
 
-        speak(item.labelSl)
+        val fallbackText = item.speakTextSl?.trim()?.takeIf { it.isNotEmpty() } ?: item.labelSl
+        speak(fallbackText)
     }
 
     private fun playAudioFileIfAvailable(audioFile: File?): Boolean {
