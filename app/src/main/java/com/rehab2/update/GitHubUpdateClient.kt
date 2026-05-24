@@ -1,5 +1,6 @@
 package com.rehab2.update
 
+import android.util.Log
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -176,7 +177,9 @@ class GitHubUpdateClient {
                 assetNames.add(name)
             }
             if (name in APK_ASSET_NAMES) {
-                return asset.optString("browser_download_url")
+                val assetUrl = asset.optString("browser_download_url")
+                Log.i("NovaRehabUpdater", "ASSET: $name URL: $assetUrl")
+                return assetUrl
             }
         }
         return null

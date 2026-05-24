@@ -13,6 +13,7 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.rehab2.update.ApkDownloadManager
@@ -151,8 +152,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                         latestVersionCode <= currentVersionCode &&
                         currentVersionCode % 2L == 1L
                     ) {
-                        txtUpdateStatus.text =
-                            "Ta posodobitev ni primerna za trenutno nameščeno rollback verzijo. Počakajte na novejšo normalno izdajo."
+                        txtUpdateStatus.text = "Ta posodobitev ni primerna za trenutno name\u0161\u010deno rollback verzijo. Po\u010dakajte na novej\u0161o normalno izdajo."
                         btnDownloadApk.isEnabled = false
                     } else {
                         txtUpdateStatus.text = "Ni nove posodobitve."
@@ -176,13 +176,16 @@ class BackupSettingsActivity : AppCompatActivity() {
     }
 
     private fun downloadLatestApk(release: GitHubUpdateClient.ReleaseInfo) {
+        diagnosticToast("DOWNLOAD START")
         val apkUrl = release.apkUrl ?: return
+        diagnosticToast("DOWNLOAD URL READY")
         setDownloadButtonLoading(true)
         txtUpdateStatus.text = "Prena\u0161am APK ..."
 
         Thread {
             val result = downloadManager.downloadLatestApk(apkUrl) { status ->
                 mainHandler.post {
+                    diagnosticToast(status)
                     if (status.contains("Prena", ignoreCase = true)) {
                         txtUpdateStatus.text = "Prena\u0161am APK ..."
                     }
@@ -192,6 +195,12 @@ class BackupSettingsActivity : AppCompatActivity() {
             mainHandler.post {
                 val downloadedFile = result.file
                 if (result.success && downloadedFile != null) {
+                    diagnosticToast("DOWNLOAD SUCCESS")
+                    if (downloadedFile.exists() && downloadedFile.length() > 0L) {
+                        diagnosticToast("APK FILE EXISTS")
+                    } else {
+                        diagnosticToast("APK FILE MISSING")
+                    }
                     val backupPrepared = preparePreviousRestorableFromCurrentInstalled(downloadedFile)
                     txtUpdateStatus.text = if (backupPrepared) {
                         "Varnostna kopija pripravljena.\nPrenos kon\u010dan. Odpiram namestitev ..."
@@ -201,6 +210,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                     refreshRestoreButtonState()
                     openInstallHandoff(downloadedFile)
                 } else {
+                    diagnosticToast("DOWNLOAD FAILED: ${result.message}")
                     txtUpdateStatus.text = toUserFriendlyDownloadStatus(result.message)
                     restoreDownloadButtonState()
                 }
@@ -442,10 +452,13 @@ class BackupSettingsActivity : AppCompatActivity() {
 
         if (!apkFile.exists() || apkFile.length() <= 0L) {
             Log.e("NovaRehabUpdater", "Installer handoff aborted, APK missing or empty")
+            diagnosticToast("APK FILE MISSING")
             txtUpdateStatus.text = "APK datoteka ni pripravljena."
             restoreDownloadButtonState()
             return
         }
+
+        diagnosticToast("APK FILE EXISTS")
 
         try {
             val apkUri: Uri = FileProvider.getUriForFile(
@@ -460,18 +473,22 @@ class BackupSettingsActivity : AppCompatActivity() {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
 
+            diagnosticToast("INSTALL INTENT START")
             startActivity(installIntent)
             restoreDownloadButtonState()
         } catch (error: ActivityNotFoundException) {
             Log.e("NovaRehabUpdater", "Installer handoff failed", error)
+            diagnosticToast("INSTALL INTENT FAILED: ${error.javaClass.simpleName}")
             txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
             restoreDownloadButtonState()
         } catch (error: SecurityException) {
             Log.e("NovaRehabUpdater", "Installer handoff blocked by security policy", error)
+            diagnosticToast("INSTALL INTENT FAILED: ${error.javaClass.simpleName}")
             txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
             restoreDownloadButtonState()
         } catch (error: Exception) {
             Log.e("NovaRehabUpdater", "Installer handoff failed with unexpected error", error)
+            diagnosticToast("INSTALL INTENT FAILED: ${error.javaClass.simpleName}")
             txtUpdateStatus.text = "Namestitve ni bilo mogo\u010de odpreti."
             restoreDownloadButtonState()
         }
@@ -714,5 +731,10 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun yesNo(value: Boolean): String {
         return if (value) "da" else "ne"
+    }
+
+    private fun diagnosticToast(message: String) {
+        Log.i("NovaRehabUpdater", message)
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
