@@ -29,11 +29,14 @@ class GitHubUpdateClient {
 
     fun fetchLatestRelease(): ReleaseInfo {
         val releases = fetchReleases()
-        val root = findLatestStableRelease(releases)
+        val stableSelection = findLatestStableRelease(releases)
+        val root = stableSelection.release
             ?: throw UpdateCheckException(
                 debugSummary = buildString {
                     appendLine("URL: $RELEASES_URL")
                     appendLine("Releases: ${releases.length()}")
+                    appendLine("Normal releases skipped, VERSION_CODE missing: ${stableSelection.skippedMissingVersionCode}")
+                    appendLine("Normal releases skipped, VERSION_CODE odd: ${stableSelection.skippedOddVersionCode}")
                     append("Napaka: Veljaven navaden release ni bil najden.")
                 }.trim(),
                 message = "Navaden GitHub release ni na voljo."
@@ -82,9 +85,17 @@ class GitHubUpdateClient {
         val source: String
     )
 
-    private fun findLatestStableRelease(releases: JSONArray): JSONObject? {
+    private data class StableReleaseSelection(
+        val release: JSONObject?,
+        val skippedMissingVersionCode: Int,
+        val skippedOddVersionCode: Int
+    )
+
+    private fun findLatestStableRelease(releases: JSONArray): StableReleaseSelection {
         var latestRelease: JSONObject? = null
         var latestVersionCode: Long? = null
+        var skippedMissingVersionCode = 0
+        var skippedOddVersionCode = 0
 
         for (index in 0 until releases.length()) {
             val release = releases.optJSONObject(index) ?: continue
@@ -97,17 +108,26 @@ class GitHubUpdateClient {
             }
 
             val parsedVersion = parseReleaseVersion(release)
-            val versionCode = parsedVersion.versionCode ?: continue
-            if (versionCode % 2L != 0L) {
+            val bodyVersionCode = parsedVersion.versionCodeFromBody
+            if (bodyVersionCode == null) {
+                skippedMissingVersionCode++
                 continue
             }
-            if (latestVersionCode == null || versionCode > latestVersionCode) {
+            if (bodyVersionCode % 2L != 0L) {
+                skippedOddVersionCode++
+                continue
+            }
+            if (latestVersionCode == null || bodyVersionCode > latestVersionCode) {
                 latestRelease = release
-                latestVersionCode = versionCode
+                latestVersionCode = bodyVersionCode
             }
         }
 
-        return latestRelease
+        return StableReleaseSelection(
+            release = latestRelease,
+            skippedMissingVersionCode = skippedMissingVersionCode,
+            skippedOddVersionCode = skippedOddVersionCode
+        )
     }
 
     private fun findLatestRollbackRelease(releases: JSONArray): JSONObject? {

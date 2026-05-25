@@ -215,13 +215,22 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun openDrinksV2Test() {
         Toast.makeText(this, "Opening drinks V2", Toast.LENGTH_SHORT).show()
-        val seeded = AacLocalStorage.seedBundledDrinksV2Page(this)
+        val seeded = refreshBundledDrinksV2Page()
         if (seeded) {
             Toast.makeText(this, "Drinks V2 seeded", Toast.LENGTH_SHORT).show()
             openTargetPage("drinks_v2")
         } else {
             Toast.makeText(this, "Drinks V2 failed", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun refreshBundledDrinksV2Page(): Boolean {
+        val pagesDir = AacLocalStorage.getPagesDir(this)
+        val runtimeFile = pagesDir?.let { File(it, "drinks_v2.json") }
+        if (runtimeFile != null && runtimeFile.exists()) {
+            runtimeFile.delete()
+        }
+        return AacLocalStorage.seedBundledDrinksV2Page(this)
     }
 
     private fun goHome() {

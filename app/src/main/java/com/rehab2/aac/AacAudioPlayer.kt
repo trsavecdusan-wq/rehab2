@@ -13,6 +13,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private var textToSpeech: TextToSpeech? = TextToSpeech(context, this)
     private var isTtsReady = false
     private var isTtsFailed = false
+    private var pendingTextToSpeak: String? = null
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) {
@@ -24,6 +25,12 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         val result = textToSpeech?.setLanguage(Locale("sl")) ?: TextToSpeech.ERROR
         isTtsReady = result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED
         isTtsFailed = !isTtsReady
+        if (isTtsReady) {
+            pendingTextToSpeak?.let { text ->
+                pendingTextToSpeak = null
+                speak(text)
+            }
+        }
     }
 
     fun playOrSpeak(item: AacItem) {
@@ -77,7 +84,13 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     }
 
     private fun speak(text: String) {
-        if (!isTtsReady || isTtsFailed) {
+        if (!isTtsReady && !isTtsFailed) {
+            pendingTextToSpeak = text
+            Toast.makeText(context, "TTS PRIPRAVLJAM: ${text}", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (isTtsFailed) {
             Toast.makeText(context, "GOVOR NI NA VOLJO", Toast.LENGTH_SHORT).show()
             return
         }
@@ -102,6 +115,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private fun releaseMediaPlayer() {
         mediaPlayer?.release()
         mediaPlayer = null
+        pendingTextToSpeak = null
     }
 
     private fun MediaPlayer.stopSafely() {
