@@ -34,9 +34,14 @@ class GitHubUpdateClient {
             ?: throw UpdateCheckException(
                 debugSummary = buildString {
                     appendLine("URL: $RELEASES_URL")
-                    appendLine("Releases: ${releases.length()}")
-                    appendLine("Normal releases skipped, VERSION_CODE missing: ${stableSelection.skippedMissingVersionCode}")
-                    appendLine("Normal releases skipped, VERSION_CODE odd: ${stableSelection.skippedOddVersionCode}")
+                    appendLine("No valid OTA release found.")
+                    appendLine("Scanned releases: ${releases.length()}")
+                    appendLine("Skipped missing VERSION_CODE: ${stableSelection.skippedMissingVersionCode}")
+                    appendLine("VERSION_CODE missing from release body: ${stableSelection.skippedMissingVersionCode}")
+                    appendLine("Skipped odd VERSION_CODE: ${stableSelection.skippedOddVersionCode}")
+                    appendLine("Skipped prerelease/draft: ${stableSelection.skippedDraftOrPrerelease}")
+                    appendLine("Selected release: ${stableSelection.selectedTagName ?: "none"}")
+                    appendLine("Selected VERSION_CODE: ${stableSelection.selectedVersionCode ?: "-"}")
                     append("Napaka: Veljaven navaden release ni bil najden.")
                 }.trim(),
                 message = "Navaden GitHub release ni na voljo."
@@ -88,7 +93,10 @@ class GitHubUpdateClient {
     private data class StableReleaseSelection(
         val release: JSONObject?,
         val skippedMissingVersionCode: Int,
-        val skippedOddVersionCode: Int
+        val skippedOddVersionCode: Int,
+        val skippedDraftOrPrerelease: Int,
+        val selectedTagName: String?,
+        val selectedVersionCode: Long?
     )
 
     private fun findLatestStableRelease(releases: JSONArray): StableReleaseSelection {
@@ -96,6 +104,7 @@ class GitHubUpdateClient {
         var latestVersionCode: Long? = null
         var skippedMissingVersionCode = 0
         var skippedOddVersionCode = 0
+        var skippedDraftOrPrerelease = 0
 
         for (index in 0 until releases.length()) {
             val release = releases.optJSONObject(index) ?: continue
@@ -104,6 +113,7 @@ class GitHubUpdateClient {
                 continue
             }
             if (release.optBoolean("draft", false) || release.optBoolean("prerelease", false)) {
+                skippedDraftOrPrerelease++
                 continue
             }
 
@@ -126,7 +136,10 @@ class GitHubUpdateClient {
         return StableReleaseSelection(
             release = latestRelease,
             skippedMissingVersionCode = skippedMissingVersionCode,
-            skippedOddVersionCode = skippedOddVersionCode
+            skippedOddVersionCode = skippedOddVersionCode,
+            skippedDraftOrPrerelease = skippedDraftOrPrerelease,
+            selectedTagName = latestRelease?.optString("tag_name")?.takeIf { it.isNotBlank() },
+            selectedVersionCode = latestVersionCode
         )
     }
 

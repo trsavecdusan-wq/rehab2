@@ -207,6 +207,19 @@ class BackupSettingsActivity : AppCompatActivity() {
                         setPrimaryButtonReadyForCheck()
                     }
                 }
+            } catch (error: GitHubUpdateClient.UpdateCheckException) {
+                val message = error.message?.takeIf { it.isNotBlank() } ?: "Preverjanje ni uspelo"
+                Log.e("NovaRehabUpdater", "Update check failed: $message", error)
+                mainHandler.post {
+                    latestRelease = null
+                    latestReleaseBody = ""
+                    txtUpdateStatus.text = buildString {
+                        appendLine(toUserFriendlyCheckStatus(message))
+                        append(error.debugSummary)
+                    }
+                    updateReleaseNotes()
+                    setPrimaryButtonReadyForCheck()
+                }
             } catch (error: Exception) {
                 val message = error.message?.takeIf { it.isNotBlank() } ?: "Preverjanje ni uspelo"
                 Log.e("NovaRehabUpdater", "Update check failed: $message", error)
