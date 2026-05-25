@@ -7,14 +7,14 @@
     android:clickable="true"
     android:focusable="true"
     android:gravity="center"
-    android:minHeight="120dp"
+    android:minHeight="160dp"
     android:orientation="vertical"
     android:padding="8dp">
 
     <ImageView
         android:id="@+id/imgAacTile"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="110dp"
         android:adjustViewBounds="true"
         android:contentDescription=""
         android:scaleType="fitCenter"

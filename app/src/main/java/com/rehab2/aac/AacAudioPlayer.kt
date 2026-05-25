@@ -22,8 +22,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             return
         }
 
-        val result = textToSpeech?.setLanguage(Locale("sl")) ?: TextToSpeech.ERROR
-        isTtsReady = result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED
+        isTtsReady = configureTtsLanguage()
         isTtsFailed = !isTtsReady
         if (isTtsReady) {
             pendingTextToSpeak?.let { text ->
@@ -81,6 +80,23 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             releaseMediaPlayer()
             false
         }
+    }
+
+    private fun configureTtsLanguage(): Boolean {
+        val tts = textToSpeech ?: return false
+        val slovenianResult = tts.setLanguage(Locale("sl"))
+        if (isLanguageUsable(slovenianResult)) {
+            return true
+        }
+
+        val defaultResult = tts.setLanguage(Locale.getDefault())
+        return isLanguageUsable(defaultResult)
+    }
+
+    private fun isLanguageUsable(result: Int): Boolean {
+        return result != TextToSpeech.ERROR &&
+            result != TextToSpeech.LANG_MISSING_DATA &&
+            result != TextToSpeech.LANG_NOT_SUPPORTED
     }
 
     private fun speak(text: String) {
