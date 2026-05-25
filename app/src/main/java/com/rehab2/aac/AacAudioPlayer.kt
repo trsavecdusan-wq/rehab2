@@ -12,6 +12,7 @@ import java.util.Locale
 
 class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener {
     private val speechCache = AacSpeechCache(context)
+    private val speechCoordinator = AacSpeechCoordinator(speechCache)
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { }
     private var mediaPlayer: MediaPlayer? = null
@@ -45,6 +46,16 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
     fun playOrSpeak(item: AacItem, languageCode: String) {
         stopPlayback()
+        val fallbackText = resolveTileSpeechText(item, languageCode)
+
+        val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
+            text = fallbackText,
+            languageCode = languageCode
+        )
+        if (playAudioFileIfAvailable(generatedAudioFile)) {
+            Log.d(TAG, "AUDIO GENERATED: ${item.id}")
+            return
+        }
 
         val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
         if (playAudioFileIfAvailable(directAudioFile)) {
@@ -58,7 +69,6 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             return
         }
 
-        val fallbackText = resolveTileSpeechText(item, languageCode)
         speakText(fallbackText, languageCode)
     }
 
@@ -73,6 +83,15 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         }
 
         stopPlayback()
+        val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
+            text = trimmed,
+            languageCode = languageCode
+        )
+        if (playAudioFileIfAvailable(generatedAudioFile)) {
+            Log.d(TAG, "AUDIO GENERATED")
+            return
+        }
+
         if (isTtsReady) {
             configureTtsLanguage(languageCode)
         }
