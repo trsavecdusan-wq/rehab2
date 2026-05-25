@@ -3,6 +3,7 @@
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -75,7 +76,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
         btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
-        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.46"
+        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.50"
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -141,6 +142,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
             clearPromptText()
             updateSentenceBar()
             showItems(currentV2RootItems)
+            if (page.pageId == DRINKS_V2_PAGE_ID) {
+                showDrinksV2WaterDebug(page)
+            }
         } else {
             clearV2State()
             showItems(page.items)
@@ -225,25 +229,51 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun openDrinksV2Test() {
-        Toast.makeText(this, "TEST V2 CLICKED 1.2.46", Toast.LENGTH_LONG).show()
-        val seeded = refreshBundledDrinksV2Page()
-        if (seeded) {
+        Toast.makeText(this, "TEST V2 CLICKED 1.2.50", Toast.LENGTH_LONG).show()
+        val refreshResult = refreshBundledDrinksV2Page()
+        showDrinksV2RefreshDebug(refreshResult)
+        if (refreshResult.isReady) {
             Toast.makeText(this, "DRINKS V2 REFRESH OK", Toast.LENGTH_LONG).show()
-            openTargetPage("drinks_v2")
-            Toast.makeText(this, "OPEN drinks_v2", Toast.LENGTH_LONG).show()
+            openTargetPage(DRINKS_V2_PAGE_ID)
+            Toast.makeText(this, "OPEN $DRINKS_V2_PAGE_ID", Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(this, "DRINKS V2 REFRESH FAILED", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun refreshBundledDrinksV2Page(): Boolean {
+    private fun refreshBundledDrinksV2Page(): DrinksV2RefreshResult {
         val pagesDir = AacLocalStorage.getPagesDir(this)
-        val runtimeFile = pagesDir?.let { File(it, "drinks_v2.json") }
+        val runtimeFile = pagesDir?.let { File(it, "$DRINKS_V2_PAGE_ID.json") }
         if (runtimeFile != null && runtimeFile.exists()) {
             runtimeFile.delete()
         }
         val seeded = AacLocalStorage.seedBundledDrinksV2Page(this)
-        return seeded && runtimeFile != null && runtimeFile.exists() && runtimeFile.length() > 0L
+        val exists = runtimeFile?.exists() == true
+        val size = runtimeFile?.takeIf { it.exists() }?.length() ?: 0L
+        return DrinksV2RefreshResult(
+            seeded = seeded,
+            exists = exists,
+            size = size,
+            path = runtimeFile?.absolutePath.orEmpty()
+        )
+    }
+
+    private fun showDrinksV2RefreshDebug(result: DrinksV2RefreshResult) {
+        val existsText = if (result.exists) "yes" else "no"
+        val message = "page=$DRINKS_V2_PAGE_ID runtime exists=$existsText size=${result.size}"
+        Log.d(TAG, "$message path=${result.path} seeded=${result.seeded}")
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun showDrinksV2WaterDebug(page: AacPage) {
+        val waterChildrenCount = page.items.firstOrNull { it.id == "water" }?.children?.size ?: 0
+        val message = if (waterChildrenCount == 4) {
+            "WATER children=4"
+        } else {
+            "WATER children=$waterChildrenCount — runtime JSON stale or wrong page"
+        }
+        Log.d(TAG, "page=${page.pageId} $message")
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun goHome() {
@@ -416,5 +446,20 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private data class DrinksV2RefreshResult(
+        val seeded: Boolean,
+        val exists: Boolean,
+        val size: Long,
+        val path: String
+    ) {
+        val isReady: Boolean
+            get() = seeded && exists && size > 0L
+    }
+
+    private companion object {
+        const val TAG = "AacCommunicatorActivity"
+        const val DRINKS_V2_PAGE_ID = "drinks_v2"
     }
 }
