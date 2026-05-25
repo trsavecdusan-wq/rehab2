@@ -48,7 +48,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         }
 
         val fallbackText = item.speakTextSl?.trim()?.takeIf { it.isNotEmpty() } ?: item.labelSl
-        speak(fallbackText)
+        speakText(fallbackText)
     }
 
     fun speakText(text: String) {
@@ -73,6 +73,11 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
                     releaseMediaPlayer()
                 }
                 prepare()
+                if (duration in 1 until MIN_AUDIO_DURATION_MS) {
+                    release()
+                    mediaPlayer = null
+                    return false
+                }
                 start()
             }
             true
@@ -90,7 +95,11 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         }
 
         val defaultResult = tts.setLanguage(Locale.getDefault())
-        return isLanguageUsable(defaultResult)
+        if (isLanguageUsable(defaultResult)) {
+            return true
+        }
+
+        return true
     }
 
     private fun isLanguageUsable(result: Int): Boolean {
@@ -112,7 +121,10 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         }
 
         Toast.makeText(context, "TTS: ${text}", Toast.LENGTH_SHORT).show()
-        textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "aac_$text")
+        val result = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "aac_$text")
+        if (result == TextToSpeech.ERROR) {
+            Toast.makeText(context, "GOVOR NI USPEL", Toast.LENGTH_SHORT).show()
+        }
     }
 
     fun release() {
@@ -131,7 +143,6 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private fun releaseMediaPlayer() {
         mediaPlayer?.release()
         mediaPlayer = null
-        pendingTextToSpeak = null
     }
 
     private fun MediaPlayer.stopSafely() {
@@ -141,5 +152,9 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             }
         } catch (_: IllegalStateException) {
         }
+    }
+
+    private companion object {
+        const val MIN_AUDIO_DURATION_MS = 250
     }
 }
