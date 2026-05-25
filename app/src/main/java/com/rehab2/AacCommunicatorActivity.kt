@@ -180,6 +180,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
             val childItems = item.children.mapNotNull { childId ->
                 currentV2ItemsById[childId]
             }
+            if (item.id == "water") {
+                Toast.makeText(this, "VODA children: ${childItems.size}", Toast.LENGTH_SHORT).show()
+            }
             sentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
@@ -237,7 +240,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
         if (runtimeFile != null && runtimeFile.exists()) {
             runtimeFile.delete()
         }
-        return AacLocalStorage.seedBundledDrinksV2Page(this)
+        val seeded = AacLocalStorage.seedBundledDrinksV2Page(this)
+        return seeded && runtimeFile != null && runtimeFile.exists() && runtimeFile.length() > 0L
     }
 
     private fun goHome() {
