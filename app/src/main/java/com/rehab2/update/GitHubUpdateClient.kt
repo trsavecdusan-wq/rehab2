@@ -17,6 +17,8 @@ class GitHubUpdateClient {
         val body: String,
         val apkUrl: String?,
         val versionCode: Long?,
+        val versionCodeFromBody: Long?,
+        val versionCodeSource: String,
         val debugSummary: String
     )
 
@@ -74,15 +76,38 @@ class GitHubUpdateClient {
         return RELEASES_URL
     }
 
+    private data class ParsedReleaseVersion(
+        val versionCode: Long?,
+        val versionCodeFromBody: Long?,
+        val source: String
+    )
+
     private fun findLatestStableRelease(releases: JSONArray): JSONObject? {
+        var latestRelease: JSONObject? = null
+        var latestVersionCode: Long? = null
+
         for (index in 0 until releases.length()) {
             val release = releases.optJSONObject(index) ?: continue
             val tagName = release.optString("tag_name")
-            if (STABLE_RELEASE_TAG_REGEX.matcher(tagName).matches()) {
-                return release
+            if (!STABLE_RELEASE_TAG_REGEX.matcher(tagName).matches()) {
+                continue
+            }
+            if (release.optBoolean("draft", false) || release.optBoolean("prerelease", false)) {
+                continue
+            }
+
+            val parsedVersion = parseReleaseVersion(release)
+            val versionCode = parsedVersion.versionCode ?: continue
+            if (versionCode % 2L != 0L) {
+                continue
+            }
+            if (latestVersionCode == null || versionCode > latestVersionCode) {
+                latestRelease = release
+                latestVersionCode = versionCode
             }
         }
-        return null
+
+        return latestRelease
     }
 
     private fun findLatestRollbackRelease(releases: JSONArray): JSONObject? {
@@ -110,6 +135,31 @@ class GitHubUpdateClient {
             matcher.group(1)?.toLongOrNull()
         } else {
             null
+        }
+    }
+
+    private fun parseReleaseVersion(root: JSONObject): ParsedReleaseVersion {
+        val tagName = root.optString("tag_name")
+        val body = root.optString("body")
+        val fallbackVersionName = tagName.removePrefix(ROLLBACK_TAG_PREFIX).removePrefix("v")
+        val bodyVersionCode = extractReleaseVersionCodeFromBody(body)
+        val fallbackVersionCode = extractReleaseVersionCode(fallbackVersionName)
+        return when {
+            bodyVersionCode != null -> ParsedReleaseVersion(
+                versionCode = bodyVersionCode,
+                versionCodeFromBody = bodyVersionCode,
+                source = "release_body"
+            )
+            fallbackVersionCode != null -> ParsedReleaseVersion(
+                versionCode = fallbackVersionCode,
+                versionCodeFromBody = null,
+                source = "tag_fallback"
+            )
+            else -> ParsedReleaseVersion(
+                versionCode = null,
+                versionCodeFromBody = null,
+                source = "missing"
+            )
         }
     }
 
@@ -165,15 +215,15 @@ class GitHubUpdateClient {
         val assets = root.optJSONArray("assets") ?: JSONArray()
         val assetNames = mutableListOf<String>()
         val apkUrl = findApkUrl(assets, assetNames)
-        val fallbackVersionName = tagName.removePrefix(ROLLBACK_TAG_PREFIX).removePrefix("v")
-        val versionCode = extractReleaseVersionCodeFromBody(body)
-            ?: extractReleaseVersionCode(fallbackVersionName)
+        val parsedVersion = parseReleaseVersion(root)
         val debugSummary = buildString {
             appendLine("URL: $RELEASES_URL")
             appendLine("Releases: $releaseCount")
             appendLine("JSON tag_name: ${if (tagName.isNotBlank()) "da" else "ne"}")
             appendLine("tag_name: ${if (tagName.isNotBlank()) tagName else "-"}")
-            appendLine("VERSION_CODE: ${versionCode ?: "-"}")
+            appendLine("VERSION_CODE body: ${parsedVersion.versionCodeFromBody ?: "-"}")
+            appendLine("versionCode used: ${parsedVersion.versionCode ?: "-"}")
+            appendLine("versionCode source: ${parsedVersion.source}")
             appendLine("Assets: ${assets.length()}")
             append("Imena assetov: ${if (assetNames.isEmpty()) "[]" else assetNames.joinToString(prefix = "[", postfix = "]")}")
         }.trim()
@@ -194,7 +244,9 @@ class GitHubUpdateClient {
             tagName = tagName,
             body = body,
             apkUrl = apkUrl,
-            versionCode = versionCode,
+            versionCode = parsedVersion.versionCode,
+            versionCodeFromBody = parsedVersion.versionCodeFromBody,
+            versionCodeSource = parsedVersion.source,
             debugSummary = debugSummary
         )
     }

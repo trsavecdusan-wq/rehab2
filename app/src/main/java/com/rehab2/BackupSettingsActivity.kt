@@ -163,7 +163,18 @@ class BackupSettingsActivity : AppCompatActivity() {
             try {
                 val release = updateClient.fetchLatestRelease()
                 val remoteVersion = release.tagName.removePrefix("v")
-                val latestVersionCode = release.versionCode ?: extractReleaseVersionCode(remoteVersion)
+                val latestVersionCode = release.versionCode
+                val installedVersionCode = BuildConfig.VERSION_CODE.toLong()
+                val updateAvailable = latestVersionCode != null &&
+                    latestVersionCode > installedVersionCode &&
+                    !release.apkUrl.isNullOrBlank()
+                val comparisonStatus = buildUpdateComparisonStatus(
+                    installedVersionCode = installedVersionCode,
+                    remoteVersionName = remoteVersion,
+                    release = release,
+                    remoteVersionCode = latestVersionCode,
+                    updateAvailable = updateAvailable
+                )
 
                 mainHandler.post {
                     latestRelease = release
@@ -171,20 +182,28 @@ class BackupSettingsActivity : AppCompatActivity() {
                     txtLatestVersion.text = "Zadnja verzija: $remoteVersion"
                     updateReleaseNotes()
 
-                    if (latestVersionCode != null &&
-                        latestVersionCode > currentVersionCode &&
-                        !release.apkUrl.isNullOrBlank()
-                    ) {
-                        txtUpdateStatus.text = "Na voljo je nova posodobitev."
+                    if (updateAvailable) {
+                        txtUpdateStatus.text = buildString {
+                            append("Na voljo je nova posodobitev.")
+                            if (release.versionCodeFromBody == null) {
+                                appendLine()
+                                append("VERSION_CODE missing from release body")
+                            }
+                            appendLine()
+                            append(comparisonStatus)
+                        }
                         setPrimaryButtonReadyForDownload()
                     } else if (latestVersionCode != null &&
-                        latestVersionCode <= currentVersionCode &&
-                        currentVersionCode % 2L == 1L
+                        latestVersionCode <= installedVersionCode &&
+                        installedVersionCode % 2L == 1L
                     ) {
-                        txtUpdateStatus.text = "Ta posodobitev ni primerna za trenutno name\u0161\u010deno rollback verzijo. Po\u010dakajte na novej\u0161o normalno izdajo."
+                        txtUpdateStatus.text = "Ta posodobitev ni primerna za trenutno name\u0161\u010deno rollback verzijo. Po\u010dakajte na novej\u0161o normalno izdajo.\n$comparisonStatus"
+                        setPrimaryButtonReadyForCheck()
+                    } else if (release.versionCodeFromBody == null) {
+                        txtUpdateStatus.text = "VERSION_CODE missing from release body\n$comparisonStatus"
                         setPrimaryButtonReadyForCheck()
                     } else {
-                        txtUpdateStatus.text = "Aplikacija je \u017ee posodobljena."
+                        txtUpdateStatus.text = "Aplikacija je \u017ee posodobljena.\n$comparisonStatus"
                         setPrimaryButtonReadyForCheck()
                     }
                 }
@@ -590,9 +609,25 @@ class BackupSettingsActivity : AppCompatActivity() {
 
     private fun canDownloadLatestRelease(): Boolean {
         val release = latestRelease ?: return false
-        val remoteVersion = release.tagName.removePrefix("v")
-        val latestVersionCode = release.versionCode ?: extractReleaseVersionCode(remoteVersion) ?: return false
-        return latestVersionCode > currentVersionCode && !release.apkUrl.isNullOrBlank()
+        val latestVersionCode = release.versionCode ?: return false
+        return latestVersionCode > BuildConfig.VERSION_CODE.toLong() && !release.apkUrl.isNullOrBlank()
+    }
+
+    private fun buildUpdateComparisonStatus(
+        installedVersionCode: Long,
+        remoteVersionName: String,
+        release: GitHubUpdateClient.ReleaseInfo,
+        remoteVersionCode: Long?,
+        updateAvailable: Boolean
+    ): String {
+        return buildString {
+            appendLine("Installed: $installedVersionCode")
+            appendLine("Remote versionName: $remoteVersionName")
+            appendLine("Remote VERSION_CODE: ${release.versionCodeFromBody ?: "-"}")
+            appendLine("Remote versionCode used: ${remoteVersionCode ?: "-"}")
+            appendLine("VersionCode source: ${release.versionCodeSource}")
+            append("Update available: $updateAvailable")
+        }
     }
 
     private fun toUserFriendlyCheckStatus(message: String): String {
