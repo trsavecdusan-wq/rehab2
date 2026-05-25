@@ -186,7 +186,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 currentV2ItemsById[childId]
             }
             if (item.id == "water") {
-                Toast.makeText(this, "VODA children: ${childItems.size}", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "WATER clicked children=${childItems.size}")
+                if (childItems.isEmpty()) {
+                    Toast.makeText(this, "WATER children missing", Toast.LENGTH_LONG).show()
+                }
             }
             sentenceManager.addItem(
                 AacSentenceItem(
@@ -201,6 +204,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 setPromptText(AacLocalizedTextResolver.resolveQuestion(item, languageCode))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
+                if (item.id == "water") {
+                    Toast.makeText(this, "OPEN WATER OPTIONS", Toast.LENGTH_LONG).show()
+                }
+                return
             } else {
                 clearPromptText()
             }
