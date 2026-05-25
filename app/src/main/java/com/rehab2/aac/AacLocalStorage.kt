@@ -124,6 +124,24 @@ object AacLocalStorage {
         }
     }
 
+    fun rebuildBundledDrinksV2Page(context: Context): Boolean {
+        val pagesDir = getPagesDir(context)
+        if (pagesDir == null || (!pagesDir.exists() && !pagesDir.mkdirs())) {
+            refreshDebugStatus(context)
+            return false
+        }
+
+        return try {
+            copyAssetReplacing(
+                context = context,
+                assetPath = SEEDED_DRINKS_V2_PAGE_ASSET_PATH,
+                targetFile = File(pagesDir, SEEDED_DRINKS_V2_PAGE_FILE_NAME)
+            )
+        } catch (_: Exception) {
+            false
+        }
+    }
+
     fun seedBundledTestAudio(context: Context): Boolean {
         val audioSlDir = getAudioSlDir(context)
         if (audioSlDir == null || (!audioSlDir.exists() && !audioSlDir.mkdirs())) {
@@ -154,6 +172,28 @@ object AacLocalStorage {
 
         val parentDir = targetFile.parentFile
         if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
+            return false
+        }
+
+        return try {
+            context.assets.open(assetPath).use { input ->
+                targetFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            targetFile.exists() && targetFile.length() > 0L
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun copyAssetReplacing(context: Context, assetPath: String, targetFile: File): Boolean {
+        val parentDir = targetFile.parentFile
+        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
+            return false
+        }
+
+        if (targetFile.exists() && !targetFile.delete()) {
             return false
         }
 

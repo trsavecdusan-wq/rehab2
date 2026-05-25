@@ -86,7 +86,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
         btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
-        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.50"
+        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.60"
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -271,11 +271,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun openDrinksV2Test() {
-        Toast.makeText(this, "TEST V2 CLICKED 1.2.50", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "TEST V2 CLICKED 1.2.60", Toast.LENGTH_LONG).show()
         val refreshResult = refreshBundledDrinksV2Page()
         showDrinksV2RefreshDebug(refreshResult)
         if (refreshResult.isReady) {
-            Toast.makeText(this, "DRINKS V2 REFRESH OK", Toast.LENGTH_LONG).show()
+            updateWaterTraceDebug("RUNTIME PAGE REBUILT")
+            Toast.makeText(this, "RUNTIME PAGE REBUILT", Toast.LENGTH_LONG).show()
             openTargetPage(DRINKS_V2_PAGE_ID)
             Toast.makeText(this, "OPEN $DRINKS_V2_PAGE_ID", Toast.LENGTH_LONG).show()
         } else {
@@ -286,14 +287,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun refreshBundledDrinksV2Page(): DrinksV2RefreshResult {
         val pagesDir = AacLocalStorage.getPagesDir(this)
         val runtimeFile = pagesDir?.let { File(it, "$DRINKS_V2_PAGE_ID.json") }
-        if (runtimeFile != null && runtimeFile.exists()) {
-            runtimeFile.delete()
-        }
-        val seeded = AacLocalStorage.seedBundledDrinksV2Page(this)
+        val rebuilt = AacLocalStorage.rebuildBundledDrinksV2Page(this)
         val exists = runtimeFile?.exists() == true
         val size = runtimeFile?.takeIf { it.exists() }?.length() ?: 0L
         return DrinksV2RefreshResult(
-            seeded = seeded,
+            rebuilt = rebuilt,
             exists = exists,
             size = size,
             path = runtimeFile?.absolutePath.orEmpty()
@@ -303,7 +301,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun showDrinksV2RefreshDebug(result: DrinksV2RefreshResult) {
         val existsText = if (result.exists) "yes" else "no"
         val message = "page=$DRINKS_V2_PAGE_ID runtime exists=$existsText size=${result.size}"
-        Log.d(TAG, "$message path=${result.path} seeded=${result.seeded}")
+        Log.d(TAG, "$message path=${result.path} rebuilt=${result.rebuilt}")
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
@@ -357,7 +355,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun updateWaterTraceDebug(stage: String) {
         txtWaterTraceDebug.visibility = View.VISIBLE
         txtWaterTraceDebug.text = buildString {
-            appendLine("WATER TRACE 1.2.58: $stage")
+            appendLine("WATER TRACE 1.2.60: $stage")
             appendLine("JSON children=${AacV2JsonParser.lastWaterJsonChildrenCount}")
             appendLine("parsed model children=${AacV2PageAdapter.lastWaterParsedModelChildrenCount}")
             appendLine("mapped AacItem children=${AacV2PageAdapter.lastWaterMappedItemChildrenCount}")
@@ -547,13 +545,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private data class DrinksV2RefreshResult(
-        val seeded: Boolean,
+        val rebuilt: Boolean,
         val exists: Boolean,
         val size: Long,
         val path: String
     ) {
         val isReady: Boolean
-            get() = seeded && exists && size > 0L
+            get() = rebuilt && exists && size > 0L
     }
 
     private companion object {
