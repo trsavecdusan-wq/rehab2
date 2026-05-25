@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import com.rehab2.BuildConfig
 import com.rehab2.update.ApkDownloadManager
 import com.rehab2.update.GitHubUpdateClient
 import java.io.File
