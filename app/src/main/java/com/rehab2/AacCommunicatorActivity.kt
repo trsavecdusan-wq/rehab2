@@ -170,7 +170,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
 
         if (isV2Item(item)) {
-            audioPlayer.playOrSpeak(item)
+            val childItems = item.children.mapNotNull { childId ->
+                currentV2ItemsById[childId]
+            }
             sentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
@@ -180,9 +182,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
             )
             updateSentenceBar()
 
-            val childItems = item.children.mapNotNull { childId ->
-                currentV2ItemsById[childId]
-            }
             if (childItems.isNotEmpty()) {
                 setPromptText(item.questionSl)
                 currentV2VisibleHistory.addLast(currentVisibleItems)
@@ -190,6 +189,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             } else {
                 clearPromptText()
             }
+            audioPlayer.playOrSpeak(item)
             return
         }
 

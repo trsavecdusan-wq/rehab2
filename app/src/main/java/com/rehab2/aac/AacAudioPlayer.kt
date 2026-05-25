@@ -155,6 +155,6 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     }
 
     private companion object {
-        const val MIN_AUDIO_DURATION_MS = 250
+        const val MIN_AUDIO_DURATION_MS = 700
     }
 }
