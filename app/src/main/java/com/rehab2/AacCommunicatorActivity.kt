@@ -3,6 +3,7 @@
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacItem
+import com.rehab2.aac.AacLabelMode
 import com.rehab2.aac.AacLocalStorage
 import com.rehab2.aac.AacPage
 import com.rehab2.aac.AacRepository
@@ -38,6 +40,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var btnSpeakSentence: Button
     private lateinit var btnClearSentence: Button
     private lateinit var recycler: RecyclerView
+    private var labelMode: AacLabelMode = AacLabelMode.DEFAULT
     private var currentPageId: String = "home"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +76,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
         recycler.layoutManager = GridLayoutManager(this, 5)
+        labelMode = readAacLabelMode()
 
         btnSpeakSentence.setOnClickListener {
             val text = sentenceManager.getSpeakText()
@@ -102,6 +106,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
         showRepositoryDebugStatus()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val updatedLabelMode = readAacLabelMode()
+        if (updatedLabelMode != labelMode) {
+            labelMode = updatedLabelMode
+            if (currentVisibleItems.isNotEmpty()) {
+                showItems(currentVisibleItems)
+            }
+        }
+    }
+
     override fun onDestroy() {
         audioPlayer.release()
         super.onDestroy()
@@ -126,9 +141,16 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun showItems(items: List<AacItem>) {
         currentVisibleItems = items
-        recycler.adapter = AacAdapter(items) { item ->
+        recycler.adapter = AacAdapter(items, labelMode) { item ->
             handleItemClick(item)
         }
+    }
+
+    private fun readAacLabelMode(): AacLabelMode {
+        val prefs = getSharedPreferences(AacLabelMode.PREFS_FILE, MODE_PRIVATE)
+        return AacLabelMode.fromPreference(
+            prefs.getString(AacLabelMode.PREF_AAC_LABEL_MODE, AacLabelMode.DEFAULT.name)
+        )
     }
 
     private fun handleItemClick(item: AacItem) {
@@ -301,13 +323,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private class AacAdapter(
         private val items: List<AacItem>,
+        private val labelMode: AacLabelMode,
         private val onItemClick: (AacItem) -> Unit
     ) : RecyclerView.Adapter<AacAdapter.AacViewHolder>() {
 
         override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): AacViewHolder {
             val view = android.view.LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_aac_tile, parent, false)
-            return AacViewHolder(view, onItemClick)
+            return AacViewHolder(view, labelMode, onItemClick)
         }
 
         override fun onBindViewHolder(holder: AacViewHolder, position: Int) {
@@ -318,6 +341,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         class AacViewHolder(
             itemView: View,
+            private val labelMode: AacLabelMode,
             private val onItemClick: (AacItem) -> Unit
         ) : RecyclerView.ViewHolder(itemView) {
             private val image: ImageView = itemView.findViewById(R.id.imgAacTile)
@@ -327,6 +351,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 label.text = item.labelSl
                 label.gravity = Gravity.CENTER
                 label.setTypeface(label.typeface, Typeface.BOLD)
+                applyLabelMode()
                 image.setImageBitmap(null)
 
                 val imageFile = item.imagePath.takeIf { it.isNotBlank() }?.let { File(it) }
@@ -342,6 +367,29 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 }
 
                 itemView.setOnClickListener { onItemClick(item) }
+            }
+
+            private fun applyLabelMode() {
+                when (labelMode) {
+                    AacLabelMode.HIDDEN -> {
+                        label.visibility = View.GONE
+                    }
+                    AacLabelMode.SMALL -> {
+                        label.visibility = View.VISIBLE
+                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+                        label.maxLines = 1
+                    }
+                    AacLabelMode.NORMAL -> {
+                        label.visibility = View.VISIBLE
+                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                        label.maxLines = 2
+                    }
+                    AacLabelMode.LARGE -> {
+                        label.visibility = View.VISIBLE
+                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                        label.maxLines = 2
+                    }
+                }
             }
         }
     }
