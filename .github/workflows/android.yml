@@ -166,9 +166,26 @@ jobs:
       - name: Prepare stable release asset
         run: cp app/build/outputs/apk/release/app-release.apk rehab-release.apk
 
+      - name: Read app version metadata
+        id: app_version
+        run: |
+          version_code=$(grep -E '^[[:space:]]*versionCode[[:space:]]+[0-9]+' app/build.gradle | awk '{print $2}' | head -n 1)
+          version_name=$(grep -E '^[[:space:]]*versionName[[:space:]]+"[^"]+"' app/build.gradle | sed -E 's/.*versionName[[:space:]]+"([^"]+)".*/\1/' | head -n 1)
+          if [ -z "$version_code" ] || [ -z "$version_name" ]; then
+            echo "Could not read versionCode/versionName from app/build.gradle" >&2
+            exit 1
+          fi
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+          echo "version_name=$version_name" >> "$GITHUB_OUTPUT"
+
       - name: Create or update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: rehab-release.apk
           name: ${{ github.ref_name }}
+          body: |
+            VERSION_CODE=${{ steps.app_version.outputs.version_code }}
+            VERSION_NAME=${{ steps.app_version.outputs.version_name }}
+            RELEASE_CHANNEL=normal
+
           generate_release_notes: true
