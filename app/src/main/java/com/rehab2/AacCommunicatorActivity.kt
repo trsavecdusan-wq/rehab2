@@ -2,7 +2,6 @@
 
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
-import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -89,15 +88,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
             updateSentenceBar()
         }
         txtTitle.setOnLongClickListener {
-            if (!isDebugBuild()) {
-                return@setOnLongClickListener false
-            }
-
+            Toast.makeText(this, "Opening V2 test", Toast.LENGTH_SHORT).show()
             val seeded = AacLocalStorage.seedBundledTestV2Page(this)
             if (seeded) {
+                Toast.makeText(this, "V2 test seeded", Toast.LENGTH_SHORT).show()
                 openTargetPage("drinks_v2_test")
             } else {
-                Toast.makeText(this, "V2 test page unavailable", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "V2 page failed", Toast.LENGTH_LONG).show()
             }
             true
         }
@@ -249,10 +246,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun isV2Item(item: AacItem): Boolean {
         return item.conceptId != null || item.children.isNotEmpty() || item.sentenceRole != null
-    }
-
-    private fun isDebugBuild(): Boolean {
-        return (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
     }
 
     private fun getV2RootItems(items: List<AacItem>): List<AacItem> {

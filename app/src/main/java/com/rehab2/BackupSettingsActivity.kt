@@ -163,7 +163,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             try {
                 val release = updateClient.fetchLatestRelease()
                 val remoteVersion = release.tagName.removePrefix("v")
-                val latestVersionCode = extractReleaseVersionCode(remoteVersion)
+                val latestVersionCode = release.versionCode ?: extractReleaseVersionCode(remoteVersion)
 
                 mainHandler.post {
                     latestRelease = release
@@ -591,7 +591,7 @@ class BackupSettingsActivity : AppCompatActivity() {
     private fun canDownloadLatestRelease(): Boolean {
         val release = latestRelease ?: return false
         val remoteVersion = release.tagName.removePrefix("v")
-        val latestVersionCode = extractReleaseVersionCode(remoteVersion) ?: return false
+        val latestVersionCode = release.versionCode ?: extractReleaseVersionCode(remoteVersion) ?: return false
         return latestVersionCode > currentVersionCode && !release.apkUrl.isNullOrBlank()
     }
 
