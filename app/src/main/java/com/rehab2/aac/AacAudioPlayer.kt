@@ -14,6 +14,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private var isTtsReady = false
     private var isTtsFailed = false
     private var pendingTextToSpeak: String? = null
+    private var pendingLanguageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) {
@@ -22,17 +23,22 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             return
         }
 
-        isTtsReady = configureTtsLanguage()
+        isTtsReady = configureTtsLanguage(AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
         isTtsFailed = !isTtsReady
         if (isTtsReady) {
             pendingTextToSpeak?.let { text ->
+                configureTtsLanguage(pendingLanguageCode)
                 pendingTextToSpeak = null
-                speak(text)
+                speak(text, pendingLanguageCode)
             }
         }
     }
 
     fun playOrSpeak(item: AacItem) {
+        playOrSpeak(item, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
+    }
+
+    fun playOrSpeak(item: AacItem, languageCode: String) {
         stopPlayback()
 
         val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
@@ -47,18 +53,25 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             return
         }
 
-        val fallbackText = item.speakTextSl?.trim()?.takeIf { it.isNotEmpty() } ?: item.labelSl
-        speakText(fallbackText)
+        val fallbackText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+        speakText(fallbackText, languageCode)
     }
 
     fun speakText(text: String) {
+        speakText(text, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
+    }
+
+    fun speakText(text: String, languageCode: String) {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) {
             return
         }
 
         stopPlayback()
-        speak(trimmed)
+        if (isTtsReady) {
+            configureTtsLanguage(languageCode)
+        }
+        speak(trimmed, languageCode)
     }
 
     private fun playAudioFileIfAvailable(audioFile: File?): Boolean {
@@ -87,8 +100,13 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         }
     }
 
-    private fun configureTtsLanguage(): Boolean {
+    private fun configureTtsLanguage(languageCode: String): Boolean {
         val tts = textToSpeech ?: return false
+        val selectedResult = tts.setLanguage(Locale.forLanguageTag(AacLanguageResolver.normalize(languageCode)))
+        if (isLanguageUsable(selectedResult)) {
+            return true
+        }
+
         val slovenianResult = tts.setLanguage(Locale("sl"))
         if (isLanguageUsable(slovenianResult)) {
             return true
@@ -108,9 +126,10 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             result != TextToSpeech.LANG_NOT_SUPPORTED
     }
 
-    private fun speak(text: String) {
+    private fun speak(text: String, languageCode: String) {
         if (!isTtsReady && !isTtsFailed) {
             pendingTextToSpeak = text
+            pendingLanguageCode = AacLanguageResolver.normalize(languageCode)
             Toast.makeText(context, "TTS PRIPRAVLJAM: ${text}", Toast.LENGTH_SHORT).show()
             return
         }

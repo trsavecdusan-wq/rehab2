@@ -30,14 +30,26 @@ class AacSentenceStateManager {
     }
 
     fun getSpeakText(): String {
+        return getSpeakText(AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
+    }
+
+    fun getSpeakText(languageCode: String): String {
         if (items.isEmpty()) return ""
 
         val normalizedTexts = items.map { it.text.trim() }.filter { it.isNotEmpty() }
         if (normalizedTexts.isEmpty()) return ""
 
+        if (AacLanguageResolver.normalize(languageCode) != AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            return buildSimpleSentence(normalizedTexts)
+        }
+
         val upperSet = normalizedTexts.map { it.uppercase() }.toSet()
         getDrinkSpeakText(upperSet)?.let { return it }
 
+        return buildSimpleSentence(normalizedTexts)
+    }
+
+    private fun buildSimpleSentence(normalizedTexts: List<String>): String {
         val raw = normalizedTexts.joinToString(" ") { it.lowercase() }
         return raw.replaceFirstChar { char ->
             if (char.isLowerCase()) char.titlecase() else char.toString()

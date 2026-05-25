@@ -16,7 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacLabelMode
+import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacLocalStorage
+import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacPage
 import com.rehab2.aac.AacRepository
 import com.rehab2.aac.AacSentenceItem
@@ -41,6 +43,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var btnClearSentence: Button
     private lateinit var recycler: RecyclerView
     private var labelMode: AacLabelMode = AacLabelMode.DEFAULT
+    private var languageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
     private var currentPageId: String = "home"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,11 +80,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
         recycler = findViewById(R.id.recyclerAacTiles)
         recycler.layoutManager = GridLayoutManager(this, 5)
         labelMode = readAacLabelMode()
+        languageCode = AacLanguageResolver.readSelectedLanguageCode(this)
 
         btnSpeakSentence.setOnClickListener {
-            val text = sentenceManager.getSpeakText()
+            val text = sentenceManager.getSpeakText(languageCode)
             if (text.isNotBlank()) {
-                audioPlayer.speakText(text)
+                audioPlayer.speakText(text, languageCode)
             }
         }
         btnClearSentence.setOnClickListener {
@@ -109,11 +113,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val updatedLabelMode = readAacLabelMode()
-        if (updatedLabelMode != labelMode) {
+        val updatedLanguageCode = AacLanguageResolver.readSelectedLanguageCode(this)
+        if (updatedLabelMode != labelMode || updatedLanguageCode != languageCode) {
             labelMode = updatedLabelMode
+            languageCode = updatedLanguageCode
             if (currentVisibleItems.isNotEmpty()) {
                 showItems(currentVisibleItems)
             }
+            updateSentenceBar()
         }
     }
 
@@ -141,7 +148,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun showItems(items: List<AacItem>) {
         currentVisibleItems = items
-        recycler.adapter = AacAdapter(items, labelMode) { item ->
+        recycler.adapter = AacAdapter(items, labelMode, languageCode) { item ->
             handleItemClick(item)
         }
     }
@@ -176,24 +183,24 @@ class AacCommunicatorActivity : AppCompatActivity() {
             sentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
-                    text = item.speakTextSl ?: item.labelSl,
+                    text = AacLocalizedTextResolver.resolveSpeakText(item, languageCode),
                     role = item.sentenceRole
                 )
             )
             updateSentenceBar()
 
             if (childItems.isNotEmpty()) {
-                setPromptText(item.questionSl)
+                setPromptText(AacLocalizedTextResolver.resolveQuestion(item, languageCode))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
             } else {
                 clearPromptText()
             }
-            audioPlayer.playOrSpeak(item)
+            audioPlayer.playOrSpeak(item, languageCode)
             return
         }
 
-        audioPlayer.playOrSpeak(item)
+        audioPlayer.playOrSpeak(item, languageCode)
     }
 
     private fun openTargetPage(targetPageId: String) {
@@ -333,13 +340,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private class AacAdapter(
         private val items: List<AacItem>,
         private val labelMode: AacLabelMode,
+        private val languageCode: String,
         private val onItemClick: (AacItem) -> Unit
     ) : RecyclerView.Adapter<AacAdapter.AacViewHolder>() {
 
         override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): AacViewHolder {
             val view = android.view.LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_aac_tile, parent, false)
-            return AacViewHolder(view, labelMode, onItemClick)
+            return AacViewHolder(view, labelMode, languageCode, onItemClick)
         }
 
         override fun onBindViewHolder(holder: AacViewHolder, position: Int) {
@@ -351,13 +359,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
         class AacViewHolder(
             itemView: View,
             private val labelMode: AacLabelMode,
+            private val languageCode: String,
             private val onItemClick: (AacItem) -> Unit
         ) : RecyclerView.ViewHolder(itemView) {
             private val image: ImageView = itemView.findViewById(R.id.imgAacTile)
             private val label: TextView = itemView.findViewById(R.id.txtAacTileLabel)
 
             fun bind(item: AacItem) {
-                label.text = item.labelSl
+                label.text = AacLocalizedTextResolver.resolveLabel(item, languageCode)
                 label.gravity = Gravity.CENTER
                 label.setTypeface(label.typeface, Typeface.BOLD)
                 applyLabelMode()
