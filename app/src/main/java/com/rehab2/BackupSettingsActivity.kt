@@ -18,7 +18,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import com.rehab2.BuildConfig
 import com.rehab2.update.ApkDownloadManager
 import com.rehab2.update.GitHubUpdateClient
 import java.io.File
@@ -165,7 +164,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                 val release = updateClient.fetchLatestRelease()
                 val remoteVersion = release.tagName.removePrefix("v")
                 val latestVersionCode = release.versionCode
-                val installedVersionCode = BuildConfig.VERSION_CODE.toLong()
+                val installedVersionCode = getInstalledVersionCodeLong()
                 val updateAvailable = latestVersionCode != null &&
                     latestVersionCode > installedVersionCode &&
                     !release.apkUrl.isNullOrBlank()
@@ -611,7 +610,17 @@ class BackupSettingsActivity : AppCompatActivity() {
     private fun canDownloadLatestRelease(): Boolean {
         val release = latestRelease ?: return false
         val latestVersionCode = release.versionCode ?: return false
-        return latestVersionCode > BuildConfig.VERSION_CODE.toLong() && !release.apkUrl.isNullOrBlank()
+        return latestVersionCode > getInstalledVersionCodeLong() && !release.apkUrl.isNullOrBlank()
+    }
+
+    private fun getInstalledVersionCodeLong(): Long {
+        val packageInfo = packageManager.getPackageInfo(packageName, 0)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            packageInfo.longVersionCode
+        } else {
+            @Suppress("DEPRECATION")
+            packageInfo.versionCode.toLong()
+        }
     }
 
     private fun buildUpdateComparisonStatus(
