@@ -1,0 +1,221 @@
+{
+  "version": 2,
+  "pageId": "drinks_v2",
+  "title": "PIJAČA",
+  "promptSl": "Kaj želiš piti?",
+  "promptUk": "Що хочеш пити?",
+  "concepts": [
+    {
+      "id": "thirsty",
+      "baseText": "ŽEJNA",
+      "category": "needs",
+      "activeIconId": null,
+      "speakTextSl": "Žejna sem.",
+      "speakTextUk": null
+    },
+    {
+      "id": "water",
+      "baseText": "VODA",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "voda",
+      "speakTextUk": null
+    },
+    {
+      "id": "tea",
+      "baseText": "ČAJ",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "čaj",
+      "speakTextUk": null
+    },
+    {
+      "id": "juice",
+      "baseText": "SOK",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "sok",
+      "speakTextUk": null
+    },
+    {
+      "id": "coffee",
+      "baseText": "KAVA",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "kava",
+      "speakTextUk": null
+    },
+    {
+      "id": "milk",
+      "baseText": "MLEKO",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "mleko",
+      "speakTextUk": null
+    },
+    {
+      "id": "lemonade",
+      "baseText": "LIMONADA",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "limonada",
+      "speakTextUk": null
+    },
+    {
+      "id": "cold_water",
+      "baseText": "MRZLA VODA",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "mrzla voda",
+      "speakTextUk": null
+    },
+    {
+      "id": "warm_water",
+      "baseText": "TOPLA VODA",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "topla voda",
+      "speakTextUk": null
+    },
+    {
+      "id": "sparkling_water",
+      "baseText": "VODA Z MEHURČKI",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "voda z mehurčki",
+      "speakTextUk": null
+    },
+    {
+      "id": "still_water",
+      "baseText": "VODA BREZ MEHURČKOV",
+      "category": "drinks",
+      "activeIconId": null,
+      "speakTextSl": "voda brez mehurčkov",
+      "speakTextUk": null
+    }
+  ],
+  "icons": [],
+  "nodes": [
+    {
+      "id": "thirsty",
+      "conceptId": "thirsty",
+      "title": "ŽEJNA",
+      "speakTextSl": "Žejna sem.",
+      "speakTextUk": null,
+      "questionSl": "Kaj želiš piti?",
+      "questionUk": "Що хочеш пити?",
+      "children": ["water", "tea", "juice", "coffee", "milk", "lemonade"],
+      "sentenceRole": "intent"
+    },
+    {
+      "id": "water",
+      "conceptId": "water",
+      "title": "VODA",
+      "speakTextSl": "voda",
+      "speakTextUk": null,
+      "questionSl": "Kakšno vodo želiš?",
+      "questionUk": null,
+      "children": ["cold_water", "warm_water", "sparkling_water", "still_water"],
+      "sentenceRole": "object"
+    },
+    {
+      "id": "tea",
+      "conceptId": "tea",
+      "title": "ČAJ",
+      "speakTextSl": "čaj",
+      "speakTextUk": null,
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "object"
+    },
+    {
+      "id": "juice",
+      "conceptId": "juice",
+      "title": "SOK",
+      "speakTextSl": "sok",
+      "speakTextUk": null,
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "object"
+    },
+    {
+      "id": "coffee",
+      "conceptId": "coffee",
+      "title": "KAVA",
+      "speakTextSl": "kava",
+      "speakTextUk": null,
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "object"
+    },
+    {
+      "id": "milk",
+      "conceptId": "milk",
+      "title": "MLEKO",
+      "speakTextSl": "mleko",
+      "speakTextUk": null,
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "object"
+    },
+    {
+      "id": "lemonade",
+      "conceptId": "lemonade",
+      "title": "LIMONADA",
+      "speakTextSl": "limonada",
+      "speakTextUk": null,
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "object"
+    },
+    {
+      "id": "cold_water",
+      "conceptId": "cold_water",
+      "title": "MRZLA VODA",
+      "speakTextSl": "mrzla voda",
+      "speakTextUk": null,
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "modifier"
+    },
+    {
+      "id": "warm_water",
+      "conceptId": "warm_water",
+      "title": "TOPLA VODA",
+      "speakTextSl": "topla voda",
+      "speakTextUk": null,
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "modifier"
+    },
+    {
+      "id": "sparkling_water",
+      "conceptId": "sparkling_water",
+      "title": "VODA Z MEHURČKI",
+      "speakTextSl": "voda z mehurčki",
+      "speakTextUk": null,
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "modifier"
+    },
+    {
+      "id": "still_water",
+      "conceptId": "still_water",
+      "title": "VODA BREZ MEHURČKOV",
+      "speakTextSl": "voda brez mehurčkov",
+      "speakTextUk": null,
+      "questionSl": null,
+      "questionUk": null,
+      "children": [],
+      "sentenceRole": "modifier"
+    }
+  ]
+}

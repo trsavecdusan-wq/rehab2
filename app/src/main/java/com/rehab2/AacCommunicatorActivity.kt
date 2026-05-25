@@ -88,13 +88,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
             updateSentenceBar()
         }
         txtTitle.setOnLongClickListener {
-            Toast.makeText(this, "Opening V2 test", Toast.LENGTH_SHORT).show()
-            val seeded = AacLocalStorage.seedBundledTestV2Page(this)
+            Toast.makeText(this, "Opening drinks V2", Toast.LENGTH_SHORT).show()
+            val seeded = AacLocalStorage.seedBundledDrinksV2Page(this)
             if (seeded) {
-                Toast.makeText(this, "V2 test seeded", Toast.LENGTH_SHORT).show()
-                openTargetPage("drinks_v2_test")
+                Toast.makeText(this, "Drinks V2 seeded", Toast.LENGTH_SHORT).show()
+                openTargetPage("drinks_v2")
             } else {
-                Toast.makeText(this, "V2 page failed", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Drinks V2 failed", Toast.LENGTH_LONG).show()
             }
             true
         }
