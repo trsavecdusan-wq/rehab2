@@ -75,6 +75,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
         btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
+        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.46"
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -224,13 +225,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun openDrinksV2Test() {
-        Toast.makeText(this, "Opening drinks V2", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "TEST V2 CLICKED 1.2.46", Toast.LENGTH_LONG).show()
         val seeded = refreshBundledDrinksV2Page()
         if (seeded) {
-            Toast.makeText(this, "Drinks V2 seeded", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "DRINKS V2 REFRESH OK", Toast.LENGTH_LONG).show()
             openTargetPage("drinks_v2")
+            Toast.makeText(this, "OPEN drinks_v2", Toast.LENGTH_LONG).show()
         } else {
-            Toast.makeText(this, "Drinks V2 failed", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "DRINKS V2 REFRESH FAILED", Toast.LENGTH_LONG).show()
         }
     }
 
