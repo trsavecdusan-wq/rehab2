@@ -4,6 +4,8 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
@@ -26,6 +28,7 @@ import com.rehab2.aac.AacPage
 import com.rehab2.aac.AacRepository
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
+import com.rehab2.aac.AacSpeechTimingSettings
 import com.rehab2.aac.AacV2JsonParser
 import com.rehab2.aac.AacV2PageAdapter
 import java.io.File
@@ -39,6 +42,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var currentVisibleItems: List<AacItem> = emptyList()
     private var currentV2RootItems: List<AacItem> = emptyList()
     private lateinit var audioPlayer: AacAudioPlayer
+    private val autoSpeakHandler = Handler(Looper.getMainLooper())
+    private var pendingAutoSpeakSentence: Runnable? = null
     private lateinit var txtTitle: TextView
     private lateinit var sentenceBar: View
     private lateinit var txtPrompt: TextView
@@ -50,6 +55,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var txtWaterTraceDebug: TextView
     private var labelMode: AacLabelMode = AacLabelMode.DEFAULT
     private var languageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
+    private var speechTimingSettings: AacSpeechTimingSettings = AacSpeechTimingSettings()
     private var currentPageId: String = "home"
     private var waterPageModelChildrenCount: Int = -1
     private var waterBeforeAdapterChildrenCount: Int = -1
@@ -93,14 +99,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
         recycler.layoutManager = GridLayoutManager(this, 5)
         labelMode = readAacLabelMode()
         languageCode = AacLanguageResolver.readSelectedLanguageCode(this)
+        speechTimingSettings = AacSpeechTimingSettings.read(this)
 
         btnSpeakSentence.setOnClickListener {
-            val text = sentenceManager.getSpeakText(languageCode)
-            if (text.isNotBlank()) {
-                audioPlayer.speakText(text, languageCode)
-            }
+            cancelPendingAutoSpeakSentence()
+            speakCurrentSentence()
         }
         btnClearSentence.setOnClickListener {
+            cancelPendingAutoSpeakSentence()
             sentenceManager.clear()
             currentV2VisibleHistory.clear()
             clearPromptText()
@@ -130,9 +136,15 @@ class AacCommunicatorActivity : AppCompatActivity() {
         super.onResume()
         val updatedLabelMode = readAacLabelMode()
         val updatedLanguageCode = AacLanguageResolver.readSelectedLanguageCode(this)
-        if (updatedLabelMode != labelMode || updatedLanguageCode != languageCode) {
+        val updatedSpeechTimingSettings = AacSpeechTimingSettings.read(this)
+        if (
+            updatedLabelMode != labelMode ||
+            updatedLanguageCode != languageCode ||
+            updatedSpeechTimingSettings != speechTimingSettings
+        ) {
             labelMode = updatedLabelMode
             languageCode = updatedLanguageCode
+            speechTimingSettings = updatedSpeechTimingSettings
             if (currentVisibleItems.isNotEmpty()) {
                 showItems(currentVisibleItems)
             }
@@ -141,6 +153,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        cancelPendingAutoSpeakSentence()
         audioPlayer.release()
         super.onDestroy()
     }
@@ -195,14 +208,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun handleItemClick(item: AacItem) {
         when (item.actionType) {
             "open_page" -> {
+                cancelPendingAutoSpeakSentence()
                 openTargetPage(item.targetPageId)
                 return
             }
             "go_home" -> {
+                cancelPendingAutoSpeakSentence()
                 goHome()
                 return
             }
             "go_back" -> {
+                cancelPendingAutoSpeakSentence()
                 goBack()
                 return
             }
@@ -234,8 +250,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 )
             )
             updateSentenceBar()
+            val singleIconText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
 
             if (childItems.isNotEmpty()) {
+                cancelPendingAutoSpeakSentence()
+                speakSingleIconIfEnabled(singleIconText)
                 setPromptText(AacLocalizedTextResolver.resolveQuestion(item, languageCode))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
@@ -246,7 +265,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
             } else {
                 clearPromptText()
             }
-            audioPlayer.playOrSpeak(item, languageCode)
+            speakSingleIconIfEnabled(singleIconText)
+            scheduleAutoSpeakSentenceIfEnabled()
             return
         }
 
@@ -367,6 +387,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun goHome() {
+        cancelPendingAutoSpeakSentence()
         clearV2State()
         val page = repository.loadPage("home")
         if (page == null) {
@@ -402,6 +423,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun clearV2State() {
+        cancelPendingAutoSpeakSentence()
         sentenceManager.clear()
         currentV2ItemsById = emptyMap()
         currentV2VisibleHistory.clear()
@@ -433,6 +455,50 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val hasSentence = displayText.isNotBlank()
         btnSpeakSentence.isEnabled = hasSentence
         btnClearSentence.isEnabled = hasSentence
+    }
+
+    private fun speakSingleIconIfEnabled(text: String) {
+        if (!speechTimingSettings.speakSingleIconEnabled) {
+            return
+        }
+
+        val trimmed = text.trim()
+        if (trimmed.isNotEmpty()) {
+            audioPlayer.speakText(trimmed, languageCode)
+        }
+    }
+
+    private fun scheduleAutoSpeakSentenceIfEnabled() {
+        cancelPendingAutoSpeakSentence()
+        if (!speechTimingSettings.autoSpeakSentenceEnabled) {
+            return
+        }
+
+        val sentence = sentenceManager.getSpeakText(languageCode).trim()
+        if (sentence.isEmpty()) {
+            return
+        }
+
+        val pending = Runnable {
+            pendingAutoSpeakSentence = null
+            audioPlayer.speakText(sentence, languageCode)
+        }
+        pendingAutoSpeakSentence = pending
+        autoSpeakHandler.postDelayed(pending, speechTimingSettings.autoSpeakSentenceDelayMs)
+    }
+
+    private fun cancelPendingAutoSpeakSentence() {
+        pendingAutoSpeakSentence?.let { pending ->
+            autoSpeakHandler.removeCallbacks(pending)
+        }
+        pendingAutoSpeakSentence = null
+    }
+
+    private fun speakCurrentSentence() {
+        val text = sentenceManager.getSpeakText(languageCode)
+        if (text.isNotBlank()) {
+            audioPlayer.speakText(text, languageCode)
+        }
     }
 
     private fun setPromptText(text: String?) {
