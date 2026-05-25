@@ -1,14 +1,19 @@
 package com.rehab2.aac
 
 import android.content.Context
+import android.media.AudioManager
 import android.media.MediaPlayer
+import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.widget.Toast
 import java.io.File
 import java.util.Locale
 
 class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener {
     private val speechCache = AacSpeechCache(context)
+    private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { }
     private var mediaPlayer: MediaPlayer? = null
     private var textToSpeech: TextToSpeech? = TextToSpeech(context, this)
     private var isTtsReady = false
@@ -53,7 +58,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             return
         }
 
-        val fallbackText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+        val fallbackText = resolveTileSpeechText(item, languageCode)
         speakText(fallbackText, languageCode)
     }
 
@@ -102,17 +107,21 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
     private fun configureTtsLanguage(languageCode: String): Boolean {
         val tts = textToSpeech ?: return false
-        val selectedResult = tts.setLanguage(Locale.forLanguageTag(AacLanguageResolver.normalize(languageCode)))
+        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
+        val selectedResult = tts.setLanguage(Locale.forLanguageTag(normalizedLanguage))
+        Log.d(TAG, "TTS language selected=$normalizedLanguage result=$selectedResult")
         if (isLanguageUsable(selectedResult)) {
             return true
         }
 
         val slovenianResult = tts.setLanguage(Locale("sl"))
+        Log.d(TAG, "TTS language sl result=$slovenianResult")
         if (isLanguageUsable(slovenianResult)) {
             return true
         }
 
         val defaultResult = tts.setLanguage(Locale.getDefault())
+        Log.d(TAG, "TTS language default=${Locale.getDefault()} result=$defaultResult")
         if (isLanguageUsable(defaultResult)) {
             return true
         }
@@ -140,9 +149,53 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         }
 
         Toast.makeText(context, "TTS: ${text}", Toast.LENGTH_SHORT).show()
-        val result = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "aac_$text")
-        if (result == TextToSpeech.ERROR) {
-            Toast.makeText(context, "GOVOR NI USPEL", Toast.LENGTH_SHORT).show()
+        requestMusicAudioFocus()
+        val params = Bundle().apply {
+            putString(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC.toString())
+        }
+        val result = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, params, "aac_$text")
+        when (result) {
+            TextToSpeech.SUCCESS -> {
+                Log.d(TAG, "TTS speak OK: $text")
+            }
+            TextToSpeech.ERROR -> {
+                Log.e(TAG, "TTS speak ERROR: $text")
+                Toast.makeText(context, "TTS speak ERROR", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                Log.e(TAG, "TTS speak unavailable: $text")
+                Toast.makeText(context, "TTS speak ERROR", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun requestMusicAudioFocus() {
+        audioManager.requestAudioFocus(
+            audioFocusChangeListener,
+            AudioManager.STREAM_MUSIC,
+            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
+        )
+    }
+
+    private fun resolveTileSpeechText(item: AacItem, languageCode: String): String {
+        val resolvedText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+        if (AacLanguageResolver.normalize(languageCode) != AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            return resolvedText
+        }
+
+        return when (resolvedText.trim().uppercase(Locale.ROOT)) {
+            "VODA" -> "Želim piti vodo."
+            "MRZLA VODA" -> "Želim piti mrzlo vodo."
+            "TOPLA VODA" -> "Želim piti toplo vodo."
+            "VODA Z MEHURČKI" -> "Želim piti vodo z mehurčki."
+            "VODA BREZ MEHURČKOV" -> "Želim piti vodo brez mehurčkov."
+            "ČAJ" -> "Želim piti čaj."
+            "SOK" -> "Želim piti sok."
+            "KAVA" -> "Želim piti kavo."
+            "MLEKO" -> "Želim piti mleko."
+            "LIMONADA" -> "Želim piti limonado."
+            else -> resolvedText
         }
     }
 
@@ -174,6 +227,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     }
 
     private companion object {
+        const val TAG = "AacAudioPlayer"
         const val MIN_AUDIO_DURATION_MS = 700
     }
 }
