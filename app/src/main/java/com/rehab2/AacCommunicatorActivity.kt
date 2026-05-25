@@ -153,6 +153,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun showItems(items: List<AacItem>) {
         currentVisibleItems = items
+        logWaterTrace("before adapter", items.firstOrNull { it.id == WATER_NODE_ID })
         recycler.adapter = AacAdapter(items, labelMode, languageCode) { item ->
             handleItemClick(item)
         }
@@ -182,10 +183,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
 
         if (isV2Item(item)) {
+            if (item.id == WATER_NODE_ID) {
+                logWaterTrace("click item", item)
+            }
             val childItems = item.children.mapNotNull { childId ->
                 currentV2ItemsById[childId]
             }
-            if (item.id == "water") {
+            if (item.id == WATER_NODE_ID) {
                 Log.d(TAG, "WATER clicked children=${childItems.size}")
                 if (childItems.isEmpty()) {
                     Toast.makeText(this, "WATER children missing", Toast.LENGTH_LONG).show()
@@ -204,7 +208,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 setPromptText(AacLocalizedTextResolver.resolveQuestion(item, languageCode))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
-                if (item.id == "water") {
+                if (item.id == WATER_NODE_ID) {
                     Toast.makeText(this, "OPEN WATER OPTIONS", Toast.LENGTH_LONG).show()
                 }
                 return
@@ -273,7 +277,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun showDrinksV2WaterDebug(page: AacPage) {
-        val waterChildrenCount = page.items.firstOrNull { it.id == "water" }?.children?.size ?: 0
+        val waterItem = page.items.firstOrNull { it.id == WATER_NODE_ID }
+        logWaterTrace("page model", waterItem)
+        val waterChildrenCount = waterItem?.children?.size ?: 0
         val message = if (waterChildrenCount == 4) {
             "WATER children=4"
         } else {
@@ -281,6 +287,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
         Log.d(TAG, "page=${page.pageId} $message")
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun logWaterTrace(stage: String, item: AacItem?) {
+        val children = item?.children.orEmpty()
+        Log.d(TAG, "TRACE water $stage children=${children.size} ids=$children")
     }
 
     private fun goHome() {
@@ -409,6 +420,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
             private val label: TextView = itemView.findViewById(R.id.txtAacTileLabel)
 
             fun bind(item: AacItem) {
+                if (item.id == "water") {
+                    Log.d("AacCommunicatorActivity", "TRACE water adapter bind children=${item.children.size} ids=${item.children}")
+                }
                 label.text = AacLocalizedTextResolver.resolveLabel(item, languageCode)
                 label.gravity = Gravity.CENTER
                 label.setTypeface(label.typeface, Typeface.BOLD)
@@ -468,5 +482,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private companion object {
         const val TAG = "AacCommunicatorActivity"
         const val DRINKS_V2_PAGE_ID = "drinks_v2"
+        const val WATER_NODE_ID = "water"
     }
 }

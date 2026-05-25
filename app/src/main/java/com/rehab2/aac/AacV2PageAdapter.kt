@@ -1,5 +1,7 @@
 package com.rehab2.aac
 
+import android.util.Log
+
 object AacV2PageAdapter {
     fun toAacPage(page: AacV2Page): AacPage {
         val conceptsById = page.concepts.associateBy { it.id }
@@ -8,8 +10,11 @@ object AacV2PageAdapter {
         val items = page.nodes.map { node ->
             val concept = node.conceptId?.let { conceptsById[it] }
             val icon = concept?.activeIconId?.let { iconsById[it] }
+            if (node.id == WATER_NODE_ID) {
+                Log.d(TAG, "TRACE water parsed model children=${node.children.size} ids=${node.children}")
+            }
 
-            AacItem(
+            val item = AacItem(
                 id = node.id,
                 labelSl = node.title,
                 imagePath = icon?.imagePath.orEmpty(),
@@ -24,6 +29,10 @@ object AacV2PageAdapter {
                 questionSl = node.questionSl,
                 questionUk = node.questionUk
             )
+            if (item.id == WATER_NODE_ID) {
+                Log.d(TAG, "TRACE water mapped AacItem children=${item.children.size} ids=${item.children}")
+            }
+            item
         }
 
         return AacPage(
@@ -32,4 +41,7 @@ object AacV2PageAdapter {
             items = items
         )
     }
+
+    private const val TAG = "AacV2PageAdapter"
+    private const val WATER_NODE_ID = "water"
 }
