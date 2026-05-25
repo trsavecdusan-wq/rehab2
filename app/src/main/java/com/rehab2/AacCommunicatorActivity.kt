@@ -1,6 +1,7 @@
 ﻿package com.rehab2
 
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -24,6 +26,8 @@ import com.rehab2.aac.AacPage
 import com.rehab2.aac.AacRepository
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
+import com.rehab2.aac.AacV2JsonParser
+import com.rehab2.aac.AacV2PageAdapter
 import java.io.File
 
 class AacCommunicatorActivity : AppCompatActivity() {
@@ -43,13 +47,19 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var btnSpeakSentence: Button
     private lateinit var btnClearSentence: Button
     private lateinit var recycler: RecyclerView
+    private lateinit var txtWaterTraceDebug: TextView
     private var labelMode: AacLabelMode = AacLabelMode.DEFAULT
     private var languageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
     private var currentPageId: String = "home"
+    private var waterPageModelChildrenCount: Int = -1
+    private var waterBeforeAdapterChildrenCount: Int = -1
+    private var waterAdapterBindChildrenCount: Int = -1
+    private var waterClickItemChildrenCount: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_aac_communicator)
+        addWaterTraceDebugView()
         repository = AacRepository(this)
         audioPlayer = AacAudioPlayer(this)
 
@@ -100,9 +110,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
             updateSentenceBar()
         }
         btnOpenDrinksV2Test.setOnClickListener {
+            resetWaterTraceDebug()
+            updateWaterTraceDebug("TEST PIJAČA V2")
             openDrinksV2Test()
         }
         txtTitle.setOnLongClickListener {
+            resetWaterTraceDebug()
+            updateWaterTraceDebug("TITLE LONG PRESS")
             openDrinksV2Test()
             true
         }
@@ -153,10 +167,22 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun showItems(items: List<AacItem>) {
         currentVisibleItems = items
-        logWaterTrace("before adapter", items.firstOrNull { it.id == WATER_NODE_ID })
-        recycler.adapter = AacAdapter(items, labelMode, languageCode) { item ->
-            handleItemClick(item)
-        }
+        val waterItem = items.firstOrNull { it.id == WATER_NODE_ID }
+        waterBeforeAdapterChildrenCount = waterItem?.children?.size ?: -1
+        logWaterTrace("before adapter", waterItem)
+        updateWaterTraceDebug("before adapter")
+        recycler.adapter = AacAdapter(
+            items = items,
+            labelMode = labelMode,
+            languageCode = languageCode,
+            onItemClick = { item ->
+                handleItemClick(item)
+            },
+            onWaterBindTrace = { item ->
+                waterAdapterBindChildrenCount = item.children.size
+                updateWaterTraceDebug("adapter bind")
+            }
+        )
     }
 
     private fun readAacLabelMode(): AacLabelMode {
@@ -184,7 +210,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         if (isV2Item(item)) {
             if (item.id == WATER_NODE_ID) {
+                waterClickItemChildrenCount = item.children.size
                 logWaterTrace("click item", item)
+                updateWaterTraceDebug("click water")
             }
             val childItems = item.children.mapNotNull { childId ->
                 currentV2ItemsById[childId]
@@ -192,7 +220,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
             if (item.id == WATER_NODE_ID) {
                 Log.d(TAG, "WATER clicked children=${childItems.size}")
                 if (childItems.isEmpty()) {
+                    updateWaterTraceDebug("WATER CLICK CHILDREN=0")
                     Toast.makeText(this, "WATER children missing", Toast.LENGTH_LONG).show()
+                } else {
+                    updateWaterTraceDebug("WATER CLICK CHILDREN=${childItems.size}")
                 }
             }
             sentenceManager.addItem(
@@ -278,7 +309,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun showDrinksV2WaterDebug(page: AacPage) {
         val waterItem = page.items.firstOrNull { it.id == WATER_NODE_ID }
+        waterPageModelChildrenCount = waterItem?.children?.size ?: -1
         logWaterTrace("page model", waterItem)
+        updateWaterTraceDebug("page model")
         val waterChildrenCount = waterItem?.children?.size ?: 0
         val message = if (waterChildrenCount == 4) {
             "WATER children=4"
@@ -292,6 +325,47 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun logWaterTrace(stage: String, item: AacItem?) {
         val children = item?.children.orEmpty()
         Log.d(TAG, "TRACE water $stage children=${children.size} ids=$children")
+    }
+
+    private fun addWaterTraceDebugView() {
+        val root = findViewById<FrameLayout>(android.R.id.content)
+        txtWaterTraceDebug = TextView(this).apply {
+            text = "WATER TRACE: waiting"
+            setTextColor(Color.WHITE)
+            setBackgroundColor(0xDD111820.toInt())
+            setPadding(10, 8, 10, 8)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+            maxLines = 10
+            visibility = View.GONE
+        }
+        val params = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = Gravity.BOTTOM
+        }
+        root.addView(txtWaterTraceDebug, params)
+    }
+
+    private fun resetWaterTraceDebug() {
+        waterPageModelChildrenCount = -1
+        waterBeforeAdapterChildrenCount = -1
+        waterAdapterBindChildrenCount = -1
+        waterClickItemChildrenCount = -1
+    }
+
+    private fun updateWaterTraceDebug(stage: String) {
+        txtWaterTraceDebug.visibility = View.VISIBLE
+        txtWaterTraceDebug.text = buildString {
+            appendLine("WATER TRACE 1.2.58: $stage")
+            appendLine("JSON children=${AacV2JsonParser.lastWaterJsonChildrenCount}")
+            appendLine("parsed model children=${AacV2PageAdapter.lastWaterParsedModelChildrenCount}")
+            appendLine("mapped AacItem children=${AacV2PageAdapter.lastWaterMappedItemChildrenCount}")
+            appendLine("page model children=$waterPageModelChildrenCount")
+            appendLine("before adapter children=$waterBeforeAdapterChildrenCount")
+            appendLine("adapter bind children=$waterAdapterBindChildrenCount")
+            append("click item children=$waterClickItemChildrenCount")
+        }
     }
 
     private fun goHome() {
@@ -395,13 +469,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
         private val items: List<AacItem>,
         private val labelMode: AacLabelMode,
         private val languageCode: String,
-        private val onItemClick: (AacItem) -> Unit
+        private val onItemClick: (AacItem) -> Unit,
+        private val onWaterBindTrace: (AacItem) -> Unit
     ) : RecyclerView.Adapter<AacAdapter.AacViewHolder>() {
 
         override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): AacViewHolder {
             val view = android.view.LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_aac_tile, parent, false)
-            return AacViewHolder(view, labelMode, languageCode, onItemClick)
+            return AacViewHolder(view, labelMode, languageCode, onItemClick, onWaterBindTrace)
         }
 
         override fun onBindViewHolder(holder: AacViewHolder, position: Int) {
@@ -414,7 +489,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
             itemView: View,
             private val labelMode: AacLabelMode,
             private val languageCode: String,
-            private val onItemClick: (AacItem) -> Unit
+            private val onItemClick: (AacItem) -> Unit,
+            private val onWaterBindTrace: (AacItem) -> Unit
         ) : RecyclerView.ViewHolder(itemView) {
             private val image: ImageView = itemView.findViewById(R.id.imgAacTile)
             private val label: TextView = itemView.findViewById(R.id.txtAacTileLabel)
@@ -422,6 +498,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             fun bind(item: AacItem) {
                 if (item.id == "water") {
                     Log.d("AacCommunicatorActivity", "TRACE water adapter bind children=${item.children.size} ids=${item.children}")
+                    onWaterBindTrace(item)
                 }
                 label.text = AacLocalizedTextResolver.resolveLabel(item, languageCode)
                 label.gravity = Gravity.CENTER

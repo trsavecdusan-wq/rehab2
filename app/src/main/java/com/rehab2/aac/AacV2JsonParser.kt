@@ -5,6 +5,12 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 object AacV2JsonParser {
+    var lastWaterJsonChildrenCount: Int = -1
+        private set
+
+    var lastWaterJsonChildrenIds: List<String> = emptyList()
+        private set
+
     fun parse(json: JSONObject): AacV2Page {
         return AacV2Page(
             version = json.optInt("version", 2),
@@ -66,6 +72,8 @@ object AacV2JsonParser {
                 val nodeId = item.optString("id")
                 val children = parseStringList(item.optJSONArray("children"))
                 if (nodeId == WATER_NODE_ID) {
+                    lastWaterJsonChildrenCount = children.size
+                    lastWaterJsonChildrenIds = children
                     Log.d(TAG, "TRACE water JSON children=${children.size} ids=$children")
                 }
                 add(

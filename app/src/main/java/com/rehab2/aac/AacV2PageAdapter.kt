@@ -3,6 +3,18 @@ package com.rehab2.aac
 import android.util.Log
 
 object AacV2PageAdapter {
+    var lastWaterParsedModelChildrenCount: Int = -1
+        private set
+
+    var lastWaterParsedModelChildrenIds: List<String> = emptyList()
+        private set
+
+    var lastWaterMappedItemChildrenCount: Int = -1
+        private set
+
+    var lastWaterMappedItemChildrenIds: List<String> = emptyList()
+        private set
+
     fun toAacPage(page: AacV2Page): AacPage {
         val conceptsById = page.concepts.associateBy { it.id }
         val iconsById = page.icons.associateBy { it.id }
@@ -11,6 +23,8 @@ object AacV2PageAdapter {
             val concept = node.conceptId?.let { conceptsById[it] }
             val icon = concept?.activeIconId?.let { iconsById[it] }
             if (node.id == WATER_NODE_ID) {
+                lastWaterParsedModelChildrenCount = node.children.size
+                lastWaterParsedModelChildrenIds = node.children
                 Log.d(TAG, "TRACE water parsed model children=${node.children.size} ids=${node.children}")
             }
 
@@ -30,6 +44,8 @@ object AacV2PageAdapter {
                 questionUk = node.questionUk
             )
             if (item.id == WATER_NODE_ID) {
+                lastWaterMappedItemChildrenCount = item.children.size
+                lastWaterMappedItemChildrenIds = item.children
                 Log.d(TAG, "TRACE water mapped AacItem children=${item.children.size} ids=${item.children}")
             }
             item
