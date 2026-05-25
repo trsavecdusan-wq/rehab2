@@ -18,6 +18,17 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
+    <Button
+        android:id="@+id/btnOpenDrinksV2Test"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="10dp"
+        android:background="#34414D"
+        android:text="TEST PIJAČA V2"
+        android:textColor="#F4F7FA"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
     <LinearLayout
         android:id="@+id/aacSentenceBar"
         android:layout_width="match_parent"

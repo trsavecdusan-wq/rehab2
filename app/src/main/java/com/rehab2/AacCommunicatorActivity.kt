@@ -34,6 +34,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var sentenceBar: View
     private lateinit var txtPrompt: TextView
     private lateinit var txtSentence: TextView
+    private lateinit var btnOpenDrinksV2Test: Button
     private lateinit var btnSpeakSentence: Button
     private lateinit var btnClearSentence: Button
     private lateinit var recycler: RecyclerView
@@ -67,6 +68,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         sentenceBar = findViewById(R.id.aacSentenceBar)
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
+        btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -87,15 +89,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
             updateSentenceBar()
         }
+        btnOpenDrinksV2Test.setOnClickListener {
+            openDrinksV2Test()
+        }
         txtTitle.setOnLongClickListener {
-            Toast.makeText(this, "Opening drinks V2", Toast.LENGTH_SHORT).show()
-            val seeded = AacLocalStorage.seedBundledDrinksV2Page(this)
-            if (seeded) {
-                Toast.makeText(this, "Drinks V2 seeded", Toast.LENGTH_SHORT).show()
-                openTargetPage("drinks_v2")
-            } else {
-                Toast.makeText(this, "Drinks V2 failed", Toast.LENGTH_LONG).show()
-            }
+            openDrinksV2Test()
             true
         }
 
@@ -191,6 +189,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         pageHistory.addLast(currentPageId)
         showPage(page)
+    }
+
+    private fun openDrinksV2Test() {
+        Toast.makeText(this, "Opening drinks V2", Toast.LENGTH_SHORT).show()
+        val seeded = AacLocalStorage.seedBundledDrinksV2Page(this)
+        if (seeded) {
+            Toast.makeText(this, "Drinks V2 seeded", Toast.LENGTH_SHORT).show()
+            openTargetPage("drinks_v2")
+        } else {
+            Toast.makeText(this, "Drinks V2 failed", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun goHome() {
