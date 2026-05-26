@@ -20,4 +20,19 @@ object AacStoragePaths {
         val externalFilesDir = context.getExternalFilesDir(null) ?: return null
         return File(externalFilesDir, PROFILES_DATA_DIR)
     }
+
+    fun getIconsSocaDir(context: Context): File? {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        return File(externalFilesDir, SOCA_ICONS_DIR)
+    }
+
+    fun getIconsArasaacDir(context: Context): File? {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        return File(externalFilesDir, ARASAAC_ICONS_DIR)
+    }
+
+    fun getIconsCustomDir(context: Context): File? {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        return File(externalFilesDir, CUSTOM_ICONS_DIR)
+    }
 }

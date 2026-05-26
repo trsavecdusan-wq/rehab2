@@ -35,6 +35,7 @@ import com.rehab2.aac.AacRepository
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
 import com.rehab2.aac.AacSpeechTimingSettings
+import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.AacV2JsonParser
 import com.rehab2.aac.AacV2PageAdapter
 import java.io.File
@@ -1164,6 +1165,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         ) : RecyclerView.ViewHolder(itemView) {
             private val image: ImageView = itemView.findViewById(R.id.imgAacTile)
             private val label: TextView = itemView.findViewById(R.id.txtAacTileLabel)
+            private val context: android.content.Context = itemView.context
 
             fun bind(item: AacItem) {
                 if (item.id == "water") {
@@ -1175,20 +1177,34 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 label.setTypeface(label.typeface, Typeface.BOLD)
                 applyLabelMode()
                 image.setImageBitmap(null)
-
-                val imageFile = item.imagePath.takeIf { it.isNotBlank() }?.let { File(it) }
-                if (imageFile != null && imageFile.exists() && imageFile.isFile) {
-                    val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
-                    if (bitmap != null) {
-                        image.setImageBitmap(bitmap)
-                    } else {
-                        image.setImageResource(android.R.drawable.ic_menu_gallery)
-                    }
-                } else {
-                    image.setImageResource(android.R.drawable.ic_menu_gallery)
-                }
+                bindImage(item)
 
                 itemView.setOnClickListener { onItemClick(item) }
+            }
+
+            private fun bindImage(item: AacItem) {
+                val imageFile = resolveAacImageFile(context, item)
+                if (imageFile == null) {
+                    Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
+                    image.setImageResource(android.R.drawable.ic_menu_gallery)
+                    return
+                }
+
+                try {
+                    val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    if (bitmap != null) {
+                        Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOADED item=${item.id}")
+                        image.setImageBitmap(bitmap)
+                    } else {
+                        Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
+                        Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
+                        image.setImageResource(android.R.drawable.ic_menu_gallery)
+                    }
+                } catch (_: Exception) {
+                    Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
+                    Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
+                    image.setImageResource(android.R.drawable.ic_menu_gallery)
+                }
             }
 
             private fun applyLabelMode() {
@@ -1213,6 +1229,41 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun resolveAacImageFile(context: android.content.Context, item: AacItem): File? {
+        val rawPath = item.imagePath.trim()
+        if (rawPath.isEmpty()) {
+            Log.d(TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
+            return null
+        }
+
+        if (item.iconSource == com.rehab2.aac.IconSource.SYSTEM) {
+            Log.d(TAG, "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
+            return null
+        }
+
+        val directFile = File(rawPath)
+        if (directFile.isAbsolute) {
+            return directFile.takeIf { it.exists() && it.isFile } ?: run {
+                Log.d(TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
+                null
+            }
+        }
+
+        val baseDir = when (item.iconSource) {
+            com.rehab2.aac.IconSource.SOCA -> AacStoragePaths.getIconsSocaDir(context)
+            com.rehab2.aac.IconSource.ARASAAC -> AacStoragePaths.getIconsArasaacDir(context)
+            com.rehab2.aac.IconSource.CUSTOM,
+            com.rehab2.aac.IconSource.PATIENT -> AacStoragePaths.getIconsCustomDir(context)
+            com.rehab2.aac.IconSource.SYSTEM -> null
+        }
+
+        val resolved = baseDir?.let { File(it, rawPath) }
+        return resolved?.takeIf { it.exists() && it.isFile } ?: run {
+            Log.d(TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
+            null
         }
     }
 
