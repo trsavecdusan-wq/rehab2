@@ -7,17 +7,26 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.widget.Toast
 import java.io.File
 import java.util.Locale
 
 class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener {
+    interface SpeechListener {
+        fun onSpeechStarted()
+        fun onSpeechCompleted()
+        fun onSpeechCancelled()
+        fun onSpeechError()
+    }
+
     private val speechCache = AacSpeechCache(context)
     private val speechCoordinator = AacSpeechCoordinator(
         speechCache,
         OpenAiAacSpeechApiClient(context),
-        voiceIdProvider = { AacSpeechApiConfig.read(context).normalizedVoiceId() }
+        voiceIdProvider = { AacSpeechApiConfig.read(context).normalizedVoiceId() },
+        speedProvider = { AacSpeechApiConfig.read(context).normalizedSpeed() }
     )
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { }
@@ -30,6 +39,9 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private val mainHandler = Handler(Looper.getMainLooper())
     @Volatile
     private var speechRequestSerial = 0
+    @Volatile
+    private var isSpeechActive = false
+    private var speechListener: SpeechListener? = null
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) {
@@ -40,6 +52,24 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
         isTtsReady = configureTtsLanguage(AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
         isTtsFailed = !isTtsReady
+        textToSpeech?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) {
+                notifySpeechStarted()
+            }
+
+            override fun onDone(utteranceId: String?) {
+                notifySpeechCompleted()
+            }
+
+            @Deprecated("Deprecated in Java")
+            override fun onError(utteranceId: String?) {
+                notifySpeechError()
+            }
+
+            override fun onError(utteranceId: String?, errorCode: Int) {
+                notifySpeechError()
+            }
+        })
         if (isTtsReady) {
             pendingTextToSpeak?.let { text ->
                 configureTtsLanguage(pendingLanguageCode)
@@ -49,12 +79,16 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         }
     }
 
+    fun setSpeechListener(listener: SpeechListener?) {
+        speechListener = listener
+    }
+
     fun playOrSpeak(item: AacItem) {
         playOrSpeak(item, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
     }
 
     fun playOrSpeak(item: AacItem, languageCode: String) {
-        stopPlayback()
+        stopPlayback(notifyCancellation = false)
         val requestSerial = nextSpeechRequestSerial()
         val fallbackText = resolveTileSpeechText(item, languageCode)
 
@@ -90,7 +124,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             return
         }
 
-        stopPlayback()
+        stopPlayback(notifyCancellation = false)
         val requestSerial = nextSpeechRequestSerial()
 
         playGeneratedSpeechOrFallback(
@@ -101,6 +135,13 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         ) {
             speakAndroidFallback(trimmed, languageCode)
         }
+    }
+
+    fun stopCurrentSpeech() {
+        pendingTextToSpeak = null
+        stopPlayback()
+        textToSpeech?.stop()
+        nextSpeechRequestSerial()
     }
 
     private fun playGeneratedSpeechOrFallback(
@@ -165,6 +206,13 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
                 setDataSource(audioFile.absolutePath)
                 setOnCompletionListener {
                     releaseMediaPlayer()
+                    notifySpeechCompleted()
+                }
+                setOnErrorListener { _, what, extra ->
+                    Log.e(TAG, "SPEECH_ERROR media what=$what extra=$extra")
+                    releaseMediaPlayer()
+                    notifySpeechError()
+                    true
                 }
                 prepare()
                 if (duration in 1 until MIN_AUDIO_DURATION_MS) {
@@ -173,10 +221,12 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
                     return false
                 }
                 start()
+                notifySpeechStarted()
             }
             true
         } catch (_: Exception) {
             releaseMediaPlayer()
+            notifySpeechError()
             false
         }
     }
@@ -229,17 +279,20 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         val params = Bundle().apply {
             putString(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC.toString())
         }
-        val result = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, params, "aac_$text")
+        val utteranceId = "aac_${speechRequestSerial}"
+        val result = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
         when (result) {
             TextToSpeech.SUCCESS -> {
                 Log.d(TAG, "TTS speak OK: $text")
             }
             TextToSpeech.ERROR -> {
                 Log.e(TAG, "TTS speak ERROR: $text")
+                notifySpeechError()
                 Toast.makeText(context, "TTS speak ERROR", Toast.LENGTH_SHORT).show()
             }
             else -> {
                 Log.e(TAG, "TTS speak unavailable: $text")
+                notifySpeechError()
                 Toast.makeText(context, "TTS speak ERROR", Toast.LENGTH_SHORT).show()
             }
         }
@@ -278,14 +331,20 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     fun release() {
         stopPlayback()
         textToSpeech?.stop()
+        textToSpeech?.setOnUtteranceProgressListener(null)
         textToSpeech?.shutdown()
         textToSpeech = null
         isTtsReady = false
+        speechListener = null
     }
 
-    private fun stopPlayback() {
+    private fun stopPlayback(notifyCancellation: Boolean = true) {
+        val shouldNotifyCancelled = notifyCancellation && (mediaPlayer != null || isSpeechActive)
         mediaPlayer?.stopSafely()
         releaseMediaPlayer()
+        if (shouldNotifyCancelled) {
+            notifySpeechCancelled()
+        }
     }
 
     private fun nextSpeechRequestSerial(): Int {
@@ -296,6 +355,38 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private fun releaseMediaPlayer() {
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+
+    private fun notifySpeechStarted() {
+        isSpeechActive = true
+        Log.d(TAG, "SPEECH_STARTED")
+        postSpeechCallback { it.onSpeechStarted() }
+    }
+
+    private fun notifySpeechCompleted() {
+        if (!isSpeechActive) return
+        isSpeechActive = false
+        Log.d(TAG, "SPEECH_COMPLETED")
+        postSpeechCallback { it.onSpeechCompleted() }
+    }
+
+    private fun notifySpeechCancelled() {
+        if (!isSpeechActive) return
+        isSpeechActive = false
+        Log.d(TAG, "SPEECH_CANCELLED")
+        postSpeechCallback { it.onSpeechCancelled() }
+    }
+
+    private fun notifySpeechError() {
+        isSpeechActive = false
+        Log.d(TAG, "SPEECH_ERROR")
+        postSpeechCallback { it.onSpeechError() }
+    }
+
+    private fun postSpeechCallback(callback: (SpeechListener) -> Unit) {
+        mainHandler.post {
+            speechListener?.let(callback)
+        }
     }
 
     private fun MediaPlayer.stopSafely() {

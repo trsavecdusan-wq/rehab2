@@ -24,7 +24,8 @@ class OpenAiAacSpeechApiClient(context: Context) : AacSpeechApiClient {
     override fun generateSpeech(
         text: String,
         languageCode: String,
-        voiceId: String
+        voiceId: String,
+        speed: Double
     ): ByteArray? {
         val config = AacSpeechApiConfig.read(appContext)
         Log.d(TAG, AacSpeechApiConfig.readDiagnostics(appContext))
@@ -40,7 +41,7 @@ class OpenAiAacSpeechApiClient(context: Context) : AacSpeechApiClient {
                 put("model", config.normalizedModel())
                 put("input", trimmedText)
                 put("voice", voiceId.trim().ifBlank { config.normalizedVoiceId() })
-                put("speed", config.normalizedSpeed())
+                put("speed", speed.coerceIn(0.25, 4.0))
                 put("instructions", languageInstructions(languageCode))
                 put("response_format", config.normalizedResponseFormat())
             }

@@ -25,6 +25,7 @@ import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacSpeechApiConfig
 import com.rehab2.aac.AacSpeechCache
 import com.rehab2.aac.AacSpeechCoordinator
+import com.rehab2.aac.AacSpeechTimingSettings
 import com.rehab2.aac.OpenAiAacSpeechApiClient
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -60,6 +61,53 @@ class SettingsActivity : AppCompatActivity() {
         private const val DEFAULT_CRITICAL_BATTERY_PERCENT = 20
         private const val DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING = true
         private const val REQUEST_IMPORT_SPEECH_API_KEY = 3001
+        private val SPEECH_VOICE_OPTIONS = arrayOf(
+            "marin",
+            "alloy",
+            "ash",
+            "ballad",
+            "coral",
+            "echo",
+            "fable",
+            "nova",
+            "onyx",
+            "sage",
+            "shimmer",
+            "verse",
+            "cedar"
+        )
+        private val SPEECH_SPEED_OPTIONS = arrayOf(
+            "Počasno (0.75)" to 0.75,
+            "Normalno (0.88)" to 0.88,
+            "Hitro (1.10)" to 1.10
+        )
+        private val SINGLE_ICON_DELAY_OPTIONS = arrayOf(
+            "0 ms" to 0L,
+            "300 ms" to 300L,
+            "500 ms" to 500L,
+            "700 ms" to 700L,
+            "1000 ms" to 1000L,
+            "1500 ms" to 1500L,
+            "2000 ms" to 2000L
+        )
+        private val AUTO_SENTENCE_DELAY_OPTIONS = arrayOf(
+            "OFF" to null,
+            "1000 ms" to 1000L,
+            "1500 ms" to 1500L,
+            "2000 ms" to 2000L,
+            "3000 ms" to 3000L,
+            "4000 ms" to 4000L,
+            "5000 ms" to 5000L
+        )
+        private const val PREF_AAC_GRID_SIZE = "aac_grid_size"
+        private const val DEFAULT_AAC_GRID_SIZE = 3
+        private val AAC_GRID_SIZE_OPTIONS = arrayOf(3, 4, 5)
+        private const val PREF_AAC_PERSISTENT_TOP_ROW_ENABLED = "aac_persistent_top_row_enabled"
+        private const val PREF_AAC_PERSISTENT_TOP_ROW_COUNT = "aac_persistent_top_row_count"
+        private const val PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = "aac_persistent_top_row_item_ids"
+        private const val DEFAULT_AAC_PERSISTENT_TOP_ROW_COUNT = 4
+        private val AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS = arrayOf(3, 4, 5)
+        private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("yes", "no", "help", "pain", "stop")
     }
 
     private lateinit var prefs: SharedPreferences
@@ -83,6 +131,14 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editSpeechApiModel: EditText
     private lateinit var editSpeechApiVoice: EditText
     private lateinit var editSpeechApiSpeed: EditText
+    private lateinit var txtSingleIconSpeechStatus: TextView
+    private lateinit var editSingleIconDelay: EditText
+    private lateinit var txtAutoSentenceSpeechStatus: TextView
+    private lateinit var editAutoSentenceDelay: EditText
+    private lateinit var txtAacGridSizeStatus: TextView
+    private lateinit var editAacGridSize: EditText
+    private lateinit var txtPersistentTopRowStatus: TextView
+    private lateinit var editPersistentTopRowCount: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
@@ -129,6 +185,14 @@ class SettingsActivity : AppCompatActivity() {
         editSpeechApiModel = findViewById(R.id.editSpeechApiModel)
         editSpeechApiVoice = findViewById(R.id.editSpeechApiVoice)
         editSpeechApiSpeed = findViewById(R.id.editSpeechApiSpeed)
+        txtSingleIconSpeechStatus = findViewById(R.id.txtSingleIconSpeechStatus)
+        editSingleIconDelay = findViewById(R.id.editSingleIconDelay)
+        txtAutoSentenceSpeechStatus = findViewById(R.id.txtAutoSentenceSpeechStatus)
+        editAutoSentenceDelay = findViewById(R.id.editAutoSentenceDelay)
+        txtAacGridSizeStatus = findViewById(R.id.txtAacGridSizeStatus)
+        editAacGridSize = findViewById(R.id.editAacGridSize)
+        txtPersistentTopRowStatus = findViewById(R.id.txtPersistentTopRowStatus)
+        editPersistentTopRowCount = findViewById(R.id.editPersistentTopRowCount)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -161,6 +225,24 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnImportSpeechApiKey).setOnClickListener {
             openSpeechApiKeyImport()
+        }
+        editSpeechApiVoice.setOnClickListener {
+            showSpeechVoicePicker()
+        }
+        editSpeechApiSpeed.setOnClickListener {
+            showSpeechSpeedPicker()
+        }
+        editSingleIconDelay.setOnClickListener {
+            showSingleIconDelayPicker()
+        }
+        editAutoSentenceDelay.setOnClickListener {
+            showAutoSentenceDelayPicker()
+        }
+        editAacGridSize.setOnClickListener {
+            showAacGridSizePicker()
+        }
+        editPersistentTopRowCount.setOnClickListener {
+            showPersistentTopRowCountPicker()
         }
 
         btnPowerOff.setOnClickListener {
@@ -224,6 +306,9 @@ class SettingsActivity : AppCompatActivity() {
         refreshStatisticsSection()
         refreshGpsDiagnosticsSection()
         refreshSpeechApiSection()
+        refreshSpeechTimingSection()
+        refreshAacGridSizeSection()
+        refreshPersistentTopRowSection()
         applyKeepScreenOnWhileCharging()
     }
 
@@ -235,6 +320,9 @@ class SettingsActivity : AppCompatActivity() {
         refreshStatisticsSection()
         refreshGpsDiagnosticsSection()
         refreshSpeechApiSection()
+        refreshSpeechTimingSection()
+        refreshAacGridSizeSection()
+        refreshPersistentTopRowSection()
         applyKeepScreenOnWhileCharging()
         startGpsDiagnosticsRefresh()
     }
@@ -341,7 +429,48 @@ class SettingsActivity : AppCompatActivity() {
         editSpeechApiBaseUrl.setText(config.baseUrl.ifBlank { AacSpeechApiConfig.DEFAULT_BASE_URL })
         editSpeechApiModel.setText(config.model.ifBlank { AacSpeechApiConfig.DEFAULT_MODEL })
         editSpeechApiVoice.setText(config.voiceId.ifBlank { AacSpeechApiConfig.DEFAULT_VOICE_ID })
-        editSpeechApiSpeed.setText(config.speed.takeIf { it > 0.0 }?.toString() ?: AacSpeechApiConfig.DEFAULT_SPEED.toString())
+        editSpeechApiSpeed.setText(formatSpeechSpeedLabel(config.speed.takeIf { it > 0.0 } ?: AacSpeechApiConfig.DEFAULT_SPEED))
+    }
+
+    private fun refreshSpeechTimingSection() {
+        val settings = AacSpeechTimingSettings.read(this)
+        txtSingleIconSpeechStatus.text = if (settings.speakSingleIconEnabled) {
+            "Govor posamezne ikone: VKLOP"
+        } else {
+            "Govor posamezne ikone: IZKLOP"
+        }
+        editSingleIconDelay.setText("${settings.singleIconSpeakDelayMs} ms")
+        txtAutoSentenceSpeechStatus.text = if (settings.autoSpeakSentenceEnabled) {
+            "Samodejni govor stavka: VKLOP"
+        } else {
+            "Samodejni govor stavka: IZKLOP"
+        }
+        editAutoSentenceDelay.setText(
+            if (settings.autoSpeakSentenceEnabled) {
+                "${settings.autoSpeakSentenceDelayMs} ms"
+            } else {
+                "OFF"
+            }
+        )
+    }
+
+    private fun refreshPersistentTopRowSection() {
+        val enabled = prefs.getBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, true)
+        val count = getPersistentTopRowCount()
+        val itemIds = getPersistentTopRowItemIds().take(count)
+        txtPersistentTopRowStatus.text = buildString {
+            append("Stalna prva vrstica: ")
+            append(if (enabled) "VKLOP" else "IZKLOP")
+            append("\nIkone: ")
+            append(itemIds.joinToString(", ") { persistentTopRowLabel(it) })
+        }
+        editPersistentTopRowCount.setText("$count ikon")
+    }
+
+    private fun refreshAacGridSizeSection() {
+        val gridSize = getAacGridSize()
+        txtAacGridSizeStatus.text = "Velikost mreže komunikatorja: $gridSize x $gridSize"
+        editAacGridSize.setText("$gridSize x $gridSize")
     }
 
     private fun saveSpeechApiSettings(showSavedToast: Boolean): Boolean {
@@ -363,7 +492,7 @@ class SettingsActivity : AppCompatActivity() {
             model = editSpeechApiModel.text?.toString().orEmpty(),
             voiceId = editSpeechApiVoice.text?.toString().orEmpty(),
             responseFormat = AacSpeechApiConfig.DEFAULT_RESPONSE_FORMAT,
-            speed = editSpeechApiSpeed.text?.toString()?.trim()?.toDoubleOrNull() ?: AacSpeechApiConfig.DEFAULT_SPEED
+            speed = selectedSpeechSpeed()
         )
 
         if (!saved) {
@@ -384,7 +513,8 @@ class SettingsActivity : AppCompatActivity() {
             val file = AacSpeechCoordinator(
                 speechCache = AacSpeechCache(this),
                 apiClient = OpenAiAacSpeechApiClient(this),
-                voiceIdProvider = { AacSpeechApiConfig.read(this).normalizedVoiceId() }
+                voiceIdProvider = { AacSpeechApiConfig.read(this).normalizedVoiceId() },
+                speedProvider = { AacSpeechApiConfig.read(this).normalizedSpeed() }
             ).getOrGenerateSpeechFile(
                 text = "To je test govora.",
                 languageCode = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
@@ -427,6 +557,128 @@ class SettingsActivity : AppCompatActivity() {
             putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/plain", "application/json", "application/octet-stream"))
         }
         startActivityForResult(intent, REQUEST_IMPORT_SPEECH_API_KEY)
+    }
+
+    private fun showSpeechVoicePicker() {
+        val current = editSpeechApiVoice.text?.toString().orEmpty()
+        val selectedIndex = SPEECH_VOICE_OPTIONS.indexOf(current).coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle("Izberi glas")
+            .setSingleChoiceItems(SPEECH_VOICE_OPTIONS, selectedIndex) { dialog, which ->
+                editSpeechApiVoice.setText(SPEECH_VOICE_OPTIONS[which])
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun showPersistentTopRowCountPicker() {
+        val gridSize = getAacGridSize()
+        val currentCount = getPersistentTopRowCount()
+        val allowedCounts = AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS.filter { it <= gridSize }.toTypedArray()
+        val labels = allowedCounts.map { "$it ikone" }.toTypedArray()
+        val selectedIndex = allowedCounts
+            .indexOf(currentCount)
+            .coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle("Stalna prva vrstica")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                prefs.edit()
+                    .putBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, true)
+                    .putInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, allowedCounts[which])
+                    .putString(
+                        PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS,
+                        DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS.joinToString(",")
+                    )
+                    .apply()
+                refreshPersistentTopRowSection()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun showAacGridSizePicker() {
+        val currentGridSize = getAacGridSize()
+        val labels = AAC_GRID_SIZE_OPTIONS.map { "$it x $it" }.toTypedArray()
+        val selectedIndex = AAC_GRID_SIZE_OPTIONS
+            .indexOf(currentGridSize)
+            .coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle("Velikost mreže komunikatorja")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val gridSize = AAC_GRID_SIZE_OPTIONS[which]
+                val normalizedTopRowCount = normalizePersistentTopRowCount(getPersistentTopRowCount(), gridSize)
+                prefs.edit()
+                    .putInt(PREF_AAC_GRID_SIZE, gridSize)
+                    .putInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, normalizedTopRowCount)
+                    .apply()
+                refreshAacGridSizeSection()
+                refreshPersistentTopRowSection()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun showSpeechSpeedPicker() {
+        val currentSpeed = selectedSpeechSpeed()
+        val selectedIndex = SPEECH_SPEED_OPTIONS
+            .indexOfFirst { (_, value) -> value == currentSpeed }
+            .coerceAtLeast(1)
+        val labels = SPEECH_SPEED_OPTIONS.map { it.first }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("Izberi hitrost govora")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                editSpeechApiSpeed.setText(SPEECH_SPEED_OPTIONS[which].first)
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun showSingleIconDelayPicker() {
+        val settings = AacSpeechTimingSettings.read(this)
+        val labels = SINGLE_ICON_DELAY_OPTIONS.map { it.first }.toTypedArray()
+        val selectedIndex = SINGLE_ICON_DELAY_OPTIONS
+            .indexOfFirst { it.second == settings.singleIconSpeakDelayMs }
+            .coerceAtLeast(3)
+        AlertDialog.Builder(this)
+            .setTitle("Zamik govora ikone")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val delayMs = SINGLE_ICON_DELAY_OPTIONS[which].second
+                prefs.edit()
+                    .putLong(AacSpeechTimingSettings.PREF_SINGLE_ICON_SPEAK_DELAY_MS, delayMs)
+                    .apply()
+                refreshSpeechTimingSection()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun showAutoSentenceDelayPicker() {
+        val settings = AacSpeechTimingSettings.read(this)
+        val labels = AUTO_SENTENCE_DELAY_OPTIONS.map { it.first }.toTypedArray()
+        val selectedIndex = if (!settings.autoSpeakSentenceEnabled) {
+            0
+        } else {
+            AUTO_SENTENCE_DELAY_OPTIONS
+                .indexOfFirst { it.second == settings.autoSpeakSentenceDelayMs }
+                .coerceAtLeast(4)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Samodejni govor stavka")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val delayMs = AUTO_SENTENCE_DELAY_OPTIONS[which].second
+                prefs.edit().apply {
+                    putBoolean(
+                        AacSpeechTimingSettings.PREF_AUTO_SPEAK_SENTENCE_ENABLED,
+                        delayMs != null
+                    )
+                    if (delayMs != null) {
+                        putLong(AacSpeechTimingSettings.PREF_AUTO_SPEAK_SENTENCE_DELAY_MS, delayMs)
+                    }
+                }.apply()
+                refreshSpeechTimingSection()
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun importSpeechApiKey(uri: Uri) {
@@ -488,6 +740,66 @@ class SettingsActivity : AppCompatActivity() {
     private fun maskApiKey(apiKey: String): String {
         val trimmed = apiKey.trim()
         return if (trimmed.length <= 4) "****" else "****${trimmed.takeLast(4)}"
+    }
+
+    private fun selectedSpeechSpeed(): Double {
+        val current = editSpeechApiSpeed.text?.toString().orEmpty()
+        return SPEECH_SPEED_OPTIONS.firstOrNull { (label, _) -> label == current }?.second
+            ?: current.trim().toDoubleOrNull()
+            ?: AacSpeechApiConfig.DEFAULT_SPEED
+    }
+
+    private fun formatSpeechSpeedLabel(speed: Double): String {
+        val normalized = String.format(Locale.ROOT, "%.2f", speed.coerceIn(0.25, 4.0)).toDouble()
+        return SPEECH_SPEED_OPTIONS.firstOrNull { (_, value) -> value == normalized }?.first
+            ?: String.format(Locale.ROOT, "%.2f", normalized)
+    }
+
+    private fun getPersistentTopRowCount(): Int {
+        val gridSize = getAacGridSize()
+        return prefs.getInt(
+            PREF_AAC_PERSISTENT_TOP_ROW_COUNT,
+            DEFAULT_AAC_PERSISTENT_TOP_ROW_COUNT
+        ).let { normalizePersistentTopRowCount(it, gridSize) }
+    }
+
+    private fun getPersistentTopRowItemIds(): List<String> {
+        return prefs.getString(
+            PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS,
+            DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS.joinToString(",")
+        )
+            .orEmpty()
+            .split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .ifEmpty { DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS }
+    }
+
+    private fun persistentTopRowLabel(itemId: String): String {
+        return when (itemId) {
+            "yes" -> "DA"
+            "no" -> "NE"
+            "help" -> "POMOČ"
+            "pain" -> "BOLI"
+            "stop" -> "STOP"
+            "wc" -> "WC"
+            else -> itemId.uppercase(Locale.ROOT)
+        }
+    }
+
+    private fun getAacGridSize(): Int {
+        return normalizeAacGridSize(prefs.getInt(PREF_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE))
+    }
+
+    private fun normalizeAacGridSize(value: Int): Int {
+        return when (value) {
+            3, 4, 5 -> value
+            else -> DEFAULT_AAC_GRID_SIZE
+        }
+    }
+
+    private fun normalizePersistentTopRowCount(value: Int, gridSize: Int): Int {
+        return value.coerceIn(AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS.first(), gridSize.coerceIn(3, 5))
     }
 
     private fun releaseSpeechApiTestPlayer() {

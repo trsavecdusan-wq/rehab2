@@ -22,9 +22,10 @@ class AacSpeechCache(private val context: Context) {
     fun getGeneratedSpeechFile(
         text: String,
         languageCode: String,
-        voiceId: String
+        voiceId: String,
+        speed: Double
     ): File? {
-        val cacheFile = getGeneratedSpeechCacheFile(text, languageCode, voiceId) ?: return null
+        val cacheFile = getGeneratedSpeechCacheFile(text, languageCode, voiceId, speed) ?: return null
         return if (cacheFile.exists() && cacheFile.isFile && cacheFile.length() > 0L) {
             cacheFile
         } else {
@@ -36,11 +37,12 @@ class AacSpeechCache(private val context: Context) {
         text: String,
         languageCode: String,
         voiceId: String,
+        speed: Double,
         audioBytes: ByteArray
     ): File? {
         if (audioBytes.isEmpty()) return null
 
-        val cacheFile = getGeneratedSpeechCacheFile(text, languageCode, voiceId) ?: return null
+        val cacheFile = getGeneratedSpeechCacheFile(text, languageCode, voiceId, speed) ?: return null
         if (cacheFile.exists() && cacheFile.isFile && cacheFile.length() > 0L) {
             return cacheFile
         }
@@ -71,15 +73,17 @@ class AacSpeechCache(private val context: Context) {
     private fun getGeneratedSpeechCacheFile(
         text: String,
         languageCode: String,
-        voiceId: String
+        voiceId: String,
+        speed: Double
     ): File? {
         val normalizedText = text.trim()
         if (normalizedText.isBlank()) return null
 
         val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
         val normalizedVoice = normalizeVoiceId(voiceId)
+        val normalizedSpeed = normalizeSpeed(speed)
         val normalizedHashText = normalizeTextForHash(normalizedText)
-        val hash = sha256("$normalizedLanguage|$normalizedVoice|$normalizedHashText")
+        val hash = sha256("$normalizedLanguage|$normalizedVoice|$normalizedSpeed|$normalizedHashText")
         val audioDir = File(
             context.filesDir,
             "NovaRehab2/aac/audio/generated/$normalizedLanguage/$normalizedVoice"
@@ -95,6 +99,10 @@ class AacSpeechCache(private val context: Context) {
         return value.trim()
             .ifBlank { DEFAULT_VOICE_ID }
             .replace(Regex("[^A-Za-z0-9._-]"), "_")
+    }
+
+    private fun normalizeSpeed(value: Double): String {
+        return "%.2f".format(java.util.Locale.ROOT, value.coerceIn(0.25, 4.0))
     }
 
     private fun sha256(value: String): String {

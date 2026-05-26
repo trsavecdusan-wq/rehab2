@@ -34,6 +34,11 @@ import com.rehab2.aac.AacV2PageAdapter
 import java.io.File
 
 class AacCommunicatorActivity : AppCompatActivity() {
+    private enum class SpeechMode {
+        SINGLE_ICON,
+        SENTENCE
+    }
+
     private lateinit var repository: AacRepository
     private val pageHistory = ArrayDeque<String>()
     private val sentenceManager = AacSentenceStateManager()
@@ -43,7 +48,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var currentV2RootItems: List<AacItem> = emptyList()
     private lateinit var audioPlayer: AacAudioPlayer
     private val autoSpeakHandler = Handler(Looper.getMainLooper())
+    private var pendingSingleIconSpeak: Runnable? = null
     private var pendingAutoSpeakSentence: Runnable? = null
+    private var isSpeakingSentence = false
+    private var isSpeakingSingleIcon = false
+    private var lastSpeechRequestId = 0
+    private var pendingSpeechMode: SpeechMode? = null
+    private var activeSpeechMode: SpeechMode? = null
+    private var aacGridSize = DEFAULT_AAC_GRID_SIZE
+    private var persistentTopRowEnabled = true
+    private var persistentTopRowCount = DEFAULT_PERSISTENT_TOP_ROW_COUNT
+    private var persistentTopRowItemIds: List<String> = DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS
     private lateinit var txtTitle: TextView
     private lateinit var sentenceBar: View
     private lateinit var txtPrompt: TextView
@@ -68,6 +83,42 @@ class AacCommunicatorActivity : AppCompatActivity() {
         addWaterTraceDebugView()
         repository = AacRepository(this)
         audioPlayer = AacAudioPlayer(this)
+        audioPlayer.setSpeechListener(object : AacAudioPlayer.SpeechListener {
+            override fun onSpeechStarted() {
+                activeSpeechMode = pendingSpeechMode
+                when (activeSpeechMode) {
+                    SpeechMode.SENTENCE -> {
+                        isSpeakingSentence = true
+                        isSpeakingSingleIcon = false
+                    }
+                    SpeechMode.SINGLE_ICON -> {
+                        isSpeakingSingleIcon = true
+                        isSpeakingSentence = false
+                    }
+                    null -> Unit
+                }
+                Log.d(TAG, "AAC_SPEECH SPEECH_STARTED mode=$activeSpeechMode")
+            }
+
+            override fun onSpeechCompleted() {
+                val completedMode = activeSpeechMode
+                Log.d(TAG, "AAC_SPEECH SPEECH_COMPLETED mode=$completedMode")
+                resetSpeechState("completed")
+                if (completedMode == SpeechMode.SENTENCE) {
+                    returnToRootMenuAfterSentence()
+                }
+            }
+
+            override fun onSpeechCancelled() {
+                Log.d(TAG, "AAC_SPEECH SPEECH_CANCELLED mode=$activeSpeechMode")
+                resetSpeechState("cancelled")
+            }
+
+            override fun onSpeechError() {
+                Log.d(TAG, "AAC_SPEECH SPEECH_ERROR mode=$activeSpeechMode")
+                resetSpeechState("error")
+            }
+        })
 
         if (AacLocalStorage.ensureStructure(this)) {
             Toast.makeText(this, "AAC MAPE PRIPRAVLJENE", Toast.LENGTH_SHORT).show()
@@ -96,23 +147,23 @@ class AacCommunicatorActivity : AppCompatActivity() {
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
-        recycler.layoutManager = GridLayoutManager(this, 5)
+        readAacGridSize()
+        recycler.layoutManager = GridLayoutManager(this, aacGridSize)
         labelMode = readAacLabelMode()
         languageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         speechTimingSettings = AacSpeechTimingSettings.read(this)
+        readPersistentTopRowSettings()
 
         btnSpeakSentence.setOnClickListener {
-            cancelPendingAutoSpeakSentence()
+            cancelPendingSpeech()
             speakCurrentSentence()
         }
         btnClearSentence.setOnClickListener {
-            cancelPendingAutoSpeakSentence()
+            cancelPendingSpeech()
             sentenceManager.clear()
             currentV2VisibleHistory.clear()
             clearPromptText()
-            if (currentV2RootItems.isNotEmpty()) {
-                showItems(currentV2RootItems)
-            }
+            returnToRootMenuAfterClear()
             updateSentenceBar()
         }
         btnOpenDrinksV2Test.setOnClickListener {
@@ -137,14 +188,25 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val updatedLabelMode = readAacLabelMode()
         val updatedLanguageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         val updatedSpeechTimingSettings = AacSpeechTimingSettings.read(this)
+        val oldGridSize = aacGridSize
+        val oldTopRowEnabled = persistentTopRowEnabled
+        val oldTopRowCount = persistentTopRowCount
+        val oldTopRowItemIds = persistentTopRowItemIds
+        readAacGridSize()
+        readPersistentTopRowSettings()
         if (
             updatedLabelMode != labelMode ||
             updatedLanguageCode != languageCode ||
-            updatedSpeechTimingSettings != speechTimingSettings
+            updatedSpeechTimingSettings != speechTimingSettings ||
+            oldGridSize != aacGridSize ||
+            oldTopRowEnabled != persistentTopRowEnabled ||
+            oldTopRowCount != persistentTopRowCount ||
+            oldTopRowItemIds != persistentTopRowItemIds
         ) {
             labelMode = updatedLabelMode
             languageCode = updatedLanguageCode
             speechTimingSettings = updatedSpeechTimingSettings
+            applyAacGridSize()
             if (currentVisibleItems.isNotEmpty()) {
                 showItems(currentVisibleItems)
             }
@@ -153,7 +215,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        cancelPendingAutoSpeakSentence()
+        cancelPendingSpeech()
+        audioPlayer.setSpeechListener(null)
         audioPlayer.release()
         super.onDestroy()
     }
@@ -180,12 +243,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun showItems(items: List<AacItem>) {
         currentVisibleItems = items
+        applyAacGridSize()
         val waterItem = items.firstOrNull { it.id == WATER_NODE_ID }
         waterBeforeAdapterChildrenCount = waterItem?.children?.size ?: -1
         logWaterTrace("before adapter", waterItem)
         updateWaterTraceDebug("before adapter")
         recycler.adapter = AacAdapter(
-            items = items,
+            items = mergePersistentTopRowWithCurrentMenuItems(items),
             labelMode = labelMode,
             languageCode = languageCode,
             onItemClick = { item ->
@@ -208,23 +272,24 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun handleItemClick(item: AacItem) {
         when (item.actionType) {
             "open_page" -> {
-                cancelPendingAutoSpeakSentence()
+                cancelPendingSpeech()
                 openTargetPage(item.targetPageId)
                 return
             }
             "go_home" -> {
-                cancelPendingAutoSpeakSentence()
+                cancelPendingSpeech()
                 goHome()
                 return
             }
             "go_back" -> {
-                cancelPendingAutoSpeakSentence()
+                cancelPendingSpeech()
                 goBack()
                 return
             }
         }
 
         if (isV2Item(item)) {
+            val speechRequestId = nextSpeechRequestId("ITEM_SELECTED:${item.id}")
             if (item.id == WATER_NODE_ID) {
                 waterClickItemChildrenCount = item.children.size
                 logWaterTrace("click item", item)
@@ -254,7 +319,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
             if (childItems.isNotEmpty()) {
                 cancelPendingAutoSpeakSentence()
-                speakSingleIconIfEnabled(singleIconText)
+                speakSingleIconIfEnabled(singleIconText, speechRequestId)
                 setPromptText(AacLocalizedTextResolver.resolveQuestion(item, languageCode))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
@@ -265,8 +330,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
             } else {
                 clearPromptText()
             }
-            speakSingleIconIfEnabled(singleIconText)
-            scheduleAutoSpeakSentenceIfEnabled()
+            speakSingleIconIfEnabled(singleIconText, speechRequestId)
+            scheduleAutoSpeakSentenceIfEnabled(speechRequestId)
             return
         }
 
@@ -387,7 +452,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun goHome() {
-        cancelPendingAutoSpeakSentence()
+        cancelPendingSpeech()
         clearV2State()
         val page = repository.loadPage("home")
         if (page == null) {
@@ -423,7 +488,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun clearV2State() {
-        cancelPendingAutoSpeakSentence()
+        cancelPendingSpeech()
         sentenceManager.clear()
         currentV2ItemsById = emptyMap()
         currentV2VisibleHistory.clear()
@@ -433,6 +498,24 @@ class AacCommunicatorActivity : AppCompatActivity() {
         sentenceBar.visibility = View.GONE
         txtSentence.text = ""
         updateSentenceBar()
+    }
+
+    private fun returnToRootMenuAfterSentence() {
+        Log.d(TAG, "AAC_NAV RETURN_TO_ROOT_AFTER_SENTENCE")
+        returnToRootMenu()
+    }
+
+    private fun returnToRootMenuAfterClear() {
+        Log.d(TAG, "AAC_NAV RETURN_TO_ROOT_AFTER_CLEAR")
+        returnToRootMenu()
+    }
+
+    private fun returnToRootMenu() {
+        currentV2VisibleHistory.clear()
+        clearPromptText()
+        if (currentV2RootItems.isNotEmpty()) {
+            showItems(currentV2RootItems)
+        }
     }
 
     private fun isV2Page(page: AacPage): Boolean {
@@ -449,6 +532,94 @@ class AacCommunicatorActivity : AppCompatActivity() {
         return rootItems.ifEmpty { items }
     }
 
+    private fun readAacGridSize() {
+        val prefs = getSharedPreferences(AAC_PREFS_FILE, MODE_PRIVATE)
+        aacGridSize = normalizeAacGridSize(
+            prefs.getInt(PREF_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE)
+        )
+    }
+
+    private fun applyAacGridSize() {
+        val layoutManager = recycler.layoutManager as? GridLayoutManager
+        if (layoutManager == null) {
+            recycler.layoutManager = GridLayoutManager(this, aacGridSize)
+        } else if (layoutManager.spanCount != aacGridSize) {
+            layoutManager.spanCount = aacGridSize
+        }
+    }
+
+    private fun getAacGridSize(): Int {
+        return normalizeAacGridSize(aacGridSize)
+    }
+
+    private fun getAacItemsPerPage(): Int {
+        val gridSize = getAacGridSize()
+        return gridSize * gridSize
+    }
+
+    private fun readPersistentTopRowSettings() {
+        val prefs = getSharedPreferences(AAC_PREFS_FILE, MODE_PRIVATE)
+        val gridSize = getAacGridSize()
+        persistentTopRowEnabled = prefs.getBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, true)
+        val rawTopRowCount = prefs.getInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, DEFAULT_PERSISTENT_TOP_ROW_COUNT)
+        persistentTopRowCount = normalizePersistentTopRowCount(rawTopRowCount, gridSize)
+        if (persistentTopRowCount != rawTopRowCount) {
+            prefs.edit().putInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, persistentTopRowCount).apply()
+        }
+        persistentTopRowItemIds = prefs.getString(
+            PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS,
+            DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS.joinToString(",")
+        )
+            .orEmpty()
+            .split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .ifEmpty { DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS }
+    }
+
+    private fun getPersistentTopRowCount(): Int {
+        return normalizePersistentTopRowCount(persistentTopRowCount, getAacGridSize())
+    }
+
+    private fun getPersistentTopRowItems(): List<AacItem> {
+        if (!persistentTopRowEnabled) return emptyList()
+
+        val homeItems = repository.loadPage("home")?.items.orEmpty().associateBy { it.id }
+        return persistentTopRowItemIds
+            .take(getPersistentTopRowCount())
+            .mapNotNull { id -> homeItems[id] }
+            .map { item ->
+                item.copy(
+                    actionType = "speak",
+                    targetPageId = "",
+                    conceptId = item.conceptId ?: item.id,
+                    sentenceRole = item.sentenceRole ?: "quick"
+                )
+            }
+    }
+
+    private fun mergePersistentTopRowWithCurrentMenuItems(items: List<AacItem>): List<AacItem> {
+        val topRowItems = getPersistentTopRowItems()
+        val maxItems = getAacItemsPerPage()
+        if (topRowItems.isEmpty()) return items.take(maxItems)
+
+        val topRowIds = topRowItems.map { it.id }.toSet()
+        val remainingSlots = (maxItems - topRowItems.size).coerceAtLeast(0)
+        val menuItemsWithoutDuplicates = items.filter { it.id !in topRowIds }.take(remainingSlots)
+        return topRowItems + menuItemsWithoutDuplicates
+    }
+
+    private fun normalizeAacGridSize(value: Int): Int {
+        return when (value) {
+            3, 4, 5 -> value
+            else -> DEFAULT_AAC_GRID_SIZE
+        }
+    }
+
+    private fun normalizePersistentTopRowCount(value: Int, gridSize: Int): Int {
+        return value.coerceIn(MIN_PERSISTENT_TOP_ROW_COUNT, gridSize.coerceIn(3, 5))
+    }
+
     private fun updateSentenceBar() {
         val displayText = sentenceManager.getDisplayText()
         txtSentence.text = displayText
@@ -457,18 +628,33 @@ class AacCommunicatorActivity : AppCompatActivity() {
         btnClearSentence.isEnabled = hasSentence
     }
 
-    private fun speakSingleIconIfEnabled(text: String) {
+    private fun speakSingleIconIfEnabled(text: String, requestId: Int) {
+        cancelPendingSingleIconSpeak()
         if (!speechTimingSettings.speakSingleIconEnabled) {
             return
         }
 
         val trimmed = text.trim()
-        if (trimmed.isNotEmpty()) {
-            audioPlayer.speakText(trimmed, languageCode)
+        if (trimmed.isEmpty()) {
+            return
         }
+
+        if (!speechTimingSettings.delayedSingleIconSpeakEnabled ||
+            speechTimingSettings.singleIconSpeakDelayMs <= 0L
+        ) {
+            startSingleIconSpeech(trimmed, requestId)
+            return
+        }
+
+        val pending = Runnable {
+            pendingSingleIconSpeak = null
+            startSingleIconSpeech(trimmed, requestId)
+        }
+        pendingSingleIconSpeak = pending
+        autoSpeakHandler.postDelayed(pending, speechTimingSettings.singleIconSpeakDelayMs)
     }
 
-    private fun scheduleAutoSpeakSentenceIfEnabled() {
+    private fun scheduleAutoSpeakSentenceIfEnabled(requestId: Int) {
         cancelPendingAutoSpeakSentence()
         if (!speechTimingSettings.autoSpeakSentenceEnabled) {
             return
@@ -481,24 +667,96 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         val pending = Runnable {
             pendingAutoSpeakSentence = null
-            audioPlayer.speakText(sentence, languageCode)
+            startSentenceSpeech(sentence, requestId)
         }
         pendingAutoSpeakSentence = pending
         autoSpeakHandler.postDelayed(pending, speechTimingSettings.autoSpeakSentenceDelayMs)
     }
 
+    private fun startSingleIconSpeech(text: String, requestId: Int) {
+        if (requestId != lastSpeechRequestId) {
+            Log.d(TAG, "AAC_SPEECH REQUEST_IGNORED_OLD_ID single_icon requestId=$requestId active=$lastSpeechRequestId")
+            return
+        }
+        if (isSpeakingSentence) {
+            Log.d(TAG, "AAC_SPEECH SINGLE_ICON_CANCEL sentence_active requestId=$requestId")
+            isSpeakingSingleIcon = false
+            return
+        }
+
+        isSpeakingSingleIcon = true
+        pendingSpeechMode = SpeechMode.SINGLE_ICON
+        activeSpeechMode = SpeechMode.SINGLE_ICON
+        Log.d(TAG, "AAC_SPEECH SINGLE_ICON_START requestId=$requestId text=$text")
+        audioPlayer.speakText(text, languageCode)
+    }
+
+    private fun startSentenceSpeech(text: String, requestId: Int) {
+        if (requestId != lastSpeechRequestId) {
+            Log.d(TAG, "AAC_SPEECH REQUEST_IGNORED_OLD_ID sentence requestId=$requestId active=$lastSpeechRequestId")
+            return
+        }
+        if (isSpeakingSentence) {
+            Log.d(TAG, "AAC_SPEECH SENTENCE_CANCEL previous requestId=$requestId")
+        }
+
+        cancelPendingSingleIconSpeak()
+        isSpeakingSingleIcon = false
+        isSpeakingSentence = true
+        pendingSpeechMode = SpeechMode.SENTENCE
+        activeSpeechMode = SpeechMode.SENTENCE
+        Log.d(TAG, "AAC_SPEECH SENTENCE_START requestId=$requestId text=$text")
+        audioPlayer.speakText(text, languageCode)
+    }
+
     private fun cancelPendingAutoSpeakSentence() {
         pendingAutoSpeakSentence?.let { pending ->
             autoSpeakHandler.removeCallbacks(pending)
+            Log.d(TAG, "AAC_SPEECH SENTENCE_CANCEL pending requestId=$lastSpeechRequestId")
         }
         pendingAutoSpeakSentence = null
+    }
+
+    private fun cancelPendingSingleIconSpeak() {
+        pendingSingleIconSpeak?.let { pending ->
+            autoSpeakHandler.removeCallbacks(pending)
+            Log.d(TAG, "AAC_SPEECH SINGLE_ICON_CANCEL pending requestId=$lastSpeechRequestId")
+        }
+        pendingSingleIconSpeak = null
+        isSpeakingSingleIcon = false
+    }
+
+    private fun cancelPendingSpeech() {
+        cancelPendingSingleIconSpeak()
+        cancelPendingAutoSpeakSentence()
+        isSpeakingSentence = false
+        isSpeakingSingleIcon = false
+        pendingSpeechMode = null
+        activeSpeechMode = null
+        audioPlayer.stopCurrentSpeech()
+        nextSpeechRequestId("CANCEL_ALL")
+    }
+
+    private fun resetSpeechState(reason: String) {
+        isSpeakingSentence = false
+        isSpeakingSingleIcon = false
+        pendingSpeechMode = null
+        activeSpeechMode = null
+        Log.d(TAG, "AAC_SPEECH STATE_RESET reason=$reason")
     }
 
     private fun speakCurrentSentence() {
         val text = sentenceManager.getSpeakText(languageCode)
         if (text.isNotBlank()) {
-            audioPlayer.speakText(text, languageCode)
+            val requestId = nextSpeechRequestId("MANUAL_SENTENCE")
+            startSentenceSpeech(text, requestId)
         }
+    }
+
+    private fun nextSpeechRequestId(reason: String): Int {
+        lastSpeechRequestId += 1
+        Log.d(TAG, "AAC_SPEECH $reason requestId=$lastSpeechRequestId")
+        return lastSpeechRequestId
     }
 
     private fun setPromptText(text: String?) {
@@ -624,5 +882,15 @@ class AacCommunicatorActivity : AppCompatActivity() {
         const val TAG = "AacCommunicatorActivity"
         const val DRINKS_V2_PAGE_ID = "drinks_v2"
         const val WATER_NODE_ID = "water"
+        const val AAC_PREFS_FILE = "rehab2_prefs"
+        const val PREF_AAC_GRID_SIZE = "aac_grid_size"
+        const val DEFAULT_AAC_GRID_SIZE = 3
+        const val PREF_AAC_PERSISTENT_TOP_ROW_ENABLED = "aac_persistent_top_row_enabled"
+        const val PREF_AAC_PERSISTENT_TOP_ROW_COUNT = "aac_persistent_top_row_count"
+        const val PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = "aac_persistent_top_row_item_ids"
+        const val MIN_PERSISTENT_TOP_ROW_COUNT = 3
+        const val MAX_PERSISTENT_TOP_ROW_COUNT = 5
+        const val DEFAULT_PERSISTENT_TOP_ROW_COUNT = 4
+        val DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("yes", "no", "help", "pain", "stop")
     }
 }

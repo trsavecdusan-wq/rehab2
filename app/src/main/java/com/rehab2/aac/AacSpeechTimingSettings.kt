@@ -4,23 +4,36 @@ import android.content.Context
 
 data class AacSpeechTimingSettings(
     val speakSingleIconEnabled: Boolean = true,
-    val autoSpeakSentenceEnabled: Boolean = false,
+    val delayedSingleIconSpeakEnabled: Boolean = true,
+    val singleIconSpeakDelayMs: Long = 700L,
+    val autoSpeakSentenceEnabled: Boolean = true,
     val autoSpeakSentenceDelayMs: Long = 3000L
 ) {
     companion object {
         const val PREFS_FILE = "rehab2_prefs"
         const val PREF_SPEAK_SINGLE_ICON_ENABLED = "aac_speak_single_icon_enabled"
+        const val PREF_DELAYED_SINGLE_ICON_SPEAK_ENABLED = "aac_delayed_single_icon_speak_enabled"
+        const val PREF_SINGLE_ICON_SPEAK_DELAY_MS = "aac_single_icon_speak_delay_ms"
         const val PREF_AUTO_SPEAK_SENTENCE_ENABLED = "aac_auto_speak_sentence_enabled"
         const val PREF_AUTO_SPEAK_SENTENCE_DELAY_MS = "aac_auto_speak_sentence_delay_ms"
+        const val DEFAULT_SINGLE_ICON_SPEAK_DELAY_MS = 700L
         const val DEFAULT_AUTO_SPEAK_SENTENCE_DELAY_MS = 3000L
 
-        private val ALLOWED_DELAYS_MS = setOf(2000L, 3000L, 5000L, 8000L)
+        private val ALLOWED_SINGLE_ICON_DELAYS_MS = setOf(0L, 300L, 500L, 700L, 1000L, 1500L, 2000L)
+        private val ALLOWED_DELAYS_MS = setOf(1000L, 1500L, 2000L, 3000L, 4000L, 5000L)
 
         fun read(context: Context): AacSpeechTimingSettings {
             val prefs = context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
             return AacSpeechTimingSettings(
                 speakSingleIconEnabled = prefs.getBoolean(PREF_SPEAK_SINGLE_ICON_ENABLED, true),
-                autoSpeakSentenceEnabled = prefs.getBoolean(PREF_AUTO_SPEAK_SENTENCE_ENABLED, false),
+                delayedSingleIconSpeakEnabled = prefs.getBoolean(PREF_DELAYED_SINGLE_ICON_SPEAK_ENABLED, true),
+                singleIconSpeakDelayMs = normalizeSingleIconDelay(
+                    prefs.getLong(
+                        PREF_SINGLE_ICON_SPEAK_DELAY_MS,
+                        DEFAULT_SINGLE_ICON_SPEAK_DELAY_MS
+                    )
+                ),
+                autoSpeakSentenceEnabled = prefs.getBoolean(PREF_AUTO_SPEAK_SENTENCE_ENABLED, true),
                 autoSpeakSentenceDelayMs = normalizeDelay(
                     prefs.getLong(
                         PREF_AUTO_SPEAK_SENTENCE_DELAY_MS,
@@ -28,6 +41,10 @@ data class AacSpeechTimingSettings(
                     )
                 )
             )
+        }
+
+        private fun normalizeSingleIconDelay(value: Long): Long {
+            return if (value in ALLOWED_SINGLE_ICON_DELAYS_MS) value else DEFAULT_SINGLE_ICON_SPEAK_DELAY_MS
         }
 
         private fun normalizeDelay(value: Long): Long {

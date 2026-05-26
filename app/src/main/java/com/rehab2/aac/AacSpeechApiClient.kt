@@ -4,14 +4,16 @@ interface AacSpeechApiClient {
     fun generateSpeech(
         text: String,
         languageCode: String,
-        voiceId: String
+        voiceId: String,
+        speed: Double
     ): ByteArray?
 
     object NotConfigured : AacSpeechApiClient {
         override fun generateSpeech(
             text: String,
             languageCode: String,
-            voiceId: String
+            voiceId: String,
+            speed: Double
         ): ByteArray? = null
     }
 }

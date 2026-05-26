@@ -149,6 +149,8 @@
             android:layout_height="60dp"
             android:layout_marginBottom="8dp"
             android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
             android:hint="marin"
             android:inputType="text"
             android:padding="16dp"
@@ -163,8 +165,114 @@
             android:layout_height="60dp"
             android:layout_marginBottom="12dp"
             android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
             android:hint="0.88"
             android:inputType="numberDecimal"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtSingleIconSpeechStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="Govor posamezne ikone: VKLOP"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editSingleIconDelay"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
+            android:hint="Zamik ikone: 700 ms"
+            android:inputType="none"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtAutoSentenceSpeechStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="Samodejni govor stavka: VKLOP"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editAutoSentenceDelay"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
+            android:hint="Samodejni stavek: 3000 ms"
+            android:inputType="none"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtAacGridSizeStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="Velikost mreže komunikatorja: 3 x 3"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editAacGridSize"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
+            android:hint="3 x 3"
+            android:inputType="none"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtPersistentTopRowStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="Stalna prva vrstica: VKLOP"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editPersistentTopRowCount"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
+            android:hint="4 ikone"
+            android:inputType="none"
             android:padding="16dp"
             android:singleLine="true"
             android:textColor="#F4F7FA"
