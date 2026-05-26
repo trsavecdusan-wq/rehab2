@@ -27,6 +27,7 @@ import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacGuidedFollowUpSettings
 import com.rehab2.aac.AacProfileStore
+import com.rehab2.aac.AacSampleContentCreator
 import com.rehab2.aac.AacSpeechApiConfig
 import com.rehab2.aac.AacSpeechCache
 import com.rehab2.aac.AacSpeechCoordinator
@@ -236,6 +237,10 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnAacSettings).setOnClickListener {
             Toast.makeText(this, getString(R.string.aac_settings_not_ready), Toast.LENGTH_SHORT).show()
+        }
+
+        findViewById<Button>(R.id.btnCreateSampleAacPack).setOnClickListener {
+            createSampleAacPack()
         }
 
         findViewById<Button>(R.id.btnStatusSettings).setOnClickListener {
@@ -979,6 +984,22 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun normalizePersistentTopRowCount(value: Int, gridSize: Int): Int {
         return value.coerceIn(AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS.first(), gridSize.coerceIn(3, 5))
+    }
+
+    private fun createSampleAacPack() {
+        val result = AacSampleContentCreator.createIfMissing(this)
+        val message = when {
+            result.failed -> "Testnega AAC paketa ni bilo mogoče ustvariti."
+            result.createdFiles.isNotEmpty() && result.skippedFiles.isEmpty() ->
+                "Testni AAC paket je ustvarjen."
+            result.createdFiles.isNotEmpty() ->
+                "Del testnega AAC paketa je ustvarjen."
+            result.skippedFiles.isNotEmpty() ->
+                "Testni AAC paket že obstaja."
+            else ->
+                "Ni sprememb."
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun releaseSpeechApiTestPlayer() {

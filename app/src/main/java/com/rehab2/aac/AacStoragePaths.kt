@@ -35,4 +35,39 @@ object AacStoragePaths {
         val externalFilesDir = context.getExternalFilesDir(null) ?: return null
         return File(externalFilesDir, CUSTOM_ICONS_DIR)
     }
+
+    fun resolveIconFile(context: Context, imagePath: String, iconSource: IconSource): File? {
+        val rawPath = imagePath.trim()
+        if (rawPath.isEmpty()) {
+            return null
+        }
+
+        val directFile = File(rawPath)
+        if (directFile.isAbsolute) {
+            return directFile
+        }
+
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        val normalizedPath = rawPath.replace('\\', '/').removePrefix("/")
+
+        val baseRelativeDir = when (iconSource) {
+            IconSource.SOCA -> SOCA_ICONS_DIR
+            IconSource.ARASAAC -> ARASAAC_ICONS_DIR
+            IconSource.CUSTOM,
+            IconSource.PATIENT -> CUSTOM_ICONS_DIR
+            IconSource.SYSTEM -> return null
+        }
+
+        val fullRelativePath = if (
+            normalizedPath.startsWith("custom/") ||
+            normalizedPath.startsWith("soca/") ||
+            normalizedPath.startsWith("arasaac/")
+        ) {
+            "NovaRehab/icons/$normalizedPath"
+        } else {
+            baseRelativeDir + normalizedPath
+        }
+
+        return File(externalFilesDir, fullRelativePath)
+    }
 }

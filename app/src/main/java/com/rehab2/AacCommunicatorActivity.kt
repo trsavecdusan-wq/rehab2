@@ -1161,23 +1161,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     return null
                 }
 
-                val directFile = File(rawPath)
-                if (directFile.isAbsolute) {
-                    return directFile.takeIf { it.exists() && it.isFile } ?: run {
-                        Log.d(IMAGE_LOG_TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
-                        null
-                    }
-                }
-
-                val baseDir = when (item.iconSource) {
-                    com.rehab2.aac.IconSource.SOCA -> AacStoragePaths.getIconsSocaDir(context)
-                    com.rehab2.aac.IconSource.ARASAAC -> AacStoragePaths.getIconsArasaacDir(context)
-                    com.rehab2.aac.IconSource.CUSTOM,
-                    com.rehab2.aac.IconSource.PATIENT -> AacStoragePaths.getIconsCustomDir(context)
-                    com.rehab2.aac.IconSource.SYSTEM -> null
-                }
-
-                val resolved = baseDir?.let { File(it, rawPath) }
+                val resolved = AacStoragePaths.resolveIconFile(context, rawPath, item.iconSource)
                 return resolved?.takeIf { it.exists() && it.isFile } ?: run {
                     Log.d(IMAGE_LOG_TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
                     null

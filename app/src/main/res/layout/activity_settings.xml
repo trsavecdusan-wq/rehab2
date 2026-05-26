@@ -57,6 +57,18 @@
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/btnCreateSampleAacPack"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#2E8B57"
+            android:text="USTVARI TESTNI AAC PAKET"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
             android:id="@+id/btnStatusSettings"
             android:layout_width="match_parent"
             android:layout_height="64dp"
