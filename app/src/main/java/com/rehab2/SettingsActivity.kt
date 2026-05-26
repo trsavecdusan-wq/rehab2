@@ -21,6 +21,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacSpeechApiConfig
 import com.rehab2.aac.AacSpeechCache
@@ -131,12 +132,16 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editSpeechApiModel: EditText
     private lateinit var editSpeechApiVoice: EditText
     private lateinit var editSpeechApiSpeed: EditText
-    private lateinit var txtSingleIconSpeechStatus: TextView
+    private lateinit var switchSingleIconSpeech: SwitchCompat
     private lateinit var editSingleIconDelay: EditText
-    private lateinit var txtAutoSentenceSpeechStatus: TextView
+    private lateinit var switchFastCompositionSkipLastIcon: SwitchCompat
+    private lateinit var switchAutoSentenceSpeech: SwitchCompat
     private lateinit var editAutoSentenceDelay: EditText
+    private lateinit var switchReturnToRootAfterSentence: SwitchCompat
+    private lateinit var switchClearSentenceAfterSentence: SwitchCompat
     private lateinit var txtAacGridSizeStatus: TextView
     private lateinit var editAacGridSize: EditText
+    private lateinit var switchPersistentTopRowEnabled: SwitchCompat
     private lateinit var txtPersistentTopRowStatus: TextView
     private lateinit var editPersistentTopRowCount: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
@@ -185,12 +190,16 @@ class SettingsActivity : AppCompatActivity() {
         editSpeechApiModel = findViewById(R.id.editSpeechApiModel)
         editSpeechApiVoice = findViewById(R.id.editSpeechApiVoice)
         editSpeechApiSpeed = findViewById(R.id.editSpeechApiSpeed)
-        txtSingleIconSpeechStatus = findViewById(R.id.txtSingleIconSpeechStatus)
+        switchSingleIconSpeech = findViewById(R.id.switchSingleIconSpeech)
         editSingleIconDelay = findViewById(R.id.editSingleIconDelay)
-        txtAutoSentenceSpeechStatus = findViewById(R.id.txtAutoSentenceSpeechStatus)
+        switchFastCompositionSkipLastIcon = findViewById(R.id.switchFastCompositionSkipLastIcon)
+        switchAutoSentenceSpeech = findViewById(R.id.switchAutoSentenceSpeech)
         editAutoSentenceDelay = findViewById(R.id.editAutoSentenceDelay)
+        switchReturnToRootAfterSentence = findViewById(R.id.switchReturnToRootAfterSentence)
+        switchClearSentenceAfterSentence = findViewById(R.id.switchClearSentenceAfterSentence)
         txtAacGridSizeStatus = findViewById(R.id.txtAacGridSizeStatus)
         editAacGridSize = findViewById(R.id.editAacGridSize)
+        switchPersistentTopRowEnabled = findViewById(R.id.switchPersistentTopRowEnabled)
         txtPersistentTopRowStatus = findViewById(R.id.txtPersistentTopRowStatus)
         editPersistentTopRowCount = findViewById(R.id.editPersistentTopRowCount)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
@@ -244,6 +253,8 @@ class SettingsActivity : AppCompatActivity() {
         editPersistentTopRowCount.setOnClickListener {
             showPersistentTopRowCountPicker()
         }
+        bindSpeechTimingSwitchListeners()
+        bindPersistentTopRowSwitchListener()
 
         btnPowerOff.setOnClickListener {
             setPowerMode(POWER_MODE_ALWAYS_ON)
@@ -434,17 +445,17 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun refreshSpeechTimingSection() {
         val settings = AacSpeechTimingSettings.read(this)
-        txtSingleIconSpeechStatus.text = if (settings.speakSingleIconEnabled) {
-            "Govor posamezne ikone: VKLOP"
-        } else {
-            "Govor posamezne ikone: IZKLOP"
-        }
+        switchSingleIconSpeech.setOnCheckedChangeListener(null)
+        switchFastCompositionSkipLastIcon.setOnCheckedChangeListener(null)
+        switchAutoSentenceSpeech.setOnCheckedChangeListener(null)
+        switchReturnToRootAfterSentence.setOnCheckedChangeListener(null)
+        switchClearSentenceAfterSentence.setOnCheckedChangeListener(null)
+        switchSingleIconSpeech.isChecked = settings.speakSingleIconEnabled
+        switchFastCompositionSkipLastIcon.isChecked = settings.fastCompositionSkipLastIconEnabled
+        switchAutoSentenceSpeech.isChecked = settings.autoSpeakSentenceEnabled
+        switchReturnToRootAfterSentence.isChecked = settings.returnToRootAfterSentenceEnabled
+        switchClearSentenceAfterSentence.isChecked = settings.clearSentenceAfterSentenceEnabled
         editSingleIconDelay.setText("${settings.singleIconSpeakDelayMs} ms")
-        txtAutoSentenceSpeechStatus.text = if (settings.autoSpeakSentenceEnabled) {
-            "Samodejni govor stavka: VKLOP"
-        } else {
-            "Samodejni govor stavka: IZKLOP"
-        }
         editAutoSentenceDelay.setText(
             if (settings.autoSpeakSentenceEnabled) {
                 "${settings.autoSpeakSentenceDelayMs} ms"
@@ -452,12 +463,17 @@ class SettingsActivity : AppCompatActivity() {
                 "OFF"
             }
         )
+        editSingleIconDelay.isEnabled = settings.speakSingleIconEnabled
+        editAutoSentenceDelay.isEnabled = settings.autoSpeakSentenceEnabled
+        bindSpeechTimingSwitchListeners()
     }
 
     private fun refreshPersistentTopRowSection() {
         val enabled = prefs.getBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, true)
         val count = getPersistentTopRowCount()
         val itemIds = getPersistentTopRowItemIds().take(count)
+        switchPersistentTopRowEnabled.setOnCheckedChangeListener(null)
+        switchPersistentTopRowEnabled.isChecked = enabled
         txtPersistentTopRowStatus.text = buildString {
             append("Stalna prva vrstica: ")
             append(if (enabled) "VKLOP" else "IZKLOP")
@@ -465,6 +481,8 @@ class SettingsActivity : AppCompatActivity() {
             append(itemIds.joinToString(", ") { persistentTopRowLabel(it) })
         }
         editPersistentTopRowCount.setText("$count ikon")
+        editPersistentTopRowCount.isEnabled = enabled
+        bindPersistentTopRowSwitchListener()
     }
 
     private fun refreshAacGridSizeSection() {
@@ -679,6 +697,48 @@ class SettingsActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             .show()
+    }
+
+    private fun bindSpeechTimingSwitchListeners() {
+        switchSingleIconSpeech.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacSpeechTimingSettings.PREF_SPEAK_SINGLE_ICON_ENABLED, isChecked)
+                .apply()
+            refreshSpeechTimingSection()
+        }
+        switchFastCompositionSkipLastIcon.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacSpeechTimingSettings.PREF_FAST_COMPOSITION_SKIP_LAST_ICON_ENABLED, isChecked)
+                .apply()
+            refreshSpeechTimingSection()
+        }
+        switchAutoSentenceSpeech.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacSpeechTimingSettings.PREF_AUTO_SPEAK_SENTENCE_ENABLED, isChecked)
+                .apply()
+            refreshSpeechTimingSection()
+        }
+        switchReturnToRootAfterSentence.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacSpeechTimingSettings.PREF_RETURN_TO_ROOT_AFTER_SENTENCE_ENABLED, isChecked)
+                .apply()
+            refreshSpeechTimingSection()
+        }
+        switchClearSentenceAfterSentence.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacSpeechTimingSettings.PREF_CLEAR_SENTENCE_AFTER_SENTENCE_ENABLED, isChecked)
+                .apply()
+            refreshSpeechTimingSection()
+        }
+    }
+
+    private fun bindPersistentTopRowSwitchListener() {
+        switchPersistentTopRowEnabled.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, isChecked)
+                .apply()
+            refreshPersistentTopRowSection()
+        }
     }
 
     private fun importSpeechApiKey(uri: Uri) {

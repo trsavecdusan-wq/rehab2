@@ -6,16 +6,22 @@ data class AacSpeechTimingSettings(
     val speakSingleIconEnabled: Boolean = true,
     val delayedSingleIconSpeakEnabled: Boolean = true,
     val singleIconSpeakDelayMs: Long = 700L,
+    val fastCompositionSkipLastIconEnabled: Boolean = true,
     val autoSpeakSentenceEnabled: Boolean = true,
-    val autoSpeakSentenceDelayMs: Long = 3000L
+    val autoSpeakSentenceDelayMs: Long = 3000L,
+    val returnToRootAfterSentenceEnabled: Boolean = true,
+    val clearSentenceAfterSentenceEnabled: Boolean = true
 ) {
     companion object {
         const val PREFS_FILE = "rehab2_prefs"
         const val PREF_SPEAK_SINGLE_ICON_ENABLED = "aac_speak_single_icon_enabled"
         const val PREF_DELAYED_SINGLE_ICON_SPEAK_ENABLED = "aac_delayed_single_icon_speak_enabled"
         const val PREF_SINGLE_ICON_SPEAK_DELAY_MS = "aac_single_icon_speak_delay_ms"
+        const val PREF_FAST_COMPOSITION_SKIP_LAST_ICON_ENABLED = "aac_fast_composition_skip_last_icon_enabled"
         const val PREF_AUTO_SPEAK_SENTENCE_ENABLED = "aac_auto_speak_sentence_enabled"
         const val PREF_AUTO_SPEAK_SENTENCE_DELAY_MS = "aac_auto_speak_sentence_delay_ms"
+        const val PREF_RETURN_TO_ROOT_AFTER_SENTENCE_ENABLED = "aac_return_to_root_after_sentence_enabled"
+        const val PREF_CLEAR_SENTENCE_AFTER_SENTENCE_ENABLED = "aac_clear_sentence_after_sentence_enabled"
         const val DEFAULT_SINGLE_ICON_SPEAK_DELAY_MS = 700L
         const val DEFAULT_AUTO_SPEAK_SENTENCE_DELAY_MS = 3000L
 
@@ -33,12 +39,24 @@ data class AacSpeechTimingSettings(
                         DEFAULT_SINGLE_ICON_SPEAK_DELAY_MS
                     )
                 ),
+                fastCompositionSkipLastIconEnabled = prefs.getBoolean(
+                    PREF_FAST_COMPOSITION_SKIP_LAST_ICON_ENABLED,
+                    true
+                ),
                 autoSpeakSentenceEnabled = prefs.getBoolean(PREF_AUTO_SPEAK_SENTENCE_ENABLED, true),
                 autoSpeakSentenceDelayMs = normalizeDelay(
                     prefs.getLong(
                         PREF_AUTO_SPEAK_SENTENCE_DELAY_MS,
                         DEFAULT_AUTO_SPEAK_SENTENCE_DELAY_MS
                     )
+                ),
+                returnToRootAfterSentenceEnabled = prefs.getBoolean(
+                    PREF_RETURN_TO_ROOT_AFTER_SENTENCE_ENABLED,
+                    true
+                ),
+                clearSentenceAfterSentenceEnabled = prefs.getBoolean(
+                    PREF_CLEAR_SENTENCE_AFTER_SENTENCE_ENABLED,
+                    true
                 )
             )
         }

@@ -109,7 +109,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 resetSpeechState("completed")
                 if (completedMode == SpeechMode.SENTENCE) {
                     resetSentenceCompositionTracking()
-                    returnToRootMenuAfterSentence()
+                    if (speechTimingSettings.clearSentenceAfterSentenceEnabled) {
+                        Log.d(TAG, "AAC_SENTENCE CLEAR_AFTER_SENTENCE_COMPLETED")
+                        sentenceManager.clear()
+                        updateSentenceBar()
+                    }
+                    if (speechTimingSettings.returnToRootAfterSentenceEnabled) {
+                        returnToRootMenuAfterSentence()
+                    }
                 }
             }
 
@@ -147,7 +154,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
         btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
-        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.82"
+        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.84"
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -319,12 +326,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     role = item.sentenceRole
                 )
             )
+            Log.d(TAG, "AAC_SENTENCE ITEM_ADDED count=${sentenceManager.getItems().size} item=${item.id}")
             updateSentenceBar()
             val singleIconText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
 
             if (childItems.isNotEmpty()) {
-                cancelPendingAutoSpeakSentence()
                 speakSingleIconIfEnabled(singleIconText, speechRequestId)
+                scheduleAutoSpeakSentenceIfEnabled(speechRequestId)
                 setPromptText(AacLocalizedTextResolver.resolveQuestion(item, languageCode))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
@@ -361,7 +369,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun openDrinksV2Test() {
-        Toast.makeText(this, "TEST V2 CLICKED 1.2.82", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "TEST V2 CLICKED 1.2.84", Toast.LENGTH_LONG).show()
         val refreshResult = refreshBundledDrinksV2Page()
         showDrinksV2RefreshDebug(refreshResult)
         if (refreshResult.isReady) {
@@ -445,7 +453,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun updateWaterTraceDebug(stage: String) {
         txtWaterTraceDebug.visibility = View.VISIBLE
         txtWaterTraceDebug.text = buildString {
-            appendLine("WATER TRACE 1.2.82: $stage")
+            appendLine("WATER TRACE 1.2.84: $stage")
             appendLine("JSON children=${AacV2JsonParser.lastWaterJsonChildrenCount}")
             appendLine("parsed model children=${AacV2PageAdapter.lastWaterParsedModelChildrenCount}")
             appendLine("mapped AacItem children=${AacV2PageAdapter.lastWaterMappedItemChildrenCount}")
@@ -673,13 +681,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
             return
         }
 
+        val itemCount = sentenceManager.getItems().size
         val sentence = sentenceManager.getSpeakText(languageCode).trim()
         if (sentence.isEmpty()) {
             return
         }
 
+        Log.d(TAG, "AAC_SENTENCE AUTO_SCHEDULED count=$itemCount requestId=$requestId")
+
         val pending = Runnable {
             pendingAutoSpeakSentence = null
+            Log.d(TAG, "AAC_SENTENCE AUTO_SPEAK_START count=$itemCount requestId=$requestId")
             startSentenceSpeech(sentence, requestId)
         }
         pendingAutoSpeakSentence = pending
@@ -795,6 +807,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun shouldSkipFastCompositionLastIcon(): Boolean {
         if (!speechTimingSettings.speakSingleIconEnabled ||
             !speechTimingSettings.delayedSingleIconSpeakEnabled ||
+            !speechTimingSettings.fastCompositionSkipLastIconEnabled ||
             !speechTimingSettings.autoSpeakSentenceEnabled ||
             singleIconSpeechOccurredInCurrentSentence
         ) {

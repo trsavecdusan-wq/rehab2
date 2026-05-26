@@ -179,13 +179,15 @@
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/txtSingleIconSpeechStatus"
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchSingleIconSpeech"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            android:text="Govor posamezne ikone: VKLOP"
-            android:textColor="#D6DDE4"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Govor posamezne ikone"
+            android:textColor="#F4F7FA"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -207,13 +209,27 @@
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/txtAutoSentenceSpeechStatus"
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchFastCompositionSkipLastIcon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            android:text="Samodejni govor stavka: VKLOP"
-            android:textColor="#D6DDE4"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Preskoči zadnjo ikono pri hitrem sestavljanju"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchAutoSentenceSpeech"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Samodejni govor stavka"
+            android:textColor="#F4F7FA"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -234,6 +250,30 @@
             android:textColor="#F4F7FA"
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchReturnToRootAfterSentence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Po govoru stavka vrni na root meni"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchClearSentenceAfterSentence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Po govoru stavka izbriši sestavljeni tekst"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtAacGridSizeStatus"
@@ -262,6 +302,18 @@
             android:textColor="#F4F7FA"
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchPersistentTopRowEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Stalna prva vrstica"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtPersistentTopRowStatus"
