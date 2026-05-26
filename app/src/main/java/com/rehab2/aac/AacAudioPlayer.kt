@@ -110,6 +110,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         generatedLog: String,
         fallback: () -> Unit
     ) {
+        showSpeechApiConfigIssueIfNeeded()
         Thread {
             val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
                 text = text,
@@ -129,6 +130,22 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
                 fallback()
             }
         }.start()
+    }
+
+    private fun showSpeechApiConfigIssueIfNeeded() {
+        val configFile = AacSpeechApiConfig.getConfigFile(context)
+        if (!configFile.exists() || !configFile.isFile || configFile.length() <= 0L) {
+            AacSpeechApiConfig.ensureExampleConfigFile(context)
+            Log.d(TAG, AacSpeechApiConfig.readDiagnostics(context))
+            Toast.makeText(context, "Speech API config manjka", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val config = AacSpeechApiConfig.read(context)
+        Log.d(TAG, AacSpeechApiConfig.readDiagnostics(context))
+        if (config.enabled && config.apiKey.isBlank()) {
+            Toast.makeText(context, "Speech API key manjka", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun speakAndroidFallback(text: String, languageCode: String) {

@@ -1,7 +1,10 @@
 package com.rehab2.aac
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -11,6 +14,7 @@ import java.util.concurrent.TimeUnit
 
 class OpenAiAacSpeechApiClient(context: Context) : AacSpeechApiClient {
     private val appContext = context.applicationContext
+    private val mainHandler = Handler(Looper.getMainLooper())
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -23,6 +27,7 @@ class OpenAiAacSpeechApiClient(context: Context) : AacSpeechApiClient {
         voiceId: String
     ): ByteArray? {
         val config = AacSpeechApiConfig.read(appContext)
+        Log.d(TAG, AacSpeechApiConfig.readDiagnostics(appContext))
         if (!config.isOpenAiEnabled()) {
             return null
         }
@@ -49,21 +54,34 @@ class OpenAiAacSpeechApiClient(context: Context) : AacSpeechApiClient {
 
             httpClient.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
-                    Log.e(TAG, "OpenAI speech failed: HTTP ${response.code}")
+                    val errorPreview = response.body?.string()
+                        ?.take(MAX_ERROR_BODY_CHARS)
+                        .orEmpty()
+                    Log.e(TAG, "OpenAI speech failed: HTTP ${response.code} body=$errorPreview")
+                    showFailureToast()
                     return null
                 }
 
                 val bytes = response.body?.bytes()
                 if (bytes == null || bytes.size <= MIN_AUDIO_BYTES) {
                     Log.e(TAG, "OpenAI speech failed: empty audio response")
+                    showFailureToast()
                     null
                 } else {
+                    Log.d(TAG, "OPENAI SPEECH OK bytes=${bytes.size}")
                     bytes
                 }
             }
         } catch (error: Exception) {
             Log.e(TAG, "OpenAI speech failed: ${error.javaClass.simpleName}")
+            showFailureToast()
             null
+        }
+    }
+
+    private fun showFailureToast() {
+        mainHandler.post {
+            Toast.makeText(appContext, "OpenAI speech napaka", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -90,5 +108,6 @@ class OpenAiAacSpeechApiClient(context: Context) : AacSpeechApiClient {
     private companion object {
         const val TAG = "OpenAiAacSpeech"
         const val MIN_AUDIO_BYTES = 1024
+        const val MAX_ERROR_BODY_CHARS = 200
     }
 }

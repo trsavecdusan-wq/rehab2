@@ -41,6 +41,40 @@ data class AacSpeechApiConfig(
         const val DEFAULT_RESPONSE_FORMAT = "mp3"
         const val DEFAULT_SPEED = 0.88
 
+        fun readDiagnostics(context: Context): String {
+            val configFile = getConfigFile(context)
+            val config = read(context)
+            return buildString {
+                append("Speech API config: ")
+                append("exists=").append(configFile.exists() && configFile.isFile)
+                append(", enabled=").append(config.enabled)
+                append(", provider=").append(config.provider.ifBlank { "(blank)" })
+                append(", baseUrl=").append(config.baseUrl.ifBlank { "(blank)" })
+                append(", model=").append(config.normalizedModel())
+                append(", voiceId=").append(config.normalizedVoiceId())
+                append(", apiKeyPresent=").append(config.apiKey.isNotBlank())
+            }
+        }
+
+        fun ensureExampleConfigFile(context: Context): File? {
+            val exampleFile = getExampleConfigFile(context)
+            if (exampleFile.exists() && exampleFile.length() > 0L) {
+                return exampleFile
+            }
+
+            val parent = exampleFile.parentFile
+            if (parent != null && !parent.exists() && !parent.mkdirs()) {
+                return null
+            }
+
+            return try {
+                exampleFile.writeText(exampleJson(), Charsets.UTF_8)
+                exampleFile.takeIf { it.exists() && it.length() > 0L }
+            } catch (_: Exception) {
+                null
+            }
+        }
+
         fun read(context: Context): AacSpeechApiConfig {
             val configFile = getConfigFile(context)
             if (!configFile.exists() || !configFile.isFile || configFile.length() <= 0L) {
@@ -66,6 +100,25 @@ data class AacSpeechApiConfig(
 
         fun getConfigFile(context: Context): File {
             return File(context.filesDir, "NovaRehab2/aac/config/speech_api.json")
+        }
+
+        fun getExampleConfigFile(context: Context): File {
+            return File(context.filesDir, "NovaRehab2/aac/config/speech_api_example.json")
+        }
+
+        private fun exampleJson(): String {
+            return """
+                {
+                  "enabled": true,
+                  "provider": "openai",
+                  "baseUrl": "https://api.openai.com",
+                  "apiKey": "PASTE_OPENAI_API_KEY_HERE",
+                  "model": "gpt-4o-mini-tts",
+                  "voiceId": "marin",
+                  "responseFormat": "mp3",
+                  "speed": 0.88
+                }
+            """.trimIndent()
         }
     }
 }

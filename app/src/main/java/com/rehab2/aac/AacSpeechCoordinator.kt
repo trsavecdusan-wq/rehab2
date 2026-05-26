@@ -1,5 +1,6 @@
 package com.rehab2.aac
 
+import android.util.Log
 import java.io.File
 
 class AacSpeechCoordinator(
@@ -21,7 +22,10 @@ class AacSpeechCoordinator(
             languageCode = normalizedLanguage,
             voiceId = voiceId
         )
-        if (cachedFile != null) return cachedFile
+        if (cachedFile != null) {
+            Log.d(TAG, "Generated speech cache hit: ${cachedFile.absolutePath}")
+            return cachedFile
+        }
 
         val generatedAudio = apiClient.generateSpeech(
             text = trimmed,
@@ -29,15 +33,20 @@ class AacSpeechCoordinator(
             voiceId = voiceId
         ) ?: return null
 
-        return speechCache.saveGeneratedSpeech(
+        val savedFile = speechCache.saveGeneratedSpeech(
             text = trimmed,
             languageCode = normalizedLanguage,
             voiceId = voiceId,
             audioBytes = generatedAudio
         )
+        if (savedFile != null) {
+            Log.d(TAG, "Generated speech cache saved: ${savedFile.absolutePath}")
+        }
+        return savedFile
     }
 
     private companion object {
+        const val TAG = "AacSpeechCoordinator"
         const val DEFAULT_VOICE_ID = "default"
     }
 }
