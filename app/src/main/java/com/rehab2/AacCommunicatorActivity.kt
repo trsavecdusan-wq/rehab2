@@ -1143,6 +1143,47 @@ class AacCommunicatorActivity : AppCompatActivity() {
         private val onItemClick: (AacItem) -> Unit,
         private val onWaterBindTrace: (AacItem) -> Unit
     ) : RecyclerView.Adapter<AacAdapter.AacViewHolder>() {
+        private companion object {
+            const val IMAGE_LOG_TAG = "AacCommunicatorActivity"
+
+            fun resolveAacImageFile(
+                context: android.content.Context,
+                item: AacItem
+            ): File? {
+                val rawPath = item.imagePath.trim()
+                if (rawPath.isEmpty()) {
+                    Log.d(IMAGE_LOG_TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
+                    return null
+                }
+
+                if (item.iconSource == com.rehab2.aac.IconSource.SYSTEM) {
+                    Log.d(IMAGE_LOG_TAG, "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
+                    return null
+                }
+
+                val directFile = File(rawPath)
+                if (directFile.isAbsolute) {
+                    return directFile.takeIf { it.exists() && it.isFile } ?: run {
+                        Log.d(IMAGE_LOG_TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
+                        null
+                    }
+                }
+
+                val baseDir = when (item.iconSource) {
+                    com.rehab2.aac.IconSource.SOCA -> AacStoragePaths.getIconsSocaDir(context)
+                    com.rehab2.aac.IconSource.ARASAAC -> AacStoragePaths.getIconsArasaacDir(context)
+                    com.rehab2.aac.IconSource.CUSTOM,
+                    com.rehab2.aac.IconSource.PATIENT -> AacStoragePaths.getIconsCustomDir(context)
+                    com.rehab2.aac.IconSource.SYSTEM -> null
+                }
+
+                val resolved = baseDir?.let { File(it, rawPath) }
+                return resolved?.takeIf { it.exists() && it.isFile } ?: run {
+                    Log.d(IMAGE_LOG_TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
+                    null
+                }
+            }
+        }
 
         override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): AacViewHolder {
             val view = android.view.LayoutInflater.from(parent.context)
@@ -1229,41 +1270,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-    }
-
-    private fun resolveAacImageFile(context: android.content.Context, item: AacItem): File? {
-        val rawPath = item.imagePath.trim()
-        if (rawPath.isEmpty()) {
-            Log.d(TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
-            return null
-        }
-
-        if (item.iconSource == com.rehab2.aac.IconSource.SYSTEM) {
-            Log.d(TAG, "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
-            return null
-        }
-
-        val directFile = File(rawPath)
-        if (directFile.isAbsolute) {
-            return directFile.takeIf { it.exists() && it.isFile } ?: run {
-                Log.d(TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
-                null
-            }
-        }
-
-        val baseDir = when (item.iconSource) {
-            com.rehab2.aac.IconSource.SOCA -> AacStoragePaths.getIconsSocaDir(context)
-            com.rehab2.aac.IconSource.ARASAAC -> AacStoragePaths.getIconsArasaacDir(context)
-            com.rehab2.aac.IconSource.CUSTOM,
-            com.rehab2.aac.IconSource.PATIENT -> AacStoragePaths.getIconsCustomDir(context)
-            com.rehab2.aac.IconSource.SYSTEM -> null
-        }
-
-        val resolved = baseDir?.let { File(it, rawPath) }
-        return resolved?.takeIf { it.exists() && it.isFile } ?: run {
-            Log.d(TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
-            null
         }
     }
 
