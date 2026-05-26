@@ -13,5 +13,16 @@ data class AacItem(
     val children: List<String> = emptyList(),
     val sentenceRole: String? = null,
     val questionSl: String? = null,
-    val questionUk: String? = null
-)
+    val questionUk: String? = null,
+    val iconSource: IconSource = IconSource.SYSTEM,
+    val parentId: String? = null,
+    val isRootItem: Boolean = true,
+    val isHiddenUntilParent: Boolean = false,
+    val priority: Int = 0
+) {
+    val text: String
+        get() = labelSl
+
+    val speechText: String
+        get() = speakTextSl?.trim()?.takeIf { it.isNotEmpty() } ?: labelSl
+}

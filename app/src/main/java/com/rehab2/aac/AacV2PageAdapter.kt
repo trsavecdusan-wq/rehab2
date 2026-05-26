@@ -18,8 +18,16 @@ object AacV2PageAdapter {
     fun toAacPage(page: AacV2Page): AacPage {
         val conceptsById = page.concepts.associateBy { it.id }
         val iconsById = page.icons.associateBy { it.id }
+        val childIds = page.nodes.flatMap { it.children }.toSet()
+        val parentIdsByChildId = buildMap {
+            page.nodes.forEach { node ->
+                node.children.forEach { childId ->
+                    put(childId, node.id)
+                }
+            }
+        }
 
-        val items = page.nodes.map { node ->
+        val items = page.nodes.mapIndexed { index, node ->
             val concept = node.conceptId?.let { conceptsById[it] }
             val icon = concept?.activeIconId?.let { iconsById[it] }
             if (node.id == WATER_NODE_ID) {
@@ -41,7 +49,12 @@ object AacV2PageAdapter {
                 children = node.children,
                 sentenceRole = node.sentenceRole,
                 questionSl = node.questionSl,
-                questionUk = node.questionUk
+                questionUk = node.questionUk,
+                iconSource = icon?.source ?: IconSource.SYSTEM,
+                parentId = parentIdsByChildId[node.id],
+                isRootItem = node.id !in childIds,
+                isHiddenUntilParent = node.id in childIds,
+                priority = index
             )
             if (item.id == WATER_NODE_ID) {
                 lastWaterMappedItemChildrenCount = item.children.size

@@ -120,7 +120,8 @@ class AacRepository(private val context: Context) {
                         imagePath = itemJson.optString("imagePath"),
                         audioSl = itemJson.optString("audioSl"),
                         actionType = itemJson.optString("actionType"),
-                        targetPageId = itemJson.optString("targetPageId")
+                        targetPageId = itemJson.optString("targetPageId"),
+                        priority = index
                     )
                 )
             }
@@ -170,3 +171,4 @@ class AacRepository(private val context: Context) {
         }
     }
 }
+

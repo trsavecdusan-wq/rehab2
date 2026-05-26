@@ -1,4 +1,4 @@
-﻿package com.rehab2
+package com.rehab2
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -71,6 +71,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var labelMode: AacLabelMode = AacLabelMode.DEFAULT
     private var languageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
     private var speechTimingSettings: AacSpeechTimingSettings = AacSpeechTimingSettings()
+    private var singleIconSpeechOccurredInCurrentSentence = false
+    private var sentenceCompositionStartedAt = 0L
+    private var lastIconClickAt = 0L
     private var currentPageId: String = "home"
     private var waterPageModelChildrenCount: Int = -1
     private var waterBeforeAdapterChildrenCount: Int = -1
@@ -105,6 +108,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 Log.d(TAG, "AAC_SPEECH SPEECH_COMPLETED mode=$completedMode")
                 resetSpeechState("completed")
                 if (completedMode == SpeechMode.SENTENCE) {
+                    resetSentenceCompositionTracking()
                     returnToRootMenuAfterSentence()
                 }
             }
@@ -143,7 +147,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
         btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
-        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.60"
+        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.82"
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -161,6 +165,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         btnClearSentence.setOnClickListener {
             cancelPendingSpeech()
             sentenceManager.clear()
+            resetSentenceCompositionTracking()
             currentV2VisibleHistory.clear()
             clearPromptText()
             returnToRootMenuAfterClear()
@@ -295,9 +300,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 logWaterTrace("click item", item)
                 updateWaterTraceDebug("click water")
             }
-            val childItems = item.children.mapNotNull { childId ->
-                currentV2ItemsById[childId]
-            }
+            val clickedAt = System.currentTimeMillis()
+            startSentenceCompositionTrackingIfNeeded(clickedAt)
+            val childItems = resolveV2ChildItems(item)
             if (item.id == WATER_NODE_ID) {
                 Log.d(TAG, "WATER clicked children=${childItems.size}")
                 if (childItems.isEmpty()) {
@@ -356,7 +361,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun openDrinksV2Test() {
-        Toast.makeText(this, "TEST V2 CLICKED 1.2.60", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "TEST V2 CLICKED 1.2.82", Toast.LENGTH_LONG).show()
         val refreshResult = refreshBundledDrinksV2Page()
         showDrinksV2RefreshDebug(refreshResult)
         if (refreshResult.isReady) {
@@ -440,7 +445,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun updateWaterTraceDebug(stage: String) {
         txtWaterTraceDebug.visibility = View.VISIBLE
         txtWaterTraceDebug.text = buildString {
-            appendLine("WATER TRACE 1.2.60: $stage")
+            appendLine("WATER TRACE 1.2.82: $stage")
             appendLine("JSON children=${AacV2JsonParser.lastWaterJsonChildrenCount}")
             appendLine("parsed model children=${AacV2PageAdapter.lastWaterParsedModelChildrenCount}")
             appendLine("mapped AacItem children=${AacV2PageAdapter.lastWaterMappedItemChildrenCount}")
@@ -490,6 +495,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun clearV2State() {
         cancelPendingSpeech()
         sentenceManager.clear()
+        resetSentenceCompositionTracking()
         currentV2ItemsById = emptyMap()
         currentV2VisibleHistory.clear()
         currentVisibleItems = emptyList()
@@ -527,6 +533,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun getV2RootItems(items: List<AacItem>): List<AacItem> {
+        val explicitRootItems = items
+            .filter { it.isRootItem && !it.isHiddenUntilParent }
+            .sortedBy { it.priority }
+        if (explicitRootItems.isNotEmpty()) {
+            return explicitRootItems
+        }
+
         val childIds = items.flatMap { it.children }.toSet()
         val rootItems = items.filter { it.id !in childIds }
         return rootItems.ifEmpty { items }
@@ -683,10 +696,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
             isSpeakingSingleIcon = false
             return
         }
+        if (shouldSkipFastCompositionLastIcon()) {
+            Log.d(TAG, "AAC_SPEECH FAST_COMPOSITION_SKIP_LAST_ICON requestId=$requestId text=$text")
+            isSpeakingSingleIcon = false
+            return
+        }
 
         isSpeakingSingleIcon = true
         pendingSpeechMode = SpeechMode.SINGLE_ICON
         activeSpeechMode = SpeechMode.SINGLE_ICON
+        singleIconSpeechOccurredInCurrentSentence = true
+        Log.d(TAG, "AAC_SPEECH SINGLE_ICON_OCCURRED_IN_SENTENCE requestId=$requestId")
         Log.d(TAG, "AAC_SPEECH SINGLE_ICON_START requestId=$requestId text=$text")
         audioPlayer.speakText(text, languageCode)
     }
@@ -743,6 +763,56 @@ class AacCommunicatorActivity : AppCompatActivity() {
         pendingSpeechMode = null
         activeSpeechMode = null
         Log.d(TAG, "AAC_SPEECH STATE_RESET reason=$reason")
+    }
+
+    private fun resolveV2ChildItems(item: AacItem): List<AacItem> {
+        val explicitChildren = item.children.mapNotNull { childId ->
+            currentV2ItemsById[childId]
+        }
+        if (explicitChildren.isNotEmpty()) {
+            return explicitChildren.sortedBy { it.priority }
+        }
+
+        return currentV2ItemsById.values
+            .filter { it.parentId == item.id }
+            .sortedBy { it.priority }
+    }
+
+    private fun startSentenceCompositionTrackingIfNeeded(clickedAt: Long) {
+        if (sentenceCompositionStartedAt == 0L) {
+            sentenceCompositionStartedAt = clickedAt
+            singleIconSpeechOccurredInCurrentSentence = false
+        }
+        lastIconClickAt = clickedAt
+    }
+
+    private fun resetSentenceCompositionTracking() {
+        singleIconSpeechOccurredInCurrentSentence = false
+        sentenceCompositionStartedAt = 0L
+        lastIconClickAt = 0L
+    }
+
+    private fun shouldSkipFastCompositionLastIcon(): Boolean {
+        if (!speechTimingSettings.speakSingleIconEnabled ||
+            !speechTimingSettings.delayedSingleIconSpeakEnabled ||
+            !speechTimingSettings.autoSpeakSentenceEnabled ||
+            singleIconSpeechOccurredInCurrentSentence
+        ) {
+            return false
+        }
+
+        val itemCount = sentenceManager.getItems().size
+        if (itemCount <= 1) {
+            return false
+        }
+
+        if (sentenceCompositionStartedAt <= 0L || lastIconClickAt <= sentenceCompositionStartedAt) {
+            return false
+        }
+
+        val compositionDuration = lastIconClickAt - sentenceCompositionStartedAt
+        val fastCompositionThreshold = speechTimingSettings.singleIconSpeakDelayMs * itemCount
+        return compositionDuration < fastCompositionThreshold
     }
 
     private fun speakCurrentSentence() {

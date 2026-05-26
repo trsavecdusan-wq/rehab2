@@ -4,7 +4,8 @@ enum class IconSource {
     SOCA,
     ARASAAC,
     PATIENT,
-    CUSTOM
+    CUSTOM,
+    SYSTEM
 }
 
 data class AacConcept(
@@ -41,3 +42,4 @@ data class AacSentenceItem(
     val text: String,
     val role: String?
 )
+
