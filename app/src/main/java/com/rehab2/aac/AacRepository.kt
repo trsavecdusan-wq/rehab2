@@ -139,16 +139,17 @@ class AacRepository(private val context: Context) {
     }
 
     private fun fallbackPage(): AacPage {
+        val fallbackItems = listOf(
+            AacItem("water", "VODA", "", "", "speak", ""),
+            AacItem("juice", "SOK", "", "", "speak", ""),
+            AacItem("food", "HRANA", "", "", "speak", ""),
+            AacItem("wc", "WC", "", "", "speak", ""),
+            AacItem("help", "POMO\u010C", "", "", "speak", "")
+        )
         return AacPage(
             pageId = "home",
             title = "AAC V1",
-            items = listOf(
-                AacItem("water", "VODA", "", "", "speak", ""),
-                AacItem("juice", "SOK", "", "", "speak", ""),
-                AacItem("food", "HRANA", "", "", "speak", ""),
-                AacItem("wc", "WC", "", "", "speak", ""),
-                AacItem("help", "POMO\u010C", "", "", "speak", "")
-            )
+            items = AacLocalJsonLoader.loadItems(context, fallbackItems)
         )
     }
 

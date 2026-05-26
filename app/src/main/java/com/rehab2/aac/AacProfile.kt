@@ -55,7 +55,7 @@ object AacProfileStore {
     )
 
     fun loadProfilesFromStorage(context: Context): List<AacProfile> {
-        return fallbackProfiles.filter { it.enabled }
+        return AacLocalJsonLoader.loadProfiles(context, fallbackProfiles.filter { it.enabled })
     }
 
     fun getActiveAacProfile(context: Context): AacProfile {
