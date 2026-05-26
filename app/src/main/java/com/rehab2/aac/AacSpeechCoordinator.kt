@@ -4,12 +4,13 @@ import java.io.File
 
 class AacSpeechCoordinator(
     private val speechCache: AacSpeechCache,
-    private val apiClient: AacSpeechApiClient = AacSpeechApiClient.NotConfigured
+    private val apiClient: AacSpeechApiClient = AacSpeechApiClient.NotConfigured,
+    private val voiceIdProvider: () -> String = { DEFAULT_VOICE_ID }
 ) {
     fun getOrGenerateSpeechFile(
         text: String,
         languageCode: String,
-        voiceId: String = DEFAULT_VOICE_ID
+        voiceId: String = voiceIdProvider()
     ): File? {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) return null

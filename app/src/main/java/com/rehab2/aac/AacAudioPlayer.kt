@@ -4,6 +4,8 @@ import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.Toast
@@ -12,7 +14,11 @@ import java.util.Locale
 
 class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener {
     private val speechCache = AacSpeechCache(context)
-    private val speechCoordinator = AacSpeechCoordinator(speechCache)
+    private val speechCoordinator = AacSpeechCoordinator(
+        speechCache,
+        OpenAiAacSpeechApiClient(context),
+        voiceIdProvider = { AacSpeechApiConfig.read(context).normalizedVoiceId() }
+    )
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { }
     private var mediaPlayer: MediaPlayer? = null
@@ -21,6 +27,9 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private var isTtsFailed = false
     private var pendingTextToSpeak: String? = null
     private var pendingLanguageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
+    private val mainHandler = Handler(Looper.getMainLooper())
+    @Volatile
+    private var speechRequestSerial = 0
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) {
@@ -46,30 +55,29 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
     fun playOrSpeak(item: AacItem, languageCode: String) {
         stopPlayback()
+        val requestSerial = nextSpeechRequestSerial()
         val fallbackText = resolveTileSpeechText(item, languageCode)
 
-        val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
+        playGeneratedSpeechOrFallback(
             text = fallbackText,
-            languageCode = languageCode
-        )
-        if (playAudioFileIfAvailable(generatedAudioFile)) {
-            Log.d(TAG, "AUDIO GENERATED: ${item.id}")
-            return
-        }
+            languageCode = languageCode,
+            requestSerial = requestSerial,
+            generatedLog = "AUDIO GENERATED: ${item.id}"
+        ) {
+            val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
+            if (playAudioFileIfAvailable(directAudioFile)) {
+                Toast.makeText(context, "AUDIO DIRECT: ${item.id}", Toast.LENGTH_SHORT).show()
+                return@playGeneratedSpeechOrFallback
+            }
 
-        val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
-        if (playAudioFileIfAvailable(directAudioFile)) {
-            Toast.makeText(context, "AUDIO DIRECT: ${item.id}", Toast.LENGTH_SHORT).show()
-            return
-        }
+            val cachedAudioFile = speechCache.getExistingCacheFile(item.id)
+            if (playAudioFileIfAvailable(cachedAudioFile)) {
+                Toast.makeText(context, "AUDIO CACHE: ${item.id}", Toast.LENGTH_SHORT).show()
+                return@playGeneratedSpeechOrFallback
+            }
 
-        val cachedAudioFile = speechCache.getExistingCacheFile(item.id)
-        if (playAudioFileIfAvailable(cachedAudioFile)) {
-            Toast.makeText(context, "AUDIO CACHE: ${item.id}", Toast.LENGTH_SHORT).show()
-            return
+            speakAndroidFallback(fallbackText, languageCode)
         }
-
-        speakText(fallbackText, languageCode)
     }
 
     fun speakText(text: String) {
@@ -83,19 +91,51 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         }
 
         stopPlayback()
-        val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
-            text = trimmed,
-            languageCode = languageCode
-        )
-        if (playAudioFileIfAvailable(generatedAudioFile)) {
-            Log.d(TAG, "AUDIO GENERATED")
-            return
-        }
+        val requestSerial = nextSpeechRequestSerial()
 
+        playGeneratedSpeechOrFallback(
+            text = trimmed,
+            languageCode = languageCode,
+            requestSerial = requestSerial,
+            generatedLog = "AUDIO GENERATED"
+        ) {
+            speakAndroidFallback(trimmed, languageCode)
+        }
+    }
+
+    private fun playGeneratedSpeechOrFallback(
+        text: String,
+        languageCode: String,
+        requestSerial: Int,
+        generatedLog: String,
+        fallback: () -> Unit
+    ) {
+        Thread {
+            val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
+                text = text,
+                languageCode = languageCode
+            )
+
+            mainHandler.post {
+                if (requestSerial != speechRequestSerial) {
+                    return@post
+                }
+
+                if (playAudioFileIfAvailable(generatedAudioFile)) {
+                    Log.d(TAG, generatedLog)
+                    return@post
+                }
+
+                fallback()
+            }
+        }.start()
+    }
+
+    private fun speakAndroidFallback(text: String, languageCode: String) {
         if (isTtsReady) {
             configureTtsLanguage(languageCode)
         }
-        speak(trimmed, languageCode)
+        speak(text, languageCode)
     }
 
     private fun playAudioFileIfAvailable(audioFile: File?): Boolean {
@@ -229,6 +269,11 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private fun stopPlayback() {
         mediaPlayer?.stopSafely()
         releaseMediaPlayer()
+    }
+
+    private fun nextSpeechRequestSerial(): Int {
+        speechRequestSerial += 1
+        return speechRequestSerial
     }
 
     private fun releaseMediaPlayer() {
