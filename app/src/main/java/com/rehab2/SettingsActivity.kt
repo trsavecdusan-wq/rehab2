@@ -26,6 +26,7 @@ import com.rehab2.aac.AacCommunicationContext
 import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacGuidedFollowUpSettings
+import com.rehab2.aac.AacContentDiagnostics
 import com.rehab2.aac.AacProfileStore
 import com.rehab2.aac.AacSampleContentCreator
 import com.rehab2.aac.AacSpeechApiConfig
@@ -241,6 +242,10 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnCreateSampleAacPack).setOnClickListener {
             createSampleAacPack()
+        }
+
+        findViewById<Button>(R.id.btnCheckAacFiles).setOnClickListener {
+            showAacContentDiagnostics()
         }
 
         findViewById<Button>(R.id.btnStatusSettings).setOnClickListener {
@@ -1000,6 +1005,50 @@ class SettingsActivity : AppCompatActivity() {
                 "Ni sprememb."
         }
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun showAacContentDiagnostics() {
+        val report = AacContentDiagnostics.inspect(this)
+        val message = if (report.storageUnavailable) {
+            "Shramba ni dosegljiva."
+        } else {
+            buildString {
+                append("Osnovna pot:\n")
+                append(report.basePath ?: "-")
+                append("\n\n")
+                append("AAC items JSON: ")
+                append(if (report.itemsJsonExists) "OK" else "MANJKA")
+                append("\n")
+                append("DOM profile JSON: ")
+                append(if (report.domProfileExists) "OK" else "MANJKA")
+                append("\n")
+                append("Custom icons folder: ")
+                append(if (report.customIconsDirExists) "OK" else "MANJKA")
+                append("\n")
+                append("SOCA icons folder: ")
+                append(if (report.socaIconsDirExists) "OK" else "MANJKA")
+                append("\n")
+                append("ARASAAC icons folder: ")
+                append(if (report.arasaacIconsDirExists) "OK" else "MANJKA")
+                append("\n\n")
+                append("Manjkajoče sample slike:\n")
+                if (report.missingSampleImages.isEmpty()) {
+                    append("- nobena")
+                } else {
+                    report.missingSampleImages.forEach { fileName ->
+                        append("- ")
+                        append(fileName)
+                        append("\n")
+                    }
+                }
+            }.trimEnd()
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("AAC diagnostika")
+            .setMessage(message)
+            .setPositiveButton("V redu", null)
+            .show()
     }
 
     private fun releaseSpeechApiTestPlayer() {
