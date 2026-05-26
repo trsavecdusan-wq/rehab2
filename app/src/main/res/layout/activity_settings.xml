@@ -343,6 +343,82 @@
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
 
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchGuidedFollowUpEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Vodena follow-up vprašanja"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchVendingNumberDisplayEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Prikaži številko pijače na avtomatu"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchSpeakDigitsSeparatelyEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Govori številko po posameznih cifrah"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtAacCommunicationContextStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="AAC kontekst: Normalna komunikacija"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editAacCommunicationContext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:hint="Normalna komunikacija"
+            android:inputType="none"
+            android:maxLines="2"
+            android:minHeight="60dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchRealWorldHelpersEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Real-world helperji"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
         <Button
             android:id="@+id/btnSaveSpeechApiSettings"
             android:layout_width="match_parent"

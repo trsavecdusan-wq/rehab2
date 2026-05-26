@@ -22,7 +22,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
+import com.rehab2.aac.AacCommunicationContext
+import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
+import com.rehab2.aac.AacGuidedFollowUpSettings
 import com.rehab2.aac.AacSpeechApiConfig
 import com.rehab2.aac.AacSpeechCache
 import com.rehab2.aac.AacSpeechCoordinator
@@ -144,6 +147,12 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var switchPersistentTopRowEnabled: SwitchCompat
     private lateinit var txtPersistentTopRowStatus: TextView
     private lateinit var editPersistentTopRowCount: EditText
+    private lateinit var switchGuidedFollowUpEnabled: SwitchCompat
+    private lateinit var switchVendingNumberDisplayEnabled: SwitchCompat
+    private lateinit var switchSpeakDigitsSeparatelyEnabled: SwitchCompat
+    private lateinit var txtAacCommunicationContextStatus: TextView
+    private lateinit var editAacCommunicationContext: EditText
+    private lateinit var switchRealWorldHelpersEnabled: SwitchCompat
     private var speechApiTestPlayer: MediaPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
@@ -202,6 +211,12 @@ class SettingsActivity : AppCompatActivity() {
         switchPersistentTopRowEnabled = findViewById(R.id.switchPersistentTopRowEnabled)
         txtPersistentTopRowStatus = findViewById(R.id.txtPersistentTopRowStatus)
         editPersistentTopRowCount = findViewById(R.id.editPersistentTopRowCount)
+        switchGuidedFollowUpEnabled = findViewById(R.id.switchGuidedFollowUpEnabled)
+        switchVendingNumberDisplayEnabled = findViewById(R.id.switchVendingNumberDisplayEnabled)
+        switchSpeakDigitsSeparatelyEnabled = findViewById(R.id.switchSpeakDigitsSeparatelyEnabled)
+        txtAacCommunicationContextStatus = findViewById(R.id.txtAacCommunicationContextStatus)
+        editAacCommunicationContext = findViewById(R.id.editAacCommunicationContext)
+        switchRealWorldHelpersEnabled = findViewById(R.id.switchRealWorldHelpersEnabled)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -252,6 +267,9 @@ class SettingsActivity : AppCompatActivity() {
         }
         editPersistentTopRowCount.setOnClickListener {
             showPersistentTopRowCountPicker()
+        }
+        editAacCommunicationContext.setOnClickListener {
+            showAacCommunicationContextPicker()
         }
         bindSpeechTimingSwitchListeners()
         bindPersistentTopRowSwitchListener()
@@ -320,6 +338,8 @@ class SettingsActivity : AppCompatActivity() {
         refreshSpeechTimingSection()
         refreshAacGridSizeSection()
         refreshPersistentTopRowSection()
+        refreshGuidedFollowUpSection()
+        refreshAacCommunicationContextSection()
         applyKeepScreenOnWhileCharging()
     }
 
@@ -334,6 +354,8 @@ class SettingsActivity : AppCompatActivity() {
         refreshSpeechTimingSection()
         refreshAacGridSizeSection()
         refreshPersistentTopRowSection()
+        refreshGuidedFollowUpSection()
+        refreshAacCommunicationContextSection()
         applyKeepScreenOnWhileCharging()
         startGpsDiagnosticsRefresh()
     }
@@ -483,6 +505,31 @@ class SettingsActivity : AppCompatActivity() {
         editPersistentTopRowCount.setText("$count ikon")
         editPersistentTopRowCount.isEnabled = enabled
         bindPersistentTopRowSwitchListener()
+    }
+
+    private fun refreshGuidedFollowUpSection() {
+        val settings = AacGuidedFollowUpSettings.read(this)
+        switchGuidedFollowUpEnabled.setOnCheckedChangeListener(null)
+        switchVendingNumberDisplayEnabled.setOnCheckedChangeListener(null)
+        switchSpeakDigitsSeparatelyEnabled.setOnCheckedChangeListener(null)
+        switchGuidedFollowUpEnabled.isChecked = settings.guidedFollowUpEnabled
+        switchVendingNumberDisplayEnabled.isChecked = settings.vendingNumberDisplayEnabled
+        switchSpeakDigitsSeparatelyEnabled.isChecked = settings.speakDigitsSeparatelyEnabled
+        switchVendingNumberDisplayEnabled.isEnabled = settings.guidedFollowUpEnabled
+        switchSpeakDigitsSeparatelyEnabled.isEnabled =
+            settings.guidedFollowUpEnabled && settings.vendingNumberDisplayEnabled
+        bindGuidedFollowUpSwitchListeners()
+    }
+
+    private fun refreshAacCommunicationContextSection() {
+        val contextMode = AacCommunicationContextPrefs.readContext(this)
+        val realWorldHelpersEnabled = AacCommunicationContextPrefs.areRealWorldHelpersEnabled(this)
+        txtAacCommunicationContextStatus.text = "AAC kontekst: ${aacCommunicationContextLabel(contextMode)}"
+        editAacCommunicationContext.setText(aacCommunicationContextLabel(contextMode))
+        switchRealWorldHelpersEnabled.setOnCheckedChangeListener(null)
+        switchRealWorldHelpersEnabled.isChecked = realWorldHelpersEnabled
+        switchRealWorldHelpersEnabled.isEnabled = contextMode != AacCommunicationContext.VIDEO_CALL_COMMUNICATION
+        bindAacCommunicationContextSwitchListener()
     }
 
     private fun refreshAacGridSizeSection() {
@@ -699,6 +746,27 @@ class SettingsActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun showAacCommunicationContextPicker() {
+        val options = arrayOf(
+            AacCommunicationContext.NORMAL_COMMUNICATION,
+            AacCommunicationContext.VIDEO_CALL_COMMUNICATION,
+            AacCommunicationContext.REAL_WORLD_ASSISTANT
+        )
+        val labels = options.map { aacCommunicationContextLabel(it) }.toTypedArray()
+        val current = AacCommunicationContextPrefs.readContext(this)
+        val selectedIndex = options.indexOf(current).coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle("Izberi AAC kontekst")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                prefs.edit()
+                    .putString(AacCommunicationContextPrefs.PREF_AAC_COMMUNICATION_CONTEXT, options[which].name)
+                    .apply()
+                refreshAacCommunicationContextSection()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
     private fun bindSpeechTimingSwitchListeners() {
         switchSingleIconSpeech.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit()
@@ -738,6 +806,44 @@ class SettingsActivity : AppCompatActivity() {
                 .putBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, isChecked)
                 .apply()
             refreshPersistentTopRowSection()
+        }
+    }
+
+    private fun bindGuidedFollowUpSwitchListeners() {
+        switchGuidedFollowUpEnabled.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacGuidedFollowUpSettings.PREF_GUIDED_FOLLOW_UP_ENABLED, isChecked)
+                .apply()
+            refreshGuidedFollowUpSection()
+        }
+        switchVendingNumberDisplayEnabled.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacGuidedFollowUpSettings.PREF_VENDING_NUMBER_DISPLAY_ENABLED, isChecked)
+                .apply()
+            refreshGuidedFollowUpSection()
+        }
+        switchSpeakDigitsSeparatelyEnabled.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacGuidedFollowUpSettings.PREF_SPEAK_DIGITS_SEPARATELY_ENABLED, isChecked)
+                .apply()
+            refreshGuidedFollowUpSection()
+        }
+    }
+
+    private fun bindAacCommunicationContextSwitchListener() {
+        switchRealWorldHelpersEnabled.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacCommunicationContextPrefs.PREF_AAC_REAL_WORLD_HELPERS_ENABLED, isChecked)
+                .apply()
+            refreshAacCommunicationContextSection()
+        }
+    }
+
+    private fun aacCommunicationContextLabel(contextMode: AacCommunicationContext): String {
+        return when (contextMode) {
+            AacCommunicationContext.NORMAL_COMMUNICATION -> "Normalna komunikacija"
+            AacCommunicationContext.VIDEO_CALL_COMMUNICATION -> "Video klic"
+            AacCommunicationContext.REAL_WORLD_ASSISTANT -> "Pomoč v realnem svetu"
         }
     }
 

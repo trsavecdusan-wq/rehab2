@@ -18,7 +18,12 @@ data class AacItem(
     val parentId: String? = null,
     val isRootItem: Boolean = true,
     val isHiddenUntilParent: Boolean = false,
-    val priority: Int = 0
+    val priority: Int = 0,
+    val followUpQuestion: String? = null,
+    val vendingNumber: String? = null,
+    val vendingInstructionImagePath: String? = null,
+    val largeCupImagePath: String? = null,
+    val hasLargeCupOption: Boolean = false
 ) {
     val text: String
         get() = labelSl

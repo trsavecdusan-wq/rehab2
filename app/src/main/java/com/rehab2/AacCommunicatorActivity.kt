@@ -1,5 +1,6 @@
 package com.rehab2
 
+import android.app.AlertDialog
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
@@ -13,12 +14,16 @@ import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rehab2.aac.AacAudioPlayer
+import com.rehab2.aac.AacCommunicationContext
+import com.rehab2.aac.AacCommunicationContextPrefs
+import com.rehab2.aac.AacGuidedFollowUpSettings
 import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacLabelMode
 import com.rehab2.aac.AacLanguageResolver
@@ -71,9 +76,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var labelMode: AacLabelMode = AacLabelMode.DEFAULT
     private var languageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
     private var speechTimingSettings: AacSpeechTimingSettings = AacSpeechTimingSettings()
+    private var guidedFollowUpSettings: AacGuidedFollowUpSettings = AacGuidedFollowUpSettings()
+    private var aacCommunicationContext: AacCommunicationContext = AacCommunicationContext.NORMAL_COMMUNICATION
+    private var realWorldHelpersEnabled = true
     private var singleIconSpeechOccurredInCurrentSentence = false
     private var sentenceCompositionStartedAt = 0L
     private var lastIconClickAt = 0L
+    private var pendingVendingDigitsSpeech: String? = null
     private var currentPageId: String = "home"
     private var waterPageModelChildrenCount: Int = -1
     private var waterBeforeAdapterChildrenCount: Int = -1
@@ -117,16 +126,19 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     if (speechTimingSettings.returnToRootAfterSentenceEnabled) {
                         returnToRootMenuAfterSentence()
                     }
+                    speakPendingVendingDigitsIfNeeded()
                 }
             }
 
             override fun onSpeechCancelled() {
                 Log.d(TAG, "AAC_SPEECH SPEECH_CANCELLED mode=$activeSpeechMode")
+                pendingVendingDigitsSpeech = null
                 resetSpeechState("cancelled")
             }
 
             override fun onSpeechError() {
                 Log.d(TAG, "AAC_SPEECH SPEECH_ERROR mode=$activeSpeechMode")
+                pendingVendingDigitsSpeech = null
                 resetSpeechState("error")
             }
         })
@@ -154,7 +166,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
         btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
-        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.84"
+        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.88"
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -163,6 +175,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
         labelMode = readAacLabelMode()
         languageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         speechTimingSettings = AacSpeechTimingSettings.read(this)
+        guidedFollowUpSettings = AacGuidedFollowUpSettings.read(this)
+        aacCommunicationContext = AacCommunicationContextPrefs.readContext(this)
+        realWorldHelpersEnabled = AacCommunicationContextPrefs.areRealWorldHelpersEnabled(this)
         readPersistentTopRowSettings()
 
         btnSpeakSentence.setOnClickListener {
@@ -200,6 +215,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val updatedLabelMode = readAacLabelMode()
         val updatedLanguageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         val updatedSpeechTimingSettings = AacSpeechTimingSettings.read(this)
+        val updatedGuidedFollowUpSettings = AacGuidedFollowUpSettings.read(this)
+        val updatedCommunicationContext = AacCommunicationContextPrefs.readContext(this)
+        val updatedRealWorldHelpersEnabled = AacCommunicationContextPrefs.areRealWorldHelpersEnabled(this)
         val oldGridSize = aacGridSize
         val oldTopRowEnabled = persistentTopRowEnabled
         val oldTopRowCount = persistentTopRowCount
@@ -210,6 +228,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
             updatedLabelMode != labelMode ||
             updatedLanguageCode != languageCode ||
             updatedSpeechTimingSettings != speechTimingSettings ||
+            updatedGuidedFollowUpSettings != guidedFollowUpSettings ||
+            updatedCommunicationContext != aacCommunicationContext ||
+            updatedRealWorldHelpersEnabled != realWorldHelpersEnabled ||
             oldGridSize != aacGridSize ||
             oldTopRowEnabled != persistentTopRowEnabled ||
             oldTopRowCount != persistentTopRowCount ||
@@ -218,6 +239,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
             labelMode = updatedLabelMode
             languageCode = updatedLanguageCode
             speechTimingSettings = updatedSpeechTimingSettings
+            guidedFollowUpSettings = updatedGuidedFollowUpSettings
+            aacCommunicationContext = updatedCommunicationContext
+            realWorldHelpersEnabled = updatedRealWorldHelpersEnabled
             applyAacGridSize()
             if (currentVisibleItems.isNotEmpty()) {
                 showItems(currentVisibleItems)
@@ -309,7 +333,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
             val clickedAt = System.currentTimeMillis()
             startSentenceCompositionTrackingIfNeeded(clickedAt)
-            val childItems = resolveV2ChildItems(item)
+            val childItems = resolveGuidedChildItems(item, resolveV2ChildItems(item))
             if (item.id == WATER_NODE_ID) {
                 Log.d(TAG, "WATER clicked children=${childItems.size}")
                 if (childItems.isEmpty()) {
@@ -329,11 +353,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
             Log.d(TAG, "AAC_SENTENCE ITEM_ADDED count=${sentenceManager.getItems().size} item=${item.id}")
             updateSentenceBar()
             val singleIconText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+            maybeShowVendingNumber(item)
 
             if (childItems.isNotEmpty()) {
                 speakSingleIconIfEnabled(singleIconText, speechRequestId)
                 scheduleAutoSpeakSentenceIfEnabled(speechRequestId)
-                setPromptText(AacLocalizedTextResolver.resolveQuestion(item, languageCode))
+                setPromptText(resolveFollowUpQuestion(item))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
                 if (item.id == WATER_NODE_ID) {
@@ -369,7 +394,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun openDrinksV2Test() {
-        Toast.makeText(this, "TEST V2 CLICKED 1.2.84", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "TEST V2 CLICKED 1.2.88", Toast.LENGTH_LONG).show()
         val refreshResult = refreshBundledDrinksV2Page()
         showDrinksV2RefreshDebug(refreshResult)
         if (refreshResult.isReady) {
@@ -453,7 +478,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun updateWaterTraceDebug(stage: String) {
         txtWaterTraceDebug.visibility = View.VISIBLE
         txtWaterTraceDebug.text = buildString {
-            appendLine("WATER TRACE 1.2.84: $stage")
+            appendLine("WATER TRACE 1.2.88: $stage")
             appendLine("JSON children=${AacV2JsonParser.lastWaterJsonChildrenCount}")
             appendLine("parsed model children=${AacV2PageAdapter.lastWaterParsedModelChildrenCount}")
             appendLine("mapped AacItem children=${AacV2PageAdapter.lastWaterMappedItemChildrenCount}")
@@ -504,6 +529,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         cancelPendingSpeech()
         sentenceManager.clear()
         resetSentenceCompositionTracking()
+        pendingVendingDigitsSpeech = null
         currentV2ItemsById = emptyMap()
         currentV2VisibleHistory.clear()
         currentVisibleItems = emptyList()
@@ -765,6 +791,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         isSpeakingSingleIcon = false
         pendingSpeechMode = null
         activeSpeechMode = null
+        pendingVendingDigitsSpeech = null
         audioPlayer.stopCurrentSpeech()
         nextSpeechRequestId("CANCEL_ALL")
     }
@@ -788,6 +815,230 @@ class AacCommunicatorActivity : AppCompatActivity() {
         return currentV2ItemsById.values
             .filter { it.parentId == item.id }
             .sortedBy { it.priority }
+    }
+
+    private fun resolveGuidedChildItems(item: AacItem, existingChildren: List<AacItem>): List<AacItem> {
+        if (!isGuidedFollowUpAllowed()) {
+            return existingChildren
+        }
+        if (existingChildren.isNotEmpty()) {
+            return existingChildren
+        }
+        if (!isDrinkFollowUpTrigger(item)) {
+            return existingChildren
+        }
+        return createFallbackDrinkChildItems(parentId = item.id)
+    }
+
+    private fun isDrinkFollowUpTrigger(item: AacItem): Boolean {
+        val id = item.id.lowercase()
+        val concept = item.conceptId?.lowercase().orEmpty()
+        val label = item.labelSl.uppercase()
+        return id == "thirsty" ||
+            id == "drinks" ||
+            id == "drink" ||
+            concept == "thirsty" ||
+            concept == "drinks" ||
+            label.contains("ŽEJNA") ||
+            label.contains("PIJAČA")
+    }
+
+    private fun createFallbackDrinkChildItems(parentId: String): List<AacItem> {
+        return listOf(
+            AacItem(
+                id = "guided_water",
+                labelSl = "VODA",
+                imagePath = "",
+                audioSl = "",
+                actionType = "speak",
+                targetPageId = "",
+                speakTextSl = "voda",
+                conceptId = "water",
+                sentenceRole = "object",
+                parentId = parentId,
+                isRootItem = false,
+                isHiddenUntilParent = true,
+                priority = 0,
+                vendingNumber = "12"
+            ),
+            AacItem(
+                id = "guided_juice",
+                labelSl = "SOK",
+                imagePath = "",
+                audioSl = "",
+                actionType = "speak",
+                targetPageId = "",
+                speakTextSl = "sok",
+                conceptId = "juice",
+                sentenceRole = "object",
+                parentId = parentId,
+                isRootItem = false,
+                isHiddenUntilParent = true,
+                priority = 1,
+                vendingNumber = "14"
+            ),
+            AacItem(
+                id = "guided_coffee",
+                labelSl = "KAVA",
+                imagePath = "",
+                audioSl = "",
+                actionType = "speak",
+                targetPageId = "",
+                speakTextSl = "kava",
+                conceptId = "coffee",
+                sentenceRole = "object",
+                parentId = parentId,
+                isRootItem = false,
+                isHiddenUntilParent = true,
+                priority = 2,
+                vendingNumber = "21",
+                hasLargeCupOption = true
+            ),
+            AacItem(
+                id = "guided_tea",
+                labelSl = "ČAJ",
+                imagePath = "",
+                audioSl = "",
+                actionType = "speak",
+                targetPageId = "",
+                speakTextSl = "čaj",
+                conceptId = "tea",
+                sentenceRole = "object",
+                parentId = parentId,
+                isRootItem = false,
+                isHiddenUntilParent = true,
+                priority = 3,
+                vendingNumber = "22",
+                hasLargeCupOption = true
+            )
+        )
+    }
+
+    private fun resolveFollowUpQuestion(item: AacItem): String? {
+        if (isGuidedFollowUpAllowed()) {
+            item.followUpQuestion?.takeIf { it.isNotBlank() }?.let { return it }
+            if (isDrinkFollowUpTrigger(item)) {
+                return "Kaj želiš piti?"
+            }
+        } else if (isDrinkFollowUpTrigger(item)) {
+            return null
+        }
+        return AacLocalizedTextResolver.resolveQuestion(item, languageCode)
+    }
+
+    private fun maybeShowVendingNumber(item: AacItem) {
+        if (!isRealWorldHelperAllowed() ||
+            !guidedFollowUpSettings.guidedFollowUpEnabled ||
+            !guidedFollowUpSettings.vendingNumberDisplayEnabled ||
+            !isDrinkMachineHelperItem(item)) {
+            pendingVendingDigitsSpeech = null
+            return
+        }
+        val vendingNumber = item.vendingNumber?.trim().orEmpty()
+        if (vendingNumber.isEmpty()) {
+            pendingVendingDigitsSpeech = null
+            return
+        }
+        showVendingNumberDialog(item, vendingNumber)
+        pendingVendingDigitsSpeech = if (guidedFollowUpSettings.speakDigitsSeparatelyEnabled) {
+            buildDigitSpeechText(vendingNumber)
+        } else {
+            null
+        }
+    }
+
+    private fun showVendingNumberDialog(item: AacItem, vendingNumber: String) {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(48, 32, 48, 16)
+        }
+        val titleView = TextView(this).apply {
+            text = item.labelSl
+            setTextColor(Color.WHITE)
+            setTypeface(typeface, Typeface.BOLD)
+            gravity = Gravity.CENTER
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
+        }
+        val numberView = TextView(this).apply {
+            text = vendingNumber
+            setTextColor(Color.WHITE)
+            setTypeface(typeface, Typeface.BOLD)
+            gravity = Gravity.CENTER
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 48f)
+        }
+        val subtitleView = TextView(this).apply {
+            text = "Številka na avtomatu"
+            setTextColor(Color.LTGRAY)
+            gravity = Gravity.CENTER
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+        }
+        container.addView(titleView)
+        container.addView(numberView)
+        container.addView(subtitleView)
+
+        AlertDialog.Builder(this)
+            .setView(container)
+            .setPositiveButton("V redu", null)
+            .show()
+    }
+
+    private fun buildDigitSpeechText(vendingNumber: String): String {
+        val digits = vendingNumber.filter { it.isDigit() }
+        if (digits.isBlank()) {
+            return vendingNumber
+        }
+        if (AacLanguageResolver.normalize(languageCode) != AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            return digits.toCharArray().joinToString(" ")
+        }
+        return digits.map { digit ->
+            when (digit) {
+                '0' -> "nič"
+                '1' -> "ena"
+                '2' -> "dva"
+                '3' -> "tri"
+                '4' -> "štiri"
+                '5' -> "pet"
+                '6' -> "šest"
+                '7' -> "sedem"
+                '8' -> "osem"
+                '9' -> "devet"
+                else -> digit.toString()
+            }
+        }.joinToString(", ")
+    }
+
+    private fun speakPendingVendingDigitsIfNeeded() {
+        val pendingText = pendingVendingDigitsSpeech?.trim().orEmpty()
+        pendingVendingDigitsSpeech = null
+        if (pendingText.isNotEmpty() &&
+            isRealWorldHelperAllowed() &&
+            guidedFollowUpSettings.speakDigitsSeparatelyEnabled) {
+            audioPlayer.speakText(pendingText, languageCode)
+        }
+    }
+
+    private fun getAacCommunicationContext(): AacCommunicationContext {
+        return aacCommunicationContext
+    }
+
+    private fun isGuidedFollowUpAllowed(): Boolean {
+        return guidedFollowUpSettings.guidedFollowUpEnabled &&
+            getAacCommunicationContext() != AacCommunicationContext.VIDEO_CALL_COMMUNICATION
+    }
+
+    private fun isRealWorldHelperAllowed(): Boolean {
+        return realWorldHelpersEnabled &&
+            getAacCommunicationContext() != AacCommunicationContext.VIDEO_CALL_COMMUNICATION
+    }
+
+    private fun isDrinkMachineHelperItem(item: AacItem): Boolean {
+        val concept = item.conceptId?.lowercase().orEmpty()
+        return !item.vendingNumber.isNullOrBlank() ||
+            !item.vendingInstructionImagePath.isNullOrBlank() ||
+            item.hasLargeCupOption ||
+            !item.largeCupImagePath.isNullOrBlank() ||
+            concept == "coffee" ||
+            concept == "tea"
     }
 
     private fun startSentenceCompositionTrackingIfNeeded(clickedAt: Long) {
