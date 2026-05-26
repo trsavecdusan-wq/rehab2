@@ -75,6 +75,40 @@ data class AacSpeechApiConfig(
             }
         }
 
+        fun saveOpenAiConfig(
+            context: Context,
+            apiKey: String,
+            enabled: Boolean = true,
+            baseUrl: String = DEFAULT_BASE_URL,
+            model: String = DEFAULT_MODEL,
+            voiceId: String = DEFAULT_VOICE_ID,
+            responseFormat: String = DEFAULT_RESPONSE_FORMAT,
+            speed: Double = DEFAULT_SPEED
+        ): Boolean {
+            val configFile = getConfigFile(context)
+            val parent = configFile.parentFile
+            if (parent != null && !parent.exists() && !parent.mkdirs()) {
+                return false
+            }
+
+            return try {
+                val json = JSONObject().apply {
+                    put("enabled", enabled)
+                    put("provider", PROVIDER_OPENAI)
+                    put("baseUrl", baseUrl.trim().trimEnd('/').ifBlank { DEFAULT_BASE_URL })
+                    put("apiKey", apiKey.trim())
+                    put("model", model.trim().ifBlank { DEFAULT_MODEL })
+                    put("voiceId", voiceId.trim().ifBlank { DEFAULT_VOICE_ID })
+                    put("responseFormat", responseFormat.trim().lowercase().ifBlank { DEFAULT_RESPONSE_FORMAT })
+                    put("speed", speed.coerceIn(0.25, 4.0))
+                }
+                configFile.writeText(json.toString(2), Charsets.UTF_8)
+                configFile.exists() && configFile.length() > 0L
+            } catch (_: Exception) {
+                false
+            }
+        }
+
         fun read(context: Context): AacSpeechApiConfig {
             val configFile = getConfigFile(context)
             if (!configFile.exists() || !configFile.isFile || configFile.length() <= 0L) {

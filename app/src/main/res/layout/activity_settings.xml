@@ -84,6 +84,133 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:text="GOVOR / SPEECH API"
+            android:textColor="#F4F7FA"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtSpeechApiStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:padding="16dp"
+            android:text="API ključ: ni nastavljen"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editSpeechApiKey"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:hint="Prilepi OpenAI API ključ"
+            android:inputType="textPassword"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/editSpeechApiBaseUrl"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:hint="https://api.openai.com"
+            android:inputType="textUri"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editSpeechApiModel"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:hint="gpt-4o-mini-tts"
+            android:inputType="text"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editSpeechApiVoice"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:hint="marin"
+            android:inputType="text"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editSpeechApiSpeed"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:hint="0.88"
+            android:inputType="numberDecimal"
+            android:padding="16dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnSaveSpeechApiSettings"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="SHRANI API NASTAVITVE"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnTestSpeechApi"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#2E8B57"
+            android:text="TEST GOVORA API"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnImportSpeechApiKey"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="#3A3F45"
+            android:text="UVOZI API KLJUČ IZ DATOTEKE"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:text="NAPAJANJE"
             android:textColor="#F4F7FA"
             android:textSize="24sp"

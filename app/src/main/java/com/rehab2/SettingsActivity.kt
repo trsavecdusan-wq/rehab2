@@ -7,6 +7,8 @@ import android.content.SharedPreferences
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.res.ColorStateList
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.BatteryManager
 import android.os.Bundle
 import android.os.Handler
@@ -19,6 +21,11 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.rehab2.aac.AacLanguageResolver
+import com.rehab2.aac.AacSpeechApiConfig
+import com.rehab2.aac.AacSpeechCache
+import com.rehab2.aac.AacSpeechCoordinator
+import com.rehab2.aac.OpenAiAacSpeechApiClient
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -52,6 +59,7 @@ class SettingsActivity : AppCompatActivity() {
         private const val DEFAULT_WARNING_GRACE_MINUTES = 5
         private const val DEFAULT_CRITICAL_BATTERY_PERCENT = 20
         private const val DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING = true
+        private const val REQUEST_IMPORT_SPEECH_API_KEY = 3001
     }
 
     private lateinit var prefs: SharedPreferences
@@ -69,6 +77,13 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtGpsAccuracyValue: TextView
     private lateinit var txtGpsIgnoredReasonValue: TextView
     private lateinit var btnResetGpsStatistics: Button
+    private lateinit var txtSpeechApiStatus: TextView
+    private lateinit var editSpeechApiKey: EditText
+    private lateinit var editSpeechApiBaseUrl: EditText
+    private lateinit var editSpeechApiModel: EditText
+    private lateinit var editSpeechApiVoice: EditText
+    private lateinit var editSpeechApiSpeed: EditText
+    private var speechApiTestPlayer: MediaPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
     private var isBatteryReceiverRegistered = false
@@ -108,6 +123,12 @@ class SettingsActivity : AppCompatActivity() {
         txtGpsAccuracyValue = findViewById(R.id.txtGpsAccuracyValue)
         txtGpsIgnoredReasonValue = findViewById(R.id.txtGpsIgnoredReasonValue)
         btnResetGpsStatistics = findViewById(R.id.btnResetGpsStatistics)
+        txtSpeechApiStatus = findViewById(R.id.txtSpeechApiStatus)
+        editSpeechApiKey = findViewById(R.id.editSpeechApiKey)
+        editSpeechApiBaseUrl = findViewById(R.id.editSpeechApiBaseUrl)
+        editSpeechApiModel = findViewById(R.id.editSpeechApiModel)
+        editSpeechApiVoice = findViewById(R.id.editSpeechApiVoice)
+        editSpeechApiSpeed = findViewById(R.id.editSpeechApiSpeed)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -126,6 +147,20 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnStatusSettings).setOnClickListener {
             Toast.makeText(this, "STATISTIKA JE SPODAJ", Toast.LENGTH_SHORT).show()
+        }
+
+        findViewById<Button>(R.id.btnSaveSpeechApiSettings).setOnClickListener {
+            saveSpeechApiSettings(showSavedToast = true)
+        }
+
+        findViewById<Button>(R.id.btnTestSpeechApi).setOnClickListener {
+            if (saveSpeechApiSettings(showSavedToast = false)) {
+                testSpeechApi()
+            }
+        }
+
+        findViewById<Button>(R.id.btnImportSpeechApiKey).setOnClickListener {
+            openSpeechApiKeyImport()
         }
 
         btnPowerOff.setOnClickListener {
@@ -188,6 +223,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshPowerSection()
         refreshStatisticsSection()
         refreshGpsDiagnosticsSection()
+        refreshSpeechApiSection()
         applyKeepScreenOnWhileCharging()
     }
 
@@ -198,6 +234,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshPowerSection()
         refreshStatisticsSection()
         refreshGpsDiagnosticsSection()
+        refreshSpeechApiSection()
         applyKeepScreenOnWhileCharging()
         startGpsDiagnosticsRefresh()
     }
@@ -206,6 +243,20 @@ class SettingsActivity : AppCompatActivity() {
         stopGpsDiagnosticsRefresh()
         unregisterBatteryReceiver()
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        releaseSpeechApiTestPlayer()
+        super.onDestroy()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_IMPORT_SPEECH_API_KEY && resultCode == RESULT_OK) {
+            val uri = data?.data ?: return
+            importSpeechApiKey(uri)
+        }
     }
 
     private fun setPowerMode(mode: String) {
@@ -271,6 +322,177 @@ class SettingsActivity : AppCompatActivity() {
             getString(R.string.gps_no_accuracy)
         }
         txtGpsIgnoredReasonValue.text = ignoredReason
+    }
+
+    private fun refreshSpeechApiSection() {
+        val config = AacSpeechApiConfig.read(this)
+        txtSpeechApiStatus.text = if (config.apiKey.isBlank()) {
+            "API ključ: ni nastavljen"
+        } else {
+            "API ključ: nastavljen (${maskApiKey(config.apiKey)})"
+        }
+
+        editSpeechApiKey.setText("")
+        editSpeechApiKey.hint = if (config.apiKey.isBlank()) {
+            "Prilepi OpenAI API ključ"
+        } else {
+            "Nov ključ ali pusti prazno"
+        }
+        editSpeechApiBaseUrl.setText(config.baseUrl.ifBlank { AacSpeechApiConfig.DEFAULT_BASE_URL })
+        editSpeechApiModel.setText(config.model.ifBlank { AacSpeechApiConfig.DEFAULT_MODEL })
+        editSpeechApiVoice.setText(config.voiceId.ifBlank { AacSpeechApiConfig.DEFAULT_VOICE_ID })
+        editSpeechApiSpeed.setText(config.speed.takeIf { it > 0.0 }?.toString() ?: AacSpeechApiConfig.DEFAULT_SPEED.toString())
+    }
+
+    private fun saveSpeechApiSettings(showSavedToast: Boolean): Boolean {
+        val currentConfig = AacSpeechApiConfig.read(this)
+        val enteredKey = editSpeechApiKey.text?.toString().orEmpty().trim()
+        val keyToSave = enteredKey.ifBlank { currentConfig.apiKey }
+
+        if (keyToSave.isBlank()) {
+            txtSpeechApiStatus.text = "API ključ: ni nastavljen"
+            Toast.makeText(this, "Speech API ključ ni nastavljen.", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        val saved = AacSpeechApiConfig.saveOpenAiConfig(
+            context = this,
+            apiKey = keyToSave,
+            enabled = true,
+            baseUrl = editSpeechApiBaseUrl.text?.toString().orEmpty(),
+            model = editSpeechApiModel.text?.toString().orEmpty(),
+            voiceId = editSpeechApiVoice.text?.toString().orEmpty(),
+            responseFormat = AacSpeechApiConfig.DEFAULT_RESPONSE_FORMAT,
+            speed = editSpeechApiSpeed.text?.toString()?.trim()?.toDoubleOrNull() ?: AacSpeechApiConfig.DEFAULT_SPEED
+        )
+
+        if (!saved) {
+            Toast.makeText(this, "API nastavitev ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        refreshSpeechApiSection()
+        if (showSavedToast) {
+            Toast.makeText(this, "API nastavitve shranjene.", Toast.LENGTH_SHORT).show()
+        }
+        return true
+    }
+
+    private fun testSpeechApi() {
+        txtSpeechApiStatus.text = "TEST GOVORA API..."
+        Thread {
+            val file = AacSpeechCoordinator(
+                speechCache = AacSpeechCache(this),
+                apiClient = OpenAiAacSpeechApiClient(this),
+                voiceIdProvider = { AacSpeechApiConfig.read(this).normalizedVoiceId() }
+            ).getOrGenerateSpeechFile(
+                text = "To je test govora.",
+                languageCode = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
+            )
+
+            runOnUiThread {
+                if (file != null && playSpeechApiTestFile(file.absolutePath)) {
+                    txtSpeechApiStatus.text = "GOVOR API DELUJE"
+                    Toast.makeText(this, "GOVOR API DELUJE", Toast.LENGTH_SHORT).show()
+                } else {
+                    txtSpeechApiStatus.text = "GOVOR API NE DELUJE"
+                    Toast.makeText(this, "GOVOR API NE DELUJE", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
+    }
+
+    private fun playSpeechApiTestFile(path: String): Boolean {
+        releaseSpeechApiTestPlayer()
+        return try {
+            speechApiTestPlayer = MediaPlayer().apply {
+                setDataSource(path)
+                setOnCompletionListener {
+                    releaseSpeechApiTestPlayer()
+                }
+                prepare()
+                start()
+            }
+            true
+        } catch (_: Exception) {
+            releaseSpeechApiTestPlayer()
+            false
+        }
+    }
+
+    private fun openSpeechApiKeyImport() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/plain", "application/json", "application/octet-stream"))
+        }
+        startActivityForResult(intent, REQUEST_IMPORT_SPEECH_API_KEY)
+    }
+
+    private fun importSpeechApiKey(uri: Uri) {
+        val raw = try {
+            contentResolver.openInputStream(uri)?.use { input ->
+                input.readBytes().toString(Charsets.UTF_8)
+            }.orEmpty()
+        } catch (_: Exception) {
+            Toast.makeText(this, "API datoteke ni bilo mogoče prebrati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val importedKey = parseImportedApiKey(raw)
+        if (importedKey.isBlank()) {
+            Toast.makeText(this, "API ključ ni bil najden.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        editSpeechApiKey.setText(importedKey)
+        saveSpeechApiSettings(showSavedToast = true)
+    }
+
+    private fun parseImportedApiKey(raw: String): String {
+        return raw.replace("\uFEFF", "")
+            .replace("\r", "\n")
+            .lines()
+            .map { it.trim().trim(',', '"', '\'') }
+            .filter { it.isNotBlank() && !it.startsWith("#") }
+            .firstNotNullOfOrNull { line ->
+                val value = valueAfterSeparator(line)
+                when {
+                    line.contains("apiKey", ignoreCase = true) -> value
+                    line.contains("api_key", ignoreCase = true) -> value
+                    line.contains("key", ignoreCase = true) -> value
+                    line.contains("token", ignoreCase = true) -> value
+                    line.startsWith("Bearer ", ignoreCase = true) -> line.removePrefix("Bearer ").trim()
+                    !line.startsWith("http", ignoreCase = true) && line.length >= 12 -> line
+                    else -> null
+                }
+            }.orEmpty()
+    }
+
+    private fun valueAfterSeparator(line: String): String {
+        val cleaned = line.trim().trim(',', '"', '\'')
+        val separatorIndex = listOf(cleaned.indexOf('='), cleaned.indexOf(':'))
+            .filter { it >= 0 }
+            .minOrNull()
+        val value = if (separatorIndex != null && !cleaned.startsWith("http", ignoreCase = true)) {
+            cleaned.substring(separatorIndex + 1)
+        } else {
+            cleaned
+        }
+        return value.trim()
+            .trim(',', '"', '\'')
+            .removePrefix("Bearer ")
+            .trim()
+    }
+
+    private fun maskApiKey(apiKey: String): String {
+        val trimmed = apiKey.trim()
+        return if (trimmed.length <= 4) "****" else "****${trimmed.takeLast(4)}"
+    }
+
+    private fun releaseSpeechApiTestPlayer() {
+        speechApiTestPlayer?.release()
+        speechApiTestPlayer = null
     }
 
     private fun updateModeButtonStyles(powerMode: String) {
