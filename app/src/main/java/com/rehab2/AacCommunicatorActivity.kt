@@ -30,6 +30,7 @@ import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacLocalStorage
 import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacPage
+import com.rehab2.aac.AacProfileStore
 import com.rehab2.aac.AacRepository
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
@@ -77,6 +78,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var languageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
     private var speechTimingSettings: AacSpeechTimingSettings = AacSpeechTimingSettings()
     private var guidedFollowUpSettings: AacGuidedFollowUpSettings = AacGuidedFollowUpSettings()
+    private var activeAacProfileId: String = AacProfileStore.DEFAULT_PROFILE_ID
     private var aacCommunicationContext: AacCommunicationContext = AacCommunicationContext.NORMAL_COMMUNICATION
     private var realWorldHelpersEnabled = true
     private var singleIconSpeechOccurredInCurrentSentence = false
@@ -176,7 +178,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
         languageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         speechTimingSettings = AacSpeechTimingSettings.read(this)
         guidedFollowUpSettings = AacGuidedFollowUpSettings.read(this)
-        aacCommunicationContext = AacCommunicationContextPrefs.readContext(this)
+        AacProfileStore.applyProfileDefaultsIfNeeded(this)
+        activeAacProfileId = AacProfileStore.getActiveAacProfile(this).id
+        aacCommunicationContext = AacProfileStore.getActiveAacContext(this)
         realWorldHelpersEnabled = AacCommunicationContextPrefs.areRealWorldHelpersEnabled(this)
         readPersistentTopRowSettings()
 
@@ -216,7 +220,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val updatedLanguageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         val updatedSpeechTimingSettings = AacSpeechTimingSettings.read(this)
         val updatedGuidedFollowUpSettings = AacGuidedFollowUpSettings.read(this)
-        val updatedCommunicationContext = AacCommunicationContextPrefs.readContext(this)
+        AacProfileStore.applyProfileDefaultsIfNeeded(this)
+        val updatedProfileId = AacProfileStore.getActiveAacProfile(this).id
+        val updatedCommunicationContext = AacProfileStore.getActiveAacContext(this)
         val updatedRealWorldHelpersEnabled = AacCommunicationContextPrefs.areRealWorldHelpersEnabled(this)
         val oldGridSize = aacGridSize
         val oldTopRowEnabled = persistentTopRowEnabled
@@ -229,6 +235,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             updatedLanguageCode != languageCode ||
             updatedSpeechTimingSettings != speechTimingSettings ||
             updatedGuidedFollowUpSettings != guidedFollowUpSettings ||
+            updatedProfileId != activeAacProfileId ||
             updatedCommunicationContext != aacCommunicationContext ||
             updatedRealWorldHelpersEnabled != realWorldHelpersEnabled ||
             oldGridSize != aacGridSize ||
@@ -240,6 +247,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             languageCode = updatedLanguageCode
             speechTimingSettings = updatedSpeechTimingSettings
             guidedFollowUpSettings = updatedGuidedFollowUpSettings
+            activeAacProfileId = updatedProfileId
             aacCommunicationContext = updatedCommunicationContext
             realWorldHelpersEnabled = updatedRealWorldHelpersEnabled
             applyAacGridSize()
@@ -1021,13 +1029,19 @@ class AacCommunicatorActivity : AppCompatActivity() {
         return aacCommunicationContext
     }
 
+    private fun getActiveAacProfileId(): String {
+        return activeAacProfileId.ifBlank { AacProfileStore.DEFAULT_PROFILE_ID }
+    }
+
     private fun isGuidedFollowUpAllowed(): Boolean {
         return guidedFollowUpSettings.guidedFollowUpEnabled &&
+            getActiveAacProfileId() != VIDEO_CALL_PROFILE_ID &&
             getAacCommunicationContext() != AacCommunicationContext.VIDEO_CALL_COMMUNICATION
     }
 
     private fun isRealWorldHelperAllowed(): Boolean {
         return realWorldHelpersEnabled &&
+            getActiveAacProfileId() != VIDEO_CALL_PROFILE_ID &&
             getAacCommunicationContext() != AacCommunicationContext.VIDEO_CALL_COMMUNICATION
     }
 
@@ -1216,6 +1230,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         const val TAG = "AacCommunicatorActivity"
         const val DRINKS_V2_PAGE_ID = "drinks_v2"
         const val WATER_NODE_ID = "water"
+        const val VIDEO_CALL_PROFILE_ID = "video_call"
         const val AAC_PREFS_FILE = "rehab2_prefs"
         const val PREF_AAC_GRID_SIZE = "aac_grid_size"
         const val DEFAULT_AAC_GRID_SIZE = 3

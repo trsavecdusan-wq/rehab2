@@ -26,6 +26,7 @@ import com.rehab2.aac.AacCommunicationContext
 import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacGuidedFollowUpSettings
+import com.rehab2.aac.AacProfileStore
 import com.rehab2.aac.AacSpeechApiConfig
 import com.rehab2.aac.AacSpeechCache
 import com.rehab2.aac.AacSpeechCoordinator
@@ -150,6 +151,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var switchGuidedFollowUpEnabled: SwitchCompat
     private lateinit var switchVendingNumberDisplayEnabled: SwitchCompat
     private lateinit var switchSpeakDigitsSeparatelyEnabled: SwitchCompat
+    private lateinit var txtActiveAacProfileStatus: TextView
+    private lateinit var editActiveAacProfile: EditText
     private lateinit var txtAacCommunicationContextStatus: TextView
     private lateinit var editAacCommunicationContext: EditText
     private lateinit var switchRealWorldHelpersEnabled: SwitchCompat
@@ -214,6 +217,8 @@ class SettingsActivity : AppCompatActivity() {
         switchGuidedFollowUpEnabled = findViewById(R.id.switchGuidedFollowUpEnabled)
         switchVendingNumberDisplayEnabled = findViewById(R.id.switchVendingNumberDisplayEnabled)
         switchSpeakDigitsSeparatelyEnabled = findViewById(R.id.switchSpeakDigitsSeparatelyEnabled)
+        txtActiveAacProfileStatus = findViewById(R.id.txtActiveAacProfileStatus)
+        editActiveAacProfile = findViewById(R.id.editActiveAacProfile)
         txtAacCommunicationContextStatus = findViewById(R.id.txtAacCommunicationContextStatus)
         editAacCommunicationContext = findViewById(R.id.editAacCommunicationContext)
         switchRealWorldHelpersEnabled = findViewById(R.id.switchRealWorldHelpersEnabled)
@@ -268,8 +273,11 @@ class SettingsActivity : AppCompatActivity() {
         editPersistentTopRowCount.setOnClickListener {
             showPersistentTopRowCountPicker()
         }
+        editActiveAacProfile.setOnClickListener {
+            showAacProfilePicker()
+        }
         editAacCommunicationContext.setOnClickListener {
-            showAacCommunicationContextPicker()
+            showAacProfilePicker()
         }
         bindSpeechTimingSwitchListeners()
         bindPersistentTopRowSwitchListener()
@@ -509,21 +517,28 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun refreshGuidedFollowUpSection() {
         val settings = AacGuidedFollowUpSettings.read(this)
+        val activeProfile = AacProfileStore.getActiveAacProfile(this)
+        val guidedAllowed = activeProfile.context != AacCommunicationContext.VIDEO_CALL_COMMUNICATION
         switchGuidedFollowUpEnabled.setOnCheckedChangeListener(null)
         switchVendingNumberDisplayEnabled.setOnCheckedChangeListener(null)
         switchSpeakDigitsSeparatelyEnabled.setOnCheckedChangeListener(null)
         switchGuidedFollowUpEnabled.isChecked = settings.guidedFollowUpEnabled
         switchVendingNumberDisplayEnabled.isChecked = settings.vendingNumberDisplayEnabled
         switchSpeakDigitsSeparatelyEnabled.isChecked = settings.speakDigitsSeparatelyEnabled
-        switchVendingNumberDisplayEnabled.isEnabled = settings.guidedFollowUpEnabled
+        switchGuidedFollowUpEnabled.isEnabled = guidedAllowed
+        switchVendingNumberDisplayEnabled.isEnabled = guidedAllowed && settings.guidedFollowUpEnabled
         switchSpeakDigitsSeparatelyEnabled.isEnabled =
-            settings.guidedFollowUpEnabled && settings.vendingNumberDisplayEnabled
+            guidedAllowed && settings.guidedFollowUpEnabled && settings.vendingNumberDisplayEnabled
         bindGuidedFollowUpSwitchListeners()
     }
 
     private fun refreshAacCommunicationContextSection() {
-        val contextMode = AacCommunicationContextPrefs.readContext(this)
+        AacProfileStore.applyProfileDefaultsIfNeeded(this)
+        val activeProfile = AacProfileStore.getActiveAacProfile(this)
+        val contextMode = AacProfileStore.getActiveAacContext(this)
         val realWorldHelpersEnabled = AacCommunicationContextPrefs.areRealWorldHelpersEnabled(this)
+        txtActiveAacProfileStatus.text = "Aktivni AAC profil: ${activeProfile.displayName}"
+        editActiveAacProfile.setText(activeProfile.displayName)
         txtAacCommunicationContextStatus.text = "AAC kontekst: ${aacCommunicationContextLabel(contextMode)}"
         editAacCommunicationContext.setText(aacCommunicationContextLabel(contextMode))
         switchRealWorldHelpersEnabled.setOnCheckedChangeListener(null)
@@ -746,21 +761,19 @@ class SettingsActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showAacCommunicationContextPicker() {
-        val options = arrayOf(
-            AacCommunicationContext.NORMAL_COMMUNICATION,
-            AacCommunicationContext.VIDEO_CALL_COMMUNICATION,
-            AacCommunicationContext.REAL_WORLD_ASSISTANT
-        )
-        val labels = options.map { aacCommunicationContextLabel(it) }.toTypedArray()
-        val current = AacCommunicationContextPrefs.readContext(this)
-        val selectedIndex = options.indexOf(current).coerceAtLeast(0)
+    private fun showAacProfilePicker() {
+        val options = AacProfileStore.loadProfilesFromStorage(this)
+        val labels = options.map { it.displayName }.toTypedArray()
+        val current = AacProfileStore.getActiveAacProfile(this)
+        val selectedIndex = options.indexOfFirst { it.id == current.id }.coerceAtLeast(0)
         AlertDialog.Builder(this)
-            .setTitle("Izberi AAC kontekst")
+            .setTitle("Aktivni AAC profil")
             .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
                 prefs.edit()
-                    .putString(AacCommunicationContextPrefs.PREF_AAC_COMMUNICATION_CONTEXT, options[which].name)
+                    .putString(AacProfileStore.PREF_ACTIVE_PROFILE_ID, options[which].id)
                     .apply()
+                AacProfileStore.applyProfileDefaultsIfNeeded(this)
+                refreshGuidedFollowUpSection()
                 refreshAacCommunicationContextSection()
                 dialog.dismiss()
             }
