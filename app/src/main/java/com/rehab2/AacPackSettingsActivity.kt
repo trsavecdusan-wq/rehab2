@@ -653,7 +653,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         val aacItemsFile = AacStoragePaths.getAacItemsFile(this)
         val hasAacItems = aacItemsFile?.isFile == true && aacItemsFile.length() > 0L
-        val aacItemsPreview = if (hasAacItems) {
+        val aacItemsPreview = if (hasAacItems && aacItemsFile != null) {
             readTextSafely(aacItemsFile, MAX_ITEMS_PREVIEW_BYTES)
         } else {
             null
