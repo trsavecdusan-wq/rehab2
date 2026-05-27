@@ -2,6 +2,7 @@ package com.rehab2
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.Context
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
@@ -36,12 +37,15 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val EXPORT_BUTTON_COLOR = 0xFF3E7C4A.toInt()
         private const val SHARE_READY_COLOR = 0xFF214A78.toInt()
         private const val BUSY_BUTTON_COLOR = 0xFF5B6672.toInt()
+        private const val IMPORT_PREFS_NAME = "aac_pack_import_diagnostics"
+        private const val KEY_LAST_IMPORT_STATUS = "last_import_status"
     }
 
     private lateinit var btnExport: Button
     private lateinit var btnShare: Button
     private lateinit var btnImportPreflight: Button
     private lateinit var txtStatus: TextView
+    private lateinit var txtLastImportStatus: TextView
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private var lastExportedZipPath: String? = null
@@ -63,6 +67,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnShare = findViewById(R.id.btnShareAacPack)
         btnImportPreflight = findViewById(R.id.btnImportAacPackPreflight)
         txtStatus = findViewById(R.id.txtExportStatus)
+        txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
 
         findViewById<Button>(R.id.btnBackAacPackSettings).setOnClickListener {
             finish()
@@ -84,6 +89,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         setShareEnabled(false)
         txtStatus.text = "Pripravljeno za izvoz ali predpreverjanje ZIP paketa."
+        refreshLastImportDiagnostic()
     }
 
     private fun startExport() {
@@ -200,13 +206,15 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Preflight uspel. ZIP je bil samo prebran.\n\n")
             append("Za uvoz je potrebna potrditev.\n")
             append("Obstojece datoteke bodo preskocene.\n\n")
-            append("Datotek v ZIP: ${result.entryCount}\n")
-            append("AAC elementi: ${yesNo(result.hasItems)}\n")
+            append("Kandidati za uvoz po kategoriji:\n")
+            append("AAC elementi: ${if (result.hasItems) 1 else 0}\n")
             append("Profili: ${result.profileCount}\n")
             append("Ikone custom: ${result.customIconCount}\n")
             append("Ikone SOCA: ${result.socaIconCount}\n")
             append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
-            append("Manifest: ${yesNo(result.hasManifest)}")
+            append("Manifest: ${if (result.hasManifest) 1 else 0}\n\n")
+            append("Obstojece datoteke bodo preskocene.\n")
+            append("Nobena datoteka ne bo izbrisana ali prepisana.")
         }
     }
 
@@ -217,9 +225,17 @@ class AacPackSettingsActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Uvozi AAC ZIP paket?")
             .setMessage(
-                "Uvoz bo dodal samo manjkajoce datoteke.\n" +
-                    "Obstojecih datotek ne bo prepisal ali izbrisal.\n\n" +
-                    "Datotek v ZIP: ${result.entryCount}"
+                buildString {
+                    append("Uvoz bo dodal samo manjkajoce datoteke.\n")
+                    append("Obstojece datoteke bodo preskocene.\n")
+                    append("Nobena datoteka ne bo izbrisana ali prepisana.\n\n")
+                    append("AAC elementi: ${if (result.hasItems) 1 else 0}\n")
+                    append("Profili: ${result.profileCount}\n")
+                    append("Ikone custom: ${result.customIconCount}\n")
+                    append("Ikone SOCA: ${result.socaIconCount}\n")
+                    append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
+                    append("Manifest: ${if (result.hasManifest) 1 else 0}")
+                }
             )
             .setNegativeButton("Preklici", null)
             .setPositiveButton("Uvozi") { _, _ ->
@@ -245,11 +261,16 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnImportPreflight.isEnabled = true
         btnImportPreflight.backgroundTintList = ColorStateList.valueOf(SHARE_READY_COLOR)
 
-        txtStatus.text = when (result) {
+        val statusText = when (result) {
             is AacPackImporter.Result.Success -> buildString {
                 append("Uvoz zakljucen.\n\n")
                 append("Uvozenih datotek: ${result.importedCount}\n")
                 append("Preskocenih obstojecih datotek: ${result.skippedExistingCount}\n")
+                append("\nUvozeno po kategoriji:\n")
+                append(formatCategoryCounts(result.importedByCategory))
+                append("\nPreskoceno po kategoriji:\n")
+                append(formatCategoryCounts(result.skippedExistingByCategory))
+                append("\n")
                 append("AAC komunikator se ni samodejno ponovno zagnal.")
             }
             is AacPackImporter.Result.Rejected ->
@@ -257,6 +278,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
             is AacPackImporter.Result.Failure ->
                 "Uvoz ni uspel.\n${result.reason}\n\nNoben obstojec podatek ni bil prepisan ali izbrisan."
         }
+        txtStatus.text = statusText
+        saveLastImportDiagnostic(statusText)
+        refreshLastImportDiagnostic()
     }
 
     private fun setShareEnabled(enabled: Boolean) {
@@ -276,7 +300,31 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun yesNo(value: Boolean): String {
-        return if (value) "da" else "ne"
+    private fun formatCategoryCounts(counts: AacPackImporter.CategoryCounts): String {
+        return buildString {
+            append("AAC elementi: ${counts.aacItems}\n")
+            append("Profili: ${counts.profiles}\n")
+            append("Ikone custom: ${counts.customIcons}\n")
+            append("Ikone SOCA: ${counts.socaIcons}\n")
+            append("Ikone ARASAAC: ${counts.arasaacIcons}\n")
+            append("Manifest: ${counts.manifest}\n")
+        }
+    }
+
+    private fun saveLastImportDiagnostic(statusText: String) {
+        getSharedPreferences(IMPORT_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_LAST_IMPORT_STATUS, statusText)
+            .apply()
+    }
+
+    private fun refreshLastImportDiagnostic() {
+        val status = getSharedPreferences(IMPORT_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_LAST_IMPORT_STATUS, null)
+        txtLastImportStatus.text = if (status.isNullOrBlank()) {
+            "Zadnji uvoz: ni podatka."
+        } else {
+            "Zadnji uvoz:\n$status"
+        }
     }
 }

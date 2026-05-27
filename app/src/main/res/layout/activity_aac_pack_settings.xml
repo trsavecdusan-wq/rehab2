@@ -86,6 +86,14 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/txtLastImportStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textColor="#B8C0C8"
+            android:textSize="16sp" />
+
+        <TextView
             android:id="@+id/txtExportStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

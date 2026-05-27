@@ -16,11 +16,35 @@ object AacPackImporter {
     sealed class Result {
         data class Success(
             val importedCount: Int,
-            val skippedExistingCount: Int
+            val skippedExistingCount: Int,
+            val importedByCategory: CategoryCounts,
+            val skippedExistingByCategory: CategoryCounts
         ) : Result()
 
         data class Rejected(val reason: String) : Result()
         data class Failure(val reason: String) : Result()
+    }
+
+    data class CategoryCounts(
+        val aacItems: Int,
+        val profiles: Int,
+        val customIcons: Int,
+        val socaIcons: Int,
+        val arasaacIcons: Int,
+        val manifest: Int
+    ) {
+        companion object {
+            fun empty(): CategoryCounts {
+                return CategoryCounts(
+                    aacItems = 0,
+                    profiles = 0,
+                    customIcons = 0,
+                    socaIcons = 0,
+                    arasaacIcons = 0,
+                    manifest = 0
+                )
+            }
+        }
     }
 
     fun importNoOverwrite(context: Context, uri: Uri): Result {
@@ -45,6 +69,8 @@ object AacPackImporter {
 
         var importedCount = 0
         var skippedExistingCount = 0
+        var importedByCategory = CategoryCounts.empty()
+        var skippedExistingByCategory = CategoryCounts.empty()
         var totalExtractedBytes = 0L
 
         context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -68,6 +94,7 @@ object AacPackImporter {
                         }
                         if (destination.exists()) {
                             skippedExistingCount += 1
+                            skippedExistingByCategory = incrementCategory(skippedExistingByCategory, name)
                         } else {
                             if (importedCount >= MAX_IMPORTED_FILE_COUNT) {
                                 return Result.Rejected("ZIP vsebuje prevec datotek za uvoz.")
@@ -100,11 +127,13 @@ object AacPackImporter {
                             if (destination.exists()) {
                                 tempFile.delete()
                                 skippedExistingCount += 1
+                                skippedExistingByCategory = incrementCategory(skippedExistingByCategory, name)
                             } else if (!tempFile.renameTo(destination)) {
                                 tempFile.delete()
                                 return Result.Failure("Datoteke ni bilo mogoce shraniti: $name")
                             } else {
                                 importedCount += 1
+                                importedByCategory = incrementCategory(importedByCategory, name)
                             }
                         }
                     }
@@ -116,8 +145,22 @@ object AacPackImporter {
 
         return Result.Success(
             importedCount = importedCount,
-            skippedExistingCount = skippedExistingCount
+            skippedExistingCount = skippedExistingCount,
+            importedByCategory = importedByCategory,
+            skippedExistingByCategory = skippedExistingByCategory
         )
+    }
+
+    private fun incrementCategory(counts: CategoryCounts, name: String): CategoryCounts {
+        return when {
+            name == "data/aac_items.json" -> counts.copy(aacItems = counts.aacItems + 1)
+            name.startsWith("data/profiles/") -> counts.copy(profiles = counts.profiles + 1)
+            name.startsWith("icons/custom/") -> counts.copy(customIcons = counts.customIcons + 1)
+            name.startsWith("icons/soca/") -> counts.copy(socaIcons = counts.socaIcons + 1)
+            name.startsWith("icons/arasaac/") -> counts.copy(arasaacIcons = counts.arasaacIcons + 1)
+            name == "aac_export_manifest.json" -> counts.copy(manifest = counts.manifest + 1)
+            else -> counts
+        }
     }
 
     private sealed class CopyResult {
