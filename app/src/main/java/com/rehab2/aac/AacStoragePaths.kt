@@ -50,6 +50,14 @@ object AacStoragePaths {
         val externalFilesDir = context.getExternalFilesDir(null) ?: return null
         val normalizedPath = rawPath.replace('\\', '/').removePrefix("/")
 
+        if (normalizedPath.startsWith("NovaRehab/icons/", ignoreCase = true)) {
+            return File(externalFilesDir, normalizedPath)
+        }
+
+        if (normalizedPath.startsWith("icons/", ignoreCase = true)) {
+            return File(externalFilesDir, "NovaRehab/$normalizedPath")
+        }
+
         val baseRelativeDir = when (iconSource) {
             IconSource.SOCA -> SOCA_ICONS_DIR
             IconSource.ARASAAC -> ARASAAC_ICONS_DIR
@@ -59,9 +67,9 @@ object AacStoragePaths {
         }
 
         val fullRelativePath = if (
-            normalizedPath.startsWith("custom/") ||
-            normalizedPath.startsWith("soca/") ||
-            normalizedPath.startsWith("arasaac/")
+            normalizedPath.startsWith("custom/", ignoreCase = true) ||
+            normalizedPath.startsWith("soca/", ignoreCase = true) ||
+            normalizedPath.startsWith("arasaac/", ignoreCase = true)
         ) {
             "NovaRehab/icons/$normalizedPath"
         } else {
