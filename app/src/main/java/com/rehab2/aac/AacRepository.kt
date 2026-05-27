@@ -23,6 +23,9 @@ class AacRepository(private val context: Context) {
 
     fun loadPage(pageId: String): AacPage? {
         val normalizedPageId = pageId.trim()
+        if (normalizedPageId == "home") {
+            buildProfileHomePage(loadMergedItems())?.let { return it }
+        }
         val externalFilesDirPath = context.getExternalFilesDir(null)?.absolutePath.orEmpty()
         if (normalizedPageId.isBlank()) {
             updateDebugStatus(
@@ -138,19 +141,83 @@ class AacRepository(private val context: Context) {
         )
     }
 
-    private fun fallbackPage(): AacPage {
-        val fallbackItems = listOf(
+    private fun fallbackPage(mergedItems: List<AacItem> = loadMergedItems()): AacPage {
+        val homeItems = mergedItems
+            .filter { it.isRootItem && !it.isHiddenUntilParent }
+            .ifEmpty { mergedItems }
+        return AacPage(
+            pageId = "home",
+            title = "AAC V1",
+            items = homeItems
+        )
+    }
+
+    private fun fallbackItems(): List<AacItem> {
+        return listOf(
             AacItem("water", "VODA", "", "", "speak", ""),
             AacItem("juice", "SOK", "", "", "speak", ""),
             AacItem("food", "HRANA", "", "", "speak", ""),
             AacItem("wc", "WC", "", "", "speak", ""),
             AacItem("help", "POMO\u010C", "", "", "speak", "")
         )
+    }
+
+    private fun loadMergedItems(): List<AacItem> {
+        val fallbackItems = fallbackItems()
+        val mergedItems = linkedMapOf<String, AacItem>()
+        fallbackItems.forEach { item ->
+            mergedItems[item.id] = item
+        }
+        AacLocalJsonLoader.loadItems(context, fallbackItems).forEach { item ->
+            mergedItems[item.id] = item
+        }
+        return mergedItems.values.toList()
+    }
+
+    private fun buildProfileHomePage(items: List<AacItem>): AacPage? {
+        val itemsById = items.associateBy { it.id }
+        val rootItems = AacProfileStore.loadItemsForProfile(context, itemsById)
+        if (rootItems.isEmpty()) {
+            return null
+        }
+
+        val pageItems = linkedMapOf<String, AacItem>()
+        rootItems.forEach { item ->
+            collectProfileItems(item, itemsById, pageItems)
+        }
+
+        if (pageItems.isEmpty()) {
+            return null
+        }
+
+        val activeProfile = AacProfileStore.getActiveAacProfile(context)
         return AacPage(
             pageId = "home",
-            title = "AAC V1",
-            items = AacLocalJsonLoader.loadItems(context, fallbackItems)
+            title = activeProfile.displayName,
+            items = pageItems.values.toList()
         )
+    }
+
+    private fun collectProfileItems(
+        item: AacItem,
+        itemsById: Map<String, AacItem>,
+        collected: LinkedHashMap<String, AacItem>
+    ) {
+        if (collected.containsKey(item.id)) {
+            return
+        }
+        collected[item.id] = item
+
+        val explicitChildren = item.children
+            .mapNotNull { childId -> itemsById[childId] }
+            .sortedBy { it.priority }
+        val linkedChildren = itemsById.values
+            .filter { it.parentId == item.id }
+            .sortedBy { it.priority }
+        val children = if (explicitChildren.isNotEmpty()) explicitChildren else linkedChildren
+        children.forEach { child ->
+            collectProfileItems(child, itemsById, collected)
+        }
     }
 
     private fun updateDebugStatus(
