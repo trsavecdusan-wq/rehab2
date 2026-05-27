@@ -22,6 +22,8 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 /**
  * Faza 2A — zaslon za IZVOZ lokalnega AAC paketa.
@@ -47,6 +49,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
     private lateinit var btnExport: Button
     private lateinit var btnShare: Button
+    private lateinit var btnCreateTestZip: Button
     private lateinit var btnImportPreflight: Button
     private lateinit var txtStatus: TextView
     private lateinit var txtLastImportStatus: TextView
@@ -69,6 +72,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         btnExport = findViewById(R.id.btnExportAacPack)
         btnShare = findViewById(R.id.btnShareAacPack)
+        btnCreateTestZip = findViewById(R.id.btnCreateTestAacZip)
         btnImportPreflight = findViewById(R.id.btnImportAacPackPreflight)
         txtStatus = findViewById(R.id.txtExportStatus)
         txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
@@ -83,6 +87,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         btnShare.setOnClickListener {
             shareLastExportedZip()
+        }
+
+        btnCreateTestZip.setOnClickListener {
+            startCreateTestZip()
         }
 
         btnImportPreflight.setOnClickListener {
@@ -174,6 +182,112 @@ class AacPackSettingsActivity : AppCompatActivity() {
             Log.e("NovaRehabAacExport", "Share failed", error)
             txtStatus.text = "Deljenje ni uspelo."
         }
+    }
+
+    private fun startCreateTestZip() {
+        btnCreateTestZip.isEnabled = false
+        btnCreateTestZip.backgroundTintList = ColorStateList.valueOf(BUSY_BUTTON_COLOR)
+        txtStatus.text = "Ustvarjam testni AAC ZIP ..."
+
+        Thread {
+            val result = createTestZip()
+            mainHandler.post {
+                handleCreateTestZipResult(result)
+            }
+        }.start()
+    }
+
+    private fun handleCreateTestZipResult(result: TestZipResult) {
+        btnCreateTestZip.isEnabled = true
+        btnCreateTestZip.backgroundTintList = ColorStateList.valueOf(SHARE_READY_COLOR)
+
+        when (result) {
+            is TestZipResult.Success -> {
+                lastExportedZipPath = result.zipFile.absolutePath
+                setShareEnabled(true)
+                txtStatus.text = buildString {
+                    append("Testni AAC ZIP ustvarjen.\n\n")
+                    append("Datotek v paketu: ${result.fileCount}\n")
+                    append("Velikost ZIP: ${formatSize(result.zipFile.length())}\n")
+                    append("Lokacija:\n${result.zipFile.absolutePath}\n\n")
+                    append("ZIP ni bil uvozen samodejno. Za prenos uporabi DELI ZIP.")
+                }
+            }
+            is TestZipResult.Failure -> {
+                txtStatus.text = "Testnega ZIP paketa ni bilo mogoce ustvariti.\n${result.reason}"
+            }
+        }
+    }
+
+    private fun createTestZip(): TestZipResult {
+        return try {
+            val exportsDir = AacPackExporter.getExportsDir(this)
+            if (!exportsDir.exists() && !exportsDir.mkdirs()) {
+                return TestZipResult.Failure("Mape za izvoz ni bilo mogoce ustvariti.")
+            }
+
+            val timestamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.ROOT).format(Date())
+            val zipFile = File(exportsDir, "NovaRehab_AAC_TEST_$timestamp.zip")
+            val exportedAt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ROOT).format(Date())
+
+            val entries = linkedMapOf(
+                "aac_export_manifest.json" to buildTestManifest(exportedAt),
+                "data/aac_items.json" to buildTestItemsJson(),
+                "data/profiles/test_profile.json" to buildTestProfileJson()
+            )
+
+            ZipOutputStream(zipFile.outputStream().buffered()).use { zip ->
+                entries.forEach { (entryName, content) ->
+                    zip.putNextEntry(ZipEntry(entryName))
+                    zip.write(content.toByteArray(Charsets.UTF_8))
+                    zip.closeEntry()
+                }
+            }
+
+            if (!zipFile.exists() || zipFile.length() <= 0L) {
+                TestZipResult.Failure("ZIP datoteka ni bila ustvarjena.")
+            } else {
+                TestZipResult.Success(zipFile = zipFile, fileCount = entries.size)
+            }
+        } catch (error: Exception) {
+            TestZipResult.Failure(error.message ?: "Neznana napaka.")
+        }
+    }
+
+    private fun buildTestManifest(exportedAt: String): String {
+        return org.json.JSONObject().apply {
+            put("packageName", "NovaRehab testni AAC paket")
+            put("packageVersion", "1")
+            put("exportTimestamp", exportedAt)
+            put("author", "NovaRehab test generator")
+            put("therapist", "Testni terapevt")
+            put("description", "Majhen testni paket za preverjanje AAC ZIP uvoza brez sprememb pacientovih podatkov.")
+        }.toString(2)
+    }
+
+    private fun buildTestItemsJson(): String {
+        return """
+            {
+              "items": [
+                {
+                  "id": "test_hello",
+                  "label": "Pozdrav",
+                  "text": "Pozdrav",
+                  "profileId": "test_profile"
+                }
+              ]
+            }
+        """.trimIndent()
+    }
+
+    private fun buildTestProfileJson(): String {
+        return """
+            {
+              "id": "test_profile",
+              "name": "Testni profil",
+              "description": "Profil za varen test AAC ZIP uvoza."
+            }
+        """.trimIndent()
     }
 
     private fun startImportPreflight(uri: Uri) {
@@ -512,5 +626,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
             .map { it.trim() }
             .filter { it.isNotEmpty() }
             .take(MAX_IMPORT_REPORTS)
+    }
+
+    private sealed class TestZipResult {
+        data class Success(
+            val zipFile: File,
+            val fileCount: Int
+        ) : TestZipResult()
+
+        data class Failure(val reason: String) : TestZipResult()
     }
 }
