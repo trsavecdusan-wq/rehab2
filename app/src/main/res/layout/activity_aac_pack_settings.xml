@@ -69,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Pred uvozom lahko ZIP samo preveris. Aplikacija ne ekstrahira, ne prepisuje in se ne uvozi podatkov."
+            android:text="Pred uvozom aplikacija ZIP najprej preveri. Uvoz se izvede samo po potrditvi in ne prepisuje obstojecih datotek."
             android:textColor="#B8C0C8"
             android:textSize="16sp" />
 
@@ -79,7 +79,7 @@
             android:layout_height="72dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="#214A78"
-            android:text="PREVERI ZIP ZA UVOZ"
+            android:text="UVOZI ZIP PAKET"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="20sp"

@@ -11,9 +11,11 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.rehab2.aac.AacPackExporter
+import com.rehab2.aac.AacPackImporter
 import com.rehab2.aac.AacPackImportPreflight
 import java.io.File
 import java.util.Locale
@@ -25,8 +27,8 @@ import java.util.Locale
  *   - sprozit izvoz lokalnega AAC paketa v ZIP (AacPackExporter),
  *   - deliti nastali ZIP prek standardnega Android deljenja (FileProvider).
  *
- * Brez uvoza. Brez brisanja ali spreminjanja AAC podatkov.
- * Uvoz je locena Faza 2B.
+ * Uvoz je dovoljen samo po uspesnem preflight pregledu in izrecni potrditvi.
+ * Brez prepisa obstojecih datotek, brez brisanja in brez samodejnega ponovnega zagona AAC.
  */
 class AacPackSettingsActivity : AppCompatActivity() {
 
@@ -172,31 +174,88 @@ class AacPackSettingsActivity : AppCompatActivity() {
         Thread {
             val result = AacPackImportPreflight.inspect(contentResolver, uri)
             mainHandler.post {
-                handleImportPreflightResult(result)
+                handleImportPreflightResult(uri, result)
             }
         }.start()
     }
 
-    private fun handleImportPreflightResult(result: AacPackImportPreflight.Result) {
+    private fun handleImportPreflightResult(uri: Uri, result: AacPackImportPreflight.Result) {
+        btnImportPreflight.isEnabled = true
+        btnImportPreflight.backgroundTintList = ColorStateList.valueOf(SHARE_READY_COLOR)
+
+        when (result) {
+            is AacPackImportPreflight.Result.Success -> {
+                txtStatus.text = buildPreflightSuccessText(result)
+                showImportConfirmDialog(uri, result)
+            }
+            is AacPackImportPreflight.Result.Rejected ->
+                txtStatus.text = "ZIP zavrnjen.\n${result.reason}\n\nNoben podatek ni bil uvozen ali prepisan."
+            is AacPackImportPreflight.Result.Failure ->
+                txtStatus.text = "Preflight ni uspel.\n${result.reason}\n\nNoben podatek ni bil uvozen ali prepisan."
+        }
+    }
+
+    private fun buildPreflightSuccessText(result: AacPackImportPreflight.Result.Success): String {
+        return buildString {
+            append("Preflight uspel. ZIP je bil samo prebran.\n\n")
+            append("Za uvoz je potrebna potrditev.\n")
+            append("Obstojece datoteke bodo preskocene.\n\n")
+            append("Datotek v ZIP: ${result.entryCount}\n")
+            append("AAC elementi: ${yesNo(result.hasItems)}\n")
+            append("Profili: ${result.profileCount}\n")
+            append("Ikone custom: ${result.customIconCount}\n")
+            append("Ikone SOCA: ${result.socaIconCount}\n")
+            append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
+            append("Manifest: ${yesNo(result.hasManifest)}")
+        }
+    }
+
+    private fun showImportConfirmDialog(
+        uri: Uri,
+        result: AacPackImportPreflight.Result.Success
+    ) {
+        AlertDialog.Builder(this)
+            .setTitle("Uvozi AAC ZIP paket?")
+            .setMessage(
+                "Uvoz bo dodal samo manjkajoce datoteke.\n" +
+                    "Obstojecih datotek ne bo prepisal ali izbrisal.\n\n" +
+                    "Datotek v ZIP: ${result.entryCount}"
+            )
+            .setNegativeButton("Preklici", null)
+            .setPositiveButton("Uvozi") { _, _ ->
+                startConfirmedImport(uri)
+            }
+            .show()
+    }
+
+    private fun startConfirmedImport(uri: Uri) {
+        btnImportPreflight.isEnabled = false
+        btnImportPreflight.backgroundTintList = ColorStateList.valueOf(BUSY_BUTTON_COLOR)
+        txtStatus.text = "Uvazam AAC ZIP paket ..."
+
+        Thread {
+            val result = AacPackImporter.importNoOverwrite(this, uri)
+            mainHandler.post {
+                handleImportResult(result)
+            }
+        }.start()
+    }
+
+    private fun handleImportResult(result: AacPackImporter.Result) {
         btnImportPreflight.isEnabled = true
         btnImportPreflight.backgroundTintList = ColorStateList.valueOf(SHARE_READY_COLOR)
 
         txtStatus.text = when (result) {
-            is AacPackImportPreflight.Result.Success -> buildString {
-                append("Preflight uspel. ZIP je bil samo prebran.\n\n")
-                append("Dejanski uvoz se ni izvedel.\n")
-                append("Datotek v ZIP: ${result.entryCount}\n")
-                append("AAC elementi: ${yesNo(result.hasItems)}\n")
-                append("Profili: ${result.profileCount}\n")
-                append("Ikone custom: ${result.customIconCount}\n")
-                append("Ikone SOCA: ${result.socaIconCount}\n")
-                append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
-                append("Manifest: ${yesNo(result.hasManifest)}")
+            is AacPackImporter.Result.Success -> buildString {
+                append("Uvoz zakljucen.\n\n")
+                append("Uvozenih datotek: ${result.importedCount}\n")
+                append("Preskocenih obstojecih datotek: ${result.skippedExistingCount}\n")
+                append("AAC komunikator se ni samodejno ponovno zagnal.")
             }
-            is AacPackImportPreflight.Result.Rejected ->
-                "ZIP zavrnjen.\n${result.reason}\n\nNoben podatek ni bil uvozen ali prepisan."
-            is AacPackImportPreflight.Result.Failure ->
-                "Preflight ni uspel.\n${result.reason}\n\nNoben podatek ni bil uvozen ali prepisan."
+            is AacPackImporter.Result.Rejected ->
+                "Uvoz zavrnjen.\n${result.reason}\n\nNoben obstojec podatek ni bil prepisan ali izbrisan."
+            is AacPackImporter.Result.Failure ->
+                "Uvoz ni uspel.\n${result.reason}\n\nNoben obstojec podatek ni bil prepisan ali izbrisan."
         }
     }
 

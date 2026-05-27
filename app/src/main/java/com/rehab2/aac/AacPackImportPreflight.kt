@@ -3,6 +3,7 @@ package com.rehab2.aac
 import android.content.ContentResolver
 import android.net.Uri
 import java.io.IOException
+import java.util.Locale
 import java.util.zip.ZipInputStream
 
 object AacPackImportPreflight {
@@ -50,12 +51,15 @@ object AacPackImportPreflight {
         while (true) {
             val entry = zip.nextEntry ?: break
             val name = entry.name
-            val unsafeReason = unsafeReason(name)
+            val unsafeReason = rejectionReasonForEntry(name)
             if (unsafeReason != null) {
                 return Result.Rejected("Nevarna pot v ZIP: $unsafeReason")
             }
 
             if (!entry.isDirectory) {
+                if (!isAllowedImportEntry(name)) {
+                    return Result.Rejected("Nedovoljena datoteka v ZIP: $name")
+                }
                 entryCount += 1
                 when {
                     name == "data/aac_items.json" -> hasItems = true
@@ -81,7 +85,7 @@ object AacPackImportPreflight {
         )
     }
 
-    private fun unsafeReason(name: String?): String? {
+    internal fun rejectionReasonForEntry(name: String?): String? {
         if (name.isNullOrEmpty()) {
             return "prazno ime vnosa"
         }
@@ -100,11 +104,46 @@ object AacPackImportPreflight {
         return null
     }
 
+    internal fun isAllowedImportEntry(name: String): Boolean {
+        return when {
+            name == "data/aac_items.json" -> true
+            isDirectJsonChild(name, "data/profiles/") -> true
+            name == "aac_export_manifest.json" -> true
+            isAllowedImageChild(name, "icons/custom/") -> true
+            isAllowedImageChild(name, "icons/soca/") -> true
+            isAllowedImageChild(name, "icons/arasaac/") -> true
+            else -> false
+        }
+    }
+
+    internal fun relativeDestinationPath(name: String): String? {
+        if (!isAllowedImportEntry(name)) {
+            return null
+        }
+        return if (name == "aac_export_manifest.json") {
+            "NovaRehab/$name"
+        } else {
+            "NovaRehab/$name"
+        }
+    }
+
     private fun isDirectJsonChild(name: String, directory: String): Boolean {
         if (!name.startsWith(directory) || !name.endsWith(".json")) {
             return false
         }
         val childName = name.removePrefix(directory)
         return childName.isNotEmpty() && !childName.contains("/")
+    }
+
+    private fun isAllowedImageChild(name: String, directory: String): Boolean {
+        val childName = name.removePrefix(directory)
+        if (!name.startsWith(directory) || childName.isEmpty()) {
+            return false
+        }
+        val lowerName = childName.lowercase(Locale.ROOT)
+        return lowerName.endsWith(".png") ||
+            lowerName.endsWith(".jpg") ||
+            lowerName.endsWith(".jpeg") ||
+            lowerName.endsWith(".webp")
     }
 }
