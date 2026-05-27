@@ -115,6 +115,9 @@ class SettingsActivity : AppCompatActivity() {
         private const val DEFAULT_AAC_PERSISTENT_TOP_ROW_COUNT = 4
         private val AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS = arrayOf(3, 4, 5)
         private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("yes", "no", "help", "pain", "stop")
+
+        // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
+        private const val MAX_MISSING_ICONS_SHOWN = 15
     }
 
     private lateinit var prefs: SharedPreferences
@@ -1009,46 +1012,127 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun showAacContentDiagnostics() {
         val report = AacContentDiagnostics.inspect(this)
-        val message = if (report.storageUnavailable) {
-            "Shramba ni dosegljiva."
-        } else {
-            buildString {
-                append("Osnovna pot:\n")
-                append(report.basePath ?: "-")
-                append("\n\n")
-                append("AAC items JSON: ")
-                append(if (report.itemsJsonExists) "OK" else "MANJKA")
-                append("\n")
-                append("DOM profile JSON: ")
-                append(if (report.domProfileExists) "OK" else "MANJKA")
-                append("\n")
-                append("Custom icons folder: ")
-                append(if (report.customIconsDirExists) "OK" else "MANJKA")
-                append("\n")
-                append("SOCA icons folder: ")
-                append(if (report.socaIconsDirExists) "OK" else "MANJKA")
-                append("\n")
-                append("ARASAAC icons folder: ")
-                append(if (report.arasaacIconsDirExists) "OK" else "MANJKA")
-                append("\n\n")
-                append("Manjkajoče sample slike:\n")
-                if (report.missingSampleImages.isEmpty()) {
-                    append("- nobena")
-                } else {
-                    report.missingSampleImages.forEach { fileName ->
-                        append("- ")
-                        append(fileName)
-                        append("\n")
-                    }
-                }
-            }.trimEnd()
-        }
+        val message = buildAacDiagnosticsMessage(report)
 
         AlertDialog.Builder(this)
             .setTitle("AAC diagnostika")
             .setMessage(message)
             .setPositiveButton("V redu", null)
             .show()
+    }
+
+    // Faza 1: terapevtu razumljivo poročilo o lokalnem AAC paketu.
+    // Brez Android terminologije, brez razvijalskih napak (npr. JSONException).
+    private fun buildAacDiagnosticsMessage(report: AacContentDiagnostics.Report): String {
+        if (report.storageUnavailable) {
+            return "Shramba tablice trenutno ni dosegljiva.\n" +
+                "Komunikator deluje s SYSTEM vsebino."
+        }
+
+        return buildString {
+            append("SKUPNA OCENA: ")
+            append(aacSeverityLabel(report.severity))
+            append("\n\n")
+
+            if (report.severity == AacContentDiagnostics.Severity.NO_PACKAGE) {
+                append("Lokalni AAC paket še ni nameščen.\n")
+                append("Uporablja se SYSTEM vsebina. To ni napaka.\n\n")
+            }
+
+            append("── AAC ELEMENTI ──\n")
+            when (report.itemsJsonState) {
+                AacContentDiagnostics.JsonState.OK ->
+                    append("Najdenih elementov: ${report.itemCount}\n")
+                AacContentDiagnostics.JsonState.MISSING ->
+                    append("Seznam elementov še ni nameščen.\n")
+                AacContentDiagnostics.JsonState.CORRUPT ->
+                    append("POKVARJEN: seznam elementov (aac_items.json)\n")
+            }
+            append("\n")
+
+            append("── PROFILI ──\n")
+            if (report.validProfileCount > 0) {
+                append("Najdenih profilov: ${report.validProfileCount}\n")
+                append(report.validProfileFileNames.joinToString("\n") { "- ${profileDisplayName(it)}" })
+                append("\n")
+            } else {
+                append("Noben profil še ni nameščen.\n")
+            }
+            if (report.corruptProfileFileNames.isNotEmpty()) {
+                append("POKVARJENI profili:\n")
+                append(report.corruptProfileFileNames.joinToString("\n") { "- ${profileDisplayName(it)}" })
+                append("\n")
+            }
+            append("\n")
+
+            append("── IKONE ──\n")
+            append("Lastne slike: ${report.customIconFileCount}\n")
+            append("Soča slike: ${report.socaIconFileCount}\n")
+            append("ARASAAC slike: ${report.arasaacIconFileCount}\n")
+            when {
+                report.iconCheckSkipped ->
+                    append("Manjkajočih slik ni bilo mogoče preveriti,\n" +
+                        "ker seznam elementov ni berljiv.\n")
+                report.missingIconPaths.isEmpty() ->
+                    append("Manjkajoče slike: nobena\n")
+                else -> {
+                    append("MANJKAJOČE SLIKE (${report.missingIconPaths.size}):\n")
+                    val shown = report.missingIconPaths.take(MAX_MISSING_ICONS_SHOWN)
+                    append(shown.joinToString("\n") { "- $it" })
+                    append("\n")
+                    val remaining = report.missingIconPaths.size - shown.size
+                    if (remaining > 0) {
+                        append("... in še $remaining\n")
+                    }
+                }
+            }
+            append("\n")
+
+            if (report.packageTotalBytes > 0L) {
+                append("── PAKET ──\n")
+                append("Velikost: ${formatPackageSize(report.packageTotalBytes)}\n")
+                if (report.packageLastModified > 0L) {
+                    append("Zadnja sprememba: ${formatPackageDate(report.packageLastModified)}\n")
+                }
+                append("\n")
+            }
+
+            append("── SYSTEM VSEBINA ──\n")
+            append("SYSTEM vsebina je na voljo.\n")
+            append("Komunikator deluje tudi brez lokalnega paketa.")
+        }.trimEnd()
+    }
+
+    private fun aacSeverityLabel(severity: AacContentDiagnostics.Severity): String {
+        return when (severity) {
+            AacContentDiagnostics.Severity.OK -> "V REDU"
+            AacContentDiagnostics.Severity.WARNING -> "OPOZORILO"
+            AacContentDiagnostics.Severity.ERROR -> "NAPAKA"
+            AacContentDiagnostics.Severity.NO_PACKAGE -> "NI PAKETA"
+        }
+    }
+
+    // Iz imena datoteke (npr. "dom.json") naredi berljiv naziv ("DOM").
+    private fun profileDisplayName(fileName: String): String {
+        return fileName
+            .substringBeforeLast('.')
+            .replace('_', ' ')
+            .trim()
+            .uppercase(Locale.ROOT)
+            .ifBlank { fileName }
+    }
+
+    private fun formatPackageSize(bytes: Long): String {
+        return when {
+            bytes >= 1024L * 1024L -> String.format(Locale.ROOT, "%.1f MB", bytes / (1024.0 * 1024.0))
+            bytes >= 1024L -> String.format(Locale.ROOT, "%.0f KB", bytes / 1024.0)
+            else -> "$bytes B"
+        }
+    }
+
+    private fun formatPackageDate(epochMs: Long): String {
+        return java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ROOT)
+            .format(java.util.Date(epochMs))
     }
 
     private fun releaseSpeechApiTestPlayer() {
