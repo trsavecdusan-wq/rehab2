@@ -21,8 +21,8 @@ android {
         // Normal releases use even versionCode values only, for example 170, 172, 174.
         // Rollback releases use odd versionCode values only, for example 171, 173, 175.
         // A rollback APK may contain older stable code, but it must use a higher odd versionCode so Android allows install.
-        versionCode 10324
-        versionName "1.2.124"
+        versionCode 10326
+        versionName "1.2.126"
     }
 
     signingConfigs {

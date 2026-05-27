@@ -202,6 +202,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     }
 
     private fun buildPreflightSuccessText(result: AacPackImportPreflight.Result.Success): String {
+        val conflictPreview = buildConflictPreview(result)
         return buildString {
             append("Preflight uspel. ZIP je bil samo prebran.\n\n")
             append("Za uvoz je potrebna potrditev.\n")
@@ -214,6 +215,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Ikone SOCA: ${result.socaIconCount}\n")
             append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
             append("Manifest: ${if (result.hasManifest) 1 else 0}\n\n")
+            append(formatConflictPreview(conflictPreview))
+            append("\n")
             append("Obstojece datoteke bodo preskocene.\n")
             append("Nobena datoteka ne bo izbrisana ali prepisana.")
         }
@@ -223,6 +226,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         uri: Uri,
         result: AacPackImportPreflight.Result.Success
     ) {
+        val conflictPreview = buildConflictPreview(result)
         AlertDialog.Builder(this)
             .setTitle("Uvozi AAC ZIP paket?")
             .setMessage(
@@ -236,7 +240,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     append("Ikone custom: ${result.customIconCount}\n")
                     append("Ikone SOCA: ${result.socaIconCount}\n")
                     append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
-                    append("Manifest: ${if (result.hasManifest) 1 else 0}")
+                    append("Manifest: ${if (result.hasManifest) 1 else 0}\n\n")
+                    append(formatConflictPreview(conflictPreview))
                 }
             )
             .setNegativeButton("Preklici", null)
@@ -326,6 +331,70 @@ class AacPackSettingsActivity : AppCompatActivity() {
             if (remainingCount > 0) {
                 append("- se $remainingCount dodatnih profilov\n")
             }
+        }
+    }
+
+    private data class ConflictPreview(
+        val newCounts: AacPackImporter.CategoryCounts,
+        val existingCounts: AacPackImporter.CategoryCounts,
+        val duplicateNames: List<String>
+    )
+
+    private fun buildConflictPreview(
+        result: AacPackImportPreflight.Result.Success
+    ): ConflictPreview {
+        val externalFilesDir = getExternalFilesDir(null)
+        var newCounts = AacPackImporter.CategoryCounts.empty()
+        var existingCounts = AacPackImporter.CategoryCounts.empty()
+        val duplicateNames = mutableListOf<String>()
+
+        result.importEntryNames.forEach { entryName ->
+            val relativePath = AacPackImportPreflight.relativeDestinationPath(entryName) ?: return@forEach
+            val exists = externalFilesDir?.let { File(it, relativePath).exists() } ?: false
+            if (exists) {
+                existingCounts = incrementCategory(existingCounts, entryName)
+                if (duplicateNames.size < 10) {
+                    duplicateNames += entryName
+                }
+            } else {
+                newCounts = incrementCategory(newCounts, entryName)
+            }
+        }
+
+        return ConflictPreview(
+            newCounts = newCounts,
+            existingCounts = existingCounts,
+            duplicateNames = duplicateNames
+        )
+    }
+
+    private fun formatConflictPreview(preview: ConflictPreview): String {
+        return buildString {
+            append("Novo za uvoz:\n")
+            append(formatCategoryCounts(preview.newCounts))
+            append("\nZe obstaja - bo preskoceno:\n")
+            append(formatCategoryCounts(preview.existingCounts))
+            if (preview.duplicateNames.isNotEmpty()) {
+                append("\nPrve podvojene datoteke:\n")
+                preview.duplicateNames.forEach { name ->
+                    append("- $name\n")
+                }
+            }
+        }
+    }
+
+    private fun incrementCategory(
+        counts: AacPackImporter.CategoryCounts,
+        name: String
+    ): AacPackImporter.CategoryCounts {
+        return when {
+            name == "data/aac_items.json" -> counts.copy(aacItems = counts.aacItems + 1)
+            name.startsWith("data/profiles/") -> counts.copy(profiles = counts.profiles + 1)
+            name.startsWith("icons/custom/") -> counts.copy(customIcons = counts.customIcons + 1)
+            name.startsWith("icons/soca/") -> counts.copy(socaIcons = counts.socaIcons + 1)
+            name.startsWith("icons/arasaac/") -> counts.copy(arasaacIcons = counts.arasaacIcons + 1)
+            name == "aac_export_manifest.json" -> counts.copy(manifest = counts.manifest + 1)
+            else -> counts
         }
     }
 

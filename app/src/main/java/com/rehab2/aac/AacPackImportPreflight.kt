@@ -11,6 +11,7 @@ object AacPackImportPreflight {
     sealed class Result {
         data class Success(
             val entryCount: Int,
+            val importEntryNames: List<String>,
             val hasItems: Boolean,
             val profileCount: Int,
             val profileNames: List<String>,
@@ -42,6 +43,7 @@ object AacPackImportPreflight {
 
     private fun inspect(zip: ZipInputStream): Result {
         var entryCount = 0
+        val importEntryNames = mutableListOf<String>()
         var hasItems = false
         var profileCount = 0
         val profileNames = mutableListOf<String>()
@@ -63,6 +65,7 @@ object AacPackImportPreflight {
                     return Result.Rejected("Nedovoljena datoteka v ZIP: $name")
                 }
                 entryCount += 1
+                importEntryNames += name
                 when {
                     name == "data/aac_items.json" -> hasItems = true
                     isDirectJsonChild(name, "data/profiles/") -> {
@@ -81,6 +84,7 @@ object AacPackImportPreflight {
 
         return Result.Success(
             entryCount = entryCount,
+            importEntryNames = importEntryNames.sortedBy { it.lowercase(Locale.ROOT) },
             hasItems = hasItems,
             profileCount = profileCount,
             profileNames = profileNames.sortedBy { it.lowercase(Locale.ROOT) },
