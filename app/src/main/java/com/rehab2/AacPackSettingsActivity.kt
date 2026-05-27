@@ -206,9 +206,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Preflight uspel. ZIP je bil samo prebran.\n\n")
             append("Za uvoz je potrebna potrditev.\n")
             append("Obstojece datoteke bodo preskocene.\n\n")
-            append("Kandidati za uvoz po kategoriji:\n")
+            append("Predogled paketa:\n")
             append("AAC elementi: ${if (result.hasItems) 1 else 0}\n")
             append("Profili: ${result.profileCount}\n")
+            append(formatProfilePreview(result.profileNames))
             append("Ikone custom: ${result.customIconCount}\n")
             append("Ikone SOCA: ${result.socaIconCount}\n")
             append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
@@ -231,6 +232,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     append("Nobena datoteka ne bo izbrisana ali prepisana.\n\n")
                     append("AAC elementi: ${if (result.hasItems) 1 else 0}\n")
                     append("Profili: ${result.profileCount}\n")
+                    append(formatProfilePreview(result.profileNames))
                     append("Ikone custom: ${result.customIconCount}\n")
                     append("Ikone SOCA: ${result.socaIconCount}\n")
                     append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
@@ -308,6 +310,22 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Ikone SOCA: ${counts.socaIcons}\n")
             append("Ikone ARASAAC: ${counts.arasaacIcons}\n")
             append("Manifest: ${counts.manifest}\n")
+        }
+    }
+
+    private fun formatProfilePreview(profileNames: List<String>): String {
+        if (profileNames.isEmpty()) {
+            return "Profili v ZIP: ni profilov\n"
+        }
+        return buildString {
+            append("Profili v ZIP:\n")
+            profileNames.take(12).forEach { profileName ->
+                append("- $profileName\n")
+            }
+            val remainingCount = profileNames.size - 12
+            if (remainingCount > 0) {
+                append("- se $remainingCount dodatnih profilov\n")
+            }
         }
     }
 

@@ -13,6 +13,7 @@ object AacPackImportPreflight {
             val entryCount: Int,
             val hasItems: Boolean,
             val profileCount: Int,
+            val profileNames: List<String>,
             val customIconCount: Int,
             val socaIconCount: Int,
             val arasaacIconCount: Int,
@@ -43,6 +44,7 @@ object AacPackImportPreflight {
         var entryCount = 0
         var hasItems = false
         var profileCount = 0
+        val profileNames = mutableListOf<String>()
         var customIconCount = 0
         var socaIconCount = 0
         var arasaacIconCount = 0
@@ -63,7 +65,10 @@ object AacPackImportPreflight {
                 entryCount += 1
                 when {
                     name == "data/aac_items.json" -> hasItems = true
-                    isDirectJsonChild(name, "data/profiles/") -> profileCount += 1
+                    isDirectJsonChild(name, "data/profiles/") -> {
+                        profileCount += 1
+                        profileNames += name.removePrefix("data/profiles/")
+                    }
                     name.startsWith("icons/custom/") -> customIconCount += 1
                     name.startsWith("icons/soca/") -> socaIconCount += 1
                     name.startsWith("icons/arasaac/") -> arasaacIconCount += 1
@@ -78,6 +83,7 @@ object AacPackImportPreflight {
             entryCount = entryCount,
             hasItems = hasItems,
             profileCount = profileCount,
+            profileNames = profileNames.sortedBy { it.lowercase(Locale.ROOT) },
             customIconCount = customIconCount,
             socaIconCount = socaIconCount,
             arasaacIconCount = arasaacIconCount,
