@@ -19,6 +19,8 @@ import com.rehab2.aac.AacPackExporter
 import com.rehab2.aac.AacPackImporter
 import com.rehab2.aac.AacPackImportPreflight
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 /**
@@ -38,7 +40,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val SHARE_READY_COLOR = 0xFF214A78.toInt()
         private const val BUSY_BUTTON_COLOR = 0xFF5B6672.toInt()
         private const val IMPORT_PREFS_NAME = "aac_pack_import_diagnostics"
-        private const val KEY_LAST_IMPORT_STATUS = "last_import_status"
+        private const val KEY_IMPORT_REPORTS = "import_reports"
+        private const val IMPORT_REPORT_SEPARATOR = "\u001E"
+        private const val MAX_IMPORT_REPORTS = 5
     }
 
     private lateinit var btnExport: Button
@@ -215,6 +219,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Ikone SOCA: ${result.socaIconCount}\n")
             append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
             append("Manifest: ${if (result.hasManifest) 1 else 0}\n\n")
+            append(formatManifestMetadata(result))
+            append("\n")
+            append(formatIntegrityWarnings(result.integrityWarnings))
+            append("\n")
             append(formatConflictPreview(conflictPreview))
             append("\n")
             append("Obstojece datoteke bodo preskocene.\n")
@@ -241,6 +249,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     append("Ikone SOCA: ${result.socaIconCount}\n")
                     append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
                     append("Manifest: ${if (result.hasManifest) 1 else 0}\n\n")
+                    append(formatManifestMetadata(result))
+                    append("\n")
+                    append(formatIntegrityWarnings(result.integrityWarnings))
+                    append("\n")
                     append(formatConflictPreview(conflictPreview))
                 }
             )
@@ -268,7 +280,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnImportPreflight.isEnabled = true
         btnImportPreflight.backgroundTintList = ColorStateList.valueOf(SHARE_READY_COLOR)
 
-        val statusText = when (result) {
+        val statusText = buildImportStatusText(result)
+        txtStatus.text = statusText
+        saveImportReport(buildImportReport(result))
+        refreshLastImportDiagnostic()
+    }
+
+    private fun buildImportStatusText(result: AacPackImporter.Result): String {
+        return when (result) {
             is AacPackImporter.Result.Success -> buildString {
                 append("Uvoz zakljucen.\n\n")
                 append("Uvozenih datotek: ${result.importedCount}\n")
@@ -285,9 +304,6 @@ class AacPackSettingsActivity : AppCompatActivity() {
             is AacPackImporter.Result.Failure ->
                 "Uvoz ni uspel.\n${result.reason}\n\nNoben obstojec podatek ni bil prepisan ali izbrisan."
         }
-        txtStatus.text = statusText
-        saveLastImportDiagnostic(statusText)
-        refreshLastImportDiagnostic()
     }
 
     private fun setShareEnabled(enabled: Boolean) {
@@ -330,6 +346,43 @@ class AacPackSettingsActivity : AppCompatActivity() {
             val remainingCount = profileNames.size - 12
             if (remainingCount > 0) {
                 append("- se $remainingCount dodatnih profilov\n")
+            }
+        }
+    }
+
+    private fun formatManifestMetadata(result: AacPackImportPreflight.Result.Success): String {
+        if (!result.hasManifest) {
+            return "Metapodatki paketa:\nManifest ni prisoten.\n"
+        }
+
+        val metadata = result.manifestMetadata
+            ?: return "Metapodatki paketa:\nManifest je prisoten, metapodatki niso na voljo.\n"
+
+        return buildString {
+            append("Metapodatki paketa:\n")
+            if (metadata.warning != null) {
+                append("Opozorilo: ${metadata.warning}\n")
+            }
+            append("Ime paketa: ${metadata.packageName ?: "ni podatka"}\n")
+            append("Verzija paketa: ${metadata.packageVersion ?: "ni podatka"}\n")
+            append("Cas izvoza: ${metadata.exportTimestamp ?: "ni podatka"}\n")
+            if (metadata.therapistAuthor != null) {
+                append("Terapevt/avtor: ${metadata.therapistAuthor}\n")
+            }
+            if (metadata.description != null) {
+                append("Opis: ${metadata.description}\n")
+            }
+        }
+    }
+
+    private fun formatIntegrityWarnings(warnings: List<String>): String {
+        if (warnings.isEmpty()) {
+            return "Diagnostika ZIP:\nNi opozoril.\n"
+        }
+        return buildString {
+            append("Diagnostika ZIP - opozorila:\n")
+            warnings.forEach { warning ->
+                append("- $warning\n")
             }
         }
     }
@@ -398,20 +451,66 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveLastImportDiagnostic(statusText: String) {
-        getSharedPreferences(IMPORT_PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_LAST_IMPORT_STATUS, statusText)
+    private fun buildImportReport(result: AacPackImporter.Result): String {
+        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ROOT).format(Date())
+        return when (result) {
+            is AacPackImporter.Result.Success -> buildString {
+                append("$timestamp - uspeh\n")
+                append("Uvozenih: ${result.importedCount}, preskocenih: ${result.skippedExistingCount}\n")
+                append("Uvozeno po kategoriji:\n")
+                append(formatCategoryCounts(result.importedByCategory).trimEnd())
+                append("\nPreskoceno po kategoriji:\n")
+                append(formatCategoryCounts(result.skippedExistingByCategory).trimEnd())
+            }
+            is AacPackImporter.Result.Rejected -> buildString {
+                append("$timestamp - zavrnjeno\n")
+                append(result.reason)
+            }
+            is AacPackImporter.Result.Failure -> buildString {
+                append("$timestamp - napaka\n")
+                append(result.reason)
+            }
+        }
+    }
+
+    private fun saveImportReport(report: String) {
+        val prefs = getSharedPreferences(IMPORT_PREFS_NAME, Context.MODE_PRIVATE)
+        val reports = loadImportReports().toMutableList()
+        reports.add(0, report)
+        val encodedReports = reports
+            .take(MAX_IMPORT_REPORTS)
+            .joinToString(IMPORT_REPORT_SEPARATOR)
+        prefs.edit()
+            .putString(KEY_IMPORT_REPORTS, encodedReports)
             .apply()
     }
 
     private fun refreshLastImportDiagnostic() {
-        val status = getSharedPreferences(IMPORT_PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_LAST_IMPORT_STATUS, null)
-        txtLastImportStatus.text = if (status.isNullOrBlank()) {
-            "Zadnji uvoz: ni podatka."
+        val reports = loadImportReports()
+        txtLastImportStatus.text = if (reports.isEmpty()) {
+            "Zadnji uvozi: ni podatka."
         } else {
-            "Zadnji uvoz:\n$status"
+            buildString {
+                append("Zadnji uvozi:\n")
+                reports.forEachIndexed { index, report ->
+                    if (index > 0) {
+                        append("\n")
+                    }
+                    append(report)
+                    append("\n")
+                }
+            }.trimEnd()
         }
+    }
+
+    private fun loadImportReports(): List<String> {
+        val rawReports = getSharedPreferences(IMPORT_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_IMPORT_REPORTS, null)
+            ?: return emptyList()
+        return rawReports
+            .split(IMPORT_REPORT_SEPARATOR)
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .take(MAX_IMPORT_REPORTS)
     }
 }
