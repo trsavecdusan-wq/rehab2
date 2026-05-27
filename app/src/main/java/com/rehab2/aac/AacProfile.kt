@@ -55,7 +55,14 @@ object AacProfileStore {
     )
 
     fun loadProfilesFromStorage(context: Context): List<AacProfile> {
-        return AacLocalJsonLoader.loadProfiles(context, fallbackProfiles.filter { it.enabled })
+        val mergedProfiles = linkedMapOf<String, AacProfile>()
+        fallbackProfiles.filter { it.enabled }.forEach { profile ->
+            mergedProfiles[profile.id] = profile
+        }
+        AacLocalJsonLoader.loadProfiles(context).forEach { profile ->
+            mergedProfiles[profile.id] = profile
+        }
+        return mergedProfiles.values.toList()
     }
 
     fun getActiveAacProfile(context: Context): AacProfile {

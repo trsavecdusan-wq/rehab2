@@ -43,7 +43,7 @@ object AacLocalJsonLoader {
         }
     }
 
-    fun loadProfiles(context: Context, fallbackProfiles: List<AacProfile>): List<AacProfile> {
+    fun loadProfiles(context: Context): List<AacProfile> {
         val profilesDir = AacStoragePaths.getProfilesDataDir(context)
         val files = profilesDir?.takeIf { it.exists() && it.isDirectory }?.listFiles { file ->
             file.isFile && file.extension.equals("json", ignoreCase = true)
@@ -52,26 +52,26 @@ object AacLocalJsonLoader {
         if (files.isEmpty()) {
             Log.d(TAG, "AAC_JSON PROFILES_FILE_MISSING")
             Log.d(TAG, "AAC_JSON FALLBACK_SYSTEM_DATA")
-            return fallbackProfiles
+            return emptyList()
         }
 
-        return try {
-            val profiles = files.flatMap { file ->
-                parseProfilesFile(file)
-            }.filter { it.enabled }
-
-            if (profiles.isEmpty()) {
-                Log.d(TAG, "AAC_JSON PROFILES_PARSE_ERROR")
-                Log.d(TAG, "AAC_JSON FALLBACK_SYSTEM_DATA")
-                fallbackProfiles
-            } else {
-                Log.d(TAG, "AAC_JSON PROFILES_LOADED count=${profiles.size}")
-                profiles
+        val profiles = buildList {
+            files.forEach { file ->
+                try {
+                    addAll(parseProfilesFile(file))
+                } catch (error: Exception) {
+                    Log.w(TAG, "AAC_JSON PROFILES_PARSE_ERROR file=${file.name}", error)
+                }
             }
-        } catch (error: Exception) {
-            Log.w(TAG, "AAC_JSON PROFILES_PARSE_ERROR", error)
+        }.filter { it.enabled }
+
+        return if (profiles.isEmpty()) {
+            Log.d(TAG, "AAC_JSON PROFILES_PARSE_ERROR")
             Log.d(TAG, "AAC_JSON FALLBACK_SYSTEM_DATA")
-            fallbackProfiles
+            emptyList()
+        } else {
+            Log.d(TAG, "AAC_JSON PROFILES_LOADED count=${profiles.size}")
+            profiles
         }
     }
 
