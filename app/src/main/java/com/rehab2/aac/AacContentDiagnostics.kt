@@ -16,6 +16,7 @@ object AacContentDiagnostics {
         val basePath: String?,
         val itemsJsonExists: Boolean,
         val profilesDirExists: Boolean,
+        val domProfileExists: Boolean,
         val profileJsonFileNames: List<String>,
         val customIconsDirExists: Boolean,
         val socaIconsDirExists: Boolean,
@@ -29,6 +30,7 @@ object AacContentDiagnostics {
                 storageUnavailable = true,
                 basePath = null,
                 itemsJsonExists = false,
+                domProfileExists = false,
                 profilesDirExists = false,
                 profileJsonFileNames = emptyList(),
                 customIconsDirExists = false,
@@ -50,6 +52,9 @@ object AacContentDiagnostics {
         } else {
             emptyList()
         }
+        val domProfileExists = profileJsonFileNames.any {
+            it.equals("dom.json", ignoreCase = true)
+        }
 
         val missingImages = sampleImageRelativePaths.mapNotNull { relativePath ->
             val resolved = AacStoragePaths.resolveIconFile(context, relativePath, IconSource.CUSTOM)
@@ -60,6 +65,7 @@ object AacContentDiagnostics {
         return Report(
             storageUnavailable = false,
             basePath = externalFilesDir.absolutePath,
+            domProfileExists = domProfileExists,
             itemsJsonExists = itemsFile?.exists() == true && itemsFile.isFile,
             profilesDirExists = profilesDir?.exists() == true && profilesDir.isDirectory,
             profileJsonFileNames = profileJsonFileNames,
