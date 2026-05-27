@@ -6,4 +6,7 @@
     <files-path
         name="updates"
         path="updates/" />
+    <files-path
+        name="aac_exports"
+        path="aac_exports/" />
 </paths>

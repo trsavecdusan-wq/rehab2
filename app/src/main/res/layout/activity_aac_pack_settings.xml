@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121417">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:text="AAC PAKET"
+            android:textColor="#F4F7FA"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnBackAacPackSettings"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="#2F5F9E"
+            android:text="NAZAJ"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Izvozi lokalni AAC paket (elemente, profile in slike) v ZIP datoteko za varnostno kopijo ali prenos na drugo tablico."
+            android:textColor="#B8C0C8"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnExportAacPack"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#3E7C4A"
+            android:text="IZVOZI AAC PAKET"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnShareAacPack"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#5B6672"
+            android:enabled="false"
+            android:text="DELI ZIP"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtExportStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+</ScrollView>

@@ -239,6 +239,10 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, BackupSettingsActivity::class.java))
         }
 
+        findViewById<Button>(R.id.btnAacPackSettings).setOnClickListener {
+            startActivity(Intent(this, AacPackSettingsActivity::class.java))
+        }
+
         findViewById<Button>(R.id.btnAacSettings).setOnClickListener {
             Toast.makeText(this, getString(R.string.aac_settings_not_ready), Toast.LENGTH_SHORT).show()
         }
