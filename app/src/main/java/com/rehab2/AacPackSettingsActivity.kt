@@ -49,6 +49,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val MAX_IMPORT_REPORTS = 5
         private const val MAX_PROFILE_PREVIEW_BYTES = 64 * 1024
         private const val MAX_ITEMS_PREVIEW_BYTES = 512 * 1024
+        private const val SUSPICIOUS_ITEMS_PER_PROFILE = 250
     }
 
     private lateinit var btnExport: Button
@@ -656,17 +657,33 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val hasAacItems = aacItemsFile?.isFile == true && aacItemsFile.length() > 0L
         val relationAnalysis = analyzeLocalAacRelations(aacItemsFile)
         val iconCount = countLocalIconsSafely()
-        val profiles = profileFiles.map { profileFile ->
-            val summary = readLocalProfileSummary(profileFile)
+        val profileSummaries = profileFiles.map { profileFile ->
+            readLocalProfileSummary(profileFile)
+        }
+        val duplicateProfileIds = profileSummaries
+            .map { profile -> profile.profileId }
+            .filter { profileId -> profileId.isNotBlank() }
+            .groupingBy { profileId -> profileId }
+            .eachCount()
+            .filterValues { count -> count > 1 }
+            .keys
+        val profiles = profileSummaries.map { summary ->
             val relation = relationAnalysis.profileRelations[summary.profileId]
+            val linkedItemCount = relation?.itemCount ?: 0
+            val extraWarnings = mutableListOf<String>()
+            if (linkedItemCount == 0) {
+                extraWarnings += "profil nima povezanih AAC elementov"
+            }
+            if (summary.profileId in duplicateProfileIds) {
+                extraWarnings += "ID profila je podvojen"
+            }
+            if (linkedItemCount > SUSPICIOUS_ITEMS_PER_PROFILE) {
+                extraWarnings += "profil ima sumljivo veliko AAC elementov"
+            }
             summary.copy(
-                linkedItemCount = relation?.itemCount ?: 0,
+                linkedItemCount = linkedItemCount,
                 missingIconCount = relation?.missingIconCount ?: 0,
-                warnings = summary.warnings + if (relation?.itemCount == null || relation.itemCount == 0) {
-                    listOf("profil nima povezanih AAC elementov")
-                } else {
-                    emptyList()
-                }
+                warnings = summary.warnings + extraWarnings
             )
         }
 
@@ -674,6 +691,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             profiles = profiles,
             hasAacItems = hasAacItems,
             iconCount = iconCount,
+            duplicateProfileIdCount = duplicateProfileIds.size,
             relationAnalysis = relationAnalysis,
             lastImportSummary = lastImportSummary()
         )
@@ -690,6 +708,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("AAC elementi brez lokalnega profila: ${overview.orphanItemCount}\n")
             append("Profili brez elementov: ${overview.zeroItemProfileCount}\n")
             append("Manjkajoce ikone v elementih: ${overview.relationAnalysis.missingIconReferenceCount}\n")
+            append("Podvojeni AAC item ID-ji: ${overview.relationAnalysis.duplicateItemIdCount}\n")
+            append("Podvojeni profil ID-ji: ${overview.duplicateProfileIdCount}\n")
+            append("Neveljavni AAC elementi: ${overview.relationAnalysis.invalidItemCount}\n")
+            append("Neveljavne ikonske reference: ${overview.relationAnalysis.invalidIconReferenceCount}\n")
             append("Zadnji uvoz: ${overview.lastImportSummary}")
         }
     }
@@ -811,29 +833,54 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 else -> org.json.JSONObject(itemsText).optJSONArray("items") ?: org.json.JSONArray()
             }
             val mutableRelations = mutableMapOf<String, MutableProfileRelation>()
+            val itemIds = mutableListOf<String>()
             var orphanItemCount = 0
             var missingIconReferenceCount = 0
+            var invalidItemCount = 0
+            var invalidIconReferenceCount = 0
 
             for (index in 0 until itemsArray.length()) {
                 val item = itemsArray.optJSONObject(index) ?: continue
+                val itemWarnings = mutableListOf<String>()
+                val itemId = item.optString("id").trim()
+                if (itemId.isBlank()) {
+                    itemWarnings += "AAC element nima ID"
+                } else {
+                    itemIds += itemId
+                }
+                if (!itemHasLabelOrText(item)) {
+                    itemWarnings += "AAC element nima oznake/besedila"
+                }
                 val profileIds = itemProfileIds(item)
                 if (profileIds.isEmpty()) {
                     orphanItemCount += 1
+                    itemWarnings += "AAC element nima reference na profil"
                 }
 
-                val iconMissing = itemIconMissing(item)
-                if (iconMissing) {
+                val iconStatus = itemIconStatus(item)
+                if (iconStatus.isMissing) {
                     missingIconReferenceCount += 1
+                }
+                if (iconStatus.isInvalid) {
+                    invalidIconReferenceCount += 1
+                    itemWarnings += "AAC element ima neveljavno ikonsko referenco"
+                }
+                if (itemWarnings.isNotEmpty()) {
+                    invalidItemCount += 1
                 }
 
                 profileIds.forEach { profileId ->
                     val relation = mutableRelations.getOrPut(profileId) { MutableProfileRelation() }
                     relation.itemCount += 1
-                    if (iconMissing) {
+                    if (iconStatus.isMissing) {
                         relation.missingIconCount += 1
                     }
                 }
             }
+            val duplicateItemIdCount = itemIds
+                .groupingBy { itemId -> itemId }
+                .eachCount()
+                .count { (_, count) -> count > 1 }
 
             AacRelationAnalysis(
                 profileRelations = mutableRelations.mapValues { (_, relation) ->
@@ -843,11 +890,19 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     )
                 },
                 orphanItemCount = orphanItemCount,
-                missingIconReferenceCount = missingIconReferenceCount
+                missingIconReferenceCount = missingIconReferenceCount,
+                duplicateItemIdCount = duplicateItemIdCount,
+                invalidItemCount = invalidItemCount,
+                invalidIconReferenceCount = invalidIconReferenceCount
             )
         } catch (error: Exception) {
             AacRelationAnalysis.empty()
         }
+    }
+
+    private fun itemHasLabelOrText(item: org.json.JSONObject): Boolean {
+        return listOf("label", "labelSl", "text", "speakTextSl", "name")
+            .any { key -> item.optString(key).trim().isNotEmpty() }
     }
 
     private fun itemProfileIds(item: org.json.JSONObject): List<String> {
@@ -875,27 +930,47 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun itemIconMissing(item: org.json.JSONObject): Boolean {
+    private fun itemIconStatus(item: org.json.JSONObject): IconReferenceStatus {
         val imagePath = item.optString("imagePath")
             .ifBlank { item.optString("image_path") }
             .ifBlank { item.optString("icon") }
             .trim()
         if (imagePath.isBlank()) {
-            return false
+            return IconReferenceStatus(isMissing = false, isInvalid = false)
         }
-        val iconSource = parseLocalIconSource(item.optString("iconSource").ifBlank { item.optString("icon_source") })
+        val rawIconSource = item.optString("iconSource").ifBlank { item.optString("icon_source") }
+        val iconSource = parseLocalIconSource(rawIconSource)
+        val invalidSource = rawIconSource.isNotBlank() && iconSource == null
+        val invalidPath = isInvalidIconPath(imagePath)
+        if (invalidSource || invalidPath) {
+            return IconReferenceStatus(isMissing = false, isInvalid = true)
+        }
+        if (iconSource == null || iconSource == IconSource.SYSTEM) {
+            return IconReferenceStatus(isMissing = false, isInvalid = false)
+        }
         val resolvedIcon = AacStoragePaths.resolveIconFile(this, imagePath, iconSource)
-        return resolvedIcon != null && !resolvedIcon.exists()
+        return IconReferenceStatus(
+            isMissing = resolvedIcon != null && !resolvedIcon.exists(),
+            isInvalid = resolvedIcon == null
+        )
     }
 
-    private fun parseLocalIconSource(rawSource: String): IconSource {
+    private fun parseLocalIconSource(rawSource: String): IconSource? {
         return when (rawSource.trim().uppercase(Locale.ROOT)) {
             "SOCA" -> IconSource.SOCA
             "ARASAAC" -> IconSource.ARASAAC
             "CUSTOM" -> IconSource.CUSTOM
             "PATIENT" -> IconSource.PATIENT
-            else -> IconSource.CUSTOM
+            "SYSTEM", "" -> IconSource.SYSTEM
+            else -> null
         }
+    }
+
+    private fun isInvalidIconPath(imagePath: String): Boolean {
+        val normalizedPath = imagePath.replace('\\', '/')
+        return normalizedPath.contains("../") ||
+            normalizedPath.startsWith("/") ||
+            Regex("^[A-Za-z]:").containsMatchIn(normalizedPath)
     }
 
     private fun readTextSafely(file: File, maxBytes: Int): String? {
@@ -918,6 +993,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val profiles: List<LocalProfileSummary>,
         val hasAacItems: Boolean,
         val iconCount: Int,
+        val duplicateProfileIdCount: Int,
         val relationAnalysis: AacRelationAnalysis,
         val lastImportSummary: String
     ) {
@@ -955,14 +1031,20 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private data class AacRelationAnalysis(
         val profileRelations: Map<String, ProfileRelation>,
         val orphanItemCount: Int,
-        val missingIconReferenceCount: Int
+        val missingIconReferenceCount: Int,
+        val duplicateItemIdCount: Int,
+        val invalidItemCount: Int,
+        val invalidIconReferenceCount: Int
     ) {
         companion object {
             fun empty(): AacRelationAnalysis {
                 return AacRelationAnalysis(
                     profileRelations = emptyMap(),
                     orphanItemCount = 0,
-                    missingIconReferenceCount = 0
+                    missingIconReferenceCount = 0,
+                    duplicateItemIdCount = 0,
+                    invalidItemCount = 0,
+                    invalidIconReferenceCount = 0
                 )
             }
         }
@@ -976,6 +1058,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private data class MutableProfileRelation(
         var itemCount: Int = 0,
         var missingIconCount: Int = 0
+    )
+
+    private data class IconReferenceStatus(
+        val isMissing: Boolean,
+        val isInvalid: Boolean
     )
 
     private sealed class TestZipResult {
