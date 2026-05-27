@@ -20,15 +20,31 @@ object AacSampleContentCreator {
 
         val itemsFile = AacStoragePaths.getAacItemsFile(context)
         val profilesDir = AacStoragePaths.getProfilesDataDir(context)
-        if (itemsFile == null || profilesDir == null) {
+        val customIconsDir = AacStoragePaths.getIconsCustomDir(context)
+        val socaIconsDir = AacStoragePaths.getIconsSocaDir(context)
+        val arasaacIconsDir = AacStoragePaths.getIconsArasaacDir(context)
+        if (
+            itemsFile == null ||
+            profilesDir == null ||
+            customIconsDir == null ||
+            socaIconsDir == null ||
+            arasaacIconsDir == null
+        ) {
             return Result(created, skipped, failed = true)
         }
 
         return try {
             ensureParentExists(itemsFile.parentFile)
             ensureParentExists(profilesDir)
+            ensureParentExists(customIconsDir)
+            ensureParentExists(socaIconsDir)
+            ensureParentExists(arasaacIconsDir)
 
-            val domProfileFile = java.io.File(profilesDir, "dom.json")
+            val profileFiles = listOf(
+                java.io.File(profilesDir, "dom.json") to buildDomProfileJson(),
+                java.io.File(profilesDir, "video_call.json") to buildVideoCallProfileJson(),
+                java.io.File(profilesDir, "real_world.json") to buildRealWorldProfileJson()
+            )
 
             if (itemsFile.exists()) {
                 Log.d(TAG, "AAC_SAMPLE SKIP_EXISTING_FILE path=${itemsFile.absolutePath}")
@@ -39,14 +55,16 @@ object AacSampleContentCreator {
                 created += itemsFile.absolutePath
             }
 
-            if (domProfileFile.exists()) {
-                Log.d(TAG, "AAC_SAMPLE SKIP_EXISTING_FILE path=${domProfileFile.absolutePath}")
-                skipped += domProfileFile.absolutePath
-            } else {
-                ensureParentExists(domProfileFile.parentFile)
-                domProfileFile.writeText(buildDomProfileJson().toString(2), Charsets.UTF_8)
-                Log.d(TAG, "AAC_SAMPLE CREATED_PROFILE_JSON path=${domProfileFile.absolutePath}")
-                created += domProfileFile.absolutePath
+            profileFiles.forEach { (profileFile, profileJson) ->
+                if (profileFile.exists()) {
+                    Log.d(TAG, "AAC_SAMPLE SKIP_EXISTING_FILE path=${profileFile.absolutePath}")
+                    skipped += profileFile.absolutePath
+                } else {
+                    ensureParentExists(profileFile.parentFile)
+                    profileFile.writeText(profileJson.toString(2), Charsets.UTF_8)
+                    Log.d(TAG, "AAC_SAMPLE CREATED_PROFILE_JSON path=${profileFile.absolutePath}")
+                    created += profileFile.absolutePath
+                }
             }
 
             Result(created, skipped, failed = false)
@@ -177,11 +195,50 @@ object AacSampleContentCreator {
     }
 
     private fun buildDomProfileJson(): JSONObject {
+        return buildProfileJson(
+            id = "dom",
+            displayName = "DOM",
+            icon = "custom/dom.png",
+            context = AacCommunicationContext.NORMAL_COMMUNICATION,
+            itemIds = listOf("yes", "no", "help", "pain", "thirsty")
+        )
+    }
+
+    private fun buildVideoCallProfileJson(): JSONObject {
+        return buildProfileJson(
+            id = "video_call",
+            displayName = "VIDEO CALL",
+            icon = "arasaac/video_call.png",
+            context = AacCommunicationContext.VIDEO_CALL_COMMUNICATION,
+            itemIds = listOf("yes", "no", "help", "pain")
+        )
+    }
+
+    private fun buildRealWorldProfileJson(): JSONObject {
+        return buildProfileJson(
+            id = "real_world",
+            displayName = "REAL WORLD",
+            icon = "soca/real_world.png",
+            context = AacCommunicationContext.REAL_WORLD_ASSISTANT,
+            itemIds = listOf("thirsty", "help", "pain")
+        )
+    }
+
+    private fun buildProfileJson(
+        id: String,
+        displayName: String,
+        icon: String,
+        context: AacCommunicationContext,
+        itemIds: List<String>
+    ): JSONObject {
         return JSONObject()
-            .put("id", "dom")
-            .put("displayName", "DOM")
-            .put("context", AacCommunicationContext.NORMAL_COMMUNICATION.name)
-            .put("itemIds", JSONArray().put("yes").put("no").put("help").put("pain").put("thirsty"))
+            .put("id", id)
+            .put("displayName", displayName)
+            .put("icon", icon)
+            .put("context", context.name)
+            .put("itemIds", JSONArray().apply {
+                itemIds.forEach { put(it) }
+            })
             .put("enabled", true)
     }
 
