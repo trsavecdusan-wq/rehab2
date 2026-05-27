@@ -15,7 +15,8 @@ object AacContentDiagnostics {
         val storageUnavailable: Boolean,
         val basePath: String?,
         val itemsJsonExists: Boolean,
-        val domProfileExists: Boolean,
+        val profilesDirExists: Boolean,
+        val profileJsonFileNames: List<String>,
         val customIconsDirExists: Boolean,
         val socaIconsDirExists: Boolean,
         val arasaacIconsDirExists: Boolean,
@@ -28,7 +29,8 @@ object AacContentDiagnostics {
                 storageUnavailable = true,
                 basePath = null,
                 itemsJsonExists = false,
-                domProfileExists = false,
+                profilesDirExists = false,
+                profileJsonFileNames = emptyList(),
                 customIconsDirExists = false,
                 socaIconsDirExists = false,
                 arasaacIconsDirExists = false,
@@ -37,10 +39,17 @@ object AacContentDiagnostics {
 
         val itemsFile = AacStoragePaths.getAacItemsFile(context)
         val profilesDir = AacStoragePaths.getProfilesDataDir(context)
-        val domProfileFile = profilesDir?.let { File(it, "dom.json") }
         val customIconsDir = AacStoragePaths.getIconsCustomDir(context)
         val socaIconsDir = AacStoragePaths.getIconsSocaDir(context)
         val arasaacIconsDir = AacStoragePaths.getIconsArasaacDir(context)
+        val profileJsonFileNames = if (profilesDir?.exists() == true && profilesDir.isDirectory) {
+            profilesDir.listFiles()
+                ?.filter { it.isFile && it.extension.equals("json", ignoreCase = true) }
+                ?.map { it.name }
+                .orEmpty()
+        } else {
+            emptyList()
+        }
 
         val missingImages = sampleImageRelativePaths.mapNotNull { relativePath ->
             val resolved = AacStoragePaths.resolveIconFile(context, relativePath, IconSource.CUSTOM)
@@ -52,7 +61,8 @@ object AacContentDiagnostics {
             storageUnavailable = false,
             basePath = externalFilesDir.absolutePath,
             itemsJsonExists = itemsFile?.exists() == true && itemsFile.isFile,
-            domProfileExists = domProfileFile?.exists() == true && domProfileFile.isFile,
+            profilesDirExists = profilesDir?.exists() == true && profilesDir.isDirectory,
+            profileJsonFileNames = profileJsonFileNames,
             customIconsDirExists = customIconsDir?.exists() == true && customIconsDir.isDirectory,
             socaIconsDirExists = socaIconsDir?.exists() == true && socaIconsDir.isDirectory,
             arasaacIconsDirExists = arasaacIconsDir?.exists() == true && arasaacIconsDir.isDirectory,
