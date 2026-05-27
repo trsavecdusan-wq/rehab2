@@ -66,6 +66,26 @@
             android:textStyle="bold" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Pred uvozom lahko ZIP samo preveris. Aplikacija ne ekstrahira, ne prepisuje in se ne uvozi podatkov."
+            android:textColor="#B8C0C8"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnImportAacPackPreflight"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#214A78"
+            android:text="PREVERI ZIP ZA UVOZ"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/txtExportStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

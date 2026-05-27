@@ -1,0 +1,110 @@
+package com.rehab2.aac
+
+import android.content.ContentResolver
+import android.net.Uri
+import java.io.IOException
+import java.util.zip.ZipInputStream
+
+object AacPackImportPreflight {
+
+    sealed class Result {
+        data class Success(
+            val entryCount: Int,
+            val hasItems: Boolean,
+            val profileCount: Int,
+            val customIconCount: Int,
+            val socaIconCount: Int,
+            val arasaacIconCount: Int,
+            val hasManifest: Boolean
+        ) : Result()
+
+        data class Rejected(val reason: String) : Result()
+        data class Failure(val reason: String) : Result()
+    }
+
+    fun inspect(contentResolver: ContentResolver, uri: Uri): Result {
+        return try {
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                ZipInputStream(inputStream).use { zip ->
+                    inspect(zip)
+                }
+            } ?: Result.Failure("Datoteke ni mogoce odpreti.")
+        } catch (error: IOException) {
+            Result.Failure("ZIP datoteke ni mogoce prebrati: ${error.message ?: "neznana napaka"}")
+        } catch (error: SecurityException) {
+            Result.Failure("Ni dovoljenja za branje izbrane datoteke.")
+        } catch (error: Exception) {
+            Result.Failure("Preverjanje ni uspelo: ${error.message ?: "neznana napaka"}")
+        }
+    }
+
+    private fun inspect(zip: ZipInputStream): Result {
+        var entryCount = 0
+        var hasItems = false
+        var profileCount = 0
+        var customIconCount = 0
+        var socaIconCount = 0
+        var arasaacIconCount = 0
+        var hasManifest = false
+
+        while (true) {
+            val entry = zip.nextEntry ?: break
+            val name = entry.name
+            val unsafeReason = unsafeReason(name)
+            if (unsafeReason != null) {
+                return Result.Rejected("Nevarna pot v ZIP: $unsafeReason")
+            }
+
+            if (!entry.isDirectory) {
+                entryCount += 1
+                when {
+                    name == "data/aac_items.json" -> hasItems = true
+                    isDirectJsonChild(name, "data/profiles/") -> profileCount += 1
+                    name.startsWith("icons/custom/") -> customIconCount += 1
+                    name.startsWith("icons/soca/") -> socaIconCount += 1
+                    name.startsWith("icons/arasaac/") -> arasaacIconCount += 1
+                    name == "aac_export_manifest.json" -> hasManifest = true
+                }
+            }
+
+            zip.closeEntry()
+        }
+
+        return Result.Success(
+            entryCount = entryCount,
+            hasItems = hasItems,
+            profileCount = profileCount,
+            customIconCount = customIconCount,
+            socaIconCount = socaIconCount,
+            arasaacIconCount = arasaacIconCount,
+            hasManifest = hasManifest
+        )
+    }
+
+    private fun unsafeReason(name: String?): String? {
+        if (name.isNullOrEmpty()) {
+            return "prazno ime vnosa"
+        }
+        if (name.startsWith("/") || name.startsWith("\\")) {
+            return name
+        }
+        if (name.length >= 2 && name[1] == ':' && name[0].isLetter()) {
+            return name
+        }
+        if (name.contains('\\')) {
+            return name
+        }
+        if (name.split('/').any { it == ".." }) {
+            return name
+        }
+        return null
+    }
+
+    private fun isDirectJsonChild(name: String, directory: String): Boolean {
+        if (!name.startsWith(directory) || !name.endsWith(".json")) {
+            return false
+        }
+        val childName = name.removePrefix(directory)
+        return childName.isNotEmpty() && !childName.contains("/")
+    }
+}

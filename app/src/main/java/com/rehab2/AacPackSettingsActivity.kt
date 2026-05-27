@@ -10,10 +10,11 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.rehab2.aac.AacPackExporter
+import com.rehab2.aac.AacPackImportPreflight
 import java.io.File
 import java.util.Locale
 
@@ -37,10 +38,20 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
     private lateinit var btnExport: Button
     private lateinit var btnShare: Button
+    private lateinit var btnImportPreflight: Button
     private lateinit var txtStatus: TextView
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private var lastExportedZipPath: String? = null
+    private val pickZipForPreflight = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) {
+            txtStatus.text = "Izbira ZIP datoteke preklicana."
+        } else {
+            startImportPreflight(uri)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +59,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         btnExport = findViewById(R.id.btnExportAacPack)
         btnShare = findViewById(R.id.btnShareAacPack)
+        btnImportPreflight = findViewById(R.id.btnImportAacPackPreflight)
         txtStatus = findViewById(R.id.txtExportStatus)
 
         findViewById<Button>(R.id.btnBackAacPackSettings).setOnClickListener {
@@ -62,8 +74,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
             shareLastExportedZip()
         }
 
+        btnImportPreflight.setOnClickListener {
+            pickZipForPreflight.launch(
+                arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")
+            )
+        }
+
         setShareEnabled(false)
-        txtStatus.text = "Pripravljeno za izvoz."
+        txtStatus.text = "Pripravljeno za izvoz ali predpreverjanje ZIP paketa."
     }
 
     private fun startExport() {
@@ -146,6 +164,42 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun startImportPreflight(uri: Uri) {
+        btnImportPreflight.isEnabled = false
+        btnImportPreflight.backgroundTintList = ColorStateList.valueOf(BUSY_BUTTON_COLOR)
+        txtStatus.text = "Preverjam ZIP paket ..."
+
+        Thread {
+            val result = AacPackImportPreflight.inspect(contentResolver, uri)
+            mainHandler.post {
+                handleImportPreflightResult(result)
+            }
+        }.start()
+    }
+
+    private fun handleImportPreflightResult(result: AacPackImportPreflight.Result) {
+        btnImportPreflight.isEnabled = true
+        btnImportPreflight.backgroundTintList = ColorStateList.valueOf(SHARE_READY_COLOR)
+
+        txtStatus.text = when (result) {
+            is AacPackImportPreflight.Result.Success -> buildString {
+                append("Preflight uspel. ZIP je bil samo prebran.\n\n")
+                append("Dejanski uvoz se ni izvedel.\n")
+                append("Datotek v ZIP: ${result.entryCount}\n")
+                append("AAC elementi: ${yesNo(result.hasItems)}\n")
+                append("Profili: ${result.profileCount}\n")
+                append("Ikone custom: ${result.customIconCount}\n")
+                append("Ikone SOCA: ${result.socaIconCount}\n")
+                append("Ikone ARASAAC: ${result.arasaacIconCount}\n")
+                append("Manifest: ${yesNo(result.hasManifest)}")
+            }
+            is AacPackImportPreflight.Result.Rejected ->
+                "ZIP zavrnjen.\n${result.reason}\n\nNoben podatek ni bil uvozen ali prepisan."
+            is AacPackImportPreflight.Result.Failure ->
+                "Preflight ni uspel.\n${result.reason}\n\nNoben podatek ni bil uvozen ali prepisan."
+        }
+    }
+
     private fun setShareEnabled(enabled: Boolean) {
         btnShare.isEnabled = enabled
         btnShare.backgroundTintList = ColorStateList.valueOf(
@@ -161,5 +215,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 String.format(Locale.ROOT, "%.0f KB", bytes / 1024.0)
             else -> "$bytes B"
         }
+    }
+
+    private fun yesNo(value: Boolean): String {
+        return if (value) "da" else "ne"
     }
 }
