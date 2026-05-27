@@ -40,6 +40,14 @@
             android:textColor="#B8C0C8"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/txtAacHealthSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp" />
+
         <Button
             android:id="@+id/btnExportAacPack"
             android:layout_width="match_parent"
@@ -99,6 +107,14 @@
 
         <TextView
             android:id="@+id/txtLastImportStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textColor="#B8C0C8"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtLocalProfilesStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"

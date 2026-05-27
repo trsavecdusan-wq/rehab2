@@ -18,6 +18,7 @@ import androidx.core.content.FileProvider
 import com.rehab2.aac.AacPackExporter
 import com.rehab2.aac.AacPackImporter
 import com.rehab2.aac.AacPackImportPreflight
+import com.rehab2.aac.AacStoragePaths
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -45,6 +46,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val KEY_IMPORT_REPORTS = "import_reports"
         private const val IMPORT_REPORT_SEPARATOR = "\u001E"
         private const val MAX_IMPORT_REPORTS = 5
+        private const val MAX_PROFILE_PREVIEW_BYTES = 64 * 1024
+        private const val MAX_ITEMS_PREVIEW_BYTES = 512 * 1024
     }
 
     private lateinit var btnExport: Button
@@ -53,6 +56,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnImportPreflight: Button
     private lateinit var txtStatus: TextView
     private lateinit var txtLastImportStatus: TextView
+    private lateinit var txtAacHealthSummary: TextView
+    private lateinit var txtLocalProfilesStatus: TextView
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private var lastExportedZipPath: String? = null
@@ -76,6 +81,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnImportPreflight = findViewById(R.id.btnImportAacPackPreflight)
         txtStatus = findViewById(R.id.txtExportStatus)
         txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
+        txtAacHealthSummary = findViewById(R.id.txtAacHealthSummary)
+        txtLocalProfilesStatus = findViewById(R.id.txtLocalProfilesStatus)
 
         findViewById<Button>(R.id.btnBackAacPackSettings).setOnClickListener {
             finish()
@@ -102,6 +109,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         setShareEnabled(false)
         txtStatus.text = "Pripravljeno za izvoz ali predpreverjanje ZIP paketa."
         refreshLastImportDiagnostic()
+        refreshLocalAacOverview()
     }
 
     private fun startExport() {
@@ -398,6 +406,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtStatus.text = statusText
         saveImportReport(buildImportReport(result))
         refreshLastImportDiagnostic()
+        refreshLocalAacOverview()
     }
 
     private fun buildImportStatusText(result: AacPackImporter.Result): String {
@@ -627,6 +636,211 @@ class AacPackSettingsActivity : AppCompatActivity() {
             .filter { it.isNotEmpty() }
             .take(MAX_IMPORT_REPORTS)
     }
+
+    private fun refreshLocalAacOverview() {
+        val overview = buildLocalAacOverview()
+        txtAacHealthSummary.text = buildAacHealthSummary(overview)
+        txtLocalProfilesStatus.text = buildLocalAacProfilesReport(overview)
+    }
+
+    private fun buildLocalAacOverview(): LocalAacOverview {
+        val profilesDir = AacStoragePaths.getProfilesDataDir(this)
+        val profileFiles = profilesDir
+            ?.takeIf { it.isDirectory }
+            ?.listFiles { file -> file.isFile && file.extension.equals("json", ignoreCase = true) }
+            ?.sortedBy { it.name.lowercase(Locale.ROOT) }
+            .orEmpty()
+
+        val aacItemsFile = AacStoragePaths.getAacItemsFile(this)
+        val hasAacItems = aacItemsFile?.isFile == true && aacItemsFile.length() > 0L
+        val aacItemsPreview = if (hasAacItems) {
+            readTextSafely(aacItemsFile, MAX_ITEMS_PREVIEW_BYTES)
+        } else {
+            null
+        }
+        val iconCount = countLocalIconsSafely()
+        val profiles = profileFiles.map { profileFile ->
+            val summary = readLocalProfileSummary(profileFile)
+            summary.copy(hasLinkedItems = profileHasLinkedItems(summary, aacItemsPreview))
+        }
+
+        return LocalAacOverview(
+            profiles = profiles,
+            hasAacItems = hasAacItems,
+            iconCount = iconCount,
+            lastImportSummary = lastImportSummary()
+        )
+    }
+
+    private fun buildAacHealthSummary(overview: LocalAacOverview): String {
+        return buildString {
+            append("AAC ZDRAVJE\n")
+            append("Lokalni profili: ${overview.profiles.size}\n")
+            append("Lokalne ikone: ${overview.iconCount}\n")
+            append("Sumljivi profili: ${overview.suspiciousProfileCount}\n")
+            append("Prazni/neveljavni profili: ${overview.emptyOrInvalidProfileCount}\n")
+            append("AAC elementi: ${if (overview.hasAacItems) "prisotni" else "niso prisotni"}\n")
+            append("Zadnji uvoz: ${overview.lastImportSummary}")
+        }
+    }
+
+    private fun buildLocalAacProfilesReport(overview: LocalAacOverview): String {
+        return buildString {
+            append("LOKALNI AAC PROFILI\n")
+            append("AAC elementi: ${if (overview.hasAacItems) "prisotni" else "niso prisotni"}\n")
+            append("Ikone v lokalnih mapah (pribl.): ${overview.iconCount}\n\n")
+
+            if (overview.profiles.isEmpty()) {
+                append("Ni lokalnih AAC profilov.")
+                return@buildString
+            }
+
+            overview.profiles.forEach { summary ->
+                append("- ${summary.displayName}\n")
+                append("  Datoteka: ${summary.fileName}\n")
+                append("  ID profila: ${summary.profileId.ifBlank { "ni podatka" }}\n")
+                append("  Povezani AAC elementi: ${if (summary.hasLinkedItems) "da" else "ni potrjeno"}\n")
+                append("  Priblizno lokalnih ikon: ${overview.iconCount}\n")
+                append("  Velikost JSON: ${formatSize(summary.fileSizeBytes)}\n")
+                if (summary.warnings.isNotEmpty()) {
+                    append("  Opozorila: ${summary.warnings.joinToString("; ")}\n")
+                }
+            }
+        }.trimEnd()
+    }
+
+    private fun readLocalProfileSummary(profileFile: File): LocalProfileSummary {
+        val fallbackName = profileFile.nameWithoutExtension.ifBlank { profileFile.name }
+        val fileSizeBytes = profileFile.length()
+        val warnings = mutableListOf<String>()
+        if (fileSizeBytes <= 0L) {
+            warnings += "profil JSON je prazen"
+        }
+        val profileText = readTextSafely(profileFile, MAX_PROFILE_PREVIEW_BYTES)
+        if (profileText == null) {
+            if (fileSizeBytes > MAX_PROFILE_PREVIEW_BYTES.toLong()) {
+                warnings += "profil JSON je vecji od varnega predogleda"
+            } else if (fileSizeBytes > 0L) {
+                warnings += "profil JSON ni berljiv"
+            }
+            return LocalProfileSummary(
+                fileName = profileFile.name,
+                displayName = fallbackName,
+                profileId = profileFile.nameWithoutExtension,
+                fileSizeBytes = fileSizeBytes,
+                warnings = warnings,
+                isEmptyOrInvalid = warnings.any { it.contains("prazen") || it.contains("ni veljaven") },
+                hasLinkedItems = false
+            )
+        }
+
+        if (profileText.isBlank()) {
+            warnings += "profil JSON nima vsebine"
+        }
+
+        return try {
+            val json = org.json.JSONObject(profileText)
+            val profileName = json.optString("name").trim()
+            val profileId = json.optString("id").trim()
+            if (profileName.isBlank()) {
+                warnings += "manjka ime profila"
+            }
+            if (profileId.isBlank()) {
+                warnings += "manjka ID profila"
+            }
+            if (json.length() == 0) {
+                warnings += "profil JSON nima polj"
+            }
+            LocalProfileSummary(
+                fileName = profileFile.name,
+                displayName = profileName.ifBlank { fallbackName },
+                profileId = profileId.ifBlank { profileFile.nameWithoutExtension },
+                fileSizeBytes = fileSizeBytes,
+                warnings = warnings,
+                isEmptyOrInvalid = warnings.any { it.contains("prazen") || it.contains("nima vsebine") || it.contains("ni veljaven") },
+                hasLinkedItems = false
+            )
+        } catch (error: Exception) {
+            warnings += "profil JSON ni veljaven"
+            LocalProfileSummary(
+                fileName = profileFile.name,
+                displayName = fallbackName,
+                profileId = profileFile.nameWithoutExtension,
+                fileSizeBytes = fileSizeBytes,
+                warnings = warnings,
+                isEmptyOrInvalid = true,
+                hasLinkedItems = false
+            )
+        }
+    }
+
+    private fun profileHasLinkedItems(
+        profile: LocalProfileSummary,
+        aacItemsPreview: String?
+    ): Boolean {
+        if (aacItemsPreview.isNullOrBlank()) {
+            return false
+        }
+        val markers = listOf(profile.profileId, profile.displayName, profile.fileName)
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+        return markers.any { marker ->
+            aacItemsPreview.contains(marker, ignoreCase = true)
+        }
+    }
+
+    private fun countLocalIconsSafely(): Int {
+        return listOf(
+            AacStoragePaths.getIconsCustomDir(this),
+            AacStoragePaths.getIconsSocaDir(this),
+            AacStoragePaths.getIconsArasaacDir(this)
+        ).sumOf { dir ->
+            dir
+                ?.takeIf { it.isDirectory }
+                ?.listFiles { file -> file.isFile }
+                ?.size
+                ?: 0
+        }
+    }
+
+    private fun readTextSafely(file: File, maxBytes: Int): String? {
+        return try {
+            if (!file.isFile || file.length() > maxBytes.toLong()) {
+                return null
+            }
+            file.readText(Charsets.UTF_8)
+        } catch (error: Exception) {
+            null
+        }
+    }
+
+    private fun lastImportSummary(): String {
+        val report = loadImportReports().firstOrNull() ?: return "ni podatka"
+        return report.lineSequence().firstOrNull()?.ifBlank { null } ?: "ni podatka"
+    }
+
+    private data class LocalAacOverview(
+        val profiles: List<LocalProfileSummary>,
+        val hasAacItems: Boolean,
+        val iconCount: Int,
+        val lastImportSummary: String
+    ) {
+        val suspiciousProfileCount: Int
+            get() = profiles.count { it.warnings.isNotEmpty() }
+
+        val emptyOrInvalidProfileCount: Int
+            get() = profiles.count { it.isEmptyOrInvalid }
+    }
+
+    private data class LocalProfileSummary(
+        val fileName: String,
+        val displayName: String,
+        val profileId: String,
+        val fileSizeBytes: Long,
+        val warnings: List<String>,
+        val isEmptyOrInvalid: Boolean,
+        val hasLinkedItems: Boolean
+    )
 
     private sealed class TestZipResult {
         data class Success(
