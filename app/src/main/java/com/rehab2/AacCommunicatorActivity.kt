@@ -722,6 +722,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val overflowIds = overflowItems.map { it.id }.toSet()
         val menuItems = items.filter { it.id !in fixedTopRowIds }
         val menuWithOverflow = overflowItems + menuItems.filter { it.id !in overflowIds }
+        Log.d(
+            TAG,
+            "AAC_TOP_ROW grid=${getAacGridSize()} fixed=${fixedTopRowItems.map { it.id }} overflow=${overflowItems.map { it.id }} max=$maxItems"
+        )
         return (fixedTopRowItems + menuWithOverflow).take(maxItems)
     }
 

@@ -140,6 +140,7 @@ object AacLocalJsonLoader {
             parentId = json.optNullableString("parentId"),
             isRootItem = if (json.has("isRootItem")) json.optBoolean("isRootItem", true) else json.optNullableString("parentId").isNullOrBlank(),
             isHiddenUntilParent = json.optBoolean("isHiddenUntilParent", false),
+            fixedTopRowPosition = json.optFixedTopRowPosition(),
             priority = json.optInt("priority", priorityFallback),
             followUpQuestion = json.optNullableString("followUpQuestion"),
             vendingNumber = json.optNullableString("vendingNumber"),
@@ -197,5 +198,14 @@ object AacLocalJsonLoader {
     private fun JSONObject.optNullableString(name: String): String? {
         val value = optString(name).trim()
         return value.takeIf { it.isNotEmpty() }
+    }
+
+    private fun JSONObject.optFixedTopRowPosition(): Int? {
+        val value = when {
+            has("fixedTopRowPosition") -> optInt("fixedTopRowPosition", 0)
+            has("fixed_top_row_position") -> optInt("fixed_top_row_position", 0)
+            else -> 0
+        }
+        return value.takeIf { it in 1..5 }
     }
 }
