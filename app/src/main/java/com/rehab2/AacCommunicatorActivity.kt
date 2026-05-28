@@ -41,6 +41,8 @@ import com.rehab2.aac.AacV2PageAdapter
 import java.io.File
 
 class AacCommunicatorActivity : AppCompatActivity() {
+    // Speech modes stay separate so tile feedback, sentence composition, and future
+    // learning/message flows can share AAC items without double-speaking one tap.
     private enum class SpeechMode {
         SINGLE_ICON,
         SENTENCE
@@ -792,6 +794,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         if (sentence.isEmpty()) {
             return
         }
+        // A single tile already has its own speech path; auto-sentence is reserved for composed phrases.
         if (itemCount <= 1 && speechTimingSettings.speakSingleIconEnabled) {
             Log.d(TAG, "AAC_SENTENCE AUTO_SKIP_SINGLE_ITEM_DUPLICATE requestId=$requestId")
             return
