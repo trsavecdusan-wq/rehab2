@@ -829,6 +829,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append('\n')
             append(formatIconFolderLine("ARASAAC", AacStoragePaths.getIconsArasaacDir(this@AacPackSettingsActivity)))
             append("\nKopiraj na primer: soca/voda.png, soca/wc.png, soca/pomoc.png, soca/boli.png")
+            append("\nSoča test PNG:\n")
+            append(formatSocaStarterFileLine(AacStoragePaths.SOCA_STARTER_WATER_ICON))
+            append('\n')
+            append(formatSocaStarterFileLine(AacStoragePaths.SOCA_STARTER_WC_ICON))
+            append('\n')
+            append(formatSocaStarterFileLine(AacStoragePaths.SOCA_STARTER_HELP_ICON))
+            append('\n')
+            append(formatSocaStarterFileLine(AacStoragePaths.SOCA_STARTER_PAIN_ICON))
         }
     }
 
@@ -840,6 +848,17 @@ class AacPackSettingsActivity : AppCompatActivity() {
             ?.size
             ?: 0
         return "$label: $existsText, PNG: $pngCount"
+    }
+
+    private fun formatSocaStarterFileLine(fileName: String): String {
+        val socaDir = AacStoragePaths.getIconsSocaDir(this)
+        val file = socaDir?.let { File(it, fileName) }
+        val status = if (file?.isFile == true && file.extension.equals("png", ignoreCase = true)) {
+            "OK"
+        } else {
+            "MISSING"
+        }
+        return "$fileName: $status"
     }
 
     private fun loadSelectedProfile(): SelectedProfile? {
