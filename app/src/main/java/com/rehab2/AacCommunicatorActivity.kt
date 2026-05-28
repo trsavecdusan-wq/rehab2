@@ -1274,6 +1274,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 val TILE_NAVIGATION_COLOR = 0xFF6A4E8E.toInt()
                 val TILE_PRESSED_COLOR = 0xFF2F7C86.toInt()
                 const val TILE_PRESS_FEEDBACK_MS = 180L
+                const val MAX_TILE_IMAGE_DECODE_SIZE = 1024
             }
 
             private val image: ImageView = itemView.findViewById(R.id.imgAacTile)
@@ -1326,21 +1327,57 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 }
 
                 try {
-                    val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    val bitmap = decodeTileBitmap(imageFile)
                     if (bitmap != null) {
                         Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOADED item=${item.id}")
                         image.alpha = 1.0f
                         image.setImageBitmap(bitmap)
                     } else {
                         Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
+                        if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
+                            Log.d("AacCommunicatorActivity", "AAC_IMAGE SOCA_decode_failed item=${item.id} path=${item.imagePath}")
+                        }
                         Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
                         showMissingImageFallback()
                     }
                 } catch (_: Exception) {
                     Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
+                    if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
+                        Log.d("AacCommunicatorActivity", "AAC_IMAGE SOCA_decode_failed item=${item.id} path=${item.imagePath}")
+                    }
+                    Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
+                    showMissingImageFallback()
+                } catch (_: OutOfMemoryError) {
+                    Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
+                    if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
+                        Log.d("AacCommunicatorActivity", "AAC_IMAGE SOCA_decode_failed item=${item.id} path=${item.imagePath}")
+                    }
                     Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
                     showMissingImageFallback()
                 }
+            }
+
+            private fun decodeTileBitmap(imageFile: File): android.graphics.Bitmap? {
+                val boundsOptions = BitmapFactory.Options().apply {
+                    inJustDecodeBounds = true
+                }
+                BitmapFactory.decodeFile(imageFile.absolutePath, boundsOptions)
+                if (boundsOptions.outWidth <= 0 || boundsOptions.outHeight <= 0) {
+                    return null
+                }
+
+                val decodeOptions = BitmapFactory.Options().apply {
+                    inSampleSize = calculateImageSampleSize(boundsOptions.outWidth, boundsOptions.outHeight)
+                }
+                return BitmapFactory.decodeFile(imageFile.absolutePath, decodeOptions)
+            }
+
+            private fun calculateImageSampleSize(width: Int, height: Int): Int {
+                var sampleSize = 1
+                while (width / sampleSize > MAX_TILE_IMAGE_DECODE_SIZE || height / sampleSize > MAX_TILE_IMAGE_DECODE_SIZE) {
+                    sampleSize *= 2
+                }
+                return sampleSize
             }
 
             private fun showMissingImageFallback() {
