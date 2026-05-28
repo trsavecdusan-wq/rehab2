@@ -67,6 +67,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var persistentTopRowCount = DEFAULT_PERSISTENT_TOP_ROW_COUNT
     private var persistentTopRowItemIds: List<String> = DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS
     private lateinit var txtTitle: TextView
+    private lateinit var txtPath: TextView
+    private lateinit var btnBackNav: Button
     private lateinit var sentenceBar: View
     private lateinit var txtPrompt: TextView
     private lateinit var txtSentence: TextView
@@ -165,6 +167,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
 
         txtTitle = findViewById(R.id.txtAacTitle)
+        txtPath = findViewById(R.id.txtAacPath)
+        btnBackNav = findViewById(R.id.btnAacBackNav)
         sentenceBar = findViewById(R.id.aacSentenceBar)
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
@@ -198,6 +202,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
             returnToRootMenuAfterClear()
             updateSentenceBar()
         }
+        btnBackNav.setOnClickListener {
+            cancelPendingSpeech()
+            goBack()
+        }
+        setupQuickAccessRow()
         btnOpenDrinksV2Test.setOnClickListener {
             resetWaterTraceDebug()
             updateWaterTraceDebug("TEST PIJAČA V2")
@@ -269,6 +278,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun showPage(page: AacPage) {
         currentPageId = page.pageId
         txtTitle.text = buildTitleText(page.title)
+        updateNavigationChrome(page.title)
         if (isV2Page(page)) {
             currentV2ItemsById = page.items.associateBy { it.id }
             currentV2RootItems = getV2RootItems(page.items)
@@ -305,6 +315,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 updateWaterTraceDebug("adapter bind")
             }
         )
+        updateNavigationChrome(txtTitle.text.toString().lineSequence().firstOrNull().orEmpty())
     }
 
     private fun readAacLabelMode(): AacLabelMode {
@@ -385,6 +396,48 @@ class AacCommunicatorActivity : AppCompatActivity() {
         audioPlayer.playOrSpeak(item, languageCode)
     }
 
+    private fun setupQuickAccessRow() {
+        bindQuickAacButton(R.id.btnQuickWater, quickSpeakItem("quick_water", "VODA", "voda", "water"))
+        bindQuickAacButton(R.id.btnQuickWc, quickSpeakItem("quick_wc", "WC", "WC", "wc"))
+        bindQuickAacButton(R.id.btnQuickHelp, quickSpeakItem("quick_help", "POMOČ", "pomoč", "help"))
+        bindQuickAacButton(R.id.btnQuickYes, quickSpeakItem("quick_yes", "DA", "da", "yes"))
+        bindQuickAacButton(R.id.btnQuickNo, quickSpeakItem("quick_no", "NE", "ne", "no"))
+        bindQuickAacButton(
+            R.id.btnQuickHome,
+            AacItem(
+                id = "quick_home",
+                labelSl = "DOMOV",
+                imagePath = "",
+                audioSl = "",
+                actionType = "go_home",
+                targetPageId = "home"
+            )
+        )
+        bindQuickAacButton(R.id.btnQuickPain, quickSpeakItem("quick_pain", "BOLI", "boli", "pain"))
+        bindQuickAacButton(R.id.btnQuickTired, quickSpeakItem("quick_tired", "UTRUJENA", "utrujena", "tired"))
+    }
+
+    private fun bindQuickAacButton(buttonId: Int, item: AacItem) {
+        findViewById<Button>(buttonId).setOnClickListener {
+            handleItemClick(item)
+        }
+    }
+
+    private fun quickSpeakItem(id: String, label: String, speakText: String, conceptId: String): AacItem {
+        return AacItem(
+            id = id,
+            labelSl = label,
+            imagePath = "",
+            audioSl = "",
+            actionType = "speak",
+            targetPageId = "",
+            speakTextSl = speakText,
+            conceptId = conceptId,
+            sentenceRole = "quick",
+            isRootItem = false
+        )
+    }
+
     private fun openTargetPage(targetPageId: String) {
         val normalizedTargetPageId = targetPageId.trim()
         if (normalizedTargetPageId.isBlank()) {
@@ -400,6 +453,23 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         pageHistory.addLast(currentPageId)
         showPage(page)
+    }
+
+    private fun updateNavigationChrome(pageTitle: String) {
+        val normalizedTitle = pageTitle.trim().ifBlank { "AAC" }
+        val inSubcategory = currentV2VisibleHistory.isNotEmpty()
+        val canGoBack = pageHistory.isNotEmpty() || inSubcategory
+
+        txtPath.text = buildString {
+            append("Trenutno: ")
+            append(normalizedTitle)
+            if (inSubcategory) {
+                append(" > izbira")
+            }
+        }
+        btnBackNav.isEnabled = canGoBack
+        btnBackNav.text = if (canGoBack) "NAZAJ" else "ZAČETEK"
+        btnBackNav.alpha = if (canGoBack) 1.0f else 0.55f
     }
 
     private fun openDrinksV2Test() {
@@ -1188,11 +1258,23 @@ class AacCommunicatorActivity : AppCompatActivity() {
             private val onItemClick: (AacItem) -> Unit,
             private val onWaterBindTrace: (AacItem) -> Unit
         ) : RecyclerView.ViewHolder(itemView) {
+            private companion object {
+                val TILE_DEFAULT_COLOR = 0xFF232A31.toInt()
+                val TILE_CATEGORY_COLOR = 0xFF214A78.toInt()
+                val TILE_SUBCATEGORY_COLOR = 0xFF2F5F9E.toInt()
+                val TILE_NAVIGATION_COLOR = 0xFF6A4E8E.toInt()
+                val TILE_PRESSED_COLOR = 0xFF2F7C86.toInt()
+                const val TILE_PRESS_FEEDBACK_MS = 180L
+            }
+
             private val image: ImageView = itemView.findViewById(R.id.imgAacTile)
             private val label: TextView = itemView.findViewById(R.id.txtAacTileLabel)
             private val context: android.content.Context = itemView.context
+            private var tileColor: Int = TILE_DEFAULT_COLOR
 
             fun bind(item: AacItem) {
+                tileColor = tileColorFor(item)
+                itemView.setBackgroundColor(tileColor)
                 if (item.id == "water") {
                     Log.d("AacCommunicatorActivity", "TRACE water adapter bind children=${item.children.size} ids=${item.children}")
                     onWaterBindTrace(item)
@@ -1204,7 +1286,26 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 image.setImageBitmap(null)
                 bindImage(item)
 
-                itemView.setOnClickListener { onItemClick(item) }
+                itemView.setOnClickListener {
+                    showPressedFeedback()
+                    onItemClick(item)
+                }
+            }
+
+            private fun showPressedFeedback() {
+                itemView.setBackgroundColor(TILE_PRESSED_COLOR)
+                itemView.postDelayed({
+                    itemView.setBackgroundColor(tileColor)
+                }, TILE_PRESS_FEEDBACK_MS)
+            }
+
+            private fun tileColorFor(item: AacItem): Int {
+                return when {
+                    item.actionType == "go_back" || item.actionType == "go_home" -> TILE_NAVIGATION_COLOR
+                    item.actionType == "open_page" -> TILE_CATEGORY_COLOR
+                    item.children.isNotEmpty() -> TILE_SUBCATEGORY_COLOR
+                    else -> TILE_DEFAULT_COLOR
+                }
             }
 
             private fun bindImage(item: AacItem) {
