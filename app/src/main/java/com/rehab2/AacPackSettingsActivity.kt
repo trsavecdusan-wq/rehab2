@@ -91,6 +91,17 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var checkLearningImageOnly: CheckBox
     private lateinit var checkLearningTextOnly: CheckBox
     private lateinit var btnSaveAacItem: Button
+    private lateinit var editPlacementItemId: EditText
+    private lateinit var editPlacementPageId: EditText
+    private lateinit var editPlacementPosition5x5: EditText
+    private lateinit var btnAddPlacement: Button
+    private lateinit var btnRemovePlacement: Button
+    private lateinit var txtPlacementStatus: TextView
+    private lateinit var editSubiconParentId: EditText
+    private lateinit var editSubiconChildId: EditText
+    private lateinit var btnAddSubicon: Button
+    private lateinit var btnRemoveSubicon: Button
+    private lateinit var txtSubiconStatus: TextView
     private lateinit var txtActiveProfileStatus: TextView
     private lateinit var txtIconFolderStatus: TextView
     private lateinit var txtLocalProfilesStatus: TextView
@@ -159,6 +170,17 @@ class AacPackSettingsActivity : AppCompatActivity() {
         checkLearningImageOnly = findViewById(R.id.checkLearningImageOnly)
         checkLearningTextOnly = findViewById(R.id.checkLearningTextOnly)
         btnSaveAacItem = findViewById(R.id.btnSaveAacItem)
+        editPlacementItemId = findViewById(R.id.editPlacementItemId)
+        editPlacementPageId = findViewById(R.id.editPlacementPageId)
+        editPlacementPosition5x5 = findViewById(R.id.editPlacementPosition5x5)
+        btnAddPlacement = findViewById(R.id.btnAddPlacement)
+        btnRemovePlacement = findViewById(R.id.btnRemovePlacement)
+        txtPlacementStatus = findViewById(R.id.txtPlacementStatus)
+        editSubiconParentId = findViewById(R.id.editSubiconParentId)
+        editSubiconChildId = findViewById(R.id.editSubiconChildId)
+        btnAddSubicon = findViewById(R.id.btnAddSubicon)
+        btnRemoveSubicon = findViewById(R.id.btnRemoveSubicon)
+        txtSubiconStatus = findViewById(R.id.txtSubiconStatus)
         txtActiveProfileStatus = findViewById(R.id.txtActiveProfileStatus)
         txtIconFolderStatus = findViewById(R.id.txtIconFolderStatus)
         txtLocalProfilesStatus = findViewById(R.id.txtLocalProfilesStatus)
@@ -210,6 +232,18 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         btnSaveAacItem.setOnClickListener {
             saveTherapistAacItem()
+        }
+        btnAddPlacement.setOnClickListener {
+            updatePlacement(add = true)
+        }
+        btnRemovePlacement.setOnClickListener {
+            updatePlacement(add = false)
+        }
+        btnAddSubicon.setOnClickListener {
+            updateSubicon(add = true)
+        }
+        btnRemoveSubicon.setOnClickListener {
+            updateSubicon(add = false)
         }
 
         AacStoragePaths.ensureAacContentDirs(this)
@@ -784,6 +818,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtAacHealthSummary.text = buildAacHealthSummary(overview)
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
         txtFixedTopRowAvailableItems.text = buildFixedTopRowAvailableItems(overview.relationAnalysis.availableItems)
+        txtPlacementStatus.text = buildPlacementStatus(overview.relationAnalysis.availableItems)
+        txtSubiconStatus.text = buildSubiconStatus()
         txtActiveProfileStatus.text = buildActiveProfileStatus()
         txtIconFolderStatus.text = buildIconFolderStatus()
         txtLocalProfilesStatus.text = buildLocalAacProfilesReport(overview)
@@ -903,6 +939,77 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }.trimEnd()
     }
 
+    private fun buildPlacementStatus(items: List<AacListItem>): String {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        return buildString {
+            append("TRENUTNE POSTAVITVE\n")
+            append("categoryId ni postavitev. Ena ikona ima lahko vec postavitev.\n")
+            val placementLines = currentItemsArray(itemsText)
+                ?.let { array ->
+                    buildList {
+                        for (index in 0 until array.length()) {
+                            val item = array.optJSONObject(index) ?: continue
+                            val itemId = item.optString("id").trim()
+                            val placements = item.optJSONArray("placements") ?: continue
+                            for (placementIndex in 0 until placements.length()) {
+                                val placement = placements.optJSONObject(placementIndex) ?: continue
+                                val pageId = placement.optString("pageId").trim()
+                                val position = placement.optInt("position5x5", 0)
+                                if (itemId.isNotBlank() && pageId.isNotBlank() && position in 1..25) {
+                                    add("- $itemId -> $pageId / $position")
+                                }
+                            }
+                        }
+                    }
+                }
+                .orEmpty()
+            if (placementLines.isEmpty()) {
+                append("Ni nastavljenih postavitev.")
+            } else {
+                placementLines.take(20).forEach { append("$it\n") }
+                val remaining = placementLines.size - 20
+                if (remaining > 0) append("... se $remaining")
+            }
+            if (items.isEmpty()) {
+                append("\nAAC elementi niso najdeni.")
+            }
+        }.trimEnd()
+    }
+
+    private fun buildSubiconStatus(): String {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        return buildString {
+            append("TRENUTNE PODIKONE\n")
+            append("Podikone so shranjene kot children pri starsu in visibleUnderIds pri otroku.\n")
+            val childLines = currentItemsArray(itemsText)
+                ?.let { array ->
+                    buildList {
+                        for (index in 0 until array.length()) {
+                            val item = array.optJSONObject(index) ?: continue
+                            val parentId = item.optString("id").trim()
+                            val children = item.optJSONArray("children") ?: continue
+                            for (childIndex in 0 until children.length()) {
+                                val childId = children.optString(childIndex).trim()
+                                if (parentId.isNotBlank() && childId.isNotBlank()) {
+                                    add("- $parentId -> $childId")
+                                }
+                            }
+                        }
+                    }
+                }
+                .orEmpty()
+            if (childLines.isEmpty()) {
+                append("Ni nastavljenih podikon.")
+            } else {
+                childLines.take(20).forEach { append("$it\n") }
+                val remaining = childLines.size - 20
+                if (remaining > 0) append("... se $remaining")
+            }
+        }.trimEnd()
+    }
+
     private fun updateIconSourceFilterButtons() {
         iconSourceFilterButtons.forEach { (filter, button) ->
             val color = if (filter == therapistIconSourceFilter) 0xFF2F5F9E.toInt() else 0xFF34414D.toInt()
@@ -1001,6 +1108,158 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 txtStatus.text = "AAC elementa ni bilo mogoce shraniti."
             }
         }
+    }
+
+    private fun updatePlacement(add: Boolean) {
+        val itemId = editPlacementItemId.text.toString().trim()
+        val pageId = editPlacementPageId.text.toString().trim()
+        val position = editPlacementPosition5x5.text.toString().trim().toIntOrNull()
+        if (itemId.isBlank() || pageId.isBlank()) {
+            txtStatus.text = "Vnesi ID elementa in stran."
+            return
+        }
+        if (position == null || position !in 1..25) {
+            txtStatus.text = "Pozicija mora biti 1-25."
+            return
+        }
+
+        when (updatePlacementInJson(itemId, pageId, position, add)) {
+            AacMetadataWriteResult.Success -> {
+                txtStatus.text = if (add) "Postavitev dodana.\n$itemId -> $pageId / $position" else "Postavitev odstranjena."
+                refreshLocalAacOverview()
+            }
+            AacMetadataWriteResult.ItemNotFound -> txtStatus.text = "ID AAC elementa ne obstaja."
+            AacMetadataWriteResult.WriteFailed -> txtStatus.text = "Postavitve ni bilo mogoce shraniti."
+        }
+    }
+
+    private fun updateSubicon(add: Boolean) {
+        val parentId = editSubiconParentId.text.toString().trim()
+        val childId = editSubiconChildId.text.toString().trim()
+        if (parentId.isBlank() || childId.isBlank()) {
+            txtStatus.text = "Vnesi starsa in podikono."
+            return
+        }
+        if (parentId == childId) {
+            txtStatus.text = "Ikona ne more biti svoja podikona."
+            return
+        }
+
+        when (updateSubiconInJson(parentId, childId, add)) {
+            AacMetadataWriteResult.Success -> {
+                txtStatus.text = if (add) "Podikona dodana.\n$parentId -> $childId" else "Podikona odstranjena."
+                refreshLocalAacOverview()
+            }
+            AacMetadataWriteResult.ItemNotFound -> txtStatus.text = "Stars ali podikona ne obstaja."
+            AacMetadataWriteResult.WriteFailed -> txtStatus.text = "Podikone ni bilo mogoce shraniti."
+        }
+    }
+
+    private fun updatePlacementInJson(
+        itemId: String,
+        pageId: String,
+        position: Int,
+        add: Boolean
+    ): AacMetadataWriteResult {
+        return updateItemsJsonMetadata { itemsArray ->
+            val item = findItemById(itemsArray, itemId) ?: return@updateItemsJsonMetadata AacMetadataWriteResult.ItemNotFound
+            val placements = item.optJSONArray("placements") ?: org.json.JSONArray()
+            val nextPlacements = org.json.JSONArray()
+            for (index in 0 until placements.length()) {
+                val placement = placements.optJSONObject(index) ?: continue
+                val samePlacement = placement.optString("pageId").trim() == pageId &&
+                    placement.optInt("position5x5", 0) == position
+                if (!samePlacement) {
+                    nextPlacements.put(placement)
+                }
+            }
+            if (add) {
+                nextPlacements.put(org.json.JSONObject().put("pageId", pageId).put("position5x5", position))
+            }
+            if (nextPlacements.length() > 0) {
+                item.put("placements", nextPlacements)
+            } else {
+                item.remove("placements")
+            }
+            AacMetadataWriteResult.Success
+        }
+    }
+
+    private fun updateSubiconInJson(parentId: String, childId: String, add: Boolean): AacMetadataWriteResult {
+        return updateItemsJsonMetadata { itemsArray ->
+            val parentItem = findItemById(itemsArray, parentId)
+            val childItem = findItemById(itemsArray, childId)
+            if (parentItem == null || childItem == null) {
+                return@updateItemsJsonMetadata AacMetadataWriteResult.ItemNotFound
+            }
+            parentItem.put("children", updateStringArray(parentItem.optJSONArray("children"), childId, add))
+            val visibleUnderIds = updateStringArray(childItem.optJSONArray("visibleUnderIds"), parentId, add)
+            childItem.put("visibleUnderIds", visibleUnderIds)
+            childItem.put("isRootItem", visibleUnderIds.length() == 0)
+            childItem.put("isHiddenUntilParent", visibleUnderIds.length() > 0)
+            AacMetadataWriteResult.Success
+        }
+    }
+
+    private fun updateStringArray(array: org.json.JSONArray?, value: String, add: Boolean): org.json.JSONArray {
+        val values = linkedSetOf<String>()
+        if (array != null) {
+            for (index in 0 until array.length()) {
+                val existing = array.optString(index).trim()
+                if (existing.isNotBlank()) values += existing
+            }
+        }
+        if (add) {
+            values += value
+        } else {
+            values -= value
+        }
+        return org.json.JSONArray().apply {
+            values.forEach { put(it) }
+        }
+    }
+
+    private fun updateItemsJsonMetadata(update: (org.json.JSONArray) -> AacMetadataWriteResult): AacMetadataWriteResult {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this) ?: return AacMetadataWriteResult.WriteFailed
+        val itemsText = readTextSafely(itemsFile, MAX_ITEMS_PREVIEW_BYTES) ?: return AacMetadataWriteResult.WriteFailed
+        return try {
+            val trimmed = itemsText.trimStart()
+            val rootObject = if (trimmed.startsWith("[")) null else org.json.JSONObject(itemsText)
+            val itemsArray = rootObject?.optJSONArray("items")
+                ?: if (rootObject == null) org.json.JSONArray(itemsText) else return AacMetadataWriteResult.WriteFailed
+            val result = update(itemsArray)
+            if (result != AacMetadataWriteResult.Success) return result
+            val output = rootObject?.toString(2) ?: itemsArray.toString(2)
+            itemsFile.writeText(output, Charsets.UTF_8)
+            AacMetadataWriteResult.Success
+        } catch (error: Exception) {
+            Log.w("NovaRehabAacEditor", "AAC placement/subicon metadata write failed", error)
+            AacMetadataWriteResult.WriteFailed
+        }
+    }
+
+    private fun currentItemsArray(itemsText: String?): org.json.JSONArray? {
+        if (itemsText.isNullOrBlank()) return null
+        return try {
+            val trimmed = itemsText.trimStart()
+            if (trimmed.startsWith("[")) {
+                org.json.JSONArray(itemsText)
+            } else {
+                org.json.JSONObject(itemsText).optJSONArray("items")
+            }
+        } catch (error: Exception) {
+            null
+        }
+    }
+
+    private fun findItemById(itemsArray: org.json.JSONArray, itemId: String): org.json.JSONObject? {
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            if (item.optString("id").trim() == itemId) {
+                return item
+            }
+        }
+        return null
     }
 
     private fun saveTherapistAacItemToJson(
@@ -1728,6 +1987,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private enum class AacItemEditorWriteResult {
         SuccessCreated,
         SuccessUpdated,
+        WriteFailed
+    }
+
+    private enum class AacMetadataWriteResult {
+        Success,
+        ItemNotFound,
         WriteFailed
     }
 
