@@ -556,7 +556,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun updateWaterTraceDebug(stage: String) {
-        txtWaterTraceDebug.visibility = View.VISIBLE
+        txtWaterTraceDebug.visibility = View.GONE
         txtWaterTraceDebug.text = buildString {
             appendLine("WATER TRACE 1.2.88: $stage")
             appendLine("JSON children=${AacV2JsonParser.lastWaterJsonChildrenCount}")
@@ -1190,11 +1190,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun buildTitleText(baseTitle: String): String {
-        return if (repository.lastDebugCode == "OK") {
-            baseTitle
-        } else {
-            "$baseTitle\n${repository.lastDebugCode}"
-        }
+        return baseTitle
     }
 
     private fun showRepositoryDebugStatus() {
@@ -1336,7 +1332,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             private fun showMissingImageFallback() {
-                image.alpha = 0.75f
+                image.alpha = 0.5f
                 image.setImageResource(android.R.drawable.ic_menu_gallery)
                 if (labelMode == AacLabelMode.HIDDEN) {
                     label.visibility = View.VISIBLE

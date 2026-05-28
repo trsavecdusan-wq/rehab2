@@ -9,16 +9,16 @@
     android:gravity="center"
     android:minHeight="176dp"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="12dp">
 
     <ImageView
         android:id="@+id/imgAacTile"
         android:layout_width="match_parent"
         android:layout_height="124dp"
         android:adjustViewBounds="true"
-        android:background="#F4F7FA"
+        android:background="#1A222B"
         android:contentDescription=""
-        android:padding="8dp"
+        android:padding="6dp"
         android:scaleType="fitCenter"
         android:src="@android:drawable/ic_menu_gallery" />
 
@@ -32,7 +32,7 @@
         android:maxLines="2"
         android:text="VODA"
         android:textColor="#F4F7FA"
-        android:textSize="12sp"
+        android:textSize="16sp"
         android:textStyle="bold" />
 
 </LinearLayout>
