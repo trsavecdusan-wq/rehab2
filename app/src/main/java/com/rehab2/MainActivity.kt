@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
         private const val MAIN_AAC_HOME_PAGE_ID = "home"
         private const val PREFS_AAC_PATIENT_PAGES = "aac_patient_pages"
         private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
+        private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
         private const val PREF_DISTANCE_TODAY_METERS = "distance_today_meters"
         private const val PREF_DISTANCE_TOTAL_METERS = "distance_total_meters"
@@ -409,7 +410,10 @@ class MainActivity : AppCompatActivity() {
         val startPageItems = selectMainStartPlacementItems(loadedItems)
         val items = if (startPageItems.isEmpty()) fallbackItems else loadedItems
         mainAacItemsById = items.associateBy { it.id }
-        showMainAacItems(startPageItems.ifEmpty { fallbackItems.filter { it.isRootItem && !it.isHiddenUntilParent } })
+        val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
+            fallbackItems.filter { it.isRootItem && !it.isHiddenUntilParent }
+        )
+        showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
     }
 
     private fun showMainAacItems(items: List<AacItem>) {
@@ -490,7 +494,11 @@ class MainActivity : AppCompatActivity() {
             return emptyList()
         }
         val itemsById = items.associateBy { it.id }
-        return items
+        val fixedItems = fixedTopRowItems(items)
+        val visibleFixedItems = visibleFixedTopRowItems(fixedItems)
+        val overflowFixedItems = fixedItems.filter { item -> item.id !in visibleFixedItems.map { it.id } }
+        val fixedItemIds = fixedItems.map { it.id }.toSet()
+        val placedItems = items
             .flatMap { item ->
                 item.placements
                     .filter { placement -> placement.pageId == normalizedPageId }
@@ -499,7 +507,39 @@ class MainActivity : AppCompatActivity() {
             .filter { (position, itemId) -> position in 1..25 && itemsById.containsKey(itemId) }
             .sortedBy { (position, _) -> position }
             .mapNotNull { (_, itemId) -> itemsById[itemId] }
+            .filter { item -> item.id !in fixedItemIds }
+        return (visibleFixedItems + overflowFixedItems + placedItems)
             .take(mainAacTileBindings.size)
+    }
+
+    private fun orderedMainAacItemsWithFixedTopRow(items: List<AacItem>): List<AacItem> {
+        val fixedItems = fixedTopRowItems(items)
+        val visibleFixedItems = visibleFixedTopRowItems(fixedItems)
+        val overflowFixedItems = fixedItems.filter { item -> item.id !in visibleFixedItems.map { it.id } }
+        val fixedItemIds = fixedItems.map { it.id }.toSet()
+        return visibleFixedItems + overflowFixedItems + items.filter { item -> item.id !in fixedItemIds }
+    }
+
+    private fun fixedTopRowItems(items: List<AacItem>): List<AacItem> {
+        return items
+            .filter { item -> item.fixedTopRowPosition in 1..MAIN_AAC_FIXED_TOP_ROW_MAX }
+            .sortedBy { item -> item.fixedTopRowPosition ?: Int.MAX_VALUE }
+            .distinctBy { item -> item.fixedTopRowPosition }
+    }
+
+    private fun visibleFixedTopRowItems(items: List<AacItem>): List<AacItem> {
+        val visibleFixedCount = mainAacFixedTopRowCapacity()
+        return items.filter { item -> item.fixedTopRowPosition in 1..visibleFixedCount }
+    }
+
+    private fun mainAacFixedTopRowCapacity(): Int {
+        val visibleSlotCount = mainAacTileBindings.size
+        val inferredGridWidth = when {
+            visibleSlotCount <= 9 -> 3
+            visibleSlotCount <= 16 -> 4
+            else -> MAIN_AAC_FIXED_TOP_ROW_MAX
+        }
+        return inferredGridWidth.coerceAtMost(MAIN_AAC_FIXED_TOP_ROW_MAX)
     }
 
     private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
@@ -551,18 +591,18 @@ class MainActivity : AppCompatActivity() {
             mainAacItem("drink", "PIJAČA", opensSubicons = true, children = listOf("water", "juice", "tea", "coffee")),
             mainAacItem("food", "HRANA", opensSubicons = true, children = listOf("soup", "bread", "fruit")),
             mainAacItem("help", "POMOČ", "pomoč"),
-            mainAacItem("yes", "DA", "da", fixedTopRowPosition = 1),
+            mainAacItem("yes", "DA", "da"),
             mainAacItem("wc", "WC", "WC"),
             mainAacItem("good", "DOBRO", "dobro"),
             mainAacItem("bad", "SLABO", "slabo"),
-            mainAacItem("no_understand", "NE\nRAZUMEM", "ne razumem", fixedTopRowPosition = 2),
+            mainAacItem("no_understand", "NE\nRAZUMEM", "ne razumem"),
             mainAacItem("tired", "UTRUJENA", "utrujena"),
             mainAacItem("cold", "MRAZ", "mraz"),
             mainAacItem("hot", "VROČE", "vroče"),
             mainAacItem("pain", "BOLEČINA", opensSubicons = true, children = listOf("head", "arm", "leg", "belly")),
             mainAacItem("doctor", "ZDRAVNIK", "zdravnik"),
             mainAacItem("family", "DRUŽINA", "družina"),
-            mainAacItem("stop", "STOP", "stop", fixedTopRowPosition = 5),
+            mainAacItem("stop", "STOP", "stop"),
             mainAacItem("water", "VODA", "voda", isRootItem = false, visibleUnderIds = listOf("drink")),
             mainAacItem("juice", "SOK", "sok", isRootItem = false, visibleUnderIds = listOf("drink")),
             mainAacItem("tea", "ČAJ", "čaj", isRootItem = false, visibleUnderIds = listOf("drink")),

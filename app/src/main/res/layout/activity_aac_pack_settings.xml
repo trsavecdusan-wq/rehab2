@@ -326,6 +326,18 @@
             android:textColorHint="#B8C0C8"
             android:textSize="16sp" />
 
+        <Button
+            android:id="@+id/btnChooseFixedTopRowItem"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="IZBERI AAC ELEMENT"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/editFixedTopRowPosition"
             android:layout_width="match_parent"

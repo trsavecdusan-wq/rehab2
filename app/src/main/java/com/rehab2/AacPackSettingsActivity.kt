@@ -80,6 +80,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var txtFixedTopRowStatus: TextView
     private lateinit var editFixedTopRowItemId: EditText
     private lateinit var editFixedTopRowPosition: EditText
+    private lateinit var btnChooseFixedTopRowItem: Button
     private lateinit var btnSaveFixedTopRowPosition: Button
     private lateinit var btnClearFixedTopRowPosition: Button
     private lateinit var txtFixedTopRowAvailableItems: TextView
@@ -165,6 +166,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtFixedTopRowStatus = findViewById(R.id.txtFixedTopRowStatus)
         editFixedTopRowItemId = findViewById(R.id.editFixedTopRowItemId)
         editFixedTopRowPosition = findViewById(R.id.editFixedTopRowPosition)
+        btnChooseFixedTopRowItem = findViewById(R.id.btnChooseFixedTopRowItem)
         btnSaveFixedTopRowPosition = findViewById(R.id.btnSaveFixedTopRowPosition)
         btnClearFixedTopRowPosition = findViewById(R.id.btnClearFixedTopRowPosition)
         txtFixedTopRowAvailableItems = findViewById(R.id.txtFixedTopRowAvailableItems)
@@ -249,6 +251,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         btnSaveFixedTopRowPosition.setOnClickListener {
             saveFixedTopRowPosition()
+        }
+
+        btnChooseFixedTopRowItem.setOnClickListener {
+            showFixedTopRowItemChooser()
         }
 
         btnClearFixedTopRowPosition.setOnClickListener {
@@ -996,6 +1002,30 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 append("... se $remaining")
             }
         }.trimEnd()
+    }
+
+    private fun showFixedTopRowItemChooser() {
+        val items = buildLocalAacOverview()
+            .relationAnalysis
+            .availableItems
+            .filter { item -> therapistIconSourceFilter.matches(item.iconSource) }
+        if (items.isEmpty()) {
+            txtStatus.text = "Ni AAC elementov za trenutni filter vira."
+            return
+        }
+        val labels = items.map { item ->
+            val title = item.label.ifBlank { item.itemId }
+            "$title (${item.itemId}, ${item.iconSource.name})"
+        }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("Izberi AAC element")
+            .setItems(labels) { _, index ->
+                val selectedItem = items[index]
+                editFixedTopRowItemId.setText(selectedItem.itemId)
+                txtStatus.text = "Izbran AAC element.\n${selectedItem.itemId}"
+            }
+            .setNegativeButton("Prekliči", null)
+            .show()
     }
 
     private fun buildSourceActivationStatus(): String {
