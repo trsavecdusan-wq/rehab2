@@ -34,11 +34,9 @@ object AacSampleContentCreator {
         }
 
         return try {
-            ensureParentExists(itemsFile.parentFile)
-            ensureParentExists(profilesDir)
-            ensureParentExists(customIconsDir)
-            ensureParentExists(socaIconsDir)
-            ensureParentExists(arasaacIconsDir)
+            if (!AacStoragePaths.ensureAacContentDirs(context)) {
+                return Result(created, skipped, failed = true)
+            }
 
             val profileFiles = listOf(
                 java.io.File(profilesDir, "dom.json") to buildDomProfileJson(),

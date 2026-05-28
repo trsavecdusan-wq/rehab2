@@ -57,7 +57,9 @@ object AacLocalStorage {
             getAudioUkDir(context)
         )
 
-        val result = dirs.isNotEmpty() && dirs.all { dir -> dir.exists() || dir.mkdirs() }
+        val result = dirs.isNotEmpty() &&
+            dirs.all { dir -> dir.exists() || dir.mkdirs() } &&
+            AacStoragePaths.ensureAacContentDirs(context)
         lastEnsureResult = if (result) "OK" else "FAIL"
         refreshDebugStatus(context)
         return result

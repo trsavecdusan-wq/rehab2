@@ -41,6 +41,17 @@ object AacStoragePaths {
         return File(externalFilesDir, CUSTOM_ICONS_DIR)
     }
 
+    fun ensureAacContentDirs(context: Context): Boolean {
+        val dirs = listOfNotNull(
+            getAacItemsFile(context)?.parentFile,
+            getProfilesDataDir(context),
+            getIconsSocaDir(context),
+            getIconsCustomDir(context),
+            getIconsArasaacDir(context)
+        )
+        return dirs.size == 5 && dirs.all { dir -> dir.exists() || dir.mkdirs() }
+    }
+
     fun resolveIconFile(context: Context, imagePath: String, iconSource: IconSource): File? {
         val rawPath = imagePath.trim()
         if (rawPath.isEmpty()) {
