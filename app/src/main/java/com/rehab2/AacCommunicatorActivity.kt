@@ -74,7 +74,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var sentenceBar: View
     private lateinit var txtPrompt: TextView
     private lateinit var txtSentence: TextView
-    private lateinit var btnOpenDrinksCategory: Button
+    private lateinit var btnOpenDrinksV2Test: Button
     private lateinit var btnSpeakSentence: Button
     private lateinit var btnClearSentence: Button
     private lateinit var recycler: RecyclerView
@@ -160,8 +160,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
         sentenceBar = findViewById(R.id.aacSentenceBar)
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
-        btnOpenDrinksCategory = findViewById(R.id.btnOpenDrinksCategory)
-        btnOpenDrinksCategory.text = "PIJAČE"
+        btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
+        btnOpenDrinksV2Test.text = "PIJAČE"
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -195,7 +195,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             goBack()
         }
         setupQuickAccessRow()
-        btnOpenDrinksCategory.setOnClickListener {
+        btnOpenDrinksV2Test.setOnClickListener {
             resetWaterTraceDebug()
             updateWaterTraceDebug("PIJAČE")
             openDrinksCategory()
