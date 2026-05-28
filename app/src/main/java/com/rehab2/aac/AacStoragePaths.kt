@@ -5,11 +5,16 @@ import java.io.File
 
 object AacStoragePaths {
     const val PROFILES_DATA_DIR = "NovaRehab/data/profiles/"
+    // Soča starter AAC paths such as "soca/voda.png" resolve to NovaRehab/icons/soca/voda.png.
     const val SOCA_ICONS_DIR = "NovaRehab/icons/soca/"
     const val ARASAAC_ICONS_DIR = "NovaRehab/icons/arasaac/"
     const val CUSTOM_ICONS_DIR = "NovaRehab/icons/custom/"
     const val AAC_ITEMS_FILE = "NovaRehab/data/aac_items.json"
     const val PROFILES_DIR = "NovaRehab/profiles/"
+    const val SOCA_STARTER_WATER_ICON = "voda.png"
+    const val SOCA_STARTER_WC_ICON = "wc.png"
+    const val SOCA_STARTER_HELP_ICON = "pomoc.png"
+    const val SOCA_STARTER_PAIN_ICON = "boli.png"
 
     fun getAacItemsFile(context: Context): File? {
         val externalFilesDir = context.getExternalFilesDir(null) ?: return null
