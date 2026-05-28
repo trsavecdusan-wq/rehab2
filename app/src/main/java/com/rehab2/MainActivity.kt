@@ -8,7 +8,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.GradientDrawable
 import android.location.Location
 import android.location.LocationListener
@@ -51,6 +53,7 @@ import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
+import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.IconSource
 import com.rehab2.radio.RadioPlayerController
 import com.rehab2.radio.SavedRadioStation
@@ -128,15 +131,31 @@ class MainActivity : AppCompatActivity() {
 
     private data class MainAacTileBinding(
         val view: View,
+        val icon: TextView?,
         val label: TextView,
+        val fallbackIconText: CharSequence,
         var item: AacItem? = null
     ) {
         companion object {
             fun from(view: View): MainAacTileBinding {
+                val icon = findFirstTextView(view)
                 return MainAacTileBinding(
                     view = view,
+                    icon = icon,
+                    fallbackIconText = icon?.text.orEmpty(),
                     label = findLastTextView(view) ?: error("AAC tile label missing")
                 )
+            }
+
+            private fun findFirstTextView(view: View): TextView? {
+                if (view is TextView) {
+                    return view
+                }
+                val group = view as? ViewGroup ?: return null
+                for (index in 0 until group.childCount) {
+                    findFirstTextView(group.getChildAt(index))?.let { return it }
+                }
+                return null
             }
 
             private fun findLastTextView(view: View): TextView? {
@@ -402,6 +421,7 @@ class MainActivity : AppCompatActivity() {
             item?.let {
                 binding.label.text = AacLocalizedTextResolver.resolveLabel(it, getActiveSpeechLanguage())
                     .uppercase(Locale.ROOT)
+                bindMainAacIcon(binding, it)
                 binding.view.setOnClickListener {
                     handleMainAacItemAction(item)
                 }
@@ -480,6 +500,33 @@ class MainActivity : AppCompatActivity() {
             .sortedBy { (position, _) -> position }
             .mapNotNull { (_, itemId) -> itemsById[itemId] }
             .take(mainAacTileBindings.size)
+    }
+
+    private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
+        val iconView = binding.icon ?: return
+        val iconFile = AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
+        if (iconFile?.isFile != true) {
+            restoreMainAacFallbackIcon(binding)
+            return
+        }
+        val bitmap = BitmapFactory.decodeFile(iconFile.absolutePath)
+        if (bitmap == null) {
+            restoreMainAacFallbackIcon(binding)
+            return
+        }
+        val drawable = BitmapDrawable(resources, bitmap).apply {
+            val size = dp(58)
+            setBounds(0, 0, size, size)
+        }
+        iconView.text = ""
+        iconView.setCompoundDrawables(null, drawable, null, null)
+    }
+
+    private fun restoreMainAacFallbackIcon(binding: MainAacTileBinding) {
+        binding.icon?.apply {
+            setCompoundDrawables(null, null, null, null)
+            text = binding.fallbackIconText
+        }
     }
 
     private fun isSafeMainAacPageId(pageId: String): Boolean {
