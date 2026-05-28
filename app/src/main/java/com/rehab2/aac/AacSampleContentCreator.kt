@@ -191,6 +191,54 @@ object AacSampleContentCreator {
                         vendingNumber = "22"
                     )
                 )
+                .put(
+                    sampleItem(
+                        id = "soca_water",
+                        label = "VODA",
+                        labelUk = "WATER",
+                        imagePath = "soca/voda.png",
+                        conceptId = "water",
+                        categoryId = "basic_needs",
+                        isRootItem = true,
+                        priority = 20
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "soca_wc",
+                        label = "WC",
+                        labelUk = "TOILET",
+                        imagePath = "soca/wc.png",
+                        conceptId = "wc",
+                        categoryId = "basic_needs",
+                        isRootItem = true,
+                        priority = 21
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "soca_help",
+                        label = "POMOČ",
+                        labelUk = "HELP",
+                        imagePath = "soca/pomoc.png",
+                        conceptId = "help",
+                        categoryId = "basic_needs",
+                        isRootItem = true,
+                        priority = 22
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "soca_pain",
+                        label = "BOLI",
+                        labelUk = "PAIN",
+                        imagePath = "soca/boli.png",
+                        conceptId = "pain",
+                        categoryId = "basic_needs",
+                        isRootItem = true,
+                        priority = 23
+                    )
+                )
         )
     }
 
@@ -220,7 +268,7 @@ object AacSampleContentCreator {
             displayName = "REAL WORLD",
             icon = "soca/real_world.png",
             context = AacCommunicationContext.REAL_WORLD_ASSISTANT,
-            itemIds = listOf("thirsty", "help", "pain")
+            itemIds = listOf("soca_water", "soca_wc", "soca_help", "soca_pain", "thirsty")
         )
     }
 
@@ -245,8 +293,10 @@ object AacSampleContentCreator {
     private fun sampleItem(
         id: String,
         label: String,
+        labelUk: String? = null,
         imagePath: String,
         conceptId: String? = null,
+        categoryId: String? = null,
         parentId: String? = null,
         isRootItem: Boolean,
         isHiddenUntilParent: Boolean = false,
@@ -257,8 +307,13 @@ object AacSampleContentCreator {
         return JSONObject()
             .put("id", id)
             .put("labelSl", label)
+            .put("labelUk", labelUk)
             .put("text", label)
             .put("speechText", label.lowercase())
+            .put("speakTextSl", label.lowercase())
+            .put("speakTextUk", labelUk?.lowercase())
+            .put("baseText", label)
+            .put("categoryId", categoryId)
             .put("imagePath", imagePath)
             .put("iconSource", inferIconSourceName(imagePath))
             .put("actionType", "speak")
