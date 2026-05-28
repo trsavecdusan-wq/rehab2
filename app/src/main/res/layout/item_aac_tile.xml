@@ -7,14 +7,14 @@
     android:clickable="true"
     android:focusable="true"
     android:gravity="center"
-    android:minHeight="178dp"
+    android:minHeight="168dp"
     android:orientation="vertical"
     android:padding="10dp">
 
     <ImageView
         android:id="@+id/imgAacTile"
         android:layout_width="match_parent"
-        android:layout_height="132dp"
+        android:layout_height="120dp"
         android:adjustViewBounds="true"
         android:background="#1E252C"
         android:contentDescription=""
@@ -29,6 +29,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:includeFontPadding="false"
+        android:minHeight="38dp"
         android:maxLines="2"
         android:text="VODA"
         android:textColor="#F4F7FA"

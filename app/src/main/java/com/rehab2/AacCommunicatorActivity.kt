@@ -1383,7 +1383,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             private fun showMissingImageFallback() {
-                image.alpha = 0.18f
+                image.alpha = 0.0f
                 image.setImageDrawable(null)
                 if (labelMode == AacLabelMode.HIDDEN) {
                     label.visibility = View.VISIBLE

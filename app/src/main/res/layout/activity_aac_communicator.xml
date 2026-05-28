@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:includeFontPadding="false"
-        android:paddingBottom="12dp"
+        android:paddingBottom="8dp"
         android:text="KOMUNIKATOR"
         android:textColor="#F4F7FA"
         android:textSize="24sp"
@@ -26,7 +26,7 @@
         android:background="#1A1F24"
         android:gravity="center"
         android:includeFontPadding="false"
-        android:minHeight="40dp"
+        android:minHeight="38dp"
         android:padding="8dp"
         android:text="Trenutno: AAC"
         android:textColor="#DCE6EF"
@@ -36,7 +36,7 @@
     <Button
         android:id="@+id/btnAacBackNav"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="60dp"
         android:layout_marginBottom="10dp"
         android:background="#6A4E8E"
         android:enabled="false"
@@ -156,7 +156,7 @@
             <Button
                 android:id="@+id/btnQuickWater"
                 android:layout_width="0dp"
-                android:layout_height="58dp"
+                android:layout_height="56dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:background="#25313A"
@@ -169,7 +169,7 @@
             <Button
                 android:id="@+id/btnQuickWc"
                 android:layout_width="0dp"
-                android:layout_height="58dp"
+                android:layout_height="56dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:background="#25313A"
@@ -182,7 +182,7 @@
             <Button
                 android:id="@+id/btnQuickHelp"
                 android:layout_width="0dp"
-                android:layout_height="58dp"
+                android:layout_height="56dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:background="#4D3435"
@@ -195,7 +195,7 @@
             <Button
                 android:id="@+id/btnQuickYes"
                 android:layout_width="0dp"
-                android:layout_height="58dp"
+                android:layout_height="56dp"
                 android:layout_weight="1"
                 android:background="#304D3A"
                 android:text="DA"
@@ -215,7 +215,7 @@
             <Button
                 android:id="@+id/btnQuickNo"
                 android:layout_width="0dp"
-                android:layout_height="58dp"
+                android:layout_height="56dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:background="#4D3435"
@@ -228,7 +228,7 @@
             <Button
                 android:id="@+id/btnQuickHome"
                 android:layout_width="0dp"
-                android:layout_height="58dp"
+                android:layout_height="56dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:background="#453D55"
@@ -241,7 +241,7 @@
             <Button
                 android:id="@+id/btnQuickPain"
                 android:layout_width="0dp"
-                android:layout_height="58dp"
+                android:layout_height="56dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:background="#4D3435"
@@ -254,7 +254,7 @@
             <Button
                 android:id="@+id/btnQuickTired"
                 android:layout_width="0dp"
-                android:layout_height="58dp"
+                android:layout_height="56dp"
                 android:layout_weight="1"
                 android:background="#3E434D"
                 android:text="UTRUJENA"
@@ -273,6 +273,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:padding="4dp" />
+        android:overScrollMode="never"
+        android:padding="4dp"
+        android:scrollbars="none" />
 
 </LinearLayout>
