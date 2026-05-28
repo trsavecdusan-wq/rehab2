@@ -47,6 +47,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacItem
+import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_ACTIVE_SPEECH_LANGUAGE = "active_speech_language"
         private const val PREF_ADMIN_PIN = "admin_pin"
         private const val DEFAULT_ADMIN_PIN = "0416"
+        private const val MAIN_AAC_HOME_PAGE_ID = "home"
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
         private const val PREF_DISTANCE_TODAY_METERS = "distance_today_meters"
         private const val PREF_DISTANCE_TOTAL_METERS = "distance_total_meters"
@@ -381,9 +383,12 @@ class MainActivity : AppCompatActivity() {
             MainAacTileBinding.from(findViewById(R.id.tileAacDruzina)),
             MainAacTileBinding.from(findViewById(R.id.tileAacStop))
         )
-        val items = buildMainAacItems()
+        val fallbackItems = buildMainAacItems()
+        val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
+        val homeItems = selectMainHomePlacementItems(loadedItems)
+        val items = if (homeItems.isEmpty()) fallbackItems else loadedItems
         mainAacItemsById = items.associateBy { it.id }
-        showMainAacItems(items.filter { it.isRootItem && !it.isHiddenUntilParent })
+        showMainAacItems(homeItems.ifEmpty { fallbackItems.filter { it.isRootItem && !it.isHiddenUntilParent } })
     }
 
     private fun showMainAacItems(items: List<AacItem>) {
@@ -410,7 +415,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleMainAacItemAction(item: AacItem) {
-        val childItems = item.children.mapNotNull { childId -> mainAacItemsById[childId] }
+        val childItems = mainAacChildrenFor(item)
         if (item.opensSubicons || childItems.isNotEmpty()) {
             if (childItems.isNotEmpty()) {
                 mainAacHistory.addLast(currentMainAacItems)
@@ -434,6 +439,28 @@ class MainActivity : AppCompatActivity() {
         if (item.speaksImmediately) {
             aacAudioPlayer.speakText(AacLocalizedTextResolver.resolveSpeakText(item, languageCode), languageCode)
         }
+    }
+
+    private fun selectMainHomePlacementItems(items: List<AacItem>): List<AacItem> {
+        val itemsById = items.associateBy { it.id }
+        return items
+            .flatMap { item ->
+                item.placements
+                    .filter { placement -> placement.pageId == MAIN_AAC_HOME_PAGE_ID }
+                    .map { placement -> placement.position5x5 to item.id }
+            }
+            .filter { (position, itemId) -> position in 1..25 && itemsById.containsKey(itemId) }
+            .sortedBy { (position, _) -> position }
+            .mapNotNull { (_, itemId) -> itemsById[itemId] }
+            .take(mainAacTileBindings.size)
+    }
+
+    private fun mainAacChildrenFor(item: AacItem): List<AacItem> {
+        val explicitChildren = item.children.mapNotNull { childId -> mainAacItemsById[childId] }
+        val visibleUnderChildren = mainAacItemsById.values
+            .filter { child -> item.id in child.visibleUnderIds && child.id !in item.children }
+            .sortedBy { it.priority }
+        return explicitChildren + visibleUnderChildren
     }
 
     private fun scheduleMainAacSentenceClear() {
