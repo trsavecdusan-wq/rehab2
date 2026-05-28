@@ -3,20 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    android:background="#1E252C"
+    android:background="#1A2027"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center"
-    android:minHeight="168dp"
+    android:minHeight="172dp"
     android:orientation="vertical"
     android:padding="10dp">
 
     <ImageView
         android:id="@+id/imgAacTile"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="124dp"
         android:adjustViewBounds="true"
-        android:background="#1E252C"
+        android:background="#1A2027"
         android:contentDescription=""
         android:padding="4dp"
         android:scaleType="fitCenter"
@@ -29,11 +29,11 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:includeFontPadding="false"
-        android:minHeight="38dp"
+        android:minHeight="40dp"
         android:maxLines="2"
         android:text="VODA"
         android:textColor="#F4F7FA"
-        android:textSize="17sp"
+        android:textSize="18sp"
         android:textStyle="bold" />
 
 </LinearLayout>
