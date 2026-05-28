@@ -46,8 +46,11 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.rehab2.aac.AacAudioPlayer
+import com.rehab2.aac.AacItem
+import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
+import com.rehab2.aac.IconSource
 import com.rehab2.radio.RadioPlayerController
 import com.rehab2.radio.SavedRadioStation
 import com.rehab2.radio.RadioStationStore
@@ -116,6 +119,34 @@ class MainActivity : AppCompatActivity() {
         private const val RADIO_STATION_TILE_COUNT = 5
         private const val MP3_TILE_INDEX = 5
         private const val RADIO_SWIPE_THRESHOLD_PX = 80f
+        private const val MAIN_AAC_SENTENCE_CLEAR_DELAY_MS = 30_000L
+    }
+
+    private data class MainAacTileBinding(
+        val view: View,
+        val label: TextView,
+        var item: AacItem? = null
+    ) {
+        companion object {
+            fun from(view: View): MainAacTileBinding {
+                return MainAacTileBinding(
+                    view = view,
+                    label = findLastTextView(view) ?: error("AAC tile label missing")
+                )
+            }
+
+            private fun findLastTextView(view: View): TextView? {
+                if (view is TextView) {
+                    return view
+                }
+                val group = view as? ViewGroup ?: return null
+                var result: TextView? = null
+                for (index in 0 until group.childCount) {
+                    findLastTextView(group.getChildAt(index))?.let { result = it }
+                }
+                return result
+            }
+        }
     }
 
     private lateinit var radioTiles: List<TextView>
@@ -149,9 +180,16 @@ class MainActivity : AppCompatActivity() {
     private var isSleepDimActive = false
     private var isKeepScreenOnApplied = false
     private val mainAacSentenceManager = AacSentenceStateManager()
+    private lateinit var mainAacTileBindings: List<MainAacTileBinding>
+    private var mainAacItemsById: Map<String, AacItem> = emptyMap()
+    private var currentMainAacItems: List<AacItem> = emptyList()
+    private val mainAacHistory = ArrayDeque<List<AacItem>>()
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
     private val mainHandler = Handler(Looper.getMainLooper())
+    private val mainAacSentenceClearRunnable = Runnable {
+        mainAacSentenceManager.clear()
+    }
     private val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
     private val dateFormat = SimpleDateFormat("dd.MM.", Locale.getDefault())
     private val yearTimeFormat = SimpleDateFormat("yyyy HH:mm", Locale.getDefault())
@@ -269,32 +307,14 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        val mainAacTileActions = listOf(
-            R.id.tileAacZejna to "žejna",
-            R.id.tileAacLacna to "lačna",
-            R.id.tileAacPomoc to "pomoč",
-            R.id.tileAacDa to "da",
-            R.id.tileAacWc to "WC",
-            R.id.tileAacDobro to "dobro",
-            R.id.tileAacSlabo to "slabo",
-            R.id.tileAacNe to "ne",
-            R.id.tileAacUtrujena to "utrujena",
-            R.id.tileAacMraz to "mraz",
-            R.id.tileAacVroce to "vroče",
-            R.id.tileAacBolecina to "bolečina",
-            R.id.tileAacZdravnik to "zdravnik",
-            R.id.tileAacDruzina to "družina",
-            R.id.tileAacStop to "stop"
-        )
-
-        mainAacTileActions.forEach { (tileId, speechText) ->
-            findViewById<View>(tileId).setOnClickListener {
-                handleMainAacTileAction(speechText)
-            }
-        }
+        configureMainAacTiles()
 
         findViewById<View>(R.id.tileAacDomov).setOnClickListener {
-            startActivity(Intent(this, AacCommunicatorActivity::class.java))
+            if (mainAacHistory.isNotEmpty()) {
+                showPreviousMainAacItems()
+            } else {
+                startActivity(Intent(this, AacCommunicatorActivity::class.java))
+            }
         }
         findViewById<View>(R.id.tileAacDomov).setOnLongClickListener {
             startActivity(Intent(this, AacCommunicatorActivity::class.java))
@@ -337,24 +357,148 @@ class MainActivity : AppCompatActivity() {
         stopSpeedUpdates()
         stopPowerMonitoring()
         unregisterPowerReceiver()
+        mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
         radioPlayerController.release()
         aacAudioPlayer.release()
         super.onDestroy()
     }
 
-    private fun handleMainAacTileAction(speechText: String) {
-        val trimmedSpeechText = speechText.trim()
-        if (trimmedSpeechText.isEmpty()) {
+    private fun configureMainAacTiles() {
+        mainAacTileBindings = listOf(
+            MainAacTileBinding.from(findViewById(R.id.tileAacZejna)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacLacna)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacPomoc)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacDa)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacWc)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacDobro)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacSlabo)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacNe)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacUtrujena)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacMraz)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacVroce)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacBolecina)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacZdravnik)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacDruzina)),
+            MainAacTileBinding.from(findViewById(R.id.tileAacStop))
+        )
+        val items = buildMainAacItems()
+        mainAacItemsById = items.associateBy { it.id }
+        showMainAacItems(items.filter { it.isRootItem && !it.isHiddenUntilParent })
+    }
+
+    private fun showMainAacItems(items: List<AacItem>) {
+        currentMainAacItems = items
+        mainAacTileBindings.forEachIndexed { index, binding ->
+            val item = items.getOrNull(index)
+            binding.item = item
+            binding.view.visibility = if (item == null) View.INVISIBLE else View.VISIBLE
+            item?.let {
+                binding.label.text = AacLocalizedTextResolver.resolveLabel(it, getActiveSpeechLanguage())
+                    .uppercase(Locale.ROOT)
+                binding.view.setOnClickListener {
+                    handleMainAacItemAction(item)
+                }
+            }
+        }
+    }
+
+    private fun showPreviousMainAacItems() {
+        if (mainAacHistory.isEmpty()) {
             return
         }
-        mainAacSentenceManager.addItem(
-            AacSentenceItem(
-                conceptId = trimmedSpeechText.lowercase(Locale.ROOT),
-                text = trimmedSpeechText,
-                role = null
+        showMainAacItems(mainAacHistory.removeLast())
+    }
+
+    private fun handleMainAacItemAction(item: AacItem) {
+        val childItems = item.children.mapNotNull { childId -> mainAacItemsById[childId] }
+        if (item.opensSubicons || childItems.isNotEmpty()) {
+            if (childItems.isNotEmpty()) {
+                mainAacHistory.addLast(currentMainAacItems)
+                showMainAacItems(childItems)
+            }
+            return
+        }
+
+        val languageCode = getActiveSpeechLanguage()
+        val resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode)
+        if (item.addsToSentence) {
+            mainAacSentenceManager.addItem(
+                AacSentenceItem(
+                    conceptId = item.conceptId ?: item.id,
+                    text = resolvedLabel,
+                    role = item.sentenceRole
+                )
             )
+            scheduleMainAacSentenceClear()
+        }
+        if (item.speaksImmediately) {
+            aacAudioPlayer.speakText(AacLocalizedTextResolver.resolveSpeakText(item, languageCode), languageCode)
+        }
+    }
+
+    private fun scheduleMainAacSentenceClear() {
+        mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
+        mainHandler.postDelayed(mainAacSentenceClearRunnable, MAIN_AAC_SENTENCE_CLEAR_DELAY_MS)
+    }
+
+    private fun buildMainAacItems(): List<AacItem> {
+        return listOf(
+            mainAacItem("drink", "PIJAČA", opensSubicons = true, children = listOf("water", "juice", "tea", "coffee")),
+            mainAacItem("food", "HRANA", opensSubicons = true, children = listOf("soup", "bread", "fruit")),
+            mainAacItem("help", "POMOČ", "pomoč"),
+            mainAacItem("yes", "DA", "da", fixedTopRowPosition = 1),
+            mainAacItem("wc", "WC", "WC"),
+            mainAacItem("good", "DOBRO", "dobro"),
+            mainAacItem("bad", "SLABO", "slabo"),
+            mainAacItem("no_understand", "NE\nRAZUMEM", "ne razumem", fixedTopRowPosition = 2),
+            mainAacItem("tired", "UTRUJENA", "utrujena"),
+            mainAacItem("cold", "MRAZ", "mraz"),
+            mainAacItem("hot", "VROČE", "vroče"),
+            mainAacItem("pain", "BOLEČINA", opensSubicons = true, children = listOf("head", "arm", "leg", "belly")),
+            mainAacItem("doctor", "ZDRAVNIK", "zdravnik"),
+            mainAacItem("family", "DRUŽINA", "družina"),
+            mainAacItem("stop", "STOP", "stop", fixedTopRowPosition = 5),
+            mainAacItem("water", "VODA", "voda", isRootItem = false, visibleUnderIds = listOf("drink")),
+            mainAacItem("juice", "SOK", "sok", isRootItem = false, visibleUnderIds = listOf("drink")),
+            mainAacItem("tea", "ČAJ", "čaj", isRootItem = false, visibleUnderIds = listOf("drink")),
+            mainAacItem("coffee", "KAVA", "kava", isRootItem = false, visibleUnderIds = listOf("drink")),
+            mainAacItem("soup", "JUHA", "juha", isRootItem = false, visibleUnderIds = listOf("food")),
+            mainAacItem("bread", "KRUH", "kruh", isRootItem = false, visibleUnderIds = listOf("food")),
+            mainAacItem("fruit", "SADJE", "sadje", isRootItem = false, visibleUnderIds = listOf("food")),
+            mainAacItem("head", "GLAVA", "glava", isRootItem = false, visibleUnderIds = listOf("pain")),
+            mainAacItem("arm", "ROKA", "roka", isRootItem = false, visibleUnderIds = listOf("pain")),
+            mainAacItem("leg", "NOGA", "noga", isRootItem = false, visibleUnderIds = listOf("pain")),
+            mainAacItem("belly", "TREBUH", "trebuh", isRootItem = false, visibleUnderIds = listOf("pain"))
         )
-        aacAudioPlayer.speakText(trimmedSpeechText, getActiveSpeechLanguage())
+    }
+
+    private fun mainAacItem(
+        id: String,
+        labelSl: String,
+        speechText: String = labelSl.lowercase(Locale.ROOT),
+        opensSubicons: Boolean = false,
+        children: List<String> = emptyList(),
+        isRootItem: Boolean = true,
+        visibleUnderIds: List<String> = emptyList(),
+        fixedTopRowPosition: Int? = null
+    ): AacItem {
+        return AacItem(
+            id = id,
+            labelSl = labelSl,
+            imagePath = "",
+            actionType = if (opensSubicons) "open_subicons" else "speak",
+            targetPageId = "",
+            speakTextSl = speechText,
+            speechText = speechText,
+            iconSource = IconSource.SYSTEM,
+            visibleUnderIds = visibleUnderIds,
+            children = children,
+            isRootItem = isRootItem,
+            fixedTopRowPosition = fixedTopRowPosition,
+            addsToSentence = !opensSubicons,
+            speaksImmediately = !opensSubicons,
+            opensSubicons = opensSubicons
+        )
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
