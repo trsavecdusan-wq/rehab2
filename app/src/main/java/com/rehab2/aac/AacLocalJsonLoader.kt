@@ -119,20 +119,29 @@ object AacLocalJsonLoader {
             .ifBlank { json.optString("text") }
             .ifBlank { json.optString("label") }
             .ifBlank { id.uppercase() }
+        val actionType = json.optString("actionType").ifBlank { "speak" }
+        val children = parseStringList(json.optJSONArray("children"))
 
         return AacItem(
             id = id,
             labelSl = label,
             imagePath = json.optString("imagePath"),
             audioSl = json.optString("audioSl"),
-            actionType = json.optString("actionType").ifBlank { "speak" },
+            actionType = actionType,
             targetPageId = json.optString("targetPageId"),
             speakTextSl = json.optNullableString("speakTextSl")
                 ?: json.optNullableString("speechText")
                 ?: json.optNullableString("text"),
             speakTextUk = json.optNullableString("speakTextUk"),
+            labelUk = json.optNullableString("labelUk"),
+            labelEn = json.optNullableString("labelEn"),
+            speechText = json.optNullableString("speechText"),
+            speechTextEn = json.optNullableString("speechTextEn")
+                ?: json.optNullableString("speakTextEn"),
+            categoryId = json.optNullableString("categoryId")
+                ?: json.optNullableString("category"),
             conceptId = json.optNullableString("conceptId"),
-            children = parseStringList(json.optJSONArray("children")),
+            children = children,
             sentenceRole = json.optNullableString("sentenceRole"),
             questionSl = json.optNullableString("questionSl"),
             questionUk = json.optNullableString("questionUk"),
@@ -143,6 +152,13 @@ object AacLocalJsonLoader {
             isRootItem = if (json.has("isRootItem")) json.optBoolean("isRootItem", true) else json.optNullableString("parentId").isNullOrBlank(),
             isHiddenUntilParent = json.optBoolean("isHiddenUntilParent", false),
             fixedTopRowPosition = json.optFixedTopRowPosition(),
+            addsToSentence = if (json.has("addsToSentence")) json.optBoolean("addsToSentence", true) else true,
+            speaksImmediately = if (json.has("speaksImmediately")) json.optBoolean("speaksImmediately", true) else true,
+            opensSubicons = if (json.has("opensSubicons")) {
+                json.optBoolean("opensSubicons", false)
+            } else {
+                children.isNotEmpty() || actionType == "open_page"
+            },
             priority = json.optInt("priority", priorityFallback),
             followUpQuestion = json.optNullableString("followUpQuestion"),
             vendingNumber = json.optNullableString("vendingNumber"),

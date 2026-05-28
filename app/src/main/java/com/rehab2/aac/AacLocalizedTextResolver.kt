@@ -36,17 +36,25 @@ object AacLocalizedTextResolver {
                 AacLanguageResolver.DEFAULT_LANGUAGE_CODE,
                 AacLocalizedText(
                     label = labelSl,
-                    speakText = speakTextSl ?: labelSl,
+                    speakText = speakTextSl ?: speechText ?: labelSl,
                     question = questionSl,
                     learningText = labelSl
                 )
             )
             val ukText = AacLocalizedText(
+                label = labelUk,
                 speakText = speakTextUk,
                 question = questionUk
             )
-            if (ukText.speakText != null || ukText.question != null) {
+            if (ukText.label != null || ukText.speakText != null || ukText.question != null) {
                 put("uk", ukText)
+            }
+            val enText = AacLocalizedText(
+                label = labelEn,
+                speakText = speechTextEn
+            )
+            if (enText.label != null || enText.speakText != null) {
+                put("en", enText)
             }
         }
     }

@@ -16,6 +16,12 @@ data class AacItem(
     val targetPageId: String,
     val speakTextSl: String? = null,
     val speakTextUk: String? = null,
+    val labelUk: String? = null,
+    val labelEn: String? = null,
+    val speechText: String? = null,
+    val speechTextEn: String? = null,
+    // Therapist organization only. Patient placement is controlled by placements/visibility metadata.
+    val categoryId: String? = null,
     val conceptId: String? = null,
     val children: List<String> = emptyList(),
     val sentenceRole: String? = null,
@@ -34,6 +40,9 @@ data class AacItem(
     val isHiddenUntilParent: Boolean = false,
     // Optional content/settings hook for future therapist-configured fixed top-row positions 1..5.
     val fixedTopRowPosition: Int? = null,
+    val addsToSentence: Boolean = true,
+    val speaksImmediately: Boolean = true,
+    val opensSubicons: Boolean = false,
     val priority: Int = 0,
     val followUpQuestion: String? = null,
     val vendingNumber: String? = null,
@@ -44,6 +53,8 @@ data class AacItem(
     val text: String
         get() = labelSl
 
-    val speechText: String
-        get() = speakTextSl?.trim()?.takeIf { it.isNotEmpty() } ?: labelSl
+    val resolvedSpeechText: String
+        get() = speechText?.trim()?.takeIf { it.isNotEmpty() }
+            ?: speakTextSl?.trim()?.takeIf { it.isNotEmpty() }
+            ?: labelSl
 }
