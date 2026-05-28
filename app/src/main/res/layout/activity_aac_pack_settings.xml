@@ -479,6 +479,18 @@
             android:textColorHint="#B8C0C8"
             android:textSize="16sp" />
 
+        <Button
+            android:id="@+id/btnChooseSubiconParent"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="IZBERI STARŠA"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/editSubiconChildId"
             android:layout_width="match_parent"
@@ -493,6 +505,18 @@
             android:textColor="#F4F7FA"
             android:textColorHint="#B8C0C8"
             android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnChooseSubiconChild"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="IZBERI PODIKONO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnAddSubicon"
@@ -671,6 +695,44 @@
             android:textColor="#F4F7FA"
             android:textColorHint="#B8C0C8"
             android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editAacImagePath"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Lokalna pot slike, npr. soca/voda.png"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnChooseAacImage"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="IZBERI LOKALNO SLIKO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/imgAacImagePreview"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginBottom="8dp"
+            android:adjustViewBounds="true"
+            android:background="#1E252C"
+            android:contentDescription="Predogled AAC slike"
+            android:padding="8dp"
+            android:scaleType="fitCenter" />
 
         <EditText
             android:id="@+id/editAacCategoryId"

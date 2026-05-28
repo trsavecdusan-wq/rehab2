@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -12,6 +13,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -100,6 +102,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var editAacActiveLanguages: EditText
     private lateinit var editAacSpeechText: EditText
     private lateinit var editAacIconSource: EditText
+    private lateinit var editAacImagePath: EditText
+    private lateinit var btnChooseAacImage: Button
+    private lateinit var imgAacImagePreview: ImageView
     private lateinit var editAacCategoryId: EditText
     private lateinit var checkAacAddsToSentence: CheckBox
     private lateinit var checkAacSpeaksImmediately: CheckBox
@@ -121,6 +126,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnSetDefaultPatientPage: Button
     private lateinit var editSubiconParentId: EditText
     private lateinit var editSubiconChildId: EditText
+    private lateinit var btnChooseSubiconParent: Button
+    private lateinit var btnChooseSubiconChild: Button
     private lateinit var btnAddSubicon: Button
     private lateinit var btnRemoveSubicon: Button
     private lateinit var txtSubiconStatus: TextView
@@ -192,6 +199,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         editAacActiveLanguages = findViewById(R.id.editAacActiveLanguages)
         editAacSpeechText = findViewById(R.id.editAacSpeechText)
         editAacIconSource = findViewById(R.id.editAacIconSource)
+        editAacImagePath = findViewById(R.id.editAacImagePath)
+        btnChooseAacImage = findViewById(R.id.btnChooseAacImage)
+        imgAacImagePreview = findViewById(R.id.imgAacImagePreview)
         editAacCategoryId = findViewById(R.id.editAacCategoryId)
         checkAacAddsToSentence = findViewById(R.id.checkAacAddsToSentence)
         checkAacSpeaksImmediately = findViewById(R.id.checkAacSpeaksImmediately)
@@ -213,6 +223,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnSetDefaultPatientPage = findViewById(R.id.btnSetDefaultPatientPage)
         editSubiconParentId = findViewById(R.id.editSubiconParentId)
         editSubiconChildId = findViewById(R.id.editSubiconChildId)
+        btnChooseSubiconParent = findViewById(R.id.btnChooseSubiconParent)
+        btnChooseSubiconChild = findViewById(R.id.btnChooseSubiconChild)
         btnAddSubicon = findViewById(R.id.btnAddSubicon)
         btnRemoveSubicon = findViewById(R.id.btnRemoveSubicon)
         txtSubiconStatus = findViewById(R.id.txtSubiconStatus)
@@ -272,6 +284,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnSaveAacItem.setOnClickListener {
             saveTherapistAacItem()
         }
+        btnChooseAacImage.setOnClickListener {
+            showAacImageChooser()
+        }
         btnActivateSocaLibrary.setOnClickListener {
             setLibrarySourceActive(LibraryIconSource.SOCA, active = true)
         }
@@ -301,6 +316,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
         btnSetDefaultPatientPage.setOnClickListener {
             setDefaultPatientPage()
+        }
+        btnChooseSubiconParent.setOnClickListener {
+            showSubiconItemChooser(targetParent = true)
+        }
+        btnChooseSubiconChild.setOnClickListener {
+            showSubiconItemChooser(targetParent = false)
         }
         btnAddSubicon.setOnClickListener {
             updateSubicon(add = true)
@@ -1383,6 +1404,36 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }.trimEnd()
     }
 
+    private fun showSubiconItemChooser(targetParent: Boolean) {
+        val items = buildLocalAacOverview()
+            .relationAnalysis
+            .availableItems
+            .filter { item -> therapistIconSourceFilter.matches(item.iconSource) }
+        if (items.isEmpty()) {
+            txtStatus.text = "Ni AAC elementov za trenutni filter vira."
+            return
+        }
+        val labels = items.map { item ->
+            val title = item.label.ifBlank { item.itemId }
+            "$title (${item.itemId}, ${item.iconSource.name})"
+        }.toTypedArray()
+        val title = if (targetParent) "Izberi starša" else "Izberi podikono"
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setItems(labels) { _, index ->
+                val selectedItem = items[index]
+                if (targetParent) {
+                    editSubiconParentId.setText(selectedItem.itemId)
+                    txtStatus.text = "Starš izbran.\n${selectedItem.itemId}"
+                } else {
+                    editSubiconChildId.setText(selectedItem.itemId)
+                    txtStatus.text = "Podikona izbrana.\n${selectedItem.itemId}"
+                }
+            }
+            .setNegativeButton("Prekliči", null)
+            .show()
+    }
+
     private fun updateIconSourceFilterButtons() {
         iconSourceFilterButtons.forEach { (filter, button) ->
             val color = if (filter == therapistIconSourceFilter) 0xFF2F5F9E.toInt() else 0xFF34414D.toInt()
@@ -1461,6 +1512,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
             txtStatus.text = "Vir ikone mora biti SOCA, CUSTOM, ARASAAC ali SYSTEM."
             return
         }
+        val imagePath = editAacImagePath.text.toString().trim()
+        if (imagePath.isNotBlank() && isInvalidIconPath(imagePath)) {
+            txtStatus.text = "Pot slike ni varna."
+            return
+        }
 
         val activeLanguages = parseTherapistLanguages(editAacActiveLanguages.text.toString())
         if (activeLanguages.size > 3) {
@@ -1480,6 +1536,58 @@ class AacPackSettingsActivity : AppCompatActivity() {
             AacItemEditorWriteResult.WriteFailed -> {
                 txtStatus.text = "AAC elementa ni bilo mogoce shraniti."
             }
+        }
+    }
+
+    private fun showAacImageChooser() {
+        val iconSource = parseLocalIconSource(iconSourceForEditor())
+        if (iconSource == null || iconSource == IconSource.SYSTEM) {
+            txtStatus.text = "Najprej nastavi vir ikone: SOCA, CUSTOM ali ARASAAC."
+            return
+        }
+        val sourceDir = iconSourceDir(iconSource)
+        if (sourceDir?.isDirectory != true) {
+            txtStatus.text = "Lokalna mapa za vir ${iconSource.name} ne obstaja."
+            return
+        }
+        val imageFiles = sourceDir.walkTopDown()
+            .filter { file -> file.isFile && isSupportedAacImageFile(file) }
+            .sortedBy { file -> file.relativeTo(sourceDir).invariantSeparatorsPath.lowercase(Locale.ROOT) }
+            .take(200)
+            .toList()
+        if (imageFiles.isEmpty()) {
+            txtStatus.text = "V mapi ${iconSource.name} ni lokalnih slik."
+            return
+        }
+        val labels = imageFiles.map { file ->
+            file.relativeTo(sourceDir).invariantSeparatorsPath
+        }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("Izberi lokalno sliko")
+            .setItems(labels) { _, index ->
+                val selectedFile = imageFiles[index]
+                val imagePath = relativeImagePathForIconSource(iconSource, selectedFile, sourceDir)
+                editAacIconSource.setText(iconSource.name)
+                editAacImagePath.setText(imagePath)
+                updateAacImagePreview(imagePath, iconSource)
+                txtStatus.text = "Slika izbrana.\n$imagePath"
+            }
+            .setNegativeButton("Prekliči", null)
+            .show()
+    }
+
+    private fun updateAacImagePreview(imagePath: String, iconSource: IconSource?) {
+        val source = iconSource ?: parseLocalIconSource(iconSourceForEditor())
+        val imageFile = source?.let { AacStoragePaths.resolveIconFile(this, imagePath, it) }
+        if (imageFile?.isFile != true) {
+            imgAacImagePreview.setImageDrawable(null)
+            return
+        }
+        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+        if (bitmap == null) {
+            imgAacImagePreview.setImageDrawable(null)
+        } else {
+            imgAacImagePreview.setImageBitmap(bitmap)
         }
     }
 
@@ -1680,6 +1788,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
             })
             putOptionalString(item, "speechText", editAacSpeechText.text.toString())
             putOptionalString(item, "iconSource", iconSourceForEditor())
+            putOptionalString(item, "imagePath", editAacImagePath.text.toString())
+            item.remove("image_path")
+            item.remove("icon")
             putOptionalString(item, "categoryId", editAacCategoryId.text.toString())
             item.put("addsToSentence", checkAacAddsToSentence.isChecked)
             item.put("speaksImmediately", checkAacSpeaksImmediately.isChecked)
@@ -1708,6 +1819,35 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
     private fun iconSourceForEditor(): String {
         return editAacIconSource.text.toString().trim().uppercase(Locale.ROOT).ifBlank { "SYSTEM" }
+    }
+
+    private fun iconSourceDir(iconSource: IconSource): File? {
+        return when (iconSource) {
+            IconSource.SOCA -> AacStoragePaths.getIconsSocaDir(this)
+            IconSource.CUSTOM,
+            IconSource.PATIENT -> AacStoragePaths.getIconsCustomDir(this)
+            IconSource.ARASAAC -> AacStoragePaths.getIconsArasaacDir(this)
+            IconSource.SYSTEM -> null
+        }
+    }
+
+    private fun relativeImagePathForIconSource(iconSource: IconSource, imageFile: File, sourceDir: File): String {
+        val relativePath = imageFile.relativeTo(sourceDir).invariantSeparatorsPath
+        val prefix = when (iconSource) {
+            IconSource.SOCA -> "soca"
+            IconSource.CUSTOM,
+            IconSource.PATIENT -> "custom"
+            IconSource.ARASAAC -> "arasaac"
+            IconSource.SYSTEM -> ""
+        }
+        return if (prefix.isBlank()) relativePath else "$prefix/$relativePath"
+    }
+
+    private fun isSupportedAacImageFile(file: File): Boolean {
+        return when (file.extension.lowercase(Locale.ROOT)) {
+            "png", "jpg", "jpeg", "webp" -> true
+            else -> false
+        }
     }
 
     private fun parseTherapistLanguages(rawValue: String): List<String> {
