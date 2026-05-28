@@ -469,7 +469,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
         btnBackNav.isEnabled = canGoBack
         btnBackNav.text = if (canGoBack) "NAZAJ" else "ZAČETEK"
-        btnBackNav.alpha = if (canGoBack) 1.0f else 0.55f
+        btnBackNav.visibility = if (canGoBack) View.VISIBLE else View.INVISIBLE
+        btnBackNav.alpha = 1.0f
     }
 
     private fun openDrinksV2Test() {

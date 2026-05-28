@@ -55,7 +55,8 @@
         android:text="TEST PIJAČA V2"
         android:textColor="#F4F7FA"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/aacSentenceBar"
@@ -136,28 +137,28 @@
 
     </LinearLayout>
 
-    <HorizontalScrollView
-        android:id="@+id/aacQuickAccessScroll"
+    <LinearLayout
+        android:id="@+id/aacQuickAccessArea"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:background="#18212A"
-        android:fillViewport="true"
-        android:overScrollMode="never"
-        android:padding="6dp"
-        android:scrollbars="none">
+        android:orientation="vertical"
+        android:padding="6dp">
 
         <LinearLayout
-            android:id="@+id/aacQuickAccessRow"
-            android:layout_width="wrap_content"
+            android:id="@+id/aacQuickAccessRowTop"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnQuickWater"
-                android:layout_width="104dp"
+                android:layout_width="0dp"
                 android:layout_height="58dp"
                 android:layout_marginEnd="6dp"
+                android:layout_weight="1"
                 android:background="#1F5D70"
                 android:text="VODA"
                 android:textAllCaps="false"
@@ -167,9 +168,10 @@
 
             <Button
                 android:id="@+id/btnQuickWc"
-                android:layout_width="104dp"
+                android:layout_width="0dp"
                 android:layout_height="58dp"
                 android:layout_marginEnd="6dp"
+                android:layout_weight="1"
                 android:background="#1F5D70"
                 android:text="WC"
                 android:textAllCaps="false"
@@ -179,9 +181,10 @@
 
             <Button
                 android:id="@+id/btnQuickHelp"
-                android:layout_width="104dp"
+                android:layout_width="0dp"
                 android:layout_height="58dp"
                 android:layout_marginEnd="6dp"
+                android:layout_weight="1"
                 android:background="#7A3A33"
                 android:text="POMOČ"
                 android:textAllCaps="false"
@@ -191,9 +194,9 @@
 
             <Button
                 android:id="@+id/btnQuickYes"
-                android:layout_width="104dp"
+                android:layout_width="0dp"
                 android:layout_height="58dp"
-                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
                 android:background="#2C6B3D"
                 android:text="DA"
                 android:textAllCaps="false"
@@ -201,11 +204,20 @@
                 android:textSize="19sp"
                 android:textStyle="bold" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/aacQuickAccessRowBottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
             <Button
                 android:id="@+id/btnQuickNo"
-                android:layout_width="104dp"
+                android:layout_width="0dp"
                 android:layout_height="58dp"
                 android:layout_marginEnd="6dp"
+                android:layout_weight="1"
                 android:background="#7A3A33"
                 android:text="NE"
                 android:textAllCaps="false"
@@ -215,9 +227,10 @@
 
             <Button
                 android:id="@+id/btnQuickHome"
-                android:layout_width="104dp"
+                android:layout_width="0dp"
                 android:layout_height="58dp"
                 android:layout_marginEnd="6dp"
+                android:layout_weight="1"
                 android:background="#6A4E8E"
                 android:text="DOMOV"
                 android:textAllCaps="false"
@@ -227,9 +240,10 @@
 
             <Button
                 android:id="@+id/btnQuickPain"
-                android:layout_width="104dp"
+                android:layout_width="0dp"
                 android:layout_height="58dp"
                 android:layout_marginEnd="6dp"
+                android:layout_weight="1"
                 android:background="#7A3A33"
                 android:text="BOLI"
                 android:textAllCaps="false"
@@ -239,8 +253,9 @@
 
             <Button
                 android:id="@+id/btnQuickTired"
-                android:layout_width="124dp"
+                android:layout_width="0dp"
                 android:layout_height="58dp"
+                android:layout_weight="1"
                 android:background="#5C5368"
                 android:text="UTRUJENA"
                 android:textAllCaps="false"
@@ -250,7 +265,7 @@
 
         </LinearLayout>
 
-    </HorizontalScrollView>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerAacTiles"
