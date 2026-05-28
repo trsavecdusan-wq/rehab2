@@ -137,7 +137,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="ZIP z ikonami podpira: soca/*.png, custom/*.png, arasaac/*.png. Obstoječe datoteke se preskočijo."
+            android:text="ZIP z ikonami podpira: soca/*.png, custom/*.png, arasaac/*.png. Priporočeno: kopiraj ZIP v NovaRehab/import/soca_ikone.zip, nato izberi UVOZI ZIP IKONE. Obstoječe datoteke se preskočijo."
             android:textColor="#B8C0C8"
             android:textSize="16sp" />
 

@@ -9,6 +9,7 @@ object AacStoragePaths {
     const val SOCA_ICONS_DIR = "NovaRehab/icons/soca/"
     const val ARASAAC_ICONS_DIR = "NovaRehab/icons/arasaac/"
     const val CUSTOM_ICONS_DIR = "NovaRehab/icons/custom/"
+    const val IMPORT_DIR = "NovaRehab/import/"
     const val AAC_ITEMS_FILE = "NovaRehab/data/aac_items.json"
     const val PROFILES_DIR = "NovaRehab/profiles/"
     const val SOCA_STARTER_WATER_ICON = "voda.png"
@@ -41,15 +42,21 @@ object AacStoragePaths {
         return File(externalFilesDir, CUSTOM_ICONS_DIR)
     }
 
+    fun getImportDir(context: Context): File? {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        return File(externalFilesDir, IMPORT_DIR)
+    }
+
     fun ensureAacContentDirs(context: Context): Boolean {
         val dirs = listOfNotNull(
             getAacItemsFile(context)?.parentFile,
             getProfilesDataDir(context),
             getIconsSocaDir(context),
             getIconsCustomDir(context),
-            getIconsArasaacDir(context)
+            getIconsArasaacDir(context),
+            getImportDir(context)
         )
-        return dirs.size == 5 && dirs.all { dir -> dir.exists() || dir.mkdirs() }
+        return dirs.size == 6 && dirs.all { dir -> dir.exists() || dir.mkdirs() }
     }
 
     fun resolveIconFile(context: Context, imagePath: String, iconSource: IconSource): File? {

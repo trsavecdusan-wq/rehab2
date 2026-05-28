@@ -137,6 +137,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             )
         }
 
+        AacStoragePaths.ensureAacContentDirs(this)
         setShareEnabled(false)
         txtStatus.text = "Pripravljeno za izvoz ali predpreverjanje ZIP paketa."
         refreshLastImportDiagnostic()
