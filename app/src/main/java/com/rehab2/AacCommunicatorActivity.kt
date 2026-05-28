@@ -1270,11 +1270,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
             private val onWaterBindTrace: (AacItem) -> Unit
         ) : RecyclerView.ViewHolder(itemView) {
             private companion object {
-                val TILE_DEFAULT_COLOR = 0xFF1A2027.toInt()
-                val TILE_CATEGORY_COLOR = 0xFF1D4A6A.toInt()
-                val TILE_SUBCATEGORY_COLOR = 0xFF285879.toInt()
-                val TILE_NAVIGATION_COLOR = 0xFF52436D.toInt()
-                val TILE_PRESSED_COLOR = 0xFF347B84.toInt()
+                val TILE_DEFAULT_COLOR = 0xFF263746.toInt()
+                val TILE_CATEGORY_COLOR = 0xFF265B7E.toInt()
+                val TILE_SUBCATEGORY_COLOR = 0xFF316A8D.toInt()
+                val TILE_NAVIGATION_COLOR = 0xFF5B4A78.toInt()
+                val TILE_PRESSED_COLOR = 0xFF3A8790.toInt()
                 const val TILE_PRESS_FEEDBACK_MS = 180L
                 const val MAX_TILE_IMAGE_DECODE_SIZE = 1024
             }
