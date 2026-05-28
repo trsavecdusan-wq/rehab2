@@ -45,6 +45,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.rehab2.aac.AacAudioPlayer
+import com.rehab2.aac.AacSentenceItem
+import com.rehab2.aac.AacSentenceStateManager
 import com.rehab2.radio.RadioPlayerController
 import com.rehab2.radio.SavedRadioStation
 import com.rehab2.radio.RadioStationStore
@@ -119,6 +122,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fallbackRadioLabels: List<CharSequence>
     private lateinit var seekVolume: SeekBar
     private lateinit var audioManager: AudioManager
+    private lateinit var aacAudioPlayer: AacAudioPlayer
     private lateinit var radioPlayerController: RadioPlayerController
     private lateinit var prefs: SharedPreferences
     private lateinit var locationManager: LocationManager
@@ -144,6 +148,7 @@ class MainActivity : AppCompatActivity() {
     private var isPowerOverlayVisible = false
     private var isSleepDimActive = false
     private var isKeepScreenOnApplied = false
+    private val mainAacSentenceManager = AacSentenceStateManager()
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -194,6 +199,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         prefs = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        aacAudioPlayer = AacAudioPlayer(this)
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         seekVolume = findViewById(R.id.seekVolume)
         txtStatusLanguageFlag = findViewById(R.id.txtStatusLanguageFlag)
@@ -263,28 +269,27 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        val aacTiles = listOf(
-            R.id.tileAacZejna to R.string.aac_label_zejna,
-            R.id.tileAacLacna to R.string.aac_label_lacna,
-            R.id.tileAacPomoc to R.string.aac_label_pomoc,
-            R.id.tileAacDa to R.string.aac_label_da,
-            R.id.tileAacWc to R.string.aac_label_wc,
-            R.id.tileAacDobro to R.string.aac_label_dobro,
-            R.id.tileAacSlabo to R.string.aac_label_slabo,
-            R.id.tileAacNe to R.string.aac_label_ne,
-            R.id.tileAacUtrujena to R.string.aac_label_utrujena,
-            R.id.tileAacMraz to R.string.aac_label_mraz,
-            R.id.tileAacVroce to R.string.aac_label_vroce,
-            R.id.tileAacBolecina to R.string.aac_label_bolecina,
-            R.id.tileAacDomov to R.string.aac_label_domov,
-            R.id.tileAacZdravnik to R.string.aac_label_zdravnik,
-            R.id.tileAacDruzina to R.string.aac_label_druzina,
-            R.id.tileAacStop to R.string.aac_label_stop
+        val mainAacTileActions = listOf(
+            R.id.tileAacZejna to "žejna",
+            R.id.tileAacLacna to "lačna",
+            R.id.tileAacPomoc to "pomoč",
+            R.id.tileAacDa to "da",
+            R.id.tileAacWc to "WC",
+            R.id.tileAacDobro to "dobro",
+            R.id.tileAacSlabo to "slabo",
+            R.id.tileAacNe to "ne",
+            R.id.tileAacUtrujena to "utrujena",
+            R.id.tileAacMraz to "mraz",
+            R.id.tileAacVroce to "vroče",
+            R.id.tileAacBolecina to "bolečina",
+            R.id.tileAacZdravnik to "zdravnik",
+            R.id.tileAacDruzina to "družina",
+            R.id.tileAacStop to "stop"
         )
 
-        aacTiles.forEach { (tileId, labelRes) ->
+        mainAacTileActions.forEach { (tileId, speechText) ->
             findViewById<View>(tileId).setOnClickListener {
-                Toast.makeText(this, getString(labelRes), Toast.LENGTH_SHORT).show()
+                handleMainAacTileAction(speechText)
             }
         }
 
@@ -333,7 +338,23 @@ class MainActivity : AppCompatActivity() {
         stopPowerMonitoring()
         unregisterPowerReceiver()
         radioPlayerController.release()
+        aacAudioPlayer.release()
         super.onDestroy()
+    }
+
+    private fun handleMainAacTileAction(speechText: String) {
+        val trimmedSpeechText = speechText.trim()
+        if (trimmedSpeechText.isEmpty()) {
+            return
+        }
+        mainAacSentenceManager.addItem(
+            AacSentenceItem(
+                conceptId = trimmedSpeechText.lowercase(Locale.ROOT),
+                text = trimmedSpeechText,
+                role = null
+            )
+        )
+        aacAudioPlayer.speakText(trimmedSpeechText, getActiveSpeechLanguage())
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
