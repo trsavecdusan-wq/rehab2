@@ -57,6 +57,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val KEY_SELECTED_PROFILE_TIMESTAMP = "selected_profile_timestamp"
         private const val SOURCE_ACTIVATION_PREFS_NAME = "aac_source_activation"
         private const val KEY_ACTIVE_LIBRARY_SOURCES = "active_library_sources"
+        private const val PATIENT_PAGE_PREFS_NAME = "aac_patient_pages"
+        private const val KEY_PATIENT_PAGES = "patient_pages"
+        private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
+        private const val PATIENT_PAGE_SEPARATOR = "\u001E"
+        private const val PATIENT_PAGE_FIELD_SEPARATOR = "\u001F"
         private const val LIBRARY_PLACEMENT_SOURCE = "library_activation"
         private const val LIBRARY_PAGE_SIZE = 25
         private const val MAX_PROFILE_PREVIEW_BYTES = 64 * 1024
@@ -108,6 +113,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnAddPlacement: Button
     private lateinit var btnRemovePlacement: Button
     private lateinit var txtPlacementStatus: TextView
+    private lateinit var txtPatientPagesStatus: TextView
+    private lateinit var editPatientPageId: EditText
+    private lateinit var editPatientPageTitle: EditText
+    private lateinit var btnSavePatientPage: Button
+    private lateinit var btnSetDefaultPatientPage: Button
     private lateinit var editSubiconParentId: EditText
     private lateinit var editSubiconChildId: EditText
     private lateinit var btnAddSubicon: Button
@@ -194,6 +204,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnAddPlacement = findViewById(R.id.btnAddPlacement)
         btnRemovePlacement = findViewById(R.id.btnRemovePlacement)
         txtPlacementStatus = findViewById(R.id.txtPlacementStatus)
+        txtPatientPagesStatus = findViewById(R.id.txtPatientPagesStatus)
+        editPatientPageId = findViewById(R.id.editPatientPageId)
+        editPatientPageTitle = findViewById(R.id.editPatientPageTitle)
+        btnSavePatientPage = findViewById(R.id.btnSavePatientPage)
+        btnSetDefaultPatientPage = findViewById(R.id.btnSetDefaultPatientPage)
         editSubiconParentId = findViewById(R.id.editSubiconParentId)
         editSubiconChildId = findViewById(R.id.editSubiconChildId)
         btnAddSubicon = findViewById(R.id.btnAddSubicon)
@@ -274,6 +289,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
         btnRemovePlacement.setOnClickListener {
             updatePlacement(add = false)
+        }
+        btnSavePatientPage.setOnClickListener {
+            savePatientPage()
+        }
+        btnSetDefaultPatientPage.setOnClickListener {
+            setDefaultPatientPage()
         }
         btnAddSubicon.setOnClickListener {
             updateSubicon(add = true)
@@ -855,6 +876,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtSourceActivationStatus.text = buildSourceActivationStatus()
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
         txtFixedTopRowAvailableItems.text = buildFixedTopRowAvailableItems(overview.relationAnalysis.availableItems)
+        txtPatientPagesStatus.text = buildPatientPagesStatus()
         txtPlacementStatus.text = buildPlacementStatus(overview.relationAnalysis.availableItems)
         txtSubiconStatus.text = buildSubiconStatus()
         txtActiveProfileStatus.text = buildActiveProfileStatus()
@@ -1185,6 +1207,117 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 append("\nAAC elementi niso najdeni.")
             }
         }.trimEnd()
+    }
+
+    private fun buildPatientPagesStatus(): String {
+        val pages = loadPatientPages()
+        val defaultPageId = defaultPatientPageId()
+        return buildString {
+            append("PACIENTOVE STRANI\n")
+            append("Strani so terapevtsko določene. pageTitle je samo prikazno ime.\n")
+            append("Knjižnične strani iz aktivacije virov so ločene in ne spreminjajo teh strani.\n")
+            if (defaultPageId.isBlank()) {
+                append("Začetna stran: varna privzeta stran aplikacije.\n")
+            } else {
+                append("Začetna stran: $defaultPageId\n")
+            }
+            if (pages.isEmpty()) {
+                append("Ni shranjenih pacientovih strani.")
+            } else {
+                pages.forEach { page ->
+                    val marker = if (page.pageId == defaultPageId) " (začetna)" else ""
+                    append("- ${page.pageId}: ${page.pageTitle}$marker\n")
+                }
+            }
+        }.trimEnd()
+    }
+
+    private fun savePatientPage() {
+        val pageId = editPatientPageId.text.toString().trim()
+        val pageTitle = editPatientPageTitle.text.toString().trim().ifBlank { pageId }
+        if (!isSafePatientPageId(pageId)) {
+            txtStatus.text = "ID strani lahko vsebuje samo črke, številke, _ ali -."
+            return
+        }
+        val pages = loadPatientPages().toMutableList()
+        val existingIndex = pages.indexOfFirst { it.pageId == pageId }
+        val updatedPage = PatientPage(pageId = pageId, pageTitle = pageTitle)
+        if (existingIndex >= 0) {
+            pages[existingIndex] = updatedPage
+            txtStatus.text = "Pacientova stran posodobljena.\n$pageId: $pageTitle"
+        } else {
+            pages += updatedPage
+            txtStatus.text = "Pacientova stran dodana.\n$pageId: $pageTitle"
+        }
+        savePatientPages(pages)
+        refreshLocalAacOverview()
+    }
+
+    private fun setDefaultPatientPage() {
+        val pageId = editPatientPageId.text.toString().trim()
+        if (!isSafePatientPageId(pageId)) {
+            txtStatus.text = "Vnesi veljaven ID strani."
+            return
+        }
+        val pages = loadPatientPages()
+        if (pages.none { it.pageId == pageId }) {
+            txtStatus.text = "Stran ne obstaja. Najprej jo shrani."
+            return
+        }
+        getSharedPreferences(PATIENT_PAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_DEFAULT_PATIENT_PAGE_ID, pageId)
+            .apply()
+        txtStatus.text = "Začetna pacientova stran nastavljena.\n$pageId"
+        refreshLocalAacOverview()
+    }
+
+    private fun loadPatientPages(): List<PatientPage> {
+        val rawPages = getSharedPreferences(PATIENT_PAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_PATIENT_PAGES, "")
+            .orEmpty()
+        return rawPages.split(PATIENT_PAGE_SEPARATOR)
+            .mapNotNull { raw ->
+                val parts = raw.split(PATIENT_PAGE_FIELD_SEPARATOR, limit = 2)
+                val pageId = parts.getOrNull(0).orEmpty().trim()
+                val pageTitle = parts.getOrNull(1).orEmpty().trim()
+                if (isSafePatientPageId(pageId)) {
+                    PatientPage(pageId = pageId, pageTitle = pageTitle.ifBlank { pageId })
+                } else {
+                    null
+                }
+            }
+            .distinctBy { it.pageId }
+            .sortedBy { it.pageId.lowercase(Locale.ROOT) }
+    }
+
+    private fun savePatientPages(pages: List<PatientPage>) {
+        val encodedPages = pages
+            .filter { isSafePatientPageId(it.pageId) }
+            .distinctBy { it.pageId }
+            .sortedBy { it.pageId.lowercase(Locale.ROOT) }
+            .joinToString(PATIENT_PAGE_SEPARATOR) { page ->
+                page.pageId + PATIENT_PAGE_FIELD_SEPARATOR + page.pageTitle
+                    .replace(PATIENT_PAGE_SEPARATOR, " ")
+                    .replace(PATIENT_PAGE_FIELD_SEPARATOR, " ")
+            }
+        getSharedPreferences(PATIENT_PAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_PATIENT_PAGES, encodedPages)
+            .apply()
+    }
+
+    private fun defaultPatientPageId(): String {
+        return getSharedPreferences(PATIENT_PAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_DEFAULT_PATIENT_PAGE_ID, "")
+            .orEmpty()
+            .trim()
+            .takeIf { isSafePatientPageId(it) }
+            .orEmpty()
+    }
+
+    private fun isSafePatientPageId(pageId: String): Boolean {
+        return pageId.isNotBlank() && pageId.matches(Regex("[A-Za-z0-9_-]+"))
     }
 
     private fun buildSubiconStatus(): String {
@@ -2167,6 +2300,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val itemId: String,
         val label: String,
         val iconSource: IconSource
+    )
+
+    private data class PatientPage(
+        val pageId: String,
+        val pageTitle: String
     )
 
     private enum class TherapistIconSourceFilter(val label: String) {

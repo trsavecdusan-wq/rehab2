@@ -249,6 +249,68 @@
             android:textColor="#B8C0C8"
             android:textSize="15sp" />
 
+        <TextView
+            android:id="@+id/txtPatientPagesStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:textColor="#B8C0C8"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/editPatientPageId"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="ID strani, npr. osnovno"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientPageTitle"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Ime strani za terapevta/pacienta"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnSavePatientPage"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="SHRANI STRAN"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSetDefaultPatientPage"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#5B6672"
+            android:text="NASTAVI KOT ZAČETNO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/editFixedTopRowItemId"
             android:layout_width="match_parent"
