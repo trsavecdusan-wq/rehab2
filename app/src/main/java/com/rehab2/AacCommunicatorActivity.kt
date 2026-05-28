@@ -792,6 +792,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
         if (sentence.isEmpty()) {
             return
         }
+        if (itemCount <= 1 && speechTimingSettings.speakSingleIconEnabled) {
+            Log.d(TAG, "AAC_SENTENCE AUTO_SKIP_SINGLE_ITEM_DUPLICATE requestId=$requestId")
+            return
+        }
 
         Log.d(TAG, "AAC_SENTENCE AUTO_SCHEDULED count=$itemCount requestId=$requestId")
 
