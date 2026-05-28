@@ -2,6 +2,8 @@ package com.rehab2.aac
 
 data class AacItem(
     val id: String,
+    // Keep current JSON fields compatible while future content can add base_text,
+    // translations, learning answer options, and cached audio metadata alongside them.
     val labelSl: String,
     val imagePath: String,
     val audioSl: String = "",
@@ -14,6 +16,8 @@ data class AacItem(
     val sentenceRole: String? = null,
     val questionSl: String? = null,
     val questionUk: String? = null,
+    // Local icon sources stay separate: SOCA -> icons/soca, CUSTOM/PATIENT -> icons/custom,
+    // ARASAAC -> icons/arasaac, SYSTEM -> text/fallback only.
     val iconSource: IconSource = IconSource.SYSTEM,
     val parentId: String? = null,
     val isRootItem: Boolean = true,

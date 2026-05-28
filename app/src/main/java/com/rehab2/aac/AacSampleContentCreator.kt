@@ -260,7 +260,7 @@ object AacSampleContentCreator {
             .put("text", label)
             .put("speechText", label.lowercase())
             .put("imagePath", imagePath)
-            .put("iconSource", if (imagePath.isBlank()) "SYSTEM" else "CUSTOM")
+            .put("iconSource", inferIconSourceName(imagePath))
             .put("actionType", "speak")
             .put("targetPageId", "")
             .put("conceptId", conceptId)
@@ -276,5 +276,15 @@ object AacSampleContentCreator {
                     put("vendingNumber", vendingNumber)
                 }
             }
+    }
+
+    private fun inferIconSourceName(imagePath: String): String {
+        val normalized = imagePath.trim().replace('\\', '/').lowercase()
+        return when {
+            normalized.isBlank() -> "SYSTEM"
+            normalized.startsWith("soca/") || normalized.contains("/soca/") -> "SOCA"
+            normalized.startsWith("arasaac/") || normalized.contains("/arasaac/") -> "ARASAAC"
+            else -> "CUSTOM"
+        }
     }
 }
