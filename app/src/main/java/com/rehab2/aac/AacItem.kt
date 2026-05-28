@@ -22,6 +22,8 @@ data class AacItem(
     val parentId: String? = null,
     val isRootItem: Boolean = true,
     val isHiddenUntilParent: Boolean = false,
+    // Optional content/settings hook for future therapist-configured fixed top-row positions 1..5.
+    val fixedTopRowPosition: Int? = null,
     val priority: Int = 0,
     val followUpQuestion: String? = null,
     val vendingNumber: String? = null,

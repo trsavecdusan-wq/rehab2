@@ -74,7 +74,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var sentenceBar: View
     private lateinit var txtPrompt: TextView
     private lateinit var txtSentence: TextView
-    private lateinit var btnOpenDrinksV2Test: Button
+    private lateinit var btnOpenDrinksCategory: Button
     private lateinit var btnSpeakSentence: Button
     private lateinit var btnClearSentence: Button
     private lateinit var recycler: RecyclerView
@@ -152,7 +152,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         Log.d(TAG, "AAC_STORAGE ensureStructure=${AacLocalStorage.ensureStructure(this)}")
         Log.d(TAG, "AAC_STORAGE seedBundledDefaultPages=${AacLocalStorage.seedBundledDefaultPages(this)}")
-        Log.d(TAG, "AAC_STORAGE seedBundledTestAudio=${AacLocalStorage.seedBundledTestAudio(this)}")
+        Log.d(TAG, "AAC_STORAGE seedBundledAudio=${AacLocalStorage.seedBundledTestAudio(this)}")
 
         txtTitle = findViewById(R.id.txtAacTitle)
         txtPath = findViewById(R.id.txtAacPath)
@@ -160,8 +160,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
         sentenceBar = findViewById(R.id.aacSentenceBar)
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
-        btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
-        btnOpenDrinksV2Test.text = "PIJAČE"
+        btnOpenDrinksCategory = findViewById(R.id.btnOpenDrinksCategory)
+        btnOpenDrinksCategory.text = "PIJAČE"
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -195,10 +195,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
             goBack()
         }
         setupQuickAccessRow()
-        btnOpenDrinksV2Test.setOnClickListener {
+        btnOpenDrinksCategory.setOnClickListener {
             resetWaterTraceDebug()
             updateWaterTraceDebug("PIJAČE")
-            openDrinksV2Test()
+            openDrinksCategory()
         }
 
         val homePage = repository.loadHomePage()
@@ -269,8 +269,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
             clearPromptText()
             updateSentenceBar()
             showItems(currentV2RootItems)
-            if (page.pageId == DRINKS_V2_PAGE_ID) {
-                showDrinksV2WaterDebug(page)
+            if (page.pageId == DRINKS_CATEGORY_PAGE_ID) {
+                showDrinksCategoryWaterLog(page)
             }
         } else {
             clearV2State()
@@ -423,7 +423,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
             return
         }
 
-        val page = repository.loadPage(normalizedTargetPageId)
+        val effectiveTargetPageId = if (normalizedTargetPageId == "drinks") {
+            val refreshResult = refreshBundledDrinksCategoryPage()
+            showDrinksCategoryRefreshLog(refreshResult)
+            if (refreshResult.isReady) DRINKS_CATEGORY_PAGE_ID else normalizedTargetPageId
+        } else {
+            normalizedTargetPageId
+        }
+        val page = repository.loadPage(effectiveTargetPageId)
         if (page == null) {
             showRepositoryDebugStatus()
             return
@@ -439,7 +446,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val canGoBack = pageHistory.isNotEmpty() || inSubcategory
 
         txtPath.text = buildString {
-            append("Trenutno: ")
+            append("Kategorija: ")
             append(normalizedTitle)
             if (inSubcategory) {
                 append(" > izbira")
@@ -451,24 +458,24 @@ class AacCommunicatorActivity : AppCompatActivity() {
         btnBackNav.alpha = 1.0f
     }
 
-    private fun openDrinksV2Test() {
-        val refreshResult = refreshBundledDrinksV2Page()
-        showDrinksV2RefreshDebug(refreshResult)
+    private fun openDrinksCategory() {
+        val refreshResult = refreshBundledDrinksCategoryPage()
+        showDrinksCategoryRefreshLog(refreshResult)
         if (refreshResult.isReady) {
-            updateWaterTraceDebug("RUNTIME PAGE REBUILT")
-            openTargetPage(DRINKS_V2_PAGE_ID)
+            updateWaterTraceDebug("PIJAČE")
+            openTargetPage(DRINKS_CATEGORY_PAGE_ID)
         } else {
-            Log.d(TAG, "DRINKS V2 REFRESH FAILED")
+            Log.d(TAG, "DRINKS CATEGORY REFRESH FAILED")
         }
     }
 
-    private fun refreshBundledDrinksV2Page(): DrinksV2RefreshResult {
+    private fun refreshBundledDrinksCategoryPage(): DrinksCategoryRefreshResult {
         val pagesDir = AacLocalStorage.getPagesDir(this)
-        val runtimeFile = pagesDir?.let { File(it, "$DRINKS_V2_PAGE_ID.json") }
+        val runtimeFile = pagesDir?.let { File(it, "$DRINKS_CATEGORY_PAGE_ID.json") }
         val rebuilt = AacLocalStorage.rebuildBundledDrinksV2Page(this)
         val exists = runtimeFile?.exists() == true
         val size = runtimeFile?.takeIf { it.exists() }?.length() ?: 0L
-        return DrinksV2RefreshResult(
+        return DrinksCategoryRefreshResult(
             rebuilt = rebuilt,
             exists = exists,
             size = size,
@@ -476,13 +483,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
         )
     }
 
-    private fun showDrinksV2RefreshDebug(result: DrinksV2RefreshResult) {
+    private fun showDrinksCategoryRefreshLog(result: DrinksCategoryRefreshResult) {
         val existsText = if (result.exists) "yes" else "no"
-        val message = "page=$DRINKS_V2_PAGE_ID runtime exists=$existsText size=${result.size}"
+        val message = "page=$DRINKS_CATEGORY_PAGE_ID runtime exists=$existsText size=${result.size}"
         Log.d(TAG, "$message path=${result.path} rebuilt=${result.rebuilt}")
     }
 
-    private fun showDrinksV2WaterDebug(page: AacPage) {
+    private fun showDrinksCategoryWaterLog(page: AacPage) {
         val waterItem = page.items.firstOrNull { it.id == WATER_NODE_ID }
         waterPageModelChildrenCount = waterItem?.children?.size ?: -1
         logWaterTrace("page model", waterItem)
@@ -491,20 +498,20 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val message = if (waterChildrenCount == 4) {
             "WATER children=4"
         } else {
-            "WATER children=$waterChildrenCount — runtime JSON stale or wrong page"
+            "WATER children=$waterChildrenCount - category data not ready"
         }
         Log.d(TAG, "page=${page.pageId} $message")
     }
 
     private fun logWaterTrace(stage: String, item: AacItem?) {
         val children = item?.children.orEmpty()
-        Log.d(TAG, "TRACE water $stage children=${children.size} ids=$children")
+        Log.d(TAG, "TRACE category $stage children=${children.size} ids=$children")
     }
 
     private fun addWaterTraceDebugView() {
         val root = findViewById<FrameLayout>(android.R.id.content)
         txtWaterTraceDebug = TextView(this).apply {
-            text = "WATER TRACE: waiting"
+            text = "AAC CATEGORY TRACE: waiting"
             setTextColor(Color.WHITE)
             setBackgroundColor(0xDD111820.toInt())
             setPadding(10, 8, 10, 8)
@@ -531,7 +538,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun updateWaterTraceDebug(stage: String) {
         txtWaterTraceDebug.visibility = View.GONE
         txtWaterTraceDebug.text = buildString {
-            appendLine("WATER TRACE 1.2.88: $stage")
+            appendLine("AAC CATEGORY TRACE: $stage")
             appendLine("JSON children=${AacV2JsonParser.lastWaterJsonChildrenCount}")
             appendLine("parsed model children=${AacV2PageAdapter.lastWaterParsedModelChildrenCount}")
             appendLine("mapped AacItem children=${AacV2PageAdapter.lastWaterMappedItemChildrenCount}")
@@ -659,10 +666,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun readPersistentTopRowSettings() {
         val prefs = getSharedPreferences(AAC_PREFS_FILE, MODE_PRIVATE)
-        val gridSize = getAacGridSize()
         persistentTopRowEnabled = prefs.getBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, true)
         val rawTopRowCount = prefs.getInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, DEFAULT_PERSISTENT_TOP_ROW_COUNT)
-        persistentTopRowCount = normalizePersistentTopRowCount(rawTopRowCount, gridSize)
+        persistentTopRowCount = normalizePersistentTopRowConfiguredCount(rawTopRowCount)
         if (persistentTopRowCount != rawTopRowCount) {
             prefs.edit().putInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, persistentTopRowCount).apply()
         }
@@ -681,32 +687,51 @@ class AacCommunicatorActivity : AppCompatActivity() {
         return normalizePersistentTopRowCount(persistentTopRowCount, getAacGridSize())
     }
 
-    private fun getPersistentTopRowItems(): List<AacItem> {
+    private fun getPersistentTopRowItems(items: List<AacItem>): List<AacItem> {
         if (!persistentTopRowEnabled) return emptyList()
 
-        val homeItems = repository.loadPage("home")?.items.orEmpty().associateBy { it.id }
+        val homeItems = repository.loadPage("home")?.items.orEmpty()
+        val metadataTopRowItems = (homeItems + items)
+            .distinctBy { it.id }
+            .filter { it.fixedTopRowPosition != null }
+            .sortedWith(
+                compareBy<AacItem> { it.fixedTopRowPosition ?: MAX_PERSISTENT_TOP_ROW_COUNT + 1 }
+                    .thenBy { it.priority }
+            )
+        if (metadataTopRowItems.isNotEmpty()) {
+            return metadataTopRowItems
+                .take(MAX_PERSISTENT_TOP_ROW_COUNT)
+                .map(::asPersistentTopRowItem)
+        }
+
+        val homeItemsById = homeItems.associateBy { it.id }
         return persistentTopRowItemIds
-            .take(getPersistentTopRowCount())
-            .mapNotNull { id -> homeItems[id] }
-            .map { item ->
-                item.copy(
-                    actionType = "speak",
-                    targetPageId = "",
-                    conceptId = item.conceptId ?: item.id,
-                    sentenceRole = item.sentenceRole ?: "quick"
-                )
-            }
+            .take(MAX_PERSISTENT_TOP_ROW_COUNT)
+            .mapNotNull { id -> homeItemsById[id] }
+            .map(::asPersistentTopRowItem)
     }
 
     private fun mergePersistentTopRowWithCurrentMenuItems(items: List<AacItem>): List<AacItem> {
-        val topRowItems = getPersistentTopRowItems()
+        val configuredTopRowItems = getPersistentTopRowItems(items)
         val maxItems = getAacItemsPerPage()
-        if (topRowItems.isEmpty()) return items.take(maxItems)
+        if (configuredTopRowItems.isEmpty()) return items.take(maxItems)
 
-        val topRowIds = topRowItems.map { it.id }.toSet()
-        val remainingSlots = (maxItems - topRowItems.size).coerceAtLeast(0)
-        val menuItemsWithoutDuplicates = items.filter { it.id !in topRowIds }.take(remainingSlots)
-        return topRowItems + menuItemsWithoutDuplicates
+        val fixedTopRowItems = configuredTopRowItems.take(getPersistentTopRowCount())
+        val overflowItems = configuredTopRowItems.drop(fixedTopRowItems.size)
+        val fixedTopRowIds = fixedTopRowItems.map { it.id }.toSet()
+        val overflowIds = overflowItems.map { it.id }.toSet()
+        val menuItems = items.filter { it.id !in fixedTopRowIds }
+        val menuWithOverflow = overflowItems + menuItems.filter { it.id !in overflowIds }
+        return (fixedTopRowItems + menuWithOverflow).take(maxItems)
+    }
+
+    private fun asPersistentTopRowItem(item: AacItem): AacItem {
+        return item.copy(
+            actionType = "speak",
+            targetPageId = "",
+            conceptId = item.conceptId ?: item.id,
+            sentenceRole = item.sentenceRole ?: "quick"
+        )
     }
 
     private fun normalizeAacGridSize(value: Int): Int {
@@ -718,6 +743,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun normalizePersistentTopRowCount(value: Int, gridSize: Int): Int {
         return value.coerceIn(MIN_PERSISTENT_TOP_ROW_COUNT, gridSize.coerceIn(3, 5))
+    }
+
+    private fun normalizePersistentTopRowConfiguredCount(value: Int): Int {
+        return value.coerceIn(MIN_PERSISTENT_TOP_ROW_COUNT, MAX_PERSISTENT_TOP_ROW_COUNT)
     }
 
     private fun updateSentenceBar() {
@@ -1384,7 +1413,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
     }
 
-    private data class DrinksV2RefreshResult(
+    private data class DrinksCategoryRefreshResult(
         val rebuilt: Boolean,
         val exists: Boolean,
         val size: Long,
@@ -1396,7 +1425,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private companion object {
         const val TAG = "AacCommunicatorActivity"
-        const val DRINKS_V2_PAGE_ID = "drinks_v2"
+        const val DRINKS_CATEGORY_PAGE_ID = "drinks_v2"
         const val WATER_NODE_ID = "water"
         const val VIDEO_CALL_PROFILE_ID = "video_call"
         const val AAC_PREFS_FILE = "rehab2_prefs"
@@ -1407,7 +1436,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
         const val PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = "aac_persistent_top_row_item_ids"
         const val MIN_PERSISTENT_TOP_ROW_COUNT = 3
         const val MAX_PERSISTENT_TOP_ROW_COUNT = 5
-        const val DEFAULT_PERSISTENT_TOP_ROW_COUNT = 4
+        // Future therapist settings/content metadata may provide positions 1..5.
+        // Runtime fixes only the first grid-width items; remaining configured items flow normally.
+        const val DEFAULT_PERSISTENT_TOP_ROW_COUNT = 5
         val DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("yes", "no", "help", "pain", "stop")
     }
 }

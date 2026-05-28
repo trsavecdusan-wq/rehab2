@@ -89,7 +89,20 @@ object AacSampleContentCreator {
                         label = "DA",
                         imagePath = "",
                         isRootItem = true,
-                        priority = 0
+                        priority = 0,
+                        fixedTopRowPosition = 1
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "dont_understand",
+                        label = "NE\nRAZUMEM",
+                        speechSl = "ne razumem",
+                        imagePath = "",
+                        conceptId = "dont_understand",
+                        isRootItem = true,
+                        priority = 1,
+                        fixedTopRowPosition = 2
                     )
                 )
                 .put(
@@ -98,7 +111,30 @@ object AacSampleContentCreator {
                         label = "NE",
                         imagePath = "",
                         isRootItem = true,
-                        priority = 1
+                        priority = 2,
+                        fixedTopRowPosition = 3
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "will",
+                        label = "BOM",
+                        imagePath = "",
+                        conceptId = "will",
+                        isRootItem = true,
+                        priority = 3,
+                        fixedTopRowPosition = 4
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "calm",
+                        label = "MIR",
+                        imagePath = "",
+                        conceptId = "calm",
+                        isRootItem = true,
+                        priority = 4,
+                        fixedTopRowPosition = 5
                     )
                 )
                 .put(
@@ -107,7 +143,7 @@ object AacSampleContentCreator {
                         label = "POMOČ",
                         imagePath = "",
                         isRootItem = true,
-                        priority = 2
+                        priority = 5
                     )
                 )
                 .put(
@@ -116,7 +152,7 @@ object AacSampleContentCreator {
                         label = "BOLI",
                         imagePath = "",
                         isRootItem = true,
-                        priority = 3
+                        priority = 6
                     )
                 )
                 .put(
@@ -126,7 +162,7 @@ object AacSampleContentCreator {
                         imagePath = "",
                         conceptId = "thirsty",
                         isRootItem = true,
-                        priority = 4,
+                        priority = 7,
                         followUpQuestion = "Kaj želiš piti?"
                     ).put(
                         "children",
@@ -246,7 +282,7 @@ object AacSampleContentCreator {
             displayName = "DOM",
             icon = "custom/dom.png",
             context = AacCommunicationContext.NORMAL_COMMUNICATION,
-            itemIds = listOf("yes", "no", "help", "pain", "thirsty")
+            itemIds = listOf("yes", "dont_understand", "no", "will", "calm", "help", "pain", "thirsty")
         )
     }
 
@@ -256,7 +292,7 @@ object AacSampleContentCreator {
             displayName = "VIDEO CALL",
             icon = "arasaac/video_call.png",
             context = AacCommunicationContext.VIDEO_CALL_COMMUNICATION,
-            itemIds = listOf("yes", "no", "help", "pain")
+            itemIds = listOf("yes", "dont_understand", "no", "will", "calm", "help", "pain")
         )
     }
 
@@ -266,7 +302,7 @@ object AacSampleContentCreator {
             displayName = "REAL WORLD",
             icon = "soca/real_world.png",
             context = AacCommunicationContext.REAL_WORLD_ASSISTANT,
-            itemIds = listOf("soca_water", "soca_wc", "soca_help", "soca_pain", "thirsty")
+            itemIds = listOf("yes", "dont_understand", "no", "will", "calm", "soca_water", "soca_wc", "soca_help", "soca_pain", "thirsty")
         )
     }
 
@@ -292,6 +328,7 @@ object AacSampleContentCreator {
         id: String,
         label: String,
         labelUk: String? = null,
+        speechSl: String? = null,
         imagePath: String,
         conceptId: String? = null,
         categoryId: String? = null,
@@ -299,6 +336,7 @@ object AacSampleContentCreator {
         isRootItem: Boolean,
         isHiddenUntilParent: Boolean = false,
         priority: Int,
+        fixedTopRowPosition: Int? = null,
         followUpQuestion: String? = null,
         vendingNumber: String? = null
     ): JSONObject {
@@ -307,8 +345,8 @@ object AacSampleContentCreator {
             .put("labelSl", label)
             .put("labelUk", labelUk)
             .put("text", label)
-            .put("speechText", label.lowercase())
-            .put("speakTextSl", label.lowercase())
+            .put("speechText", speechSl ?: label.lowercase())
+            .put("speakTextSl", speechSl ?: label.lowercase())
             .put("speakTextUk", labelUk?.lowercase())
             .put("baseText", label)
             .put("categoryId", categoryId)
@@ -322,6 +360,9 @@ object AacSampleContentCreator {
             .put("isHiddenUntilParent", isHiddenUntilParent)
             .put("priority", priority)
             .apply {
+                if (fixedTopRowPosition != null) {
+                    put("fixedTopRowPosition", fixedTopRowPosition)
+                }
                 if (!followUpQuestion.isNullOrBlank()) {
                     put("followUpQuestion", followUpQuestion)
                 }
