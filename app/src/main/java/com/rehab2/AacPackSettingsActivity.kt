@@ -828,7 +828,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append(formatIconFolderLine("Custom", AacStoragePaths.getIconsCustomDir(this@AacPackSettingsActivity)))
             append('\n')
             append(formatIconFolderLine("ARASAAC", AacStoragePaths.getIconsArasaacDir(this@AacPackSettingsActivity)))
-            append("\nKopiraj na primer: soca/voda.png, soca/wc.png, soca/pomoc.png")
+            append("\nKopiraj na primer: soca/voda.png, soca/wc.png, soca/pomoc.png, soca/boli.png")
         }
     }
 

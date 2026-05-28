@@ -1236,7 +1236,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 }
 
                 val resolved = AacStoragePaths.resolveIconFile(context, rawPath, item.iconSource)
-                return resolved?.takeIf { it.exists() && it.isFile } ?: run {
+                val resolvedFile = resolved?.takeIf { it.exists() && it.isFile }
+                if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
+                    val state = if (resolvedFile != null) "resolved" else "missing"
+                    Log.d(IMAGE_LOG_TAG, "AAC_IMAGE SOCA_$state item=${item.id} path=$rawPath")
+                }
+                return resolvedFile ?: run {
                     Log.d(IMAGE_LOG_TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
                     null
                 }
