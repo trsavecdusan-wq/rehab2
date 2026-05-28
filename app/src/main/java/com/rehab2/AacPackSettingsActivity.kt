@@ -459,13 +459,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         txtStatus.text = when (result) {
             is AacIconZipImporter.Result.Success -> buildString {
-                append("Uvoz ikon ZIP koncan.\n")
-                append("Uvozeno: ${result.importedCount}\n")
-                append("Preskoceno obstojecih: ${result.skippedExistingCount}\n")
-                append("Zavrnjeno nevarnih: ${result.rejectedUnsafeCount}\n")
+                append("Uvoz ikon ZIP končan.\n")
+                append("Uvoženo: ${result.importedCount}\n")
+                append("Preskočeno obstoječih: ${result.skippedExistingCount}\n")
+                append("Zavrnjenih nevarnih: ${result.rejectedUnsafeCount}\n")
                 append("Ignorirano nepodprtih: ${result.ignoredUnsupportedCount}\n")
                 append("SOCA: ${result.importedSocaCount}, Custom: ${result.importedCustomCount}, ARASAAC: ${result.importedArasaacCount}\n")
-                append("Obstojece datoteke niso bile prepisane.")
+                append("Podprta struktura: soca/*.png, custom/*.png, arasaac/*.png\n")
+                append("Obstoječe datoteke niso bile prepisane.")
             }
             is AacIconZipImporter.Result.Failure ->
                 "Uvoz ikon ZIP ni uspel: ${result.reason}"
