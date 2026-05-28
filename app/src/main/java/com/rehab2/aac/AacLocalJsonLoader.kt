@@ -138,6 +138,17 @@ object AacLocalJsonLoader {
             speechText = json.optNullableString("speechText"),
             speechTextEn = json.optNullableString("speechTextEn")
                 ?: json.optNullableString("speakTextEn"),
+            baseLanguage = normalizeLanguageCode(
+                json.optNullableString("baseLanguage")
+                    ?: json.optNullableString("base_language")
+            ),
+            activeLanguages = parseActiveLanguages(json),
+            labelByLanguage = parseLanguageTextMap(json.optJSONObject("labelByLanguage")),
+            speechTextByLanguage = parseLanguageTextMap(json.optJSONObject("speechTextByLanguage")),
+            translationGenerated = json.optBoolean("translationGenerated", false),
+            translationSource = json.optNullableString("translationSource"),
+            translationManualOverride = json.optBoolean("translationManualOverride", false),
+            learningRepresentations = parseLearningRepresentations(json.optJSONArray("learningRepresentations")),
             categoryId = json.optNullableString("categoryId")
                 ?: json.optNullableString("category"),
             conceptId = json.optNullableString("conceptId"),
@@ -222,6 +233,65 @@ object AacLocalJsonLoader {
         }
     }
 
+    private fun parseActiveLanguages(json: JSONObject): List<String> {
+        val parsed = parseStringList(json.optJSONArray("activeLanguages"))
+            .map(::normalizeLanguageCode)
+            .filter { it.isNotBlank() }
+            .distinct()
+            .take(MAX_ACTIVE_LANGUAGES)
+        return parsed.ifEmpty { listOf(AacLanguageResolver.DEFAULT_LANGUAGE_CODE) }
+    }
+
+    private fun parseLanguageTextMap(obj: JSONObject?): Map<String, String> {
+        if (obj == null) return emptyMap()
+        return buildMap {
+            obj.keys().forEach { key ->
+                val languageCode = normalizeLanguageCode(key)
+                val value = obj.optString(key).trim()
+                if (languageCode.isNotBlank() && value.isNotEmpty()) {
+                    put(languageCode, value)
+                }
+            }
+        }
+    }
+
+    private fun parseLearningRepresentations(array: JSONArray?): List<AacLearningRepresentation> {
+        if (array == null) return emptyList()
+        return buildList {
+            for (index in 0 until array.length()) {
+                val representation = array.optJSONObject(index) ?: continue
+                val mode = representation.optString("mode").trim()
+                if (mode.isBlank()) continue
+                add(
+                    AacLearningRepresentation(
+                        mode = mode,
+                        imagePath = representation.optNullableString("imagePath"),
+                        textByLanguage = parseLanguageTextMap(representation.optJSONObject("textByLanguage")),
+                        answerVariants = parseLearningAnswerVariants(representation.optJSONArray("answerVariants"))
+                    )
+                )
+            }
+        }
+    }
+
+    private fun parseLearningAnswerVariants(array: JSONArray?): List<AacLearningAnswerVariant> {
+        if (array == null) return emptyList()
+        return buildList {
+            for (index in 0 until array.length()) {
+                val answer = array.optJSONObject(index) ?: continue
+                val id = answer.optString("id").trim()
+                if (id.isBlank()) continue
+                add(
+                    AacLearningAnswerVariant(
+                        id = id,
+                        textByLanguage = parseLanguageTextMap(answer.optJSONObject("textByLanguage")),
+                        correct = answer.optBoolean("correct", false)
+                    )
+                )
+            }
+        }
+    }
+
     private fun parseContext(value: String?): AacCommunicationContext {
         return AacCommunicationContext.fromPreference(value)
     }
@@ -237,6 +307,10 @@ object AacLocalJsonLoader {
         }
     }
 
+    private fun normalizeLanguageCode(value: String?): String {
+        return AacLanguageResolver.normalize(value)
+    }
+
     private fun JSONObject.optNullableString(name: String): String? {
         val value = optString(name).trim()
         return value.takeIf { it.isNotEmpty() }
@@ -250,4 +324,6 @@ object AacLocalJsonLoader {
         }
         return value.takeIf { it in 1..5 }
     }
+
+    private const val MAX_ACTIVE_LANGUAGES = 3
 }

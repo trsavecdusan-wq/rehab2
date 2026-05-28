@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Izvozi lokalni AAC paket (elemente, profile in slike) v ZIP datoteko za varnostno kopijo ali prenos na drugo tablico."
+            android:text="Uredi lokalno AAC knjižnico, jezike, vedenje ikon in varne uvoze brez nove APK verzije."
             android:textColor="#B8C0C8"
             android:textSize="16sp" />
 
@@ -49,12 +49,125 @@
             android:textSize="16sp" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="AAC KNJIŽNICA"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/aacIconSourceFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnIconSourceAll"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#2F5F9E"
+                    android:text="ALL"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnIconSourceSoca"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="SOCA"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnIconSourceCustom"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="CUSTOM"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnIconSourceArasaac"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="ARASAAC"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnIconSourceSystem"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="SYSTEM"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="POSTAVITEV / PACIENTOV ZASLON"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/txtFixedTopRowStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:textColor="#B8C0C8"
             android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Filter vira ikon ne spremeni pacientovega zaslona. Postavitve ostanejo stabilne, dokler jih terapevt izrecno ne spremeni."
+            android:textColor="#B8C0C8"
+            android:textSize="15sp" />
 
         <EditText
             android:id="@+id/editFixedTopRowItemId"
@@ -118,6 +231,265 @@
             android:layout_marginBottom="16dp"
             android:textColor="#B8C0C8"
             android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="DODAJ / UREDI IKONO"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editAacItemId"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="ID ikone"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editAacLabelSl"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Slovenski tekst"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editAacLabelUk"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Ukrajinski tekst"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editAacLabelEn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Angleški tekst"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="JEZIKI"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editAacBaseLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Osnovni jezik, npr. sl"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editAacActiveLanguages"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Aktivni jeziki max 3: sl,uk,en"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Shranjeni prevodi se uporabijo lokalno. AI prevod bo dodan kasneje in ne sme teči med pacientovo uporabo."
+            android:textColor="#B8C0C8"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/editAacSpeechText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Govorjeni tekst"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editAacIconSource"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Vir ikone: SOCA / CUSTOM / ARASAAC / SYSTEM"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editAacCategoryId"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Kategorija za terapevta"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="VEDENJE IKONE"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/checkAacAddsToSentence"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:buttonTint="#6EA8FE"
+            android:checked="true"
+            android:text="Gre v stavek"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp" />
+
+        <CheckBox
+            android:id="@+id/checkAacSpeaksImmediately"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:buttonTint="#6EA8FE"
+            android:checked="true"
+            android:text="Govori takoj"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp" />
+
+        <CheckBox
+            android:id="@+id/checkAacOpensSubicons"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:buttonTint="#6EA8FE"
+            android:text="Odpira podikone"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
+            android:text="Učenje"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/checkLearningImageText"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:buttonTint="#6EA8FE"
+            android:checked="true"
+            android:text="Slika + tekst"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp" />
+
+        <CheckBox
+            android:id="@+id/checkLearningImageOnly"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:buttonTint="#6EA8FE"
+            android:text="Samo slika"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp" />
+
+        <CheckBox
+            android:id="@+id/checkLearningTextOnly"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:buttonTint="#6EA8FE"
+            android:text="Samo tekst"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnSaveAacItem"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#214A78"
+            android:text="SHRANI AAC ELEMENT"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="UVOZ / IZVOZ / DIAGNOSTIKA"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtActiveProfileStatus"

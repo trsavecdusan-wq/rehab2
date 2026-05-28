@@ -56,10 +56,34 @@ object AacLocalizedTextResolver {
             if (enText.label != null || enText.speakText != null) {
                 put("en", enText)
             }
+            val localLanguageCodes = (activeLanguages + labelByLanguage.keys + speechTextByLanguage.keys)
+                .map(AacLanguageResolver::normalize)
+                .filter { it.isNotBlank() }
+                .distinct()
+                .take(MAX_ACTIVE_LANGUAGES)
+            localLanguageCodes.forEach { languageCode ->
+                val existingText = get(languageCode)
+                val localText = AacLocalizedText(
+                    label = labelByLanguage[languageCode],
+                    speakText = speechTextByLanguage[languageCode],
+                    learningText = labelByLanguage[languageCode]
+                )
+                put(
+                    languageCode,
+                    AacLocalizedText(
+                        label = localText.label ?: existingText?.label,
+                        speakText = localText.speakText ?: existingText?.speakText,
+                        question = existingText?.question,
+                        learningText = localText.learningText ?: existingText?.learningText
+                    )
+                )
+            }
         }
     }
 
     private fun String?.clean(): String? {
         return this?.trim()?.takeIf { it.isNotEmpty() }
     }
+
+    private const val MAX_ACTIVE_LANGUAGES = 3
 }

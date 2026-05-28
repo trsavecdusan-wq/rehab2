@@ -5,6 +5,19 @@ data class AacPlacement(
     val position5x5: Int
 )
 
+data class AacLearningAnswerVariant(
+    val id: String,
+    val textByLanguage: Map<String, String> = emptyMap(),
+    val correct: Boolean = false
+)
+
+data class AacLearningRepresentation(
+    val mode: String,
+    val imagePath: String? = null,
+    val textByLanguage: Map<String, String> = emptyMap(),
+    val answerVariants: List<AacLearningAnswerVariant> = emptyList()
+)
+
 data class AacItem(
     val id: String,
     // Keep current JSON fields compatible while future content can add base_text,
@@ -20,6 +33,16 @@ data class AacItem(
     val labelEn: String? = null,
     val speechText: String? = null,
     val speechTextEn: String? = null,
+    val baseLanguage: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE,
+    val activeLanguages: List<String> = listOf(AacLanguageResolver.DEFAULT_LANGUAGE_CODE),
+    val labelByLanguage: Map<String, String> = emptyMap(),
+    val speechTextByLanguage: Map<String, String> = emptyMap(),
+    // Translations are saved metadata. Patient runtime must resolve local text only, never live-translate.
+    val translationGenerated: Boolean = false,
+    val translationSource: String? = null,
+    val translationManualOverride: Boolean = false,
+    // Learning reuses this AAC concept instead of creating a duplicate learning database object.
+    val learningRepresentations: List<AacLearningRepresentation> = emptyList(),
     // Therapist organization only. Patient placement is controlled by placements/visibility metadata.
     val categoryId: String? = null,
     val conceptId: String? = null,
