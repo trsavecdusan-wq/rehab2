@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -47,6 +48,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val KEY_IMPORT_REPORTS = "import_reports"
         private const val IMPORT_REPORT_SEPARATOR = "\u001E"
         private const val MAX_IMPORT_REPORTS = 5
+        private const val PROFILE_SELECTION_PREFS_NAME = "aac_therapist_profile_selection"
+        private const val KEY_SELECTED_PROFILE_ID = "selected_profile_id"
+        private const val KEY_SELECTED_PROFILE_NAME = "selected_profile_name"
+        private const val KEY_SELECTED_PROFILE_TIMESTAMP = "selected_profile_timestamp"
         private const val MAX_PROFILE_PREVIEW_BYTES = 64 * 1024
         private const val MAX_ITEMS_PREVIEW_BYTES = 512 * 1024
         private const val SUSPICIOUS_ITEMS_PER_PROFILE = 250
@@ -59,7 +64,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var txtStatus: TextView
     private lateinit var txtLastImportStatus: TextView
     private lateinit var txtAacHealthSummary: TextView
+    private lateinit var txtActiveProfileStatus: TextView
     private lateinit var txtLocalProfilesStatus: TextView
+    private lateinit var localProfileActions: LinearLayout
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private var lastExportedZipPath: String? = null
@@ -84,7 +91,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtStatus = findViewById(R.id.txtExportStatus)
         txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
         txtAacHealthSummary = findViewById(R.id.txtAacHealthSummary)
+        txtActiveProfileStatus = findViewById(R.id.txtActiveProfileStatus)
         txtLocalProfilesStatus = findViewById(R.id.txtLocalProfilesStatus)
+        localProfileActions = findViewById(R.id.localProfileActions)
 
         findViewById<Button>(R.id.btnBackAacPackSettings).setOnClickListener {
             finish()
@@ -642,7 +651,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun refreshLocalAacOverview() {
         val overview = buildLocalAacOverview()
         txtAacHealthSummary.text = buildAacHealthSummary(overview)
+        txtActiveProfileStatus.text = buildActiveProfileStatus()
         txtLocalProfilesStatus.text = buildLocalAacProfilesReport(overview)
+        renderLocalProfileActions(overview)
     }
 
     private fun buildLocalAacOverview(): LocalAacOverview {
@@ -739,6 +750,86 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 }
             }
         }.trimEnd()
+    }
+
+    private fun renderLocalProfileActions(overview: LocalAacOverview) {
+        localProfileActions.removeAllViews()
+        val selectedProfile = loadSelectedProfile()
+
+        overview.profiles.forEach { profile ->
+            val isSelected = selectedProfile?.profileId == profile.profileId
+            val button = Button(this).apply {
+                text = if (isSelected) {
+                    "AKTIVEN PROFIL - ${profile.displayName}"
+                } else {
+                    "AKTIVIRAJ PROFIL - ${profile.displayName}"
+                }
+                isEnabled = !isSelected
+                textAllCaps = false
+                setTextColor(0xFFF4F7FA.toInt())
+                textSize = 18f
+                backgroundTintList = ColorStateList.valueOf(
+                    if (isSelected) BUSY_BUTTON_COLOR else SHARE_READY_COLOR
+                )
+                setOnClickListener {
+                    activateLocalProfile(profile)
+                }
+            }
+            localProfileActions.addView(
+                button,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    64.dp()
+                ).apply {
+                    bottomMargin = 12.dp()
+                }
+            )
+        }
+    }
+
+    private fun activateLocalProfile(profile: LocalProfileSummary) {
+        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ROOT).format(Date())
+        getSharedPreferences(PROFILE_SELECTION_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_SELECTED_PROFILE_ID, profile.profileId)
+            .putString(KEY_SELECTED_PROFILE_NAME, profile.displayName)
+            .putString(KEY_SELECTED_PROFILE_TIMESTAMP, timestamp)
+            .apply()
+
+        txtStatus.text = buildString {
+            append("AAC profil izbran za terapevtsko nastavitev.\n")
+            append("Profil: ${profile.displayName}\n")
+            append("ID: ${profile.profileId}\n\n")
+            append("AAC komunikator se ni samodejno ponovno zagnal.")
+        }
+        refreshLocalAacOverview()
+    }
+
+    private fun buildActiveProfileStatus(): String {
+        val selectedProfile = loadSelectedProfile()
+            ?: return "AKTIVNI AAC PROFIL\nNi izbranega lokalnega AAC profila."
+
+        return buildString {
+            append("AKTIVNI AAC PROFIL\n")
+            append("Profil: ${selectedProfile.displayName}\n")
+            append("ID: ${selectedProfile.profileId}\n")
+            append("Izbran: ${selectedProfile.selectedAt}")
+        }
+    }
+
+    private fun loadSelectedProfile(): SelectedProfile? {
+        val prefs = getSharedPreferences(PROFILE_SELECTION_PREFS_NAME, Context.MODE_PRIVATE)
+        val profileId = prefs.getString(KEY_SELECTED_PROFILE_ID, null)?.trim().orEmpty()
+        val displayName = prefs.getString(KEY_SELECTED_PROFILE_NAME, null)?.trim().orEmpty()
+        val selectedAt = prefs.getString(KEY_SELECTED_PROFILE_TIMESTAMP, null)?.trim().orEmpty()
+        if (profileId.isEmpty()) {
+            return null
+        }
+        return SelectedProfile(
+            profileId = profileId,
+            displayName = displayName.ifBlank { profileId },
+            selectedAt = selectedAt.ifBlank { "ni podatka" }
+        )
     }
 
     private fun readLocalProfileSummary(profileFile: File): LocalProfileSummary {
@@ -1064,6 +1155,16 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val isMissing: Boolean,
         val isInvalid: Boolean
     )
+
+    private data class SelectedProfile(
+        val profileId: String,
+        val displayName: String,
+        val selectedAt: String
+    )
+
+    private fun Int.dp(): Int {
+        return (this * resources.displayMetrics.density).toInt()
+    }
 
     private sealed class TestZipResult {
         data class Success(
