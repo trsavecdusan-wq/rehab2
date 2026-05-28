@@ -55,6 +55,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val KEY_SELECTED_PROFILE_ID = "selected_profile_id"
         private const val KEY_SELECTED_PROFILE_NAME = "selected_profile_name"
         private const val KEY_SELECTED_PROFILE_TIMESTAMP = "selected_profile_timestamp"
+        private const val SOURCE_ACTIVATION_PREFS_NAME = "aac_source_activation"
+        private const val KEY_ACTIVE_LIBRARY_SOURCES = "active_library_sources"
+        private const val LIBRARY_PLACEMENT_SOURCE = "library_activation"
+        private const val LIBRARY_PAGE_SIZE = 25
         private const val MAX_PROFILE_PREVIEW_BYTES = 64 * 1024
         private const val MAX_ITEMS_PREVIEW_BYTES = 512 * 1024
         private const val SUSPICIOUS_ITEMS_PER_PROFILE = 250
@@ -75,6 +79,13 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnClearFixedTopRowPosition: Button
     private lateinit var txtFixedTopRowAvailableItems: TextView
     private lateinit var iconSourceFilterButtons: Map<TherapistIconSourceFilter, Button>
+    private lateinit var txtSourceActivationStatus: TextView
+    private lateinit var btnActivateSocaLibrary: Button
+    private lateinit var btnDeactivateSocaLibrary: Button
+    private lateinit var btnActivateCustomLibrary: Button
+    private lateinit var btnDeactivateCustomLibrary: Button
+    private lateinit var btnActivateArasaacLibrary: Button
+    private lateinit var btnDeactivateArasaacLibrary: Button
     private lateinit var editAacItemId: EditText
     private lateinit var editAacLabelSl: EditText
     private lateinit var editAacLabelUk: EditText
@@ -154,6 +165,13 @@ class AacPackSettingsActivity : AppCompatActivity() {
             TherapistIconSourceFilter.ARASAAC to findViewById(R.id.btnIconSourceArasaac),
             TherapistIconSourceFilter.SYSTEM to findViewById(R.id.btnIconSourceSystem)
         )
+        txtSourceActivationStatus = findViewById(R.id.txtSourceActivationStatus)
+        btnActivateSocaLibrary = findViewById(R.id.btnActivateSocaLibrary)
+        btnDeactivateSocaLibrary = findViewById(R.id.btnDeactivateSocaLibrary)
+        btnActivateCustomLibrary = findViewById(R.id.btnActivateCustomLibrary)
+        btnDeactivateCustomLibrary = findViewById(R.id.btnDeactivateCustomLibrary)
+        btnActivateArasaacLibrary = findViewById(R.id.btnActivateArasaacLibrary)
+        btnDeactivateArasaacLibrary = findViewById(R.id.btnDeactivateArasaacLibrary)
         editAacItemId = findViewById(R.id.editAacItemId)
         editAacLabelSl = findViewById(R.id.editAacLabelSl)
         editAacLabelUk = findViewById(R.id.editAacLabelUk)
@@ -232,6 +250,24 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         btnSaveAacItem.setOnClickListener {
             saveTherapistAacItem()
+        }
+        btnActivateSocaLibrary.setOnClickListener {
+            setLibrarySourceActive(LibraryIconSource.SOCA, active = true)
+        }
+        btnDeactivateSocaLibrary.setOnClickListener {
+            setLibrarySourceActive(LibraryIconSource.SOCA, active = false)
+        }
+        btnActivateCustomLibrary.setOnClickListener {
+            setLibrarySourceActive(LibraryIconSource.CUSTOM, active = true)
+        }
+        btnDeactivateCustomLibrary.setOnClickListener {
+            setLibrarySourceActive(LibraryIconSource.CUSTOM, active = false)
+        }
+        btnActivateArasaacLibrary.setOnClickListener {
+            setLibrarySourceActive(LibraryIconSource.ARASAAC, active = true)
+        }
+        btnDeactivateArasaacLibrary.setOnClickListener {
+            setLibrarySourceActive(LibraryIconSource.ARASAAC, active = false)
         }
         btnAddPlacement.setOnClickListener {
             updatePlacement(add = true)
@@ -816,6 +852,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun refreshLocalAacOverview() {
         val overview = buildLocalAacOverview()
         txtAacHealthSummary.text = buildAacHealthSummary(overview)
+        txtSourceActivationStatus.text = buildSourceActivationStatus()
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
         txtFixedTopRowAvailableItems.text = buildFixedTopRowAvailableItems(overview.relationAnalysis.availableItems)
         txtPlacementStatus.text = buildPlacementStatus(overview.relationAnalysis.availableItems)
@@ -937,6 +974,179 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 append("... se $remaining")
             }
         }.trimEnd()
+    }
+
+    private fun buildSourceActivationStatus(): String {
+        val activeSources = loadActiveLibrarySources()
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText)
+        return buildString {
+            append("AKTIVACIJA VIROV ZA KNJIŽNICO\n")
+            append("Filter vira je samo terapevtski pogled. Aktivacija ustvari samo generirane strani knjižnice.\n")
+            LibraryIconSource.values().forEach { source ->
+                val generatedCount = countGeneratedLibraryPlacements(itemsArray, source)
+                val pageCount = generatedLibraryPageIds(itemsArray, source).size
+                val activeText = if (source in activeSources) "aktivna" else "neaktivna"
+                append("- ${source.label}: $activeText, strani: $pageCount, postavitve: $generatedCount\n")
+            }
+            append("Ročne pacientove postavitve se ne spreminjajo.")
+        }.trimEnd()
+    }
+
+    private fun setLibrarySourceActive(source: LibraryIconSource, active: Boolean) {
+        val result = if (active) {
+            regenerateLibraryPlacements(source)
+        } else {
+            removeGeneratedLibraryPlacements(source)
+        }
+        when (result) {
+            AacMetadataWriteResult.Success -> {
+                updateActiveLibrarySource(source, active)
+                txtStatus.text = if (active) {
+                    "${source.label} knjižnica aktivirana."
+                } else {
+                    "${source.label} knjižnica deaktivirana."
+                }
+                refreshLocalAacOverview()
+            }
+            AacMetadataWriteResult.ItemNotFound -> {
+                txtStatus.text = "Ni AAC elementov za vir ${source.label}."
+            }
+            AacMetadataWriteResult.WriteFailed -> {
+                txtStatus.text = "Aktivacije vira ${source.label} ni bilo mogoče shraniti."
+            }
+        }
+    }
+
+    private fun regenerateLibraryPlacements(source: LibraryIconSource): AacMetadataWriteResult {
+        return updateItemsJsonMetadata { itemsArray ->
+            val candidates = libraryCandidates(itemsArray, source)
+            if (candidates.isEmpty()) {
+                return@updateItemsJsonMetadata AacMetadataWriteResult.ItemNotFound
+            }
+            removeGeneratedLibraryPlacementsFromArray(itemsArray, source)
+            candidates.forEachIndexed { index, item ->
+                val pageIndex = index / LIBRARY_PAGE_SIZE + 1
+                val position = index % LIBRARY_PAGE_SIZE + 1
+                val pageId = "library_${source.key}_$pageIndex"
+                val placements = item.optJSONArray("placements") ?: org.json.JSONArray()
+                placements.put(
+                    org.json.JSONObject()
+                        .put("pageId", pageId)
+                        .put("position5x5", position)
+                        .put("generated", true)
+                        .put("placementSource", LIBRARY_PLACEMENT_SOURCE)
+                )
+                item.put("placements", placements)
+            }
+            AacMetadataWriteResult.Success
+        }
+    }
+
+    private fun removeGeneratedLibraryPlacements(source: LibraryIconSource): AacMetadataWriteResult {
+        return updateItemsJsonMetadata { itemsArray ->
+            removeGeneratedLibraryPlacementsFromArray(itemsArray, source)
+            AacMetadataWriteResult.Success
+        }
+    }
+
+    private fun removeGeneratedLibraryPlacementsFromArray(itemsArray: org.json.JSONArray, source: LibraryIconSource) {
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val placements = item.optJSONArray("placements") ?: continue
+            val preservedPlacements = org.json.JSONArray()
+            for (placementIndex in 0 until placements.length()) {
+                val placement = placements.optJSONObject(placementIndex) ?: continue
+                if (!isGeneratedLibraryPlacementForSource(placement, source)) {
+                    preservedPlacements.put(placement)
+                }
+            }
+            if (preservedPlacements.length() > 0) {
+                item.put("placements", preservedPlacements)
+            } else {
+                item.remove("placements")
+            }
+        }
+    }
+
+    private fun libraryCandidates(itemsArray: org.json.JSONArray, source: LibraryIconSource): List<org.json.JSONObject> {
+        return buildList {
+            for (index in 0 until itemsArray.length()) {
+                val item = itemsArray.optJSONObject(index) ?: continue
+                if (source.matches(itemIconSource(item))) {
+                    add(item)
+                }
+            }
+        }.sortedWith(
+            compareBy<org.json.JSONObject> { itemLabel(it).ifBlank { it.optString("id") }.lowercase(Locale.ROOT) }
+                .thenBy { it.optString("id") }
+        )
+    }
+
+    private fun countGeneratedLibraryPlacements(itemsArray: org.json.JSONArray?, source: LibraryIconSource): Int {
+        if (itemsArray == null) return 0
+        var count = 0
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val placements = item.optJSONArray("placements") ?: continue
+            for (placementIndex in 0 until placements.length()) {
+                val placement = placements.optJSONObject(placementIndex) ?: continue
+                if (isGeneratedLibraryPlacementForSource(placement, source)) {
+                    count += 1
+                }
+            }
+        }
+        return count
+    }
+
+    private fun generatedLibraryPageIds(itemsArray: org.json.JSONArray?, source: LibraryIconSource): Set<String> {
+        if (itemsArray == null) return emptySet()
+        return buildSet {
+            for (index in 0 until itemsArray.length()) {
+                val item = itemsArray.optJSONObject(index) ?: continue
+                val placements = item.optJSONArray("placements") ?: continue
+                for (placementIndex in 0 until placements.length()) {
+                    val placement = placements.optJSONObject(placementIndex) ?: continue
+                    if (isGeneratedLibraryPlacementForSource(placement, source)) {
+                        val pageId = placement.optString("pageId").trim()
+                        if (pageId.isNotBlank()) add(pageId)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun isGeneratedLibraryPlacementForSource(
+        placement: org.json.JSONObject,
+        source: LibraryIconSource
+    ): Boolean {
+        val pageId = placement.optString("pageId").trim()
+        return placement.optBoolean("generated", false) &&
+            placement.optString("placementSource").trim() == LIBRARY_PLACEMENT_SOURCE &&
+            pageId.startsWith("library_${source.key}_")
+    }
+
+    private fun loadActiveLibrarySources(): Set<LibraryIconSource> {
+        val rawSources = getSharedPreferences(SOURCE_ACTIVATION_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_ACTIVE_LIBRARY_SOURCES, "")
+            .orEmpty()
+        return rawSources.split(',')
+            .mapNotNull { raw -> LibraryIconSource.fromKey(raw.trim()) }
+            .toSet()
+    }
+
+    private fun updateActiveLibrarySource(source: LibraryIconSource, active: Boolean) {
+        val updatedSources = loadActiveLibrarySources().toMutableSet()
+        if (active) {
+            updatedSources += source
+        } else {
+            updatedSources -= source
+        }
+        getSharedPreferences(SOURCE_ACTIVATION_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_ACTIVE_LIBRARY_SOURCES, updatedSources.joinToString(",") { it.key })
+            .apply()
     }
 
     private fun buildPlacementStatus(items: List<AacListItem>): String {
@@ -1973,6 +2183,26 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 CUSTOM -> iconSource == IconSource.CUSTOM || iconSource == IconSource.PATIENT
                 ARASAAC -> iconSource == IconSource.ARASAAC
                 SYSTEM -> iconSource == IconSource.SYSTEM
+            }
+        }
+    }
+
+    private enum class LibraryIconSource(val key: String, val label: String) {
+        SOCA("soca", "SOCA"),
+        CUSTOM("custom", "CUSTOM"),
+        ARASAAC("arasaac", "ARASAAC");
+
+        fun matches(iconSource: IconSource): Boolean {
+            return when (this) {
+                SOCA -> iconSource == IconSource.SOCA
+                CUSTOM -> iconSource == IconSource.CUSTOM || iconSource == IconSource.PATIENT
+                ARASAAC -> iconSource == IconSource.ARASAAC
+            }
+        }
+
+        companion object {
+            fun fromKey(value: String): LibraryIconSource? {
+                return values().firstOrNull { it.key == value.trim().lowercase(Locale.ROOT) }
             }
         }
     }

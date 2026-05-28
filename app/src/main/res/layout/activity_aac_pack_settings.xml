@@ -145,6 +145,86 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/txtSourceActivationStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:textColor="#B8C0C8"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnActivateSocaLibrary"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="AKTIVIRAJ SOCA KNJIŽNICO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnDeactivateSocaLibrary"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#5B6672"
+            android:text="DEAKTIVIRAJ SOCA KNJIŽNICO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnActivateCustomLibrary"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="AKTIVIRAJ CUSTOM KNJIŽNICO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnDeactivateCustomLibrary"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#5B6672"
+            android:text="DEAKTIVIRAJ CUSTOM KNJIŽNICO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnActivateArasaacLibrary"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="AKTIVIRAJ ARASAAC KNJIŽNICO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnDeactivateArasaacLibrary"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#5B6672"
+            android:text="DEAKTIVIRAJ ARASAAC KNJIŽNICO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
