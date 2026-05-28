@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                 return MainAacTileBinding(
                     view = view,
                     icon = icon,
-                    fallbackIconText = icon?.text.orEmpty(),
+                    fallbackIconText = icon?.text ?: "",
                     label = findLastTextView(view) ?: error("AAC tile label missing")
                 )
             }
