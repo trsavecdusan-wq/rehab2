@@ -234,7 +234,8 @@ object AacSampleContentCreator {
                         conceptId = "water",
                         categoryId = "basic_needs",
                         isRootItem = true,
-                        priority = 20
+                        priority = 20,
+                        visibleUnderIds = listOf("drinks", "want", "basic_needs")
                     )
                 )
                 .put(
@@ -258,7 +259,8 @@ object AacSampleContentCreator {
                         conceptId = "help",
                         categoryId = "basic_needs",
                         isRootItem = true,
-                        priority = 22
+                        priority = 22,
+                        visibleUnderIds = listOf("home", "emergency", "basic_needs")
                     )
                 )
                 .put(
@@ -333,6 +335,7 @@ object AacSampleContentCreator {
         conceptId: String? = null,
         categoryId: String? = null,
         parentId: String? = null,
+        visibleUnderIds: List<String> = emptyList(),
         isRootItem: Boolean,
         isHiddenUntilParent: Boolean = false,
         priority: Int,
@@ -360,6 +363,11 @@ object AacSampleContentCreator {
             .put("isHiddenUntilParent", isHiddenUntilParent)
             .put("priority", priority)
             .apply {
+                if (visibleUnderIds.isNotEmpty()) {
+                    put("visibleUnderIds", JSONArray().apply {
+                        visibleUnderIds.forEach { put(it) }
+                    })
+                }
                 if (fixedTopRowPosition != null) {
                     put("fixedTopRowPosition", fixedTopRowPosition)
                 }

@@ -20,6 +20,9 @@ data class AacItem(
     // ARASAAC -> icons/arasaac, SYSTEM -> text/fallback only.
     val iconSource: IconSource = IconSource.SYSTEM,
     val parentId: String? = null,
+    // Future visibility model: one AAC object can appear as root, under one parent,
+    // under multiple parents, or inside learning/message flows without duplicating the item.
+    val visibleUnderIds: List<String> = emptyList(),
     val isRootItem: Boolean = true,
     val isHiddenUntilParent: Boolean = false,
     // Optional content/settings hook for future therapist-configured fixed top-row positions 1..5.

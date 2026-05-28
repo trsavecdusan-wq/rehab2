@@ -138,6 +138,7 @@ object AacLocalJsonLoader {
             questionUk = json.optNullableString("questionUk"),
             iconSource = parseIconSource(json.optString("iconSource")),
             parentId = json.optNullableString("parentId"),
+            visibleUnderIds = parseVisibleUnderIds(json),
             isRootItem = if (json.has("isRootItem")) json.optBoolean("isRootItem", true) else json.optNullableString("parentId").isNullOrBlank(),
             isHiddenUntilParent = json.optBoolean("isHiddenUntilParent", false),
             fixedTopRowPosition = json.optFixedTopRowPosition(),
@@ -178,6 +179,16 @@ object AacLocalJsonLoader {
                 if (value.isNotEmpty()) add(value)
             }
         }
+    }
+
+    private fun parseVisibleUnderIds(json: JSONObject): List<String> {
+        val explicitVisibility = parseStringList(json.optJSONArray("visibleUnderIds"))
+        val parentIds = parseStringList(json.optJSONArray("parentIds"))
+        val legacyParentId = json.optNullableString("parentId")
+        return (explicitVisibility + parentIds + listOfNotNull(legacyParentId))
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
     }
 
     private fun parseContext(value: String?): AacCommunicationContext {
