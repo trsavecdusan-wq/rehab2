@@ -1312,7 +1312,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 val imageFile = resolveAacImageFile(context, item)
                 if (imageFile == null) {
                     Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
-                    image.setImageResource(android.R.drawable.ic_menu_gallery)
+                    showMissingImageFallback()
                     return
                 }
 
@@ -1320,16 +1320,27 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
                     if (bitmap != null) {
                         Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOADED item=${item.id}")
+                        image.alpha = 1.0f
                         image.setImageBitmap(bitmap)
                     } else {
                         Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
                         Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
-                        image.setImageResource(android.R.drawable.ic_menu_gallery)
+                        showMissingImageFallback()
                     }
                 } catch (_: Exception) {
                     Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
                     Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
-                    image.setImageResource(android.R.drawable.ic_menu_gallery)
+                    showMissingImageFallback()
+                }
+            }
+
+            private fun showMissingImageFallback() {
+                image.alpha = 0.75f
+                image.setImageResource(android.R.drawable.ic_menu_gallery)
+                if (labelMode == AacLabelMode.HIDDEN) {
+                    label.visibility = View.VISIBLE
+                    label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                    label.maxLines = 2
                 }
             }
 
