@@ -1270,11 +1270,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
             private val onWaterBindTrace: (AacItem) -> Unit
         ) : RecyclerView.ViewHolder(itemView) {
             private companion object {
-                val TILE_DEFAULT_COLOR = 0xFF232A31.toInt()
-                val TILE_CATEGORY_COLOR = 0xFF214A78.toInt()
-                val TILE_SUBCATEGORY_COLOR = 0xFF2F5F9E.toInt()
-                val TILE_NAVIGATION_COLOR = 0xFF6A4E8E.toInt()
-                val TILE_PRESSED_COLOR = 0xFF2F7C86.toInt()
+                val TILE_DEFAULT_COLOR = 0xFF1E252C.toInt()
+                val TILE_CATEGORY_COLOR = 0xFF1F5278.toInt()
+                val TILE_SUBCATEGORY_COLOR = 0xFF2A5F83.toInt()
+                val TILE_NAVIGATION_COLOR = 0xFF5B4A78.toInt()
+                val TILE_PRESSED_COLOR = 0xFF2B6F78.toInt()
                 const val TILE_PRESS_FEEDBACK_MS = 180L
                 const val MAX_TILE_IMAGE_DECODE_SIZE = 1024
             }
@@ -1383,8 +1383,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             private fun showMissingImageFallback() {
-                image.alpha = 0.5f
-                image.setImageResource(android.R.drawable.ic_menu_gallery)
+                image.alpha = 0.18f
+                image.setImageDrawable(null)
                 if (labelMode == AacLabelMode.HIDDEN) {
                     label.visibility = View.VISIBLE
                     label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)

@@ -2,23 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    android:background="#232A31"
+    android:layout_margin="5dp"
+    android:background="#1E252C"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center"
-    android:minHeight="176dp"
+    android:minHeight="178dp"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="10dp">
 
     <ImageView
         android:id="@+id/imgAacTile"
         android:layout_width="match_parent"
-        android:layout_height="124dp"
+        android:layout_height="132dp"
         android:adjustViewBounds="true"
-        android:background="#1A222B"
+        android:background="#1E252C"
         android:contentDescription=""
-        android:padding="6dp"
+        android:padding="4dp"
         android:scaleType="fitCenter"
         android:src="@android:drawable/ic_menu_gallery" />
 
@@ -26,13 +26,13 @@
         android:id="@+id/txtAacTileLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:gravity="center"
         android:includeFontPadding="false"
         android:maxLines="2"
         android:text="VODA"
         android:textColor="#F4F7FA"
-        android:textSize="16sp"
+        android:textSize="17sp"
         android:textStyle="bold" />
 
 </LinearLayout>
