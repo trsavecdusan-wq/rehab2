@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import com.rehab2.aac.AacIconZipImporter
 import com.rehab2.aac.AacPackExporter
 import com.rehab2.aac.AacPackImporter
 import com.rehab2.aac.AacPackImportPreflight
@@ -61,6 +62,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnShare: Button
     private lateinit var btnCreateTestZip: Button
     private lateinit var btnImportPreflight: Button
+    private lateinit var btnImportIconZip: Button
     private lateinit var txtStatus: TextView
     private lateinit var txtLastImportStatus: TextView
     private lateinit var txtAacHealthSummary: TextView
@@ -80,6 +82,15 @@ class AacPackSettingsActivity : AppCompatActivity() {
             startImportPreflight(uri)
         }
     }
+    private val pickIconZip = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) {
+            txtStatus.text = "Izbira ZIP datoteke z ikonami preklicana."
+        } else {
+            startIconZipImport(uri)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +100,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnShare = findViewById(R.id.btnShareAacPack)
         btnCreateTestZip = findViewById(R.id.btnCreateTestAacZip)
         btnImportPreflight = findViewById(R.id.btnImportAacPackPreflight)
+        btnImportIconZip = findViewById(R.id.btnImportAacIconZip)
         txtStatus = findViewById(R.id.txtExportStatus)
         txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
         txtAacHealthSummary = findViewById(R.id.txtAacHealthSummary)
@@ -115,6 +127,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         btnImportPreflight.setOnClickListener {
             pickZipForPreflight.launch(
+                arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")
+            )
+        }
+
+        btnImportIconZip.setOnClickListener {
+            pickIconZip.launch(
                 arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")
             )
         }
@@ -419,6 +437,39 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtStatus.text = statusText
         saveImportReport(buildImportReport(result))
         refreshLastImportDiagnostic()
+        refreshLocalAacOverview()
+    }
+
+    private fun startIconZipImport(uri: Uri) {
+        btnImportIconZip.isEnabled = false
+        btnImportIconZip.backgroundTintList = ColorStateList.valueOf(BUSY_BUTTON_COLOR)
+        txtStatus.text = "Uvažam lokalne AAC ikone iz ZIP ..."
+
+        Thread {
+            val result = AacIconZipImporter.importNoOverwrite(this, uri)
+            mainHandler.post {
+                handleIconZipImportResult(result)
+            }
+        }.start()
+    }
+
+    private fun handleIconZipImportResult(result: AacIconZipImporter.Result) {
+        btnImportIconZip.isEnabled = true
+        btnImportIconZip.backgroundTintList = ColorStateList.valueOf(SHARE_READY_COLOR)
+
+        txtStatus.text = when (result) {
+            is AacIconZipImporter.Result.Success -> buildString {
+                append("Uvoz ikon ZIP koncan.\n")
+                append("Uvozeno: ${result.importedCount}\n")
+                append("Preskoceno obstojecih: ${result.skippedExistingCount}\n")
+                append("Zavrnjeno nevarnih: ${result.rejectedUnsafeCount}\n")
+                append("Ignorirano nepodprtih: ${result.ignoredUnsupportedCount}\n")
+                append("SOCA: ${result.importedSocaCount}, Custom: ${result.importedCustomCount}, ARASAAC: ${result.importedArasaacCount}\n")
+                append("Obstojece datoteke niso bile prepisane.")
+            }
+            is AacIconZipImporter.Result.Failure ->
+                "Uvoz ikon ZIP ni uspel: ${result.reason}"
+        }
         refreshLocalAacOverview()
     }
 
