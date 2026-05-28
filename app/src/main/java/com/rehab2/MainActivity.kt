@@ -74,6 +74,8 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_ADMIN_PIN = "admin_pin"
         private const val DEFAULT_ADMIN_PIN = "0416"
         private const val MAIN_AAC_HOME_PAGE_ID = "home"
+        private const val PREFS_AAC_PATIENT_PAGES = "aac_patient_pages"
+        private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
         private const val PREF_DISTANCE_TODAY_METERS = "distance_today_meters"
         private const val PREF_DISTANCE_TOTAL_METERS = "distance_total_meters"
@@ -385,10 +387,10 @@ class MainActivity : AppCompatActivity() {
         )
         val fallbackItems = buildMainAacItems()
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
-        val homeItems = selectMainHomePlacementItems(loadedItems)
-        val items = if (homeItems.isEmpty()) fallbackItems else loadedItems
+        val startPageItems = selectMainStartPlacementItems(loadedItems)
+        val items = if (startPageItems.isEmpty()) fallbackItems else loadedItems
         mainAacItemsById = items.associateBy { it.id }
-        showMainAacItems(homeItems.ifEmpty { fallbackItems.filter { it.isRootItem && !it.isHiddenUntilParent } })
+        showMainAacItems(startPageItems.ifEmpty { fallbackItems.filter { it.isRootItem && !it.isHiddenUntilParent } })
     }
 
     private fun showMainAacItems(items: List<AacItem>) {
@@ -448,8 +450,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun selectMainHomePlacementItems(items: List<AacItem>): List<AacItem> {
-        return mainAacPageItems(MAIN_AAC_HOME_PAGE_ID, items)
+    private fun selectMainStartPlacementItems(items: List<AacItem>): List<AacItem> {
+        val defaultPageId = getSharedPreferences(PREFS_AAC_PATIENT_PAGES, MODE_PRIVATE)
+            .getString(KEY_DEFAULT_PATIENT_PAGE_ID, "")
+            .orEmpty()
+            .trim()
+            .takeIf { isSafeMainAacPageId(it) }
+            ?: MAIN_AAC_HOME_PAGE_ID
+        return mainAacPageItems(defaultPageId, items)
     }
 
     private fun mainAacPageItems(pageId: String): List<AacItem> {
@@ -458,7 +466,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun mainAacPageItems(pageId: String, items: List<AacItem>): List<AacItem> {
         val normalizedPageId = pageId.trim()
-        if (normalizedPageId.isBlank()) {
+        if (!isSafeMainAacPageId(normalizedPageId)) {
             return emptyList()
         }
         val itemsById = items.associateBy { it.id }
@@ -472,6 +480,10 @@ class MainActivity : AppCompatActivity() {
             .sortedBy { (position, _) -> position }
             .mapNotNull { (_, itemId) -> itemsById[itemId] }
             .take(mainAacTileBindings.size)
+    }
+
+    private fun isSafeMainAacPageId(pageId: String): Boolean {
+        return pageId.isNotBlank() && pageId.matches(Regex("[A-Za-z0-9_-]+"))
     }
 
     private fun mainAacChildrenFor(item: AacItem): List<AacItem> {
