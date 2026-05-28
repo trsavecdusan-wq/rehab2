@@ -72,6 +72,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var editFixedTopRowPosition: EditText
     private lateinit var btnSaveFixedTopRowPosition: Button
     private lateinit var btnClearFixedTopRowPosition: Button
+    private lateinit var txtFixedTopRowAvailableItems: TextView
     private lateinit var txtActiveProfileStatus: TextView
     private lateinit var txtIconFolderStatus: TextView
     private lateinit var txtLocalProfilesStatus: TextView
@@ -115,6 +116,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         editFixedTopRowPosition = findViewById(R.id.editFixedTopRowPosition)
         btnSaveFixedTopRowPosition = findViewById(R.id.btnSaveFixedTopRowPosition)
         btnClearFixedTopRowPosition = findViewById(R.id.btnClearFixedTopRowPosition)
+        txtFixedTopRowAvailableItems = findViewById(R.id.txtFixedTopRowAvailableItems)
         txtActiveProfileStatus = findViewById(R.id.txtActiveProfileStatus)
         txtIconFolderStatus = findViewById(R.id.txtIconFolderStatus)
         txtLocalProfilesStatus = findViewById(R.id.txtLocalProfilesStatus)
@@ -726,6 +728,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val overview = buildLocalAacOverview()
         txtAacHealthSummary.text = buildAacHealthSummary(overview)
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
+        txtFixedTopRowAvailableItems.text = buildFixedTopRowAvailableItems(overview.relationAnalysis.availableItems)
         txtActiveProfileStatus.text = buildActiveProfileStatus()
         txtIconFolderStatus.text = buildIconFolderStatus()
         txtLocalProfilesStatus.text = buildLocalAacProfilesReport(overview)
@@ -825,6 +828,23 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }.trimEnd()
     }
 
+    private fun buildFixedTopRowAvailableItems(items: List<AacListItem>): String {
+        return buildString {
+            append("DOSTOPNI AAC ELEMENTI ZA FIKSNO VRSTICO\n")
+            if (items.isEmpty()) {
+                append("Ni najdenih AAC elementov.")
+                return@buildString
+            }
+            items.take(20).forEach { item ->
+                append("- ${item.itemId}: ${item.label.ifBlank { "brez oznake" }}\n")
+            }
+            val remaining = items.size - 20
+            if (remaining > 0) {
+                append("... se $remaining")
+            }
+        }.trimEnd()
+    }
+
     private fun saveFixedTopRowPosition() {
         val itemId = editFixedTopRowItemId.text.toString().trim()
         val position = editFixedTopRowPosition.text.toString().trim().toIntOrNull()
@@ -833,20 +853,20 @@ class AacPackSettingsActivity : AppCompatActivity() {
             return
         }
         if (position == null || position !in 1..5) {
-            txtStatus.text = "Vnesi fiksno pozicijo od 1 do 5."
+            txtStatus.text = "Pozicija mora biti 1-5."
             return
         }
 
         when (val result = writeFixedTopRowPosition(itemId, position)) {
             FixedTopRowWriteResult.Success -> {
-                txtStatus.text = "Fiksna pozicija shranjena.\n$itemId -> $position"
+                txtStatus.text = "Shranjeno.\n$itemId -> $position"
                 refreshLocalAacOverview()
             }
             FixedTopRowWriteResult.ItemsFileMissing -> {
                 txtStatus.text = "AAC elementi niso najdeni. Najprej pripravi lokalno AAC vsebino."
             }
             FixedTopRowWriteResult.ItemNotFound -> {
-                txtStatus.text = "AAC element z ID '$itemId' ni najden."
+                txtStatus.text = "ID AAC elementa ne obstaja."
             }
             FixedTopRowWriteResult.WriteFailed -> {
                 txtStatus.text = "Fiksne pozicije ni bilo mogoce shraniti."
@@ -857,13 +877,13 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun clearFixedTopRowPosition() {
         val position = editFixedTopRowPosition.text.toString().trim().toIntOrNull()
         if (position == null || position !in 1..5) {
-            txtStatus.text = "Vnesi fiksno pozicijo od 1 do 5."
+            txtStatus.text = "Pozicija mora biti 1-5."
             return
         }
 
         when (clearFixedTopRowPositionInJson(position)) {
             FixedTopRowWriteResult.Success -> {
-                txtStatus.text = "Fiksna pozicija $position je pociscena."
+                txtStatus.text = "Pozicija počiščena."
                 refreshLocalAacOverview()
             }
             FixedTopRowWriteResult.ItemsFileMissing -> {
@@ -873,7 +893,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 txtStatus.text = "Na poziciji $position ni fiksnega AAC elementa."
             }
             FixedTopRowWriteResult.WriteFailed -> {
-                txtStatus.text = "Fiksne pozicije ni bilo mogoce pocistiti."
+                txtStatus.text = "Fiksne pozicije ni bilo mogoce počistiti."
             }
         }
     }
@@ -1183,6 +1203,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             var invalidItemCount = 0
             var invalidIconReferenceCount = 0
             val fixedTopRowItems = mutableListOf<FixedTopRowItem>()
+            val availableItems = mutableListOf<AacListItem>()
 
             for (index in 0 until itemsArray.length()) {
                 val item = itemsArray.optJSONObject(index) ?: continue
@@ -1212,6 +1233,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 }
                 if (itemWarnings.isNotEmpty()) {
                     invalidItemCount += 1
+                }
+                if (itemId.isNotBlank()) {
+                    availableItems += AacListItem(
+                        itemId = itemId,
+                        label = itemLabel(item)
+                    )
                 }
                 val fixedTopRowPosition = itemFixedTopRowPosition(item)
                 if (fixedTopRowPosition != null && itemId.isNotBlank()) {
@@ -1249,7 +1276,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 invalidIconReferenceCount = invalidIconReferenceCount,
                 fixedTopRowItems = fixedTopRowItems
                     .sortedWith(compareBy<FixedTopRowItem> { it.position }.thenBy { it.itemId })
-                    .distinctBy { it.position }
+                    .distinctBy { it.position },
+                availableItems = availableItems
+                    .sortedWith(compareBy<AacListItem> { it.label.ifBlank { it.itemId }.lowercase(Locale.ROOT) }.thenBy { it.itemId })
+                    .distinctBy { it.itemId }
             )
         } catch (error: Exception) {
             AacRelationAnalysis.empty()
@@ -1410,7 +1440,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val duplicateItemIdCount: Int,
         val invalidItemCount: Int,
         val invalidIconReferenceCount: Int,
-        val fixedTopRowItems: List<FixedTopRowItem>
+        val fixedTopRowItems: List<FixedTopRowItem>,
+        val availableItems: List<AacListItem>
     ) {
         companion object {
             fun empty(): AacRelationAnalysis {
@@ -1421,7 +1452,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     duplicateItemIdCount = 0,
                     invalidItemCount = 0,
                     invalidIconReferenceCount = 0,
-                    fixedTopRowItems = emptyList()
+                    fixedTopRowItems = emptyList(),
+                    availableItems = emptyList()
                 )
             }
         }
@@ -1431,6 +1463,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val position: Int,
         val label: String,
         val itemId: String
+    )
+
+    private data class AacListItem(
+        val itemId: String,
+        val label: String
     )
 
     private enum class FixedTopRowWriteResult {

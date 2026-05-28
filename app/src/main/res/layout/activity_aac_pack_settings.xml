@@ -61,8 +61,11 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginBottom="8dp"
+            android:background="#1E252C"
             android:backgroundTint="#5B6672"
             android:hint="ID AAC elementa"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
             android:singleLine="true"
             android:textColor="#F4F7FA"
             android:textColorHint="#B8C0C8"
@@ -73,9 +76,12 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginBottom="8dp"
+            android:background="#1E252C"
             android:backgroundTint="#5B6672"
             android:hint="Pozicija 1-5"
             android:inputType="number"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
             android:singleLine="true"
             android:textColor="#F4F7FA"
             android:textColorHint="#B8C0C8"
@@ -104,6 +110,14 @@
             android:textColor="#F4F7FA"
             android:textSize="18sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtFixedTopRowAvailableItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textColor="#B8C0C8"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/txtActiveProfileStatus"
