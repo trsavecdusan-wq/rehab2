@@ -765,7 +765,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     "AKTIVIRAJ PROFIL - ${profile.displayName}"
                 }
                 isEnabled = !isSelected
-                textAllCaps = false
+                setAllCaps(false)
                 setTextColor(0xFFF4F7FA.toInt())
                 textSize = 18f
                 backgroundTintList = ColorStateList.valueOf(
