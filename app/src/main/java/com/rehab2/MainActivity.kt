@@ -288,6 +288,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        findViewById<View>(R.id.tileAacDomov).setOnClickListener {
+            startActivity(Intent(this, AacCommunicatorActivity::class.java))
+        }
         findViewById<View>(R.id.tileAacDomov).setOnLongClickListener {
             startActivity(Intent(this, AacCommunicatorActivity::class.java))
             true

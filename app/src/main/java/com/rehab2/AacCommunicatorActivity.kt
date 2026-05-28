@@ -150,23 +150,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
         })
 
-        if (AacLocalStorage.ensureStructure(this)) {
-            Toast.makeText(this, "AAC MAPE PRIPRAVLJENE", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "AAC MAP NI MOGOČE USTVARITI", Toast.LENGTH_SHORT).show()
-        }
-
-        if (AacLocalStorage.seedBundledDefaultPages(this)) {
-            Toast.makeText(this, "AAC STRANI PRIPRAVLJENE", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "AAC STRANI NISO PRIPRAVLJENE", Toast.LENGTH_SHORT).show()
-        }
-
-        if (AacLocalStorage.seedBundledTestAudio(this)) {
-            Toast.makeText(this, "AAC TEST AUDIO PRIPRAVLJEN", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "AAC TEST AUDIO NI PRIPRAVLJEN", Toast.LENGTH_SHORT).show()
-        }
+        Log.d(TAG, "AAC_STORAGE ensureStructure=${AacLocalStorage.ensureStructure(this)}")
+        Log.d(TAG, "AAC_STORAGE seedBundledDefaultPages=${AacLocalStorage.seedBundledDefaultPages(this)}")
+        Log.d(TAG, "AAC_STORAGE seedBundledTestAudio=${AacLocalStorage.seedBundledTestAudio(this)}")
 
         txtTitle = findViewById(R.id.txtAacTitle)
         txtPath = findViewById(R.id.txtAacPath)
@@ -175,7 +161,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         txtPrompt = findViewById(R.id.txtAacPrompt)
         txtSentence = findViewById(R.id.txtAacSentence)
         btnOpenDrinksV2Test = findViewById(R.id.btnOpenDrinksV2Test)
-        btnOpenDrinksV2Test.text = "TEST PIJAČA V2 1.2.88"
+        btnOpenDrinksV2Test.text = "PIJAČE"
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
@@ -211,14 +197,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
         setupQuickAccessRow()
         btnOpenDrinksV2Test.setOnClickListener {
             resetWaterTraceDebug()
-            updateWaterTraceDebug("TEST PIJAČA V2")
+            updateWaterTraceDebug("PIJAČE")
             openDrinksV2Test()
-        }
-        txtTitle.setOnLongClickListener {
-            resetWaterTraceDebug()
-            updateWaterTraceDebug("TITLE LONG PRESS")
-            openDrinksV2Test()
-            true
         }
 
         val homePage = repository.loadHomePage()
@@ -360,7 +340,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 Log.d(TAG, "WATER clicked children=${childItems.size}")
                 if (childItems.isEmpty()) {
                     updateWaterTraceDebug("WATER CLICK CHILDREN=0")
-                    Toast.makeText(this, "WATER children missing", Toast.LENGTH_LONG).show()
                 } else {
                     updateWaterTraceDebug("WATER CLICK CHILDREN=${childItems.size}")
                 }
@@ -383,9 +362,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 setPromptText(resolveFollowUpQuestion(item))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
-                if (item.id == WATER_NODE_ID) {
-                    Toast.makeText(this, "OPEN WATER OPTIONS", Toast.LENGTH_LONG).show()
-                }
                 return
             } else {
                 clearPromptText()
@@ -476,16 +452,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun openDrinksV2Test() {
-        Toast.makeText(this, "TEST V2 CLICKED 1.2.88", Toast.LENGTH_LONG).show()
         val refreshResult = refreshBundledDrinksV2Page()
         showDrinksV2RefreshDebug(refreshResult)
         if (refreshResult.isReady) {
             updateWaterTraceDebug("RUNTIME PAGE REBUILT")
-            Toast.makeText(this, "RUNTIME PAGE REBUILT", Toast.LENGTH_LONG).show()
             openTargetPage(DRINKS_V2_PAGE_ID)
-            Toast.makeText(this, "OPEN $DRINKS_V2_PAGE_ID", Toast.LENGTH_LONG).show()
         } else {
-            Toast.makeText(this, "DRINKS V2 REFRESH FAILED", Toast.LENGTH_LONG).show()
+            Log.d(TAG, "DRINKS V2 REFRESH FAILED")
         }
     }
 
@@ -507,7 +480,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val existsText = if (result.exists) "yes" else "no"
         val message = "page=$DRINKS_V2_PAGE_ID runtime exists=$existsText size=${result.size}"
         Log.d(TAG, "$message path=${result.path} rebuilt=${result.rebuilt}")
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun showDrinksV2WaterDebug(page: AacPage) {
@@ -522,7 +494,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
             "WATER children=$waterChildrenCount — runtime JSON stale or wrong page"
         }
         Log.d(TAG, "page=${page.pageId} $message")
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun logWaterTrace(stage: String, item: AacItem?) {
@@ -1206,8 +1177,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
 
         txtTitle.text = buildTitleText(txtTitle.text.toString().lineSequence().firstOrNull().orEmpty())
-        Toast.makeText(this, repository.lastDebugStatus, Toast.LENGTH_LONG).show()
-        Toast.makeText(this, AacLocalStorage.lastStorageDebugStatus, Toast.LENGTH_LONG).show()
     }
 
     private class AacAdapter(

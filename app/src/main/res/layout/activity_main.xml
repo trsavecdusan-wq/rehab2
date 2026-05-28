@@ -804,7 +804,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="&#x1F3E0;"
+                    android:text="&#x1F4AC;"
                     android:textColor="#F4F7FA"
                     android:textSize="38sp" />
 
@@ -813,7 +813,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:maxLines="1"
-                    android:text="DOMOV"
+                    android:text="AAC"
                     android:textColor="#F4F7FA"
                     android:textSize="9sp"
                     android:textStyle="bold" />
