@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -67,6 +68,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var txtLastImportStatus: TextView
     private lateinit var txtAacHealthSummary: TextView
     private lateinit var txtFixedTopRowStatus: TextView
+    private lateinit var editFixedTopRowItemId: EditText
+    private lateinit var editFixedTopRowPosition: EditText
+    private lateinit var btnSaveFixedTopRowPosition: Button
+    private lateinit var btnClearFixedTopRowPosition: Button
     private lateinit var txtActiveProfileStatus: TextView
     private lateinit var txtIconFolderStatus: TextView
     private lateinit var txtLocalProfilesStatus: TextView
@@ -106,6 +111,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
         txtAacHealthSummary = findViewById(R.id.txtAacHealthSummary)
         txtFixedTopRowStatus = findViewById(R.id.txtFixedTopRowStatus)
+        editFixedTopRowItemId = findViewById(R.id.editFixedTopRowItemId)
+        editFixedTopRowPosition = findViewById(R.id.editFixedTopRowPosition)
+        btnSaveFixedTopRowPosition = findViewById(R.id.btnSaveFixedTopRowPosition)
+        btnClearFixedTopRowPosition = findViewById(R.id.btnClearFixedTopRowPosition)
         txtActiveProfileStatus = findViewById(R.id.txtActiveProfileStatus)
         txtIconFolderStatus = findViewById(R.id.txtIconFolderStatus)
         txtLocalProfilesStatus = findViewById(R.id.txtLocalProfilesStatus)
@@ -137,6 +146,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
             pickIconZip.launch(
                 arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")
             )
+        }
+
+        btnSaveFixedTopRowPosition.setOnClickListener {
+            saveFixedTopRowPosition()
+        }
+
+        btnClearFixedTopRowPosition.setOnClickListener {
+            clearFixedTopRowPosition()
         }
 
         AacStoragePaths.ensureAacContentDirs(this)
@@ -808,6 +825,120 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }.trimEnd()
     }
 
+    private fun saveFixedTopRowPosition() {
+        val itemId = editFixedTopRowItemId.text.toString().trim()
+        val position = editFixedTopRowPosition.text.toString().trim().toIntOrNull()
+        if (itemId.isBlank()) {
+            txtStatus.text = "Vnesi ID AAC elementa."
+            return
+        }
+        if (position == null || position !in 1..5) {
+            txtStatus.text = "Vnesi fiksno pozicijo od 1 do 5."
+            return
+        }
+
+        when (val result = writeFixedTopRowPosition(itemId, position)) {
+            FixedTopRowWriteResult.Success -> {
+                txtStatus.text = "Fiksna pozicija shranjena.\n$itemId -> $position"
+                refreshLocalAacOverview()
+            }
+            FixedTopRowWriteResult.ItemsFileMissing -> {
+                txtStatus.text = "AAC elementi niso najdeni. Najprej pripravi lokalno AAC vsebino."
+            }
+            FixedTopRowWriteResult.ItemNotFound -> {
+                txtStatus.text = "AAC element z ID '$itemId' ni najden."
+            }
+            FixedTopRowWriteResult.WriteFailed -> {
+                txtStatus.text = "Fiksne pozicije ni bilo mogoce shraniti."
+            }
+        }
+    }
+
+    private fun clearFixedTopRowPosition() {
+        val position = editFixedTopRowPosition.text.toString().trim().toIntOrNull()
+        if (position == null || position !in 1..5) {
+            txtStatus.text = "Vnesi fiksno pozicijo od 1 do 5."
+            return
+        }
+
+        when (clearFixedTopRowPositionInJson(position)) {
+            FixedTopRowWriteResult.Success -> {
+                txtStatus.text = "Fiksna pozicija $position je pociscena."
+                refreshLocalAacOverview()
+            }
+            FixedTopRowWriteResult.ItemsFileMissing -> {
+                txtStatus.text = "AAC elementi niso najdeni. Najprej pripravi lokalno AAC vsebino."
+            }
+            FixedTopRowWriteResult.ItemNotFound -> {
+                txtStatus.text = "Na poziciji $position ni fiksnega AAC elementa."
+            }
+            FixedTopRowWriteResult.WriteFailed -> {
+                txtStatus.text = "Fiksne pozicije ni bilo mogoce pocistiti."
+            }
+        }
+    }
+
+    private fun writeFixedTopRowPosition(itemId: String, position: Int): FixedTopRowWriteResult {
+        return updateFixedTopRowItemsJson { itemsArray ->
+            var targetFound = false
+            for (index in 0 until itemsArray.length()) {
+                val item = itemsArray.optJSONObject(index) ?: continue
+                if (itemFixedTopRowPosition(item) == position) {
+                    item.remove("fixedTopRowPosition")
+                    item.remove("fixed_top_row_position")
+                }
+                if (item.optString("id").trim() == itemId) {
+                    item.remove("fixed_top_row_position")
+                    item.put("fixedTopRowPosition", position)
+                    targetFound = true
+                }
+            }
+            if (targetFound) FixedTopRowWriteResult.Success else FixedTopRowWriteResult.ItemNotFound
+        }
+    }
+
+    private fun clearFixedTopRowPositionInJson(position: Int): FixedTopRowWriteResult {
+        return updateFixedTopRowItemsJson { itemsArray ->
+            var cleared = false
+            for (index in 0 until itemsArray.length()) {
+                val item = itemsArray.optJSONObject(index) ?: continue
+                if (itemFixedTopRowPosition(item) == position) {
+                    item.remove("fixedTopRowPosition")
+                    item.remove("fixed_top_row_position")
+                    cleared = true
+                }
+            }
+            if (cleared) FixedTopRowWriteResult.Success else FixedTopRowWriteResult.ItemNotFound
+        }
+    }
+
+    private fun updateFixedTopRowItemsJson(
+        update: (org.json.JSONArray) -> FixedTopRowWriteResult
+    ): FixedTopRowWriteResult {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+            ?: return FixedTopRowWriteResult.ItemsFileMissing
+        val itemsText = readTextSafely(itemsFile, MAX_ITEMS_PREVIEW_BYTES)
+            ?: return FixedTopRowWriteResult.ItemsFileMissing
+
+        return try {
+            val trimmed = itemsText.trimStart()
+            val rootObject = if (trimmed.startsWith("[")) null else org.json.JSONObject(itemsText)
+            val itemsArray = rootObject?.optJSONArray("items")
+                ?: if (rootObject == null) org.json.JSONArray(itemsText) else return FixedTopRowWriteResult.WriteFailed
+            val updateResult = update(itemsArray)
+            if (updateResult != FixedTopRowWriteResult.Success) {
+                return updateResult
+            }
+
+            val output = rootObject?.toString(2) ?: itemsArray.toString(2)
+            itemsFile.writeText(output, Charsets.UTF_8)
+            FixedTopRowWriteResult.Success
+        } catch (error: Exception) {
+            Log.w("NovaRehabAacTopRow", "Fixed top-row metadata write failed", error)
+            FixedTopRowWriteResult.WriteFailed
+        }
+    }
+
     private fun buildLocalAacProfilesReport(overview: LocalAacOverview): String {
         return buildString {
             append("LOKALNI AAC PROFILI\n")
@@ -1301,6 +1432,13 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val label: String,
         val itemId: String
     )
+
+    private enum class FixedTopRowWriteResult {
+        Success,
+        ItemsFileMissing,
+        ItemNotFound,
+        WriteFailed
+    }
 
     private data class ProfileRelation(
         val itemCount: Int,
