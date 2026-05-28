@@ -66,6 +66,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var txtStatus: TextView
     private lateinit var txtLastImportStatus: TextView
     private lateinit var txtAacHealthSummary: TextView
+    private lateinit var txtFixedTopRowStatus: TextView
     private lateinit var txtActiveProfileStatus: TextView
     private lateinit var txtIconFolderStatus: TextView
     private lateinit var txtLocalProfilesStatus: TextView
@@ -104,6 +105,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtStatus = findViewById(R.id.txtExportStatus)
         txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
         txtAacHealthSummary = findViewById(R.id.txtAacHealthSummary)
+        txtFixedTopRowStatus = findViewById(R.id.txtFixedTopRowStatus)
         txtActiveProfileStatus = findViewById(R.id.txtActiveProfileStatus)
         txtIconFolderStatus = findViewById(R.id.txtIconFolderStatus)
         txtLocalProfilesStatus = findViewById(R.id.txtLocalProfilesStatus)
@@ -706,6 +708,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun refreshLocalAacOverview() {
         val overview = buildLocalAacOverview()
         txtAacHealthSummary.text = buildAacHealthSummary(overview)
+        txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
         txtActiveProfileStatus.text = buildActiveProfileStatus()
         txtIconFolderStatus.text = buildIconFolderStatus()
         txtLocalProfilesStatus.text = buildLocalAacProfilesReport(overview)
@@ -781,6 +784,28 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Neveljavne ikonske reference: ${overview.relationAnalysis.invalidIconReferenceCount}\n")
             append("Zadnji uvoz: ${overview.lastImportSummary}")
         }
+    }
+
+    private fun buildFixedTopRowStatus(fixedItems: List<FixedTopRowItem>): String {
+        return buildString {
+            append("FIKSNA PRVA VRSTICA\n")
+            append("3x3: prvi 3 fiksni, 4x4: prvi 4 fiksni, 5x5: vseh 5 fiksnih.\n\n")
+
+            if (fixedItems.isEmpty()) {
+                append("Ni nastavljenih fiksnih ikon v prvi vrstici.")
+                return@buildString
+            }
+
+            val itemsByPosition = fixedItems.associateBy { it.position }
+            for (position in 1..5) {
+                val item = itemsByPosition[position]
+                if (item == null) {
+                    append("$position. ni nastavljeno - ne obstaja\n")
+                } else {
+                    append("$position. ${item.label.ifBlank { "brez oznake" }} (${item.itemId}) - obstaja\n")
+                }
+            }
+        }.trimEnd()
     }
 
     private fun buildLocalAacProfilesReport(overview: LocalAacOverview): String {
@@ -1026,6 +1051,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             var missingIconReferenceCount = 0
             var invalidItemCount = 0
             var invalidIconReferenceCount = 0
+            val fixedTopRowItems = mutableListOf<FixedTopRowItem>()
 
             for (index in 0 until itemsArray.length()) {
                 val item = itemsArray.optJSONObject(index) ?: continue
@@ -1056,6 +1082,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 if (itemWarnings.isNotEmpty()) {
                     invalidItemCount += 1
                 }
+                val fixedTopRowPosition = itemFixedTopRowPosition(item)
+                if (fixedTopRowPosition != null && itemId.isNotBlank()) {
+                    fixedTopRowItems += FixedTopRowItem(
+                        position = fixedTopRowPosition,
+                        label = itemLabel(item),
+                        itemId = itemId
+                    )
+                }
 
                 profileIds.forEach { profileId ->
                     val relation = mutableRelations.getOrPut(profileId) { MutableProfileRelation() }
@@ -1081,7 +1115,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 missingIconReferenceCount = missingIconReferenceCount,
                 duplicateItemIdCount = duplicateItemIdCount,
                 invalidItemCount = invalidItemCount,
-                invalidIconReferenceCount = invalidIconReferenceCount
+                invalidIconReferenceCount = invalidIconReferenceCount,
+                fixedTopRowItems = fixedTopRowItems
+                    .sortedWith(compareBy<FixedTopRowItem> { it.position }.thenBy { it.itemId })
+                    .distinctBy { it.position }
             )
         } catch (error: Exception) {
             AacRelationAnalysis.empty()
@@ -1091,6 +1128,25 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun itemHasLabelOrText(item: org.json.JSONObject): Boolean {
         return listOf("label", "labelSl", "text", "speakTextSl", "name")
             .any { key -> item.optString(key).trim().isNotEmpty() }
+    }
+
+    private fun itemLabel(item: org.json.JSONObject): String {
+        listOf("labelSl", "label", "text", "speakTextSl", "name").forEach { key ->
+            val value = item.optString(key).trim()
+            if (value.isNotEmpty()) {
+                return value
+            }
+        }
+        return ""
+    }
+
+    private fun itemFixedTopRowPosition(item: org.json.JSONObject): Int? {
+        val value = when {
+            item.has("fixedTopRowPosition") -> item.optInt("fixedTopRowPosition", 0)
+            item.has("fixed_top_row_position") -> item.optInt("fixed_top_row_position", 0)
+            else -> 0
+        }
+        return value.takeIf { it in 1..5 }
     }
 
     private fun itemProfileIds(item: org.json.JSONObject): List<String> {
@@ -1222,7 +1278,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val missingIconReferenceCount: Int,
         val duplicateItemIdCount: Int,
         val invalidItemCount: Int,
-        val invalidIconReferenceCount: Int
+        val invalidIconReferenceCount: Int,
+        val fixedTopRowItems: List<FixedTopRowItem>
     ) {
         companion object {
             fun empty(): AacRelationAnalysis {
@@ -1232,11 +1289,18 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     missingIconReferenceCount = 0,
                     duplicateItemIdCount = 0,
                     invalidItemCount = 0,
-                    invalidIconReferenceCount = 0
+                    invalidIconReferenceCount = 0,
+                    fixedTopRowItems = emptyList()
                 )
             }
         }
     }
+
+    private data class FixedTopRowItem(
+        val position: Int,
+        val label: String,
+        val itemId: String
+    )
 
     private data class ProfileRelation(
         val itemCount: Int,
