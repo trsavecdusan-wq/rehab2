@@ -415,6 +415,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleMainAacItemAction(item: AacItem) {
+        val targetPageItems = mainAacPageItems(item.targetPageId)
+        if (targetPageItems.isNotEmpty()) {
+            mainAacHistory.addLast(currentMainAacItems)
+            showMainAacItems(targetPageItems)
+            return
+        }
+
         val childItems = mainAacChildrenFor(item)
         if (item.opensSubicons || childItems.isNotEmpty()) {
             if (childItems.isNotEmpty()) {
@@ -442,11 +449,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun selectMainHomePlacementItems(items: List<AacItem>): List<AacItem> {
+        return mainAacPageItems(MAIN_AAC_HOME_PAGE_ID, items)
+    }
+
+    private fun mainAacPageItems(pageId: String): List<AacItem> {
+        return mainAacPageItems(pageId, mainAacItemsById.values.toList())
+    }
+
+    private fun mainAacPageItems(pageId: String, items: List<AacItem>): List<AacItem> {
+        val normalizedPageId = pageId.trim()
+        if (normalizedPageId.isBlank()) {
+            return emptyList()
+        }
         val itemsById = items.associateBy { it.id }
         return items
             .flatMap { item ->
                 item.placements
-                    .filter { placement -> placement.pageId == MAIN_AAC_HOME_PAGE_ID }
+                    .filter { placement -> placement.pageId == normalizedPageId }
                     .map { placement -> placement.position5x5 to item.id }
             }
             .filter { (position, itemId) -> position in 1..25 && itemsById.containsKey(itemId) }
