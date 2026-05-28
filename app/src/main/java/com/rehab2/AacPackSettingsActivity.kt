@@ -65,6 +65,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var txtLastImportStatus: TextView
     private lateinit var txtAacHealthSummary: TextView
     private lateinit var txtActiveProfileStatus: TextView
+    private lateinit var txtIconFolderStatus: TextView
     private lateinit var txtLocalProfilesStatus: TextView
     private lateinit var localProfileActions: LinearLayout
 
@@ -92,6 +93,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
         txtAacHealthSummary = findViewById(R.id.txtAacHealthSummary)
         txtActiveProfileStatus = findViewById(R.id.txtActiveProfileStatus)
+        txtIconFolderStatus = findViewById(R.id.txtIconFolderStatus)
         txtLocalProfilesStatus = findViewById(R.id.txtLocalProfilesStatus)
         localProfileActions = findViewById(R.id.localProfileActions)
 
@@ -652,6 +654,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val overview = buildLocalAacOverview()
         txtAacHealthSummary.text = buildAacHealthSummary(overview)
         txtActiveProfileStatus.text = buildActiveProfileStatus()
+        txtIconFolderStatus.text = buildIconFolderStatus()
         txtLocalProfilesStatus.text = buildLocalAacProfilesReport(overview)
         renderLocalProfileActions(overview)
     }
@@ -815,6 +818,28 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("ID: ${selectedProfile.profileId}\n")
             append("Izbran: ${selectedProfile.selectedAt}")
         }
+    }
+
+    private fun buildIconFolderStatus(): String {
+        return buildString {
+            append("LOKALNE AAC IKONE\n")
+            append(formatIconFolderLine("Soča", AacStoragePaths.getIconsSocaDir(this@AacPackSettingsActivity)))
+            append('\n')
+            append(formatIconFolderLine("Custom", AacStoragePaths.getIconsCustomDir(this@AacPackSettingsActivity)))
+            append('\n')
+            append(formatIconFolderLine("ARASAAC", AacStoragePaths.getIconsArasaacDir(this@AacPackSettingsActivity)))
+            append("\nKopiraj na primer: soca/voda.png, soca/wc.png, soca/pomoc.png")
+        }
+    }
+
+    private fun formatIconFolderLine(label: String, dir: File?): String {
+        val existsText = if (dir?.isDirectory == true) "obstaja" else "manjka"
+        val pngCount = dir
+            ?.takeIf { it.isDirectory }
+            ?.listFiles { file -> file.isFile && file.extension.equals("png", ignoreCase = true) }
+            ?.size
+            ?: 0
+        return "$label: $existsText, PNG: $pngCount"
     }
 
     private fun loadSelectedProfile(): SelectedProfile? {
