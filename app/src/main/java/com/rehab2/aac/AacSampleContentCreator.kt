@@ -235,7 +235,8 @@ object AacSampleContentCreator {
                         categoryId = "basic_needs",
                         isRootItem = true,
                         priority = 20,
-                        visibleUnderIds = listOf("drinks", "want", "basic_needs")
+                        visibleUnderIds = listOf("drinks", "want", "basic_needs"),
+                        placements = listOf("drinks" to 1)
                     )
                 )
                 .put(
@@ -260,7 +261,8 @@ object AacSampleContentCreator {
                         categoryId = "basic_needs",
                         isRootItem = true,
                         priority = 22,
-                        visibleUnderIds = listOf("home", "emergency", "basic_needs")
+                        visibleUnderIds = listOf("home", "emergency", "basic_needs"),
+                        placements = listOf("home" to 3, "basic_needs" to 3)
                     )
                 )
                 .put(
@@ -336,6 +338,7 @@ object AacSampleContentCreator {
         categoryId: String? = null,
         parentId: String? = null,
         visibleUnderIds: List<String> = emptyList(),
+        placements: List<Pair<String, Int>> = emptyList(),
         isRootItem: Boolean,
         isHiddenUntilParent: Boolean = false,
         priority: Int,
@@ -366,6 +369,15 @@ object AacSampleContentCreator {
                 if (visibleUnderIds.isNotEmpty()) {
                     put("visibleUnderIds", JSONArray().apply {
                         visibleUnderIds.forEach { put(it) }
+                    })
+                }
+                if (placements.isNotEmpty()) {
+                    put("placements", JSONArray().apply {
+                        placements.forEach { (pageId, position5x5) ->
+                            if (pageId.isNotBlank() && position5x5 in 1..25) {
+                                put(JSONObject().put("pageId", pageId).put("position5x5", position5x5))
+                            }
+                        }
                     })
                 }
                 if (fixedTopRowPosition != null) {

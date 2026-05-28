@@ -1,5 +1,10 @@
 package com.rehab2.aac
 
+data class AacPlacement(
+    val pageId: String,
+    val position5x5: Int
+)
+
 data class AacItem(
     val id: String,
     // Keep current JSON fields compatible while future content can add base_text,
@@ -23,6 +28,8 @@ data class AacItem(
     // Future visibility model: one AAC object can appear as root, under one parent,
     // under multiple parents, or inside learning/message flows without duplicating the item.
     val visibleUnderIds: List<String> = emptyList(),
+    // Future placement model uses a single 5x5 reference grid; smaller grids adapt from this order.
+    val placements: List<AacPlacement> = emptyList(),
     val isRootItem: Boolean = true,
     val isHiddenUntilParent: Boolean = false,
     // Optional content/settings hook for future therapist-configured fixed top-row positions 1..5.

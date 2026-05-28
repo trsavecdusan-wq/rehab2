@@ -139,6 +139,7 @@ object AacLocalJsonLoader {
             iconSource = parseIconSource(json.optString("iconSource")),
             parentId = json.optNullableString("parentId"),
             visibleUnderIds = parseVisibleUnderIds(json),
+            placements = parsePlacements(json.optJSONArray("placements")),
             isRootItem = if (json.has("isRootItem")) json.optBoolean("isRootItem", true) else json.optNullableString("parentId").isNullOrBlank(),
             isHiddenUntilParent = json.optBoolean("isHiddenUntilParent", false),
             fixedTopRowPosition = json.optFixedTopRowPosition(),
@@ -189,6 +190,20 @@ object AacLocalJsonLoader {
             .map { it.trim() }
             .filter { it.isNotEmpty() }
             .distinct()
+    }
+
+    private fun parsePlacements(array: JSONArray?): List<AacPlacement> {
+        if (array == null) return emptyList()
+        return buildList {
+            for (index in 0 until array.length()) {
+                val placement = array.optJSONObject(index) ?: continue
+                val pageId = placement.optString("pageId").trim()
+                val position5x5 = placement.optInt("position5x5", 0)
+                if (pageId.isNotEmpty() && position5x5 in 1..25) {
+                    add(AacPlacement(pageId = pageId, position5x5 = position5x5))
+                }
+            }
+        }
     }
 
     private fun parseContext(value: String?): AacCommunicationContext {
