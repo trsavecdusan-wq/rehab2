@@ -17,6 +17,14 @@ object AacContentBootstrap {
     private const val DEFAULT_PAGE_TITLE = "STRAN 1"
     private const val DOM_PROFILE_ID = "dom"
     private const val DOM_PROFILE_FILE = "dom.json"
+    private const val DEBUG_PREFS_NAME = "aac_dom_profile_debug"
+    private const val KEY_DEBUG_PROFILE_FILE_PATH = "profile_file_path"
+    private const val KEY_DEBUG_PROFILE_FILE_EXISTS = "profile_file_exists"
+    private const val KEY_DEBUG_PROFILE_TYPE = "profile_type"
+    private const val KEY_DEBUG_DOM_PROFILE_FOUND = "dom_profile_found"
+    private const val KEY_DEBUG_DOM_PROFILE_ID = "dom_profile_id"
+    private const val KEY_DEBUG_ITEM_IDS_BEFORE = "item_ids_before"
+    private const val KEY_DEBUG_ITEM_IDS_AFTER = "item_ids_after"
 
     data class Result(
         val itemCount: Int,
@@ -30,6 +38,16 @@ object AacContentBootstrap {
         val visibleNormalItemCount: Int,
         val skipped: Boolean,
         val reason: String
+    )
+
+    data class DomProfileDebug(
+        val profileFilePath: String,
+        val profileFileExists: Boolean,
+        val profileType: String,
+        val domProfileFound: Boolean,
+        val domProfileId: String,
+        val itemIdsBefore: Int,
+        val itemIdsAfter: Int
     )
 
     fun ensurePatientStartupContent(context: Context, fallbackItems: List<AacItem>): Result {
@@ -120,21 +138,66 @@ object AacContentBootstrap {
     private fun ensureDomProfileLinked(context: Context, itemIds: List<String>): ProfileBootstrapResult {
         val safeItemIds = itemIds.map { it.trim() }.filter { it.isNotBlank() }.distinct()
         if (safeItemIds.isEmpty()) {
+            saveDomProfileDebug(
+                context = context,
+                profileFile = null,
+                profileFileExists = false,
+                profileType = "NO_SAFE_ITEMS",
+                domProfileFound = false,
+                domProfileId = "",
+                itemIdsBefore = 0,
+                itemIdsAfter = 0
+            )
             return ProfileBootstrapResult(linkedItemCount = 0, updated = false)
         }
-        val profilesDir = AacStoragePaths.getProfilesDataDir(context) ?: return ProfileBootstrapResult(0, false)
+        val profilesDir = AacStoragePaths.getProfilesDataDir(context) ?: run {
+            saveDomProfileDebug(
+                context = context,
+                profileFile = null,
+                profileFileExists = false,
+                profileType = "NO_PROFILE_DIR",
+                domProfileFound = false,
+                domProfileId = "",
+                itemIdsBefore = 0,
+                itemIdsAfter = 0
+            )
+            return ProfileBootstrapResult(0, false)
+        }
         if (!profilesDir.exists() && !profilesDir.mkdirs()) {
+            saveDomProfileDebug(
+                context = context,
+                profileFile = File(profilesDir, DOM_PROFILE_FILE),
+                profileFileExists = false,
+                profileType = "PROFILE_DIR_CREATE_FAILED",
+                domProfileFound = false,
+                domProfileId = "",
+                itemIdsBefore = 0,
+                itemIdsAfter = 0
+            )
             return ProfileBootstrapResult(0, false)
         }
         val profileFile = File(profilesDir, DOM_PROFILE_FILE)
         val rootJson = readProfileJson(profileFile)
+        val profileType = domProfileType(rootJson)
         val profileJson = domProfileJson(rootJson) ?: JSONObject()
             .put("id", DOM_PROFILE_ID)
             .put("displayName", "DOM")
             .put("context", AacCommunicationContext.NORMAL_COMMUNICATION.name)
             .put("enabled", true)
+        val domProfileFound = domProfileJson(rootJson) != null
+        val domProfileId = profileJson.optString("id").trim()
         val existingItemIds = stringList(profileJson.optJSONArray("itemIds"))
         if (existingItemIds.isNotEmpty()) {
+            saveDomProfileDebug(
+                context = context,
+                profileFile = profileFile,
+                profileFileExists = profileFile.isFile,
+                profileType = profileType,
+                domProfileFound = domProfileFound,
+                domProfileId = domProfileId,
+                itemIdsBefore = existingItemIds.size,
+                itemIdsAfter = existingItemIds.size
+            )
             return ProfileBootstrapResult(linkedItemCount = existingItemIds.size, updated = false)
         }
         profileJson.put("itemIds", JSONArray().apply { safeItemIds.forEach { itemId -> put(itemId) } })
@@ -144,7 +207,44 @@ object AacContentBootstrap {
             profileJson
         }
         profileFile.writeText(outputJson.toString(2), Charsets.UTF_8)
+        val writtenRootJson = readProfileJson(profileFile)
+        val itemIdsAfter = stringList(domProfileJson(writtenRootJson)?.optJSONArray("itemIds")).size
+        saveDomProfileDebug(
+            context = context,
+            profileFile = profileFile,
+            profileFileExists = profileFile.isFile,
+            profileType = profileType,
+            domProfileFound = domProfileFound,
+            domProfileId = domProfileId,
+            itemIdsBefore = existingItemIds.size,
+            itemIdsAfter = itemIdsAfter
+        )
+        Log.d(
+            TAG,
+            "DOM_PROFILE_DEBUG file=${profileFile.absolutePath} exists=${profileFile.isFile} type=$profileType found=$domProfileFound id=$domProfileId before=${existingItemIds.size} after=$itemIdsAfter"
+        )
         return ProfileBootstrapResult(linkedItemCount = safeItemIds.size, updated = true)
+    }
+
+    fun inspectDomProfileDebug(context: Context): DomProfileDebug {
+        val profileFile = AacStoragePaths.getProfilesDataDir(context)?.let { profilesDir ->
+            File(profilesDir, DOM_PROFILE_FILE)
+        }
+        val rootJson = profileFile?.let { readProfileJson(it) }
+        val profileJson = domProfileJson(rootJson)
+        val currentItemIdsCount = stringList(profileJson?.optJSONArray("itemIds")).size
+        val prefs = context.getSharedPreferences(DEBUG_PREFS_NAME, Context.MODE_PRIVATE)
+        return DomProfileDebug(
+            profileFilePath = profileFile?.absolutePath
+                ?: prefs.getString(KEY_DEBUG_PROFILE_FILE_PATH, "").orEmpty(),
+            profileFileExists = profileFile?.isFile
+                ?: prefs.getBoolean(KEY_DEBUG_PROFILE_FILE_EXISTS, false),
+            profileType = domProfileType(rootJson),
+            domProfileFound = profileJson != null,
+            domProfileId = profileJson?.optString("id")?.trim().orEmpty(),
+            itemIdsBefore = prefs.getInt(KEY_DEBUG_ITEM_IDS_BEFORE, currentItemIdsCount),
+            itemIdsAfter = prefs.getInt(KEY_DEBUG_ITEM_IDS_AFTER, currentItemIdsCount)
+        )
     }
 
     private fun domProfileJson(rootJson: JSONObject?): JSONObject? {
@@ -160,6 +260,13 @@ object AacContentBootstrap {
             }
         }
         return null
+    }
+
+    private fun domProfileType(rootJson: JSONObject?): String {
+        if (rootJson == null) return "MISSING"
+        if (rootJson.optString("id").trim() == DOM_PROFILE_ID) return "DIRECT"
+        if (rootJson.has("profiles")) return "WRAPPED"
+        return "UNKNOWN"
     }
 
     private fun ensureDomProfileInRoot(rootJson: JSONObject, profileJson: JSONObject): JSONObject {
@@ -349,6 +456,32 @@ object AacContentBootstrap {
             Log.w(TAG, "AAC_BOOTSTRAP_PROFILE_READ_FAILED file=${profileFile.name}", error)
             null
         }
+    }
+
+    private fun saveDomProfileDebug(
+        context: Context,
+        profileFile: File?,
+        profileFileExists: Boolean,
+        profileType: String,
+        domProfileFound: Boolean,
+        domProfileId: String,
+        itemIdsBefore: Int,
+        itemIdsAfter: Int
+    ) {
+        context.getSharedPreferences(DEBUG_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_DEBUG_PROFILE_FILE_PATH, profileFile?.absolutePath.orEmpty())
+            .putBoolean(KEY_DEBUG_PROFILE_FILE_EXISTS, profileFileExists)
+            .putString(KEY_DEBUG_PROFILE_TYPE, profileType)
+            .putBoolean(KEY_DEBUG_DOM_PROFILE_FOUND, domProfileFound)
+            .putString(KEY_DEBUG_DOM_PROFILE_ID, domProfileId)
+            .putInt(KEY_DEBUG_ITEM_IDS_BEFORE, itemIdsBefore)
+            .putInt(KEY_DEBUG_ITEM_IDS_AFTER, itemIdsAfter)
+            .apply()
+        Log.d(
+            TAG,
+            "DOM_PROFILE_DEBUG file=${profileFile?.absolutePath.orEmpty()} exists=$profileFileExists type=$profileType found=$domProfileFound id=$domProfileId before=$itemIdsBefore after=$itemIdsAfter"
+        )
     }
 
     private fun stringList(array: JSONArray?): List<String> {

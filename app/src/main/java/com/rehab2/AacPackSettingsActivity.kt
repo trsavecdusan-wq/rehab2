@@ -1203,6 +1203,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             ?: 0
         val fixedRowCount = fixedTopRowCellItems().size
         val domLinkedCount = overview.relationAnalysis.profileRelations["dom"]?.itemCount ?: 0
+        val domDebug = AacContentBootstrap.inspectDomProfileDebug(this)
         val health = when {
             overview.relationAnalysis.availableItems.isEmpty() -> "NI AAC ELEMENTOV"
             pages.isEmpty() -> "MANJKA STRAN"
@@ -1220,7 +1221,15 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Vidnih ikon na začetni strani: $visibleItemCount\n")
             append("Fiksna vrstica: $fixedRowCount/5\n")
             append("DOM profil povezanih ikon: $domLinkedCount\n")
-            append("Lokalne PNG ikone: ${overview.iconCount}")
+            append("Lokalne PNG ikone: ${overview.iconCount}\n\n")
+            append("DOM PROFILE DEBUG\n")
+            append("Profile file:\n${domDebug.profileFilePath.ifBlank { "ni poti" }}\n")
+            append("Exists: ${if (domDebug.profileFileExists) "YES" else "NO"}\n")
+            append("Profile type: ${domDebug.profileType}\n")
+            append("DOM profile found: ${if (domDebug.domProfileFound) "YES" else "NO"}\n")
+            append("DOM profile id: ${domDebug.domProfileId.ifBlank { "ni zaznan" }}\n")
+            append("ItemIds before: ${domDebug.itemIdsBefore}\n")
+            append("ItemIds after: ${domDebug.itemIdsAfter}")
         }
     }
 
