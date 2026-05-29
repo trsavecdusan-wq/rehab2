@@ -374,6 +374,7 @@ class MainActivity : AppCompatActivity() {
         registerPowerReceiver()
         refreshInitialPowerState()
         startPowerMonitoring()
+        resetMainAacRootOnResume()
     }
 
     override fun onPause() {
@@ -467,6 +468,13 @@ class MainActivity : AppCompatActivity() {
         showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
     }
 
+    private fun resetMainAacRootOnResume() {
+        if (::mainAacTileBindings.isInitialized) {
+            clearMainAacSentenceState()
+            resetMainAacRoot()
+        }
+    }
+
     private fun handleMainAacItemAction(item: AacItem) {
         val targetPageItems = mainAacPageItems(item.targetPageId)
         if (targetPageItems.isNotEmpty()) {
@@ -527,12 +535,14 @@ class MainActivity : AppCompatActivity() {
                 )
             )
             speakMainAacSentenceNow(languageCode)
+            resetMainAacAfterTerminalSpeech()
             return
         }
         if (resolvedSpeechText.isNotBlank()) {
             aacAudioPlayer.speakText(resolvedSpeechText, languageCode)
         }
         clearMainAacSentenceState()
+        resetMainAacAfterTerminalSpeech()
     }
 
     private fun needsMainAacTranslation(item: AacItem, languageCode: String): Boolean {
@@ -836,6 +846,7 @@ class MainActivity : AppCompatActivity() {
         if (shouldSpeakSentence && sentence.isNotBlank()) {
             aacAudioPlayer.speakText(sentence, languageCode)
             clearMainAacSentenceState()
+            resetMainAacAfterTerminalSpeech()
         }
     }
 
@@ -845,6 +856,11 @@ class MainActivity : AppCompatActivity() {
             aacAudioPlayer.speakText(sentence, languageCode)
         }
         clearMainAacSentenceState()
+    }
+
+    private fun resetMainAacAfterTerminalSpeech() {
+        mainAacHistory.clear()
+        resetMainAacRoot()
     }
 
     private fun clearMainAacSentenceState() {
