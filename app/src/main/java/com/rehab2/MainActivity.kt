@@ -470,6 +470,7 @@ class MainActivity : AppCompatActivity() {
     private fun handleMainAacItemAction(item: AacItem) {
         val targetPageItems = mainAacPageItems(item.targetPageId)
         if (targetPageItems.isNotEmpty()) {
+            prepareMainAacContextPrompt(item)
             mainAacHistory.addLast(currentMainAacItems)
             showMainAacItems(targetPageItems)
             return
@@ -478,6 +479,7 @@ class MainActivity : AppCompatActivity() {
         val childItems = mainAacChildrenFor(item)
         if (item.opensSubicons || childItems.isNotEmpty()) {
             if (childItems.isNotEmpty()) {
+                prepareMainAacContextPrompt(item)
                 mainAacHistory.addLast(currentMainAacItems)
                 showMainAacItems(childItems)
             }
@@ -493,17 +495,30 @@ class MainActivity : AppCompatActivity() {
             item = item,
             languageCode = languageCode,
             resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode),
-            resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+            resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode),
+            inContextFlow = mainAacHistory.isNotEmpty()
         )
+    }
+
+    private fun prepareMainAacContextPrompt(item: AacItem) {
+        clearMainAacSentenceState()
+        val languageCode = getActiveSpeechLanguage()
+        val prompt = AacLocalizedTextResolver.resolveQuestion(item, languageCode)?.trim().orEmpty()
+        if (prompt.isNotBlank()) {
+            aacAudioPlayer.speakText(prompt, languageCode)
+        }
     }
 
     private fun handleMainAacResolvedSpeech(
         item: AacItem,
         languageCode: String,
         resolvedLabel: String,
-        resolvedSpeechText: String
+        resolvedSpeechText: String,
+        inContextFlow: Boolean
     ) {
-        if (item.addsToSentence) {
+        mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
+        mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
+        if (inContextFlow && item.addsToSentence) {
             mainAacSentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
@@ -511,11 +526,13 @@ class MainActivity : AppCompatActivity() {
                     role = item.sentenceRole
                 )
             )
-            scheduleMainAacSentenceSpeech(item.speaksImmediately)
+            speakMainAacSentenceNow(languageCode)
+            return
         }
-        if (item.speaksImmediately) {
+        if (resolvedSpeechText.isNotBlank()) {
             aacAudioPlayer.speakText(resolvedSpeechText, languageCode)
         }
+        clearMainAacSentenceState()
     }
 
     private fun needsMainAacTranslation(item: AacItem, languageCode: String): Boolean {
@@ -550,7 +567,8 @@ class MainActivity : AppCompatActivity() {
                         item = item,
                         languageCode = normalizedLanguage,
                         resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, normalizedLanguage),
-                        resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, normalizedLanguage)
+                        resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, normalizedLanguage),
+                        inContextFlow = mainAacHistory.isNotEmpty()
                     )
                     return@post
                 }
@@ -565,7 +583,8 @@ class MainActivity : AppCompatActivity() {
                     item = updatedItem,
                     languageCode = normalizedLanguage,
                     resolvedLabel = translation.label,
-                    resolvedSpeechText = translation.speechText
+                    resolvedSpeechText = translation.speechText,
+                    inContextFlow = mainAacHistory.isNotEmpty()
                 )
             }
         }.start()
@@ -672,6 +691,7 @@ class MainActivity : AppCompatActivity() {
             labelByLanguage = storedItem.labelByLanguage.ifEmpty { fallbackItem.labelByLanguage },
             speechTextByLanguage = storedItem.speechTextByLanguage.ifEmpty { fallbackItem.speechTextByLanguage },
             activeLanguages = storedItem.activeLanguages.ifEmpty { fallbackItem.activeLanguages },
+            questionByLanguage = storedItem.questionByLanguage.ifEmpty { fallbackItem.questionByLanguage },
             baseLanguage = storedItem.baseLanguage,
             translationGenerated = storedItem.translationGenerated,
             translationSource = storedItem.translationSource,
@@ -815,16 +835,49 @@ class MainActivity : AppCompatActivity() {
         val sentence = mainAacSentenceManager.getSpeakText(languageCode).trim()
         if (shouldSpeakSentence && sentence.isNotBlank()) {
             aacAudioPlayer.speakText(sentence, languageCode)
-            mainAacSentenceManager.clear()
-            mainAacAutoSentenceMaySpeakSingle = false
-            mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
+            clearMainAacSentenceState()
         }
+    }
+
+    private fun speakMainAacSentenceNow(languageCode: String) {
+        val sentence = mainAacSentenceManager.getSpeakText(languageCode).trim()
+        if (sentence.isNotBlank()) {
+            aacAudioPlayer.speakText(sentence, languageCode)
+        }
+        clearMainAacSentenceState()
+    }
+
+    private fun clearMainAacSentenceState() {
+        mainAacSentenceManager.clear()
+        mainAacAutoSentenceMaySpeakSingle = false
+        mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
+        mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
     }
 
     private fun buildMainAacItems(): List<AacItem> {
         return listOf(
-            mainAacItem("drink", "PIJAČA", opensSubicons = true, children = listOf("water", "juice", "tea", "coffee")),
-            mainAacItem("food", "HRANA", opensSubicons = true, children = listOf("soup", "bread", "fruit")),
+            mainAacItem(
+                "drink",
+                "PIJAČA",
+                opensSubicons = true,
+                children = listOf("water", "juice", "tea", "coffee"),
+                questionByLanguage = mapOf(
+                    "sl" to "Kaj želiš piti?",
+                    "uk" to "Що ти хочеш пити?",
+                    "en" to "What do you want to drink?"
+                )
+            ),
+            mainAacItem(
+                "food",
+                "HRANA",
+                opensSubicons = true,
+                children = listOf("soup", "bread", "fruit"),
+                questionByLanguage = mapOf(
+                    "sl" to "Kaj želiš jesti?",
+                    "uk" to "Що ти хочеш їсти?",
+                    "en" to "What do you want to eat?"
+                )
+            ),
             mainAacItem("help", "POMOČ", "pomoč"),
             mainAacItem("yes", "DA", "da"),
             mainAacItem("wc", "WC", "WC"),
@@ -834,7 +887,17 @@ class MainActivity : AppCompatActivity() {
             mainAacItem("tired", "UTRUJENA", "utrujena"),
             mainAacItem("cold", "MRAZ", "mraz"),
             mainAacItem("hot", "VROČE", "vroče"),
-            mainAacItem("pain", "BOLEČINA", opensSubicons = true, children = listOf("head", "arm", "leg", "belly")),
+            mainAacItem(
+                "pain",
+                "BOLEČINA",
+                opensSubicons = true,
+                children = listOf("head", "arm", "leg", "belly"),
+                questionByLanguage = mapOf(
+                    "sl" to "Kje boli?",
+                    "uk" to "Де болить?",
+                    "en" to "Where does it hurt?"
+                )
+            ),
             mainAacItem("doctor", "ZDRAVNIK", "zdravnik"),
             mainAacItem("family", "DRUŽINA", "družina"),
             mainAacItem("stop", "STOP", "stop"),
@@ -860,7 +923,8 @@ class MainActivity : AppCompatActivity() {
         children: List<String> = emptyList(),
         isRootItem: Boolean = true,
         visibleUnderIds: List<String> = emptyList(),
-        fixedTopRowPosition: Int? = null
+        fixedTopRowPosition: Int? = null,
+        questionByLanguage: Map<String, String> = emptyMap()
     ): AacItem {
         return AacItem(
             id = id,
@@ -873,6 +937,7 @@ class MainActivity : AppCompatActivity() {
             iconSource = IconSource.SYSTEM,
             visibleUnderIds = visibleUnderIds,
             children = children,
+            questionByLanguage = questionByLanguage,
             isRootItem = isRootItem,
             fixedTopRowPosition = fixedTopRowPosition,
             addsToSentence = !opensSubicons,

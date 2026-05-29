@@ -66,7 +66,7 @@ object AacLocalizedTextResolver {
             if (enText.label != null || enText.speakText != null) {
                 put("en", enText)
             }
-            val localLanguageCodes = (activeLanguages + labelByLanguage.keys + speechTextByLanguage.keys)
+            val localLanguageCodes = (activeLanguages + labelByLanguage.keys + speechTextByLanguage.keys + questionByLanguage.keys)
                 .map(AacLanguageResolver::normalize)
                 .filter { it.isNotBlank() }
                 .distinct()
@@ -75,6 +75,7 @@ object AacLocalizedTextResolver {
                 val localText = AacLocalizedText(
                     label = labelByLanguage[languageCode],
                     speakText = speechTextByLanguage[languageCode],
+                    question = questionByLanguage[languageCode],
                     learningText = labelByLanguage[languageCode]
                 )
                 put(
@@ -82,7 +83,7 @@ object AacLocalizedTextResolver {
                     AacLocalizedText(
                         label = localText.label ?: existingText?.label,
                         speakText = localText.speakText ?: existingText?.speakText,
-                        question = existingText?.question,
+                        question = localText.question ?: existingText?.question,
                         learningText = localText.learningText ?: existingText?.learningText
                     )
                 )

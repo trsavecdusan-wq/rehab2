@@ -244,6 +244,7 @@ object AacStoredTranslationCache {
             sentenceRole?.let { put("sentenceRole", it) }
             questionSl?.let { put("questionSl", it) }
             questionUk?.let { put("questionUk", it) }
+            if (questionByLanguage.isNotEmpty()) put("questionByLanguage", JSONObject(questionByLanguage))
             put("iconSource", iconSource.name)
             parentId?.let { put("parentId", it) }
             if (visibleUnderIds.isNotEmpty()) put("visibleUnderIds", JSONArray(visibleUnderIds))

@@ -15,6 +15,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -117,6 +118,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnAddAacActiveLanguage: Button
     private lateinit var btnSetAacBaseLanguage: Button
     private lateinit var editAacSpeechText: EditText
+    private lateinit var editAacQuestionByLanguage: EditText
     private lateinit var editAacIconSource: EditText
     private lateinit var editAacImagePath: EditText
     private lateinit var btnChooseAacImage: Button
@@ -136,10 +138,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnRemovePlacement: Button
     private lateinit var txtPlacementStatus: TextView
     private lateinit var txtPatientPagesStatus: TextView
+    private lateinit var patientPageActions: LinearLayout
     private lateinit var editPatientPageId: EditText
     private lateinit var editPatientPageTitle: EditText
     private lateinit var btnSavePatientPage: Button
     private lateinit var btnSetDefaultPatientPage: Button
+    private lateinit var placementGridActions: LinearLayout
     private lateinit var editSubiconParentId: EditText
     private lateinit var editSubiconChildId: EditText
     private lateinit var btnChooseSubiconParent: Button
@@ -219,6 +223,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnAddAacActiveLanguage = findViewById(R.id.btnAddAacActiveLanguage)
         btnSetAacBaseLanguage = findViewById(R.id.btnSetAacBaseLanguage)
         editAacSpeechText = findViewById(R.id.editAacSpeechText)
+        editAacQuestionByLanguage = findViewById(R.id.editAacQuestionByLanguage)
         editAacIconSource = findViewById(R.id.editAacIconSource)
         editAacImagePath = findViewById(R.id.editAacImagePath)
         btnChooseAacImage = findViewById(R.id.btnChooseAacImage)
@@ -238,10 +243,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnRemovePlacement = findViewById(R.id.btnRemovePlacement)
         txtPlacementStatus = findViewById(R.id.txtPlacementStatus)
         txtPatientPagesStatus = findViewById(R.id.txtPatientPagesStatus)
+        patientPageActions = findViewById(R.id.patientPageActions)
         editPatientPageId = findViewById(R.id.editPatientPageId)
         editPatientPageTitle = findViewById(R.id.editPatientPageTitle)
         btnSavePatientPage = findViewById(R.id.btnSavePatientPage)
         btnSetDefaultPatientPage = findViewById(R.id.btnSetDefaultPatientPage)
+        placementGridActions = findViewById(R.id.placementGridActions)
         editSubiconParentId = findViewById(R.id.editSubiconParentId)
         editSubiconChildId = findViewById(R.id.editSubiconChildId)
         btnChooseSubiconParent = findViewById(R.id.btnChooseSubiconParent)
@@ -253,6 +260,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtIconFolderStatus = findViewById(R.id.txtIconFolderStatus)
         txtLocalProfilesStatus = findViewById(R.id.txtLocalProfilesStatus)
         localProfileActions = findViewById(R.id.localProfileActions)
+
+        configureSettingsModuleNavigation()
 
         findViewById<Button>(R.id.btnBackAacPackSettings).setOnClickListener {
             finish()
@@ -364,6 +373,25 @@ class AacPackSettingsActivity : AppCompatActivity() {
         refreshAacLanguageManagerStatus()
         refreshLastImportDiagnostic()
         refreshLocalAacOverview()
+    }
+
+    private fun configureSettingsModuleNavigation() {
+        val scrollView = findViewById<ScrollView>(R.id.aacSettingsScrollView)
+        fun bind(buttonId: Int, targetId: Int) {
+            findViewById<Button>(buttonId).setOnClickListener {
+                val target = findViewById<android.view.View>(targetId)
+                scrollView.post {
+                    scrollView.smoothScrollTo(0, target.top)
+                }
+            }
+        }
+        bind(R.id.btnModuleCommunicator, R.id.sectionAacLibrary)
+        bind(R.id.btnModuleVideoCalls, R.id.sectionFutureModules)
+        bind(R.id.btnModuleMessages, R.id.sectionFutureModules)
+        bind(R.id.btnModuleGallery, R.id.sectionFutureModules)
+        bind(R.id.btnModuleMirror, R.id.sectionFutureModules)
+        bind(R.id.btnModuleSpeechApi, R.id.sectionAacLanguages)
+        bind(R.id.btnModuleSystemUpdates, R.id.sectionAacImportExport)
     }
 
     private fun startExport() {
@@ -933,7 +961,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
         txtFixedTopRowAvailableItems.text = buildFixedTopRowAvailableItems(overview.relationAnalysis.availableItems)
         txtPatientPagesStatus.text = buildPatientPagesStatus()
+        renderPatientPageBrowser()
         txtPlacementStatus.text = buildPlacementStatus(overview.relationAnalysis.availableItems)
+        renderPlacementGrid()
         txtSubiconStatus.text = buildSubiconStatus()
         txtActiveProfileStatus.text = buildActiveProfileStatus()
         txtIconFolderStatus.text = buildIconFolderStatus()
@@ -1087,22 +1117,44 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
 
         filteredItems.take(MAX_EDITOR_LIST_ITEMS).forEach { item ->
-            val button = Button(this).apply {
-                text = "${item.label.ifBlank { "brez oznake" }}\n${item.itemId} · ${item.iconSource.name}"
-                setAllCaps(false)
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setBackgroundColor(0xFF34414D.toInt())
+                setPadding(10.dp(), 8.dp(), 10.dp(), 8.dp())
+                isClickable = true
+                isFocusable = true
+                setOnClickListener { loadAacItemIntoEditor(item.itemId) }
+            }
+            val preview = ImageView(this).apply {
+                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                setBackgroundColor(0xFF1E252C.toInt())
+                setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
+            }
+            bindAacListIconPreview(preview, item)
+            val text = TextView(this).apply {
+                this.text = "${item.label.ifBlank { "brez oznake" }}\n${item.itemId} · ${item.iconSource.name}"
                 textSize = 15f
                 setTextColor(0xFFF4F7FA.toInt())
-                setBackgroundColor(0xFF34414D.toInt())
-                setPadding(12.dp(), 8.dp(), 12.dp(), 8.dp())
-                setOnClickListener {
-                    loadAacItemIntoEditor(item.itemId)
-                }
+                setPadding(12.dp(), 0, 0, 0)
             }
+            row.addView(
+                preview,
+                LinearLayout.LayoutParams(54.dp(), 54.dp())
+            )
+            row.addView(
+                text,
+                LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1f
+                )
+            )
             aacItemListActions.addView(
-                button,
+                row,
                 LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    64.dp()
+                    72.dp()
                 ).apply {
                     bottomMargin = 8.dp()
                 }
@@ -1114,6 +1166,20 @@ class AacPackSettingsActivity : AppCompatActivity() {
             aacItemListActions.addView(
                 buildAacItemListMessage("Prikazanih je prvih $MAX_EDITOR_LIST_ITEMS elementov. Preostalih: $remaining.")
             )
+        }
+    }
+
+    private fun bindAacListIconPreview(preview: ImageView, item: AacListItem) {
+        val imageFile = AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
+        if (imageFile?.isFile != true) {
+            preview.setImageDrawable(null)
+            return
+        }
+        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+        if (bitmap == null) {
+            preview.setImageDrawable(null)
+        } else {
+            preview.setImageBitmap(bitmap)
         }
     }
 
@@ -1152,6 +1218,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 .ifBlank { itemLanguageText(item, "speechTextByLanguage", baseLanguage) }
                 .ifBlank { item.optString("speakTextSl") }
         )
+        editAacQuestionByLanguage.setText(formatQuestionByLanguageForEditor(item))
         val iconSource = itemIconSource(item)
         val imagePath = item.optString("imagePath")
             .ifBlank { item.optString("image_path") }
@@ -1536,6 +1603,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun buildPatientPagesStatus(): String {
         val pages = loadPatientPages()
         val defaultPageId = defaultPatientPageId()
+        val itemCounts = patientPageItemCounts()
         return buildString {
             append("PACIENTOVE STRANI\n")
             append("Strani so terapevtsko določene. pageTitle je samo prikazno ime.\n")
@@ -1550,10 +1618,110 @@ class AacPackSettingsActivity : AppCompatActivity() {
             } else {
                 pages.forEach { page ->
                     val marker = if (page.pageId == defaultPageId) " (začetna)" else ""
-                    append("- ${page.pageId}: ${page.pageTitle}$marker\n")
+                    val count = itemCounts[page.pageId] ?: 0
+                    append("- ${page.pageTitle} (${page.pageId}) - $count ikon$marker\n")
                 }
             }
         }.trimEnd()
+    }
+
+    private fun renderPatientPageBrowser() {
+        patientPageActions.removeAllViews()
+        val pages = loadPatientPages()
+        val itemCounts = patientPageItemCounts()
+        val defaultPageId = defaultPatientPageId()
+        if (pages.isEmpty()) {
+            patientPageActions.addView(buildAacItemListMessage("Ni pacientovih strani. Ustvari stran, nato izberi postavitve."))
+            return
+        }
+        pages.forEach { page ->
+            val button = Button(this).apply {
+                val marker = if (page.pageId == defaultPageId) " · začetna" else ""
+                text = "${page.pageTitle}\n${page.pageId} · ${itemCounts[page.pageId] ?: 0} ikon$marker"
+                setAllCaps(false)
+                textSize = 15f
+                setTextColor(0xFFF4F7FA.toInt())
+                setBackgroundColor(0xFF34414D.toInt())
+                setPadding(12.dp(), 6.dp(), 12.dp(), 6.dp())
+                setOnClickListener {
+                    editPatientPageId.setText(page.pageId)
+                    editPatientPageTitle.setText(page.pageTitle)
+                    editPlacementPageId.setText(page.pageId)
+                    txtStatus.text = "Stran izbrana.\n${page.pageTitle} (${page.pageId})"
+                }
+            }
+            patientPageActions.addView(
+                button,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    64.dp()
+                ).apply {
+                    bottomMargin = 8.dp()
+                }
+            )
+        }
+    }
+
+    private fun patientPageItemCounts(): Map<String, Int> {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText) ?: return emptyMap()
+        val counts = mutableMapOf<String, Int>()
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val placements = item.optJSONArray("placements") ?: continue
+            for (placementIndex in 0 until placements.length()) {
+                val placement = placements.optJSONObject(placementIndex) ?: continue
+                val pageId = placement.optString("pageId").trim()
+                val position = placement.optInt("position5x5", 0)
+                if (isSafePatientPageId(pageId) && position in 1..25) {
+                    counts[pageId] = (counts[pageId] ?: 0) + 1
+                }
+            }
+        }
+        return counts
+    }
+
+    private fun renderPlacementGrid() {
+        placementGridActions.removeAllViews()
+        for (rowIndex in 0 until 5) {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+            }
+            for (columnIndex in 0 until 5) {
+                val position = rowIndex * 5 + columnIndex + 1
+                val button = Button(this).apply {
+                    text = position.toString()
+                    setAllCaps(false)
+                    textSize = 14f
+                    setTextColor(0xFFF4F7FA.toInt())
+                    setBackgroundColor(0xFF34414D.toInt())
+                    setOnClickListener {
+                        editPlacementPosition5x5.setText(position.toString())
+                        txtStatus.text = "Pozicija izbrana: $position"
+                    }
+                }
+                row.addView(
+                    button,
+                    LinearLayout.LayoutParams(
+                        0,
+                        48.dp(),
+                        1f
+                    ).apply {
+                        marginEnd = if (columnIndex < 4) 4.dp() else 0
+                    }
+                )
+            }
+            placementGridActions.addView(
+                row,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = 4.dp()
+                }
+            )
+        }
     }
 
     private fun savePatientPage() {
@@ -1652,17 +1820,30 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Podikone so shranjene kot children pri starsu in visibleUnderIds pri otroku.\n")
             val childLines = currentItemsArray(itemsText)
                 ?.let { array ->
+                    val labelsById = buildMap {
+                        for (index in 0 until array.length()) {
+                            val item = array.optJSONObject(index) ?: continue
+                            val itemId = item.optString("id").trim()
+                            if (itemId.isNotBlank()) {
+                                put(itemId, itemLabel(item).ifBlank { itemId })
+                            }
+                        }
+                    }
                     buildList {
                         for (index in 0 until array.length()) {
                             val item = array.optJSONObject(index) ?: continue
                             val parentId = item.optString("id").trim()
                             val children = item.optJSONArray("children") ?: continue
+                            if (parentId.isBlank()) continue
+                            add("${labelsById[parentId] ?: parentId}")
                             for (childIndex in 0 until children.length()) {
                                 val childId = children.optString(childIndex).trim()
-                                if (parentId.isNotBlank() && childId.isNotBlank()) {
-                                    add("- $parentId -> $childId")
+                                if (childId.isNotBlank()) {
+                                    val branch = if (childIndex == children.length() - 1) "└─" else "├─"
+                                    add("$branch ${labelsById[childId] ?: childId} ($childId)")
                                 }
                             }
+                            add("")
                         }
                     }
                 }
@@ -1670,8 +1851,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
             if (childLines.isEmpty()) {
                 append("Ni nastavljenih podikon.")
             } else {
-                childLines.take(20).forEach { append("$it\n") }
-                val remaining = childLines.size - 20
+                childLines.take(40).forEach { append("$it\n") }
+                val remaining = childLines.size - 40
                 if (remaining > 0) append("... se $remaining")
             }
         }.trimEnd()
@@ -2073,6 +2254,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 activeLanguages.ifEmpty { listOf("sl") }.take(3).forEach { put(it) }
             })
             putOptionalString(item, "speechText", editAacSpeechText.text.toString())
+            val questionByLanguage = parseLanguageAssignments(editAacQuestionByLanguage.text.toString())
+            if (questionByLanguage.isNotEmpty()) {
+                item.put("questionByLanguage", org.json.JSONObject(questionByLanguage))
+                item.remove("questionSl")
+                item.remove("questionUk")
+            } else {
+                item.remove("questionByLanguage")
+            }
             putOptionalString(item, "iconSource", iconSourceForEditor())
             putOptionalString(item, "imagePath", editAacImagePath.text.toString())
             item.remove("image_path")
@@ -2178,6 +2367,39 @@ class AacPackSettingsActivity : AppCompatActivity() {
         } else {
             item.put(key, cleanValue)
         }
+    }
+
+    private fun formatQuestionByLanguageForEditor(item: org.json.JSONObject): String {
+        val values = linkedMapOf<String, String>()
+        item.optJSONObject("questionByLanguage")?.let { questions ->
+            questions.keys().forEach { key ->
+                val language = key.trim().lowercase(Locale.ROOT)
+                val value = questions.optString(key).trim()
+                if (language.isNotBlank() && value.isNotBlank()) {
+                    values[language] = value
+                }
+            }
+        }
+        item.optString("questionSl").trim().takeIf { it.isNotBlank() }?.let { values.putIfAbsent("sl", it) }
+        item.optString("questionUk").trim().takeIf { it.isNotBlank() }?.let { values.putIfAbsent("uk", it) }
+        return values.entries.joinToString("; ") { (language, value) -> "$language=$value" }
+    }
+
+    private fun parseLanguageAssignments(rawValue: String): Map<String, String> {
+        return rawValue
+            .split(';')
+            .mapNotNull { assignment ->
+                val separatorIndex = assignment.indexOf('=')
+                if (separatorIndex <= 0) return@mapNotNull null
+                val language = assignment.substring(0, separatorIndex).trim().lowercase(Locale.ROOT)
+                val value = assignment.substring(separatorIndex + 1).trim()
+                if (language.matches(Regex("[a-z]{2,3}")) && value.isNotBlank()) {
+                    language to value
+                } else {
+                    null
+                }
+            }
+            .toMap()
     }
 
     private fun buildLabelByLanguageJson(existing: org.json.JSONObject?, labelSl: String): org.json.JSONObject {
@@ -2547,7 +2769,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     availableItems += AacListItem(
                         itemId = itemId,
                         label = itemLabel(item),
-                        iconSource = itemIconSource(item)
+                        iconSource = itemIconSource(item),
+                        imagePath = item.optString("imagePath")
+                            .ifBlank { item.optString("image_path") }
+                            .ifBlank { item.optString("icon") }
                     )
                 }
                 val fixedTopRowPosition = itemFixedTopRowPosition(item)
@@ -2783,7 +3008,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private data class AacListItem(
         val itemId: String,
         val label: String,
-        val iconSource: IconSource
+        val iconSource: IconSource,
+        val imagePath: String
     )
 
     private data class PatientPage(

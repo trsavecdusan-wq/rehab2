@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/aacSettingsScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121417">
@@ -41,6 +42,133 @@
             android:textSize="16sp" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="MODULI"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/settingsModuleNavigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btnModuleCommunicator"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="#214A78"
+                android:text="KOMUNIKATOR"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnModuleVideoCalls"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="VIDEO KLICI"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnModuleMessages"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="SPOROČILA"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnModuleGallery"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="GALERIJA"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnModuleMirror"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="OGLEDALO"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnModuleSpeechApi"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="GOVOR / API"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnModuleSystemUpdates"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#34414D"
+                    android:text="SISTEM / POSODOBITVE"
+                    android:textAllCaps="false"
+                    android:textColor="#F4F7FA"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
             android:id="@+id/txtAacHealthSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,6 +177,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/sectionAacLibrary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -249,6 +378,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/sectionAacPlacement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -256,6 +386,15 @@
             android:textColor="#F4F7FA"
             android:textSize="18sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtAacWizardGuide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="AAC ČAROVNIK: 1 izberi/ustvari ikono · 2 izberi sliko · 3 vnesi tekst · 4 shrani jezike · 5 izberi stran · 6 tapni pozicijo · 7 po želji dodaj podikono · 8 shrani."
+            android:textColor="#B8C0C8"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/txtFixedTopRowStatus"
@@ -280,6 +419,13 @@
             android:layout_marginBottom="12dp"
             android:textColor="#B8C0C8"
             android:textSize="15sp" />
+
+        <LinearLayout
+            android:id="@+id/patientPageActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical" />
 
         <EditText
             android:id="@+id/editPatientPageId"
@@ -456,6 +602,21 @@
             android:textColorHint="#B8C0C8"
             android:textSize="16sp" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Tapni pozicijo na 5x5 mreži:"
+            android:textColor="#B8C0C8"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:id="@+id/placementGridActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical" />
+
         <Button
             android:id="@+id/btnAddPlacement"
             android:layout_width="match_parent"
@@ -575,6 +736,7 @@
             android:textSize="15sp" />
 
         <TextView
+            android:id="@+id/sectionAacItemEditor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -644,6 +806,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/sectionAacLanguages"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -745,6 +908,21 @@
             android:background="#1E252C"
             android:backgroundTint="#5B6672"
             android:hint="Govorjeni tekst"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editAacQuestionByLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Vprašanja: sl=Kaj želiš piti?; uk=...; en=..."
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
             android:singleLine="true"
@@ -910,6 +1088,25 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/sectionFutureModules"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="VIDEO KLICI / SPOROČILA / GALERIJA / OGLEDALO"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Ti moduli ostanejo ločeni od AAC urejanja. Ta stran trenutno ureja komunikator, govor/API nastavitve za AAC in varne uvoze."
+            android:textColor="#B8C0C8"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/sectionAacImportExport"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"

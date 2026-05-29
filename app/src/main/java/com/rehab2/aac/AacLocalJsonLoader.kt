@@ -156,6 +156,7 @@ object AacLocalJsonLoader {
             sentenceRole = json.optNullableString("sentenceRole"),
             questionSl = json.optNullableString("questionSl"),
             questionUk = json.optNullableString("questionUk"),
+            questionByLanguage = parseLanguageTextMap(json.optJSONObject("questionByLanguage")),
             iconSource = parseIconSource(json.optString("iconSource")),
             parentId = json.optNullableString("parentId"),
             visibleUnderIds = parseVisibleUnderIds(json),

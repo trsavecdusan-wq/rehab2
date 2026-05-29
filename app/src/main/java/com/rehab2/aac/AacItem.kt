@@ -50,6 +50,7 @@ data class AacItem(
     val sentenceRole: String? = null,
     val questionSl: String? = null,
     val questionUk: String? = null,
+    val questionByLanguage: Map<String, String> = emptyMap(),
     // Local icon sources stay separate: SOCA -> icons/soca, CUSTOM/PATIENT -> icons/custom,
     // ARASAAC -> icons/arasaac, SYSTEM -> text/fallback only.
     val iconSource: IconSource = IconSource.SYSTEM,
