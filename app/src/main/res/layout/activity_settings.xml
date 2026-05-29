@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settingsScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121417">
@@ -33,10 +34,117 @@
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/btnAacSettings"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#2F5F9E"
+            android:text="KOMUNIKATOR"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsModuleVideoCalls"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#214A78"
+            android:text="VIDEO KLICI"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsModuleMessages"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#214A78"
+            android:text="SPOROČILA"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsModuleGallery"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#214A78"
+            android:text="GALERIJA"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsModuleMirror"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#214A78"
+            android:text="OGLEDALO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnStatusSettings"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#3A3F45"
+            android:text="GOVOR / API"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsModuleSystem"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#3A3F45"
+            android:text="SISTEM"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnBackupSettings"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="28dp"
+            android:backgroundTint="#3A3F45"
+            android:text="POSODOBITVE / VARNOSTNE KOPIJE"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/sectionAdvancedSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:text="NAPREDNA ORODJA"
+            android:textColor="#F4F7FA"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <Button
             android:id="@+id/btnRadioSettings"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="#214A78"
             android:text="Radio nastavitve"
             android:textAllCaps="false"
@@ -45,12 +153,12 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/btnAacSettings"
+            android:id="@+id/btnAacPackSettings"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="#3A3F45"
-            android:text="AAC nastavitve"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#3E7C4A"
+            android:text="AAC paket (izvoz)"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="20sp"
@@ -60,7 +168,7 @@
             android:id="@+id/btnCreateSampleAacPack"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="#2E8B57"
             android:text="USTVARI TESTNI AAC PAKET"
             android:textAllCaps="false"
@@ -72,7 +180,7 @@
             android:id="@+id/btnCheckAacFiles"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="24dp"
             android:backgroundTint="#214A78"
             android:text="PREVERI AAC DATOTEKE"
             android:textAllCaps="false"
@@ -80,47 +188,12 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/btnStatusSettings"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="#3A3F45"
-            android:text="Status nastavitve"
-            android:textAllCaps="false"
-            android:textColor="#F4F7FA"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btnBackupSettings"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_marginBottom="24dp"
-            android:backgroundTint="#214A78"
-            android:text="Nadgradnje"
-            android:textAllCaps="false"
-            android:textColor="#F4F7FA"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btnAacPackSettings"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_marginBottom="24dp"
-            android:backgroundTint="#3E7C4A"
-            android:text="AAC paket (izvoz)"
-            android:textAllCaps="false"
-            android:textColor="#F4F7FA"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
         <TextView
+            android:id="@+id/sectionSpeechApiSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="GOVOR / SPEECH API"
+            android:text="GOVOR / API"
             android:textColor="#F4F7FA"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -520,6 +593,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/sectionSystemSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"

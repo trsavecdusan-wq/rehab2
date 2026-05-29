@@ -16,8 +16,10 @@ import android.os.Looper
 import android.text.InputType
 import android.text.method.PasswordTransformationMethod
 import android.util.TypedValue
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -247,6 +249,26 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, AacPackSettingsActivity::class.java))
         }
 
+        findViewById<Button>(R.id.btnSettingsModuleVideoCalls).setOnClickListener {
+            showModulePlaceholder("VIDEO KLICI")
+        }
+
+        findViewById<Button>(R.id.btnSettingsModuleMessages).setOnClickListener {
+            showModulePlaceholder("SPOROČILA")
+        }
+
+        findViewById<Button>(R.id.btnSettingsModuleGallery).setOnClickListener {
+            showModulePlaceholder("GALERIJA")
+        }
+
+        findViewById<Button>(R.id.btnSettingsModuleMirror).setOnClickListener {
+            showModulePlaceholder("OGLEDALO")
+        }
+
+        findViewById<Button>(R.id.btnSettingsModuleSystem).setOnClickListener {
+            scrollToSettingsSection(R.id.sectionSystemSettings)
+        }
+
         findViewById<Button>(R.id.btnCreateSampleAacPack).setOnClickListener {
             createSampleAacPack()
         }
@@ -256,7 +278,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnStatusSettings).setOnClickListener {
-            Toast.makeText(this, "STATISTIKA JE SPODAJ", Toast.LENGTH_SHORT).show()
+            scrollToSettingsSection(R.id.sectionSpeechApiSettings)
         }
 
         findViewById<Button>(R.id.btnSaveSpeechApiSettings).setOnClickListener {
@@ -366,6 +388,18 @@ class SettingsActivity : AppCompatActivity() {
         refreshGuidedFollowUpSection()
         refreshAacCommunicationContextSection()
         applyKeepScreenOnWhileCharging()
+    }
+
+    private fun scrollToSettingsSection(targetId: Int) {
+        val scrollView = findViewById<ScrollView>(R.id.settingsScrollView)
+        val target = findViewById<View>(targetId)
+        scrollView.post {
+            scrollView.smoothScrollTo(0, target.top)
+        }
+    }
+
+    private fun showModulePlaceholder(moduleName: String) {
+        Toast.makeText(this, "$moduleName bo dodan v naslednji fazi.", Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
