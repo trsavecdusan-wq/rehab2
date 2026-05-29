@@ -683,10 +683,57 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/txtAacLanguageManagerStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textColor="#B8C0C8"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/editAacLanguageCode"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Dodaj ali nastavi jezik: sl, uk, en, de, hr, sr, it"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnAddAacActiveLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#214A78"
+            android:text="DODAJ AKTIVNI JEZIK"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSetAacBaseLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#5B6672"
+            android:text="NASTAVI OSNOVNI JEZIK"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Shranjeni prevodi se uporabijo lokalno. AI prevod bo dodan kasneje in ne sme teči med pacientovo uporabo."
+            android:text="Prevodi ostanejo shranjeni tudi, če jezik ni aktiven. Shranjeni prevodi se uporabijo lokalno; pacientova uporaba ne sme izvajati prevajanja v zanki."
             android:textColor="#B8C0C8"
             android:textSize="15sp" />
 

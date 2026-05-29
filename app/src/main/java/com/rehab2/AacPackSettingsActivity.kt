@@ -65,6 +65,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
         private const val PATIENT_PAGE_SEPARATOR = "\u001E"
         private const val PATIENT_PAGE_FIELD_SEPARATOR = "\u001F"
+        private const val AAC_LANGUAGE_PREFS_NAME = "aac_language_settings"
+        private const val KEY_AAC_ACTIVE_LANGUAGES = "active_languages"
+        private const val KEY_AAC_BASE_LANGUAGE = "base_language"
+        private const val PREFS_FILE = "rehab2_prefs"
+        private const val PREF_PATIENT_LANGUAGE_1 = "patient_language_1"
+        private const val PREF_PATIENT_LANGUAGE_2 = "patient_language_2"
+        private const val PREF_PATIENT_LANGUAGE_3 = "patient_language_3"
+        private const val PREF_ACTIVE_SPEECH_LANGUAGE = "active_speech_language"
         private const val LIBRARY_PLACEMENT_SOURCE = "library_activation"
         private const val LIBRARY_PAGE_SIZE = 25
         private const val MAX_EDITOR_LIST_ITEMS = 80
@@ -103,6 +111,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var editAacLabelEn: EditText
     private lateinit var editAacBaseLanguage: EditText
     private lateinit var editAacActiveLanguages: EditText
+    private lateinit var txtAacLanguageManagerStatus: TextView
+    private lateinit var editAacLanguageCode: EditText
+    private lateinit var btnAddAacActiveLanguage: Button
+    private lateinit var btnSetAacBaseLanguage: Button
     private lateinit var editAacSpeechText: EditText
     private lateinit var editAacIconSource: EditText
     private lateinit var editAacImagePath: EditText
@@ -201,6 +213,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
         editAacLabelEn = findViewById(R.id.editAacLabelEn)
         editAacBaseLanguage = findViewById(R.id.editAacBaseLanguage)
         editAacActiveLanguages = findViewById(R.id.editAacActiveLanguages)
+        txtAacLanguageManagerStatus = findViewById(R.id.txtAacLanguageManagerStatus)
+        editAacLanguageCode = findViewById(R.id.editAacLanguageCode)
+        btnAddAacActiveLanguage = findViewById(R.id.btnAddAacActiveLanguage)
+        btnSetAacBaseLanguage = findViewById(R.id.btnSetAacBaseLanguage)
         editAacSpeechText = findViewById(R.id.editAacSpeechText)
         editAacIconSource = findViewById(R.id.editAacIconSource)
         editAacImagePath = findViewById(R.id.editAacImagePath)
@@ -291,6 +307,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnChooseAacImage.setOnClickListener {
             showAacImageChooser()
         }
+        btnAddAacActiveLanguage.setOnClickListener {
+            addAacActiveLanguage()
+        }
+        btnSetAacBaseLanguage.setOnClickListener {
+            setAacBaseLanguage()
+        }
         btnActivateSocaLibrary.setOnClickListener {
             setLibrarySourceActive(LibraryIconSource.SOCA, active = true)
         }
@@ -338,6 +360,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         setShareEnabled(false)
         txtStatus.text = "Pripravljeno za izvoz ali predpreverjanje ZIP paketa."
         updateIconSourceFilterButtons()
+        refreshAacLanguageManagerStatus()
         refreshLastImportDiagnostic()
         refreshLocalAacOverview()
     }
@@ -1169,6 +1192,130 @@ class AacPackSettingsActivity : AppCompatActivity() {
             ?.optString(languageCode.trim().lowercase(Locale.ROOT))
             ?.trim()
             .orEmpty()
+    }
+
+    private fun refreshAacLanguageManagerStatus() {
+        val activeLanguages = loadAacActiveLanguages()
+        val baseLanguage = loadAacBaseLanguage()
+        txtAacLanguageManagerStatus.text = buildString {
+            append("Aktivni AAC jeziki: ${activeLanguages.joinToString(", ")}\n")
+            append("Osnovni jezik: $baseLanguage\n")
+            append("Najvec 3 aktivni jeziki. Prevodi ostanejo shranjeni tudi, ce jezik ni aktiven.")
+        }
+        editAacActiveLanguages.setText(activeLanguages.joinToString(","))
+        if (editAacBaseLanguage.text.isNullOrBlank()) {
+            editAacBaseLanguage.setText(baseLanguage)
+        }
+    }
+
+    private fun addAacActiveLanguage() {
+        val newLanguage = normalizeAacLanguageCode(editAacLanguageCode.text.toString())
+        if (newLanguage == null) {
+            txtStatus.text = "Vnesi varen jezikovni kod, npr. sl, uk, en, de, hr, sr ali it."
+            return
+        }
+        val activeLanguages = loadAacActiveLanguages()
+        if (newLanguage in activeLanguages) {
+            txtStatus.text = "Jezik je ze aktiven: $newLanguage"
+            return
+        }
+        if (activeLanguages.size < 3) {
+            saveAacActiveLanguages(activeLanguages + newLanguage)
+            txtStatus.text = "Aktivni jezik dodan.\n$newLanguage"
+            refreshAacLanguageManagerStatus()
+            return
+        }
+        showReplaceActiveLanguageDialog(activeLanguages, newLanguage)
+    }
+
+    private fun showReplaceActiveLanguageDialog(activeLanguages: List<String>, newLanguage: String) {
+        val baseLanguage = loadAacBaseLanguage()
+        AlertDialog.Builder(this)
+            .setTitle("Zamenjaj aktivni jezik")
+            .setMessage("Aktivni so ze 3 jeziki. Prevodi ostanejo shranjeni tudi, ce jezik ni aktiven.")
+            .setItems(activeLanguages.toTypedArray()) { _, index ->
+                val replacedLanguage = activeLanguages[index]
+                if (replacedLanguage == baseLanguage) {
+                    txtStatus.text = "Osnovnega jezika $baseLanguage ni mogoce odstraniti. Najprej nastavi drug osnovni jezik."
+                    return@setItems
+                }
+                val updatedLanguages = activeLanguages.toMutableList()
+                updatedLanguages[index] = newLanguage
+                saveAacActiveLanguages(updatedLanguages.distinct().take(3))
+                txtStatus.text = "Aktivni jezik zamenjan.\n$replacedLanguage -> $newLanguage"
+                refreshAacLanguageManagerStatus()
+            }
+            .setNegativeButton("Preklici", null)
+            .show()
+    }
+
+    private fun setAacBaseLanguage() {
+        val language = normalizeAacLanguageCode(editAacLanguageCode.text.toString())
+            ?: normalizeAacLanguageCode(editAacBaseLanguage.text.toString())
+        if (language == null) {
+            txtStatus.text = "Vnesi varen osnovni jezik, npr. sl, uk ali en."
+            return
+        }
+        val activeLanguages = loadAacActiveLanguages()
+        if (language !in activeLanguages) {
+            txtStatus.text = "Osnovni jezik mora biti med aktivnimi jeziki. Najprej dodaj $language."
+            return
+        }
+        getSharedPreferences(AAC_LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_AAC_BASE_LANGUAGE, language)
+            .apply()
+        editAacBaseLanguage.setText(language)
+        txtStatus.text = "Osnovni AAC jezik nastavljen.\n$language"
+        refreshAacLanguageManagerStatus()
+    }
+
+    private fun loadAacActiveLanguages(): List<String> {
+        val raw = getSharedPreferences(AAC_LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_AAC_ACTIVE_LANGUAGES, null)
+        return raw
+            ?.split(',', ';', ' ')
+            ?.mapNotNull(::normalizeAacLanguageCode)
+            ?.distinct()
+            ?.take(3)
+            ?.takeIf { it.isNotEmpty() }
+            ?: listOf("sl", "uk", "en")
+    }
+
+    private fun loadAacBaseLanguage(): String {
+        val saved = getSharedPreferences(AAC_LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_AAC_BASE_LANGUAGE, null)
+        val activeLanguages = loadAacActiveLanguages()
+        return normalizeAacLanguageCode(saved)
+            ?.takeIf { it in activeLanguages }
+            ?: activeLanguages.firstOrNull()
+            ?: "sl"
+    }
+
+    private fun saveAacActiveLanguages(languages: List<String>) {
+        val cleanLanguages = languages.mapNotNull(::normalizeAacLanguageCode).distinct().take(3).ifEmpty { listOf("sl") }
+        val baseLanguage = loadAacBaseLanguage()
+        val safeLanguages = if (baseLanguage in cleanLanguages) cleanLanguages else (listOf(baseLanguage) + cleanLanguages).distinct().take(3)
+        getSharedPreferences(AAC_LANGUAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_AAC_ACTIVE_LANGUAGES, safeLanguages.joinToString(","))
+            .apply()
+        val runtimePrefs = getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
+        val activeSpeechLanguage = runtimePrefs.getString(PREF_ACTIVE_SPEECH_LANGUAGE, "sl").orEmpty()
+        runtimePrefs.edit()
+            .putString(PREF_PATIENT_LANGUAGE_1, safeLanguages.getOrElse(0) { "sl" })
+            .putString(PREF_PATIENT_LANGUAGE_2, safeLanguages.getOrElse(1) { safeLanguages.first() })
+            .putString(PREF_PATIENT_LANGUAGE_3, safeLanguages.getOrElse(2) { safeLanguages.last() })
+            .putString(
+                PREF_ACTIVE_SPEECH_LANGUAGE,
+                normalizeAacLanguageCode(activeSpeechLanguage)?.takeIf { it in safeLanguages } ?: safeLanguages.first()
+            )
+            .apply()
+    }
+
+    private fun normalizeAacLanguageCode(rawValue: String?): String? {
+        val value = rawValue?.trim()?.lowercase(Locale.ROOT).orEmpty()
+        return value.takeIf { it.matches(Regex("[a-z]{2,5}")) }
     }
 
     private fun buildSourceActivationStatus(): String {
