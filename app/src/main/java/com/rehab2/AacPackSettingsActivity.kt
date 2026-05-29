@@ -1146,7 +1146,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 "Brez povezave: ${subiconStatus.orphanCount}"
             ),
             actionText = "UREDI PODIKONE",
-            targetId = R.id.sectionAacPlacement
+            targetId = R.id.sectionAacSubicons
         )
         addDashboardCard(
             title = "FIKSNA VRSTICA",
@@ -1156,7 +1156,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 "Manjka: ${5 - overview.relationAnalysis.fixedTopRowItems.size}"
             ),
             actionText = "FIKSNA VRSTICA",
-            targetId = R.id.sectionAacPlacement
+            targetId = R.id.sectionAacFixedRow
         )
         addDashboardCard(
             title = "OPOZORILA",
@@ -1289,7 +1289,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun buildFixedTopRowStatus(fixedItems: List<FixedTopRowItem>): String {
         return buildString {
             append("FIKSNA PRVA VRSTICA\n")
-            append("3x3: prvi 3 fiksni, 4x4: prvi 4 fiksni, 5x5: vseh 5 fiksnih.\n\n")
+            append("5x5: vidne so pozicije 1-5.\n")
+            append("4x4: vidne so pozicije 1-4; pozicija 5 gre v normalno vsebino.\n")
+            append("3x3: vidne so pozicije 1-3; poziciji 4-5 gresta v normalno vsebino.\n\n")
 
             if (fixedItems.isEmpty()) {
                 append("Ni nastavljenih fiksnih ikon v prvi vrstici.")
@@ -1457,6 +1459,13 @@ class AacPackSettingsActivity : AppCompatActivity() {
             return
         }
 
+        aacItemListActions.addView(
+            buildAacItemListMessage(
+                "KNJIŽNICA IKON\n" +
+                    "Prikazano: ${filteredItems.size} ikon · filter vira: ${therapistIconSourceFilter.label} · tapni kartico za urejanje."
+            )
+        )
+
         filteredItems.take(MAX_EDITOR_LIST_ITEMS).chunked(3).forEach { rowItems ->
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -1507,7 +1516,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
-            setBackgroundColor(0xFF26323D.toInt())
+            setBackgroundColor(
+                when {
+                    isMissingImage -> 0xFF3B3327.toInt()
+                    item.translationStatus == ItemTranslationStatus.MISSING -> 0xFF3A313E.toInt()
+                    item.pageCount == 0 -> 0xFF24313C.toInt()
+                    else -> 0xFF26323D.toInt()
+                }
+            )
             setPadding(12.dp(), 12.dp(), 12.dp(), 12.dp())
             isClickable = true
             isFocusable = true
@@ -2298,6 +2314,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val itemCounts = patientPageItemCounts()
         val fixedRowCount = fixedTopRowCellItems().size
         val defaultPageId = defaultPatientPageId()
+        val selectedPageId = selectedPlacementPageId()
         if (pages.isEmpty()) {
             patientPageActions.addView(buildAacItemListMessage("Ni pacientovih strani. Ustvari stran, nato izberi postavitve."))
             return
@@ -2307,9 +2324,15 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 val marker = if (page.pageId == defaultPageId) " · začetna" else ""
                 text = "${page.pageTitle}\n${page.pageId} · ${itemCounts[page.pageId] ?: 0} ikon · fiksnih: $fixedRowCount$marker"
                 setAllCaps(false)
-                textSize = 15f
+                textSize = 17f
                 setTextColor(0xFFF4F7FA.toInt())
-                setBackgroundColor(if (page.pageId == defaultPageId) 0xFF2F5F9E.toInt() else 0xFF34414D.toInt())
+                setBackgroundColor(
+                    when (page.pageId) {
+                        selectedPageId -> 0xFF214A78.toInt()
+                        defaultPageId -> 0xFF2F5F9E.toInt()
+                        else -> 0xFF34414D.toInt()
+                    }
+                )
                 setPadding(18.dp(), 10.dp(), 18.dp(), 10.dp())
                 setOnClickListener {
                     editPatientPageId.setText(page.pageId)
@@ -2368,8 +2391,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
             ?: pageId
         val placedItems = pageCellItems(pageId)
         placementGridActions.addView(
-            buildAacItemListMessage("Predogled strani: $pageTitle ($pageId)\nTapni celico za dodelitev, zamenjavo ali brisanje ikone.")
+            buildAacItemListMessage("OBLIKOVALEC PACIENTOVE STRANI\n$pageTitle ($pageId)\nFiksna vrstica je vedno zgoraj. Vsebina strani je spodaj. Tapni ikono za urejanje, drzi za zamenjavo ali brisanje.")
         )
+        placementGridActions.addView(buildPlacementGridHeading("FIKSNA VRSTICA"))
+        placementGridActions.addView(buildPatientDesignerFixedRow())
+        placementGridActions.addView(buildPlacementGridHeading("VSEBINA STRANI"))
         for (rowIndex in 0 until 5) {
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -2390,10 +2416,22 @@ class AacPackSettingsActivity : AppCompatActivity() {
                         if (cellItem == null) {
                             showPlacementCellItemChooser(pageId, position, null)
                         } else if (cellItem.isFixedTopRowCell) {
+                            loadAacItemIntoEditor(cellItem.itemId)
+                        } else {
+                            loadAacItemIntoEditor(cellItem.itemId)
+                        }
+                    }
+                    setOnLongClickListener {
+                        editPlacementPageId.setText(pageId)
+                        editPlacementPosition5x5.setText(position.toString())
+                        if (cellItem == null) {
+                            showPlacementCellItemChooser(pageId, position, null)
+                        } else if (cellItem.isFixedTopRowCell) {
                             showFixedPlacementCellActions(position, cellItem)
                         } else {
                             showPlacementCellActions(pageId, position, cellItem)
                         }
+                        true
                     }
                 }
                 val image = ImageView(this).apply {
@@ -2449,6 +2487,93 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun buildPlacementGridHeading(textValue: String): TextView {
+        return TextView(this).apply {
+            text = textValue
+            textSize = 17f
+            setTextColor(0xFFF4F7FA.toInt())
+            setPadding(0, 12.dp(), 0, 8.dp())
+        }
+    }
+
+    private fun buildPatientDesignerFixedRow(): LinearLayout {
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val fixedCells = fixedTopRowCellItems()
+        for (position in 1..5) {
+            val cellItem = fixedCells[position]
+            val cell = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                setPadding(6.dp(), 6.dp(), 6.dp(), 6.dp())
+                setBackgroundColor(if (cellItem == null) 0xFF172029.toInt() else 0xFF214A78.toInt())
+                isClickable = true
+                isFocusable = true
+                setOnClickListener {
+                    editFixedTopRowPosition.setText(position.toString())
+                    if (cellItem == null) {
+                        showFixedPlacementCellItemChooser(position, null)
+                    } else {
+                        loadAacItemIntoEditor(cellItem.itemId)
+                    }
+                }
+                setOnLongClickListener {
+                    editFixedTopRowPosition.setText(position.toString())
+                    if (cellItem == null) {
+                        showFixedPlacementCellItemChooser(position, null)
+                    } else {
+                        showFixedPlacementCellActions(position, cellItem)
+                    }
+                    true
+                }
+            }
+            val image = ImageView(this).apply {
+                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                setBackgroundColor(0xFF172029.toInt())
+                setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
+            }
+            val label = TextView(this).apply {
+                text = cellItem?.let { item ->
+                    "F$position\n${item.label.ifBlank { item.itemId }}"
+                } ?: "F$position\nprosto"
+                gravity = Gravity.CENTER
+                maxLines = 3
+                textSize = 13f
+                setTextColor(if (cellItem == null) 0xFF9CA8B5.toInt() else 0xFFF4F7FA.toInt())
+            }
+            if (cellItem != null) {
+                bindPlacementCellIconPreview(image, cellItem)
+                cell.addView(
+                    image,
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        54.dp()
+                    )
+                )
+            }
+            cell.addView(
+                label,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    0,
+                    1f
+                )
+            )
+            row.addView(
+                cell,
+                LinearLayout.LayoutParams(
+                    0,
+                    116.dp(),
+                    1f
+                ).apply {
+                    marginEnd = if (position < 5) 4.dp() else 0
+                }
+            )
+        }
+        return row
+    }
+
     private fun placementCellBackground(cellItem: PlacementCellItem?): Int {
         return when {
             cellItem == null -> 0xFF172029.toInt()
@@ -2496,29 +2621,41 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(0xFF26323D.toInt())
-            setPadding(14.dp(), 12.dp(), 14.dp(), 12.dp())
+            setPadding(18.dp(), 16.dp(), 18.dp(), 16.dp())
         }
         card.addView(TextView(this).apply {
-            text = "DELOVNI PROSTOR: $pageTitle"
-            textSize = 16f
+            text = "PACIENTOVA STRAN: $pageTitle"
+            textSize = 20f
             setTextColor(0xFFF4F7FA.toInt())
         })
         card.addView(TextView(this).apply {
             text = buildString {
-                append("$pageId · ${cells.values.count { !it.isFixedTopRowCell }} ikon na strani · fiksnih: ${fixedTopRowCellItems().size}/5\n")
+                append("$pageId · ${cells.size} ikon na strani · fiksnih: ${fixedTopRowCellItems().size}/5\n")
                 append("Podikone na strani: ${diagnostics.subiconCount}\n")
                 append("Manjkajoči prevodi: ${diagnostics.missingTranslations}\n")
                 append("Manjkajoče slike: ${diagnostics.missingImages}\n")
                 append("Podvojene pozicije: ${diagnostics.duplicatePlacements}")
             }
-            textSize = 14f
+            textSize = 16f
             setTextColor(0xFFB8C0C8.toInt())
-            setPadding(0, 6.dp(), 0, 0)
+            setPadding(0, 8.dp(), 0, 8.dp())
+        })
+        card.addView(TextView(this).apply {
+            text = "Hitro delo: tapni prazno polje za dodajanje. Tapni ikono za urejanje. Drzi ikono za zamenjavo ali brisanje."
+            textSize = 15f
+            setTextColor(0xFFD7DEE7.toInt())
+            setPadding(0, 0, 0, 4.dp())
+        })
+        card.addView(TextView(this).apply {
+            text = "Prihodnje prilagajanje: uporaba, zadnja uporaba in AI predlogi lahko pomagajo pri vrstnem redu, vendar ne smejo premakniti fiksne vrstice ali roÄŤno zaklenjenih mest."
+            textSize = 14f
+            setTextColor(0xFF9CA8B5.toInt())
+            setPadding(0, 2.dp(), 0, 4.dp())
         })
         if (diagnostics.warningLines.isNotEmpty()) {
             card.addView(TextView(this).apply {
                 text = diagnostics.warningLines.joinToString("\n")
-                textSize = 14f
+                textSize = 15f
                 setTextColor(0xFFFFD27A.toInt())
                 setPadding(0, 8.dp(), 0, 0)
             })
@@ -2626,6 +2763,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
         return buildString {
             append("TRENUTNE PODIKONE\n")
             append("Podikone so shranjene kot children pri starsu in visibleUnderIds pri otroku.\n")
+            val selectedParent = editSubiconParentId.text.toString().trim().ifBlank { "ni izbran" }
+            val selectedChild = editSubiconChildId.text.toString().trim().ifBlank { "ni izbrana" }
+            append("Izbran stars: $selectedParent\n")
+            append("Izbrana podikona: $selectedChild\n\n")
             val childLines = currentItemsArray(itemsText)
                 ?.let { array ->
                     val labelsById = buildMap {
@@ -2691,6 +2832,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     editSubiconChildId.setText(selectedItem.itemId)
                     txtStatus.text = "Podikona izbrana.\n${selectedItem.itemId}"
                 }
+                txtSubiconStatus.text = buildSubiconStatus()
             }
             .setNegativeButton("Prekliči", null)
             .show()
@@ -2755,14 +2897,6 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
         val itemsArray = currentItemsArray(itemsText) ?: return emptyMap()
         val cells = linkedMapOf<Int, PlacementCellItem>()
-        for (index in 0 until itemsArray.length()) {
-            val item = itemsArray.optJSONObject(index) ?: continue
-            val fixedPosition = itemFixedTopRowPosition(item)
-            if (fixedPosition == null || fixedPosition !in 1..5) continue
-            val itemId = item.optString("id").trim()
-            if (itemId.isBlank()) continue
-            cells[fixedPosition] = placementCellItemFromJson(item, fixedPosition, isFixedTopRowCell = true)
-        }
         for (index in 0 until itemsArray.length()) {
             val item = itemsArray.optJSONObject(index) ?: continue
             val itemId = item.optString("id").trim()
@@ -2930,7 +3064,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                         editPlacementPageId.setText(pageId)
                         editPlacementPosition5x5.setText(position.toString())
                         txtStatus.text = if (currentItem == null) {
-                            "Ikona postavljena.\n${selectedItem.itemId} -> $pageId / $position"
+                            "Ikona dodana na stran.\n${selectedItem.itemId} -> $pageId / $position"
                         } else {
                             "Ikona zamenjana.\n${currentItem.itemId} -> ${selectedItem.itemId}"
                         }
@@ -2951,7 +3085,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             .setPositiveButton("Počisti") { _, _ ->
                 when (clearPlacementCell(pageId, position)) {
                     AacMetadataWriteResult.Success -> {
-                        txtStatus.text = "Pozicija počiščena.\n$pageId / $position"
+                        txtStatus.text = "Polje počiščeno.\n$pageId / $position"
                         refreshLocalAacOverview()
                     }
                     AacMetadataWriteResult.ItemNotFound -> txtStatus.text = "Na tej poziciji ni ikone."
@@ -3211,10 +3345,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
         val subiconCount = pageItems.count { previewChildItems(it.itemId).isNotEmpty() }
         val warningLines = mutableListOf<String>()
-        if (missingTranslations > 0) warningLines += "Opozorilo: na strani manjkajo prevodi."
-        if (missingImages > 0) warningLines += "Opozorilo: nekatere slike niso najdene."
-        if (duplicatePlacements > 0) warningLines += "Opozorilo: podvojene pozicije na strani."
-        if (pageItems.isEmpty()) warningLines += "Stran je prazna."
+        if (missingTranslations > 0) warningLines += "PREVODI: na strani manjkajo prevodi."
+        if (missingImages > 0) warningLines += "SLIKE: nekatere slike niso najdene."
+        if (duplicatePlacements > 0) warningLines += "POSTAVITEV: podvojene pozicije na strani."
+        if (pageItems.isEmpty()) warningLines += "PRAZNA STRAN: klikni prazno polje in izberi ikono."
         return PageWorkspaceDiagnostics(
             subiconCount = subiconCount,
             missingTranslations = missingTranslations,
@@ -3566,6 +3700,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
             txtStatus.text = "Pot slike ni varna."
             return
         }
+        val editorWarnings = buildList {
+            if (imagePath.isBlank() && iconSource != "SYSTEM") add("manjka slika")
+            if (iconSource.isBlank()) add("manjka vir ikone")
+        }
 
         val activeLanguages = parseTherapistLanguages(editAacActiveLanguages.text.toString())
         if (activeLanguages.size > 3) {
@@ -3575,15 +3713,31 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         when (saveTherapistAacItemToJson(itemId, labelSl, activeLanguages)) {
             AacItemEditorWriteResult.SuccessCreated -> {
-                txtStatus.text = "AAC element ustvarjen.\n$itemId"
+                txtStatus.text = buildEditorSaveStatus("Ikona ustvarjena.", itemId, editorWarnings)
                 refreshLocalAacOverview()
             }
             AacItemEditorWriteResult.SuccessUpdated -> {
-                txtStatus.text = "AAC element shranjen.\n$itemId"
+                txtStatus.text = buildEditorSaveStatus("Ikona shranjena.", itemId, editorWarnings)
                 refreshLocalAacOverview()
             }
             AacItemEditorWriteResult.WriteFailed -> {
                 txtStatus.text = "AAC elementa ni bilo mogoce shraniti."
+            }
+        }
+    }
+
+    private fun buildEditorSaveStatus(
+        headline: String,
+        itemId: String,
+        warnings: List<String>
+    ): String {
+        return buildString {
+            append(headline)
+            append("\n")
+            append(itemId)
+            if (warnings.isNotEmpty()) {
+                append("\nOpozorilo: ")
+                append(warnings.joinToString(", "))
             }
         }
     }
@@ -3655,7 +3809,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         when (updatePlacementInJson(itemId, pageId, position, add)) {
             AacMetadataWriteResult.Success -> {
-                txtStatus.text = if (add) "Postavitev dodana.\n$itemId -> $pageId / $position" else "Postavitev odstranjena."
+                txtStatus.text = if (add) "Ikona dodana na stran.\n$itemId -> $pageId / $position" else "Polje počiščeno."
                 refreshLocalAacOverview()
             }
             AacMetadataWriteResult.ItemNotFound -> txtStatus.text = "ID AAC elementa ne obstaja."

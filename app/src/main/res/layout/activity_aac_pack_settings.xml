@@ -522,9 +522,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="AAC ČAROVNIK: 1 izberi/ustvari ikono · 2 izberi sliko · 3 vnesi tekst · 4 shrani jezike · 5 izberi stran · 6 tapni pozicijo · 7 po želji dodaj podikono · 8 shrani."
+            android:text="DELOVNI TOK: izberi ikono → uredi tekst/sliko → shrani ikono → izberi stran → tapni polje v 5x5 mreži → po potrebi dodaj podikono."
             android:textColor="#B8C0C8"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/sectionAacFixedRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="FIKSNA VRSTICA"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtFixedTopRowStatus"
@@ -750,9 +760,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="Tapni pozicijo na 5x5 mreži:"
+            android:text="5x5 mreža strani: prazno polje doda ikono, zasedeno polje odpre urejanje/zamenjavo."
             android:textColor="#B8C0C8"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/placementGridActions"
@@ -820,6 +830,16 @@
             android:backgroundTint="#5B6672"
             android:text="ODSTRANI POSTAVITEV"
             android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/sectionAacSubicons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="PODIKONE"
             android:textColor="#F4F7FA"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -1271,7 +1291,7 @@
             android:layout_height="64dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="#214A78"
-            android:text="SHRANI AAC ELEMENT"
+            android:text="SHRANI IKONO"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="18sp"
