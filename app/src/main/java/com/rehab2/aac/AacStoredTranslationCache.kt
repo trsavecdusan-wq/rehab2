@@ -17,6 +17,13 @@ object AacStoredTranslationCache {
         val speechText: String
     )
 
+    data class PretranslationResult(
+        val languageCode: String,
+        val missingCount: Int,
+        val translatedCount: Int,
+        val failedCount: Int
+    )
+
     fun ensureTranslation(
         context: Context,
         item: AacItem,
@@ -27,21 +34,73 @@ object AacStoredTranslationCache {
             return null
         }
 
+        val hasStoredLabel = AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage)
+        val hasStoredSpeechText = AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
         val storedLabel = AacLocalizedTextResolver.resolveLabel(item, normalizedLanguage)
         val storedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, normalizedLanguage)
-        val hasStoredTranslation =
-            AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage) ||
-                AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
-        if (hasStoredTranslation) {
+        if (hasStoredLabel && hasStoredSpeechText) {
             return Translation(storedLabel, storedSpeechText)
         }
 
         val generated = generateTranslation(context, item, normalizedLanguage) ?: return null
         return if (saveTranslation(context, item, normalizedLanguage, generated)) {
-            generated
+            Translation(
+                label = if (hasStoredLabel) storedLabel else generated.label,
+                speechText = if (hasStoredSpeechText) storedSpeechText else generated.speechText
+            )
         } else {
             null
         }
+    }
+
+    fun ensureTranslationsForLanguage(
+        context: Context,
+        languageCode: String,
+        items: List<AacItem>
+    ): PretranslationResult {
+        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
+        if (normalizedLanguage == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            val result = PretranslationResult(normalizedLanguage, 0, 0, 0)
+            savePretranslationResult(context, result)
+            return result
+        }
+
+        var missingCount = 0
+        var translatedCount = 0
+        var failedCount = 0
+        items.asSequence()
+            .filter { item -> item.id.isNotBlank() && item.labelSl.isNotBlank() }
+            .distinctBy { item -> item.id }
+            .forEach { item ->
+                val hasLabel = AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage)
+                val hasSpeech = AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
+                if (hasLabel && hasSpeech) {
+                    return@forEach
+                }
+                missingCount += 1
+                if (ensureTranslation(context, item, normalizedLanguage) != null) {
+                    translatedCount += 1
+                } else {
+                    failedCount += 1
+                }
+            }
+        val result = PretranslationResult(normalizedLanguage, missingCount, translatedCount, failedCount)
+        savePretranslationResult(context, result)
+        return result
+    }
+
+    fun readLastPretranslationResult(context: Context): PretranslationResult? {
+        val prefs = context.getSharedPreferences(PREFS_PRETRANSLATION_STATUS, Context.MODE_PRIVATE)
+        val languageCode = prefs.getString(KEY_PRETRANSLATION_LANGUAGE, null)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?: return null
+        return PretranslationResult(
+            languageCode = languageCode,
+            missingCount = prefs.getInt(KEY_PRETRANSLATION_MISSING, 0),
+            translatedCount = prefs.getInt(KEY_PRETRANSLATION_TRANSLATED, 0),
+            failedCount = prefs.getInt(KEY_PRETRANSLATION_FAILED, 0)
+        )
     }
 
     private fun generateTranslation(
@@ -129,8 +188,12 @@ object AacStoredTranslationCache {
             val item = findItemById(itemsArray, sourceItem.id) ?: sourceItem.toJson().also { itemsArray.put(it) }
             val labelByLanguage = item.optJSONObject("labelByLanguage") ?: JSONObject()
             val speechTextByLanguage = item.optJSONObject("speechTextByLanguage") ?: JSONObject()
-            labelByLanguage.put(languageCode, translation.label)
-            speechTextByLanguage.put(languageCode, translation.speechText)
+            if (labelByLanguage.optString(languageCode).trim().isBlank()) {
+                labelByLanguage.put(languageCode, translation.label)
+            }
+            if (speechTextByLanguage.optString(languageCode).trim().isBlank()) {
+                speechTextByLanguage.put(languageCode, translation.speechText)
+            }
             item.put("labelByLanguage", labelByLanguage)
             item.put("speechTextByLanguage", speechTextByLanguage)
             item.put("translationGenerated", true)
@@ -142,6 +205,16 @@ object AacStoredTranslationCache {
             Log.w(TAG, "AAC translation save failed: ${error.javaClass.simpleName}")
             false
         }
+    }
+
+    private fun savePretranslationResult(context: Context, result: PretranslationResult) {
+        context.getSharedPreferences(PREFS_PRETRANSLATION_STATUS, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_PRETRANSLATION_LANGUAGE, result.languageCode)
+            .putInt(KEY_PRETRANSLATION_MISSING, result.missingCount)
+            .putInt(KEY_PRETRANSLATION_TRANSLATED, result.translatedCount)
+            .putInt(KEY_PRETRANSLATION_FAILED, result.failedCount)
+            .apply()
     }
 
     private fun AacItem.toJson(): JSONObject {
@@ -261,4 +334,9 @@ object AacStoredTranslationCache {
     private const val TAG = "AacTranslationCache"
     private const val DEFAULT_TRANSLATION_MODEL = "gpt-4o-mini"
     private const val MAX_ITEMS_BYTES = 512 * 1024L
+    private const val PREFS_PRETRANSLATION_STATUS = "aac_pretranslation_status"
+    private const val KEY_PRETRANSLATION_LANGUAGE = "language"
+    private const val KEY_PRETRANSLATION_MISSING = "missing"
+    private const val KEY_PRETRANSLATION_TRANSLATED = "translated"
+    private const val KEY_PRETRANSLATION_FAILED = "failed"
 }

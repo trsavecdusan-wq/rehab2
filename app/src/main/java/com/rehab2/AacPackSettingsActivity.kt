@@ -25,6 +25,7 @@ import com.rehab2.aac.AacPackExporter
 import com.rehab2.aac.AacPackImporter
 import com.rehab2.aac.AacPackImportPreflight
 import com.rehab2.aac.AacStoragePaths
+import com.rehab2.aac.AacStoredTranslationCache
 import com.rehab2.aac.IconSource
 import java.io.File
 import java.text.Normalizer
@@ -1200,6 +1201,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtAacLanguageManagerStatus.text = buildString {
             append("Aktivni AAC jeziki: ${activeLanguages.joinToString(", ")}\n")
             append("Osnovni jezik: $baseLanguage\n")
+            AacStoredTranslationCache.readLastPretranslationResult(this@AacPackSettingsActivity)?.let { result ->
+                append("Zadnja priprava prevodov (${result.languageCode}): manjka ${result.missingCount}, prevedeno ${result.translatedCount}, napak ${result.failedCount}.\n")
+            }
             append("Najvec 3 aktivni jeziki. Prevodi ostanejo shranjeni tudi, ce jezik ni aktiven.")
         }
         editAacActiveLanguages.setText(activeLanguages.joinToString(","))

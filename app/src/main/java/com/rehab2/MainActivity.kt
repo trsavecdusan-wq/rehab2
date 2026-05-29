@@ -212,6 +212,7 @@ class MainActivity : AppCompatActivity() {
     private var currentMainAacItems: List<AacItem> = emptyList()
     private val mainAacHistory = ArrayDeque<List<AacItem>>()
     private val pendingMainAacTranslationKeys = mutableSetOf<String>()
+    private val pendingMainAacPretranslationLanguages = mutableSetOf<String>()
     private var mainAacAutoSentenceMaySpeakSingle = false
     private var lastMainAacRenderedLanguage = ""
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
@@ -522,7 +523,7 @@ class MainActivity : AppCompatActivity() {
         if (normalizedLanguage.isBlank() || normalizedLanguage == "sl") {
             return false
         }
-        return !AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage) &&
+        return !AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage) ||
             !AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
     }
 
@@ -581,6 +582,46 @@ class MainActivity : AppCompatActivity() {
         mainAacHistory.clear()
         remappedHistory.forEach { mainAacHistory.addLast(it) }
         showMainAacItems(currentMainAacItems)
+    }
+
+    private fun startMainAacPretranslation(languageCode: String) {
+        val normalizedLanguage = languageCode.trim().lowercase(Locale.ROOT)
+        if (normalizedLanguage.isBlank() || normalizedLanguage == "sl") {
+            return
+        }
+        synchronized(pendingMainAacPretranslationLanguages) {
+            if (!pendingMainAacPretranslationLanguages.add(normalizedLanguage)) {
+                return
+            }
+        }
+        val itemsSnapshot = mainAacItemsById.values
+            .ifEmpty {
+                val fallbackItems = buildMainAacItems()
+                mergeMainAacFallbackItems(
+                    fallbackItems = fallbackItems,
+                    loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
+                )
+            }
+            .toList()
+        Thread {
+            val result = AacStoredTranslationCache.ensureTranslationsForLanguage(
+                context = applicationContext,
+                languageCode = normalizedLanguage,
+                items = itemsSnapshot
+            )
+            mainHandler.post {
+                synchronized(pendingMainAacPretranslationLanguages) {
+                    pendingMainAacPretranslationLanguages.remove(normalizedLanguage)
+                }
+                if (result.translatedCount > 0) {
+                    refreshMainAacLanguageText()
+                }
+                Log.d(
+                    "MainAAC",
+                    "AAC_PRETRANSLATION language=${result.languageCode} missing=${result.missingCount} translated=${result.translatedCount} failed=${result.failedCount}"
+                )
+            }
+        }.start()
     }
 
     private fun refreshMainAacLanguageText() {
@@ -929,6 +970,7 @@ class MainActivity : AppCompatActivity() {
             activeLanguage != lastMainAacRenderedLanguage
         ) {
             refreshMainAacLanguageText()
+            startMainAacPretranslation(activeLanguage)
         }
         val flagDrawable = flagDrawableForLanguage(activeLanguage)
         if (flagDrawable != 0) {
@@ -1057,6 +1099,7 @@ class MainActivity : AppCompatActivity() {
                 prefs.edit().putString(PREF_ACTIVE_SPEECH_LANGUAGE, languageCode).apply()
                 refreshStatusModule()
                 refreshMainAacLanguageText()
+                startMainAacPretranslation(languageCode)
                 dialog.dismiss()
             })
         }
