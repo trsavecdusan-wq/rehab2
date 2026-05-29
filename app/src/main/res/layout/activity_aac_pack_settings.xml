@@ -168,13 +168,20 @@
             </LinearLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/communicatorDashboardActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical" />
+
         <TextView
             android:id="@+id/txtAacHealthSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:textColor="#F4F7FA"
-            android:textSize="16sp" />
+            android:textColor="#B8C0C8"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/sectionAacLibrary"
@@ -298,6 +305,129 @@
             android:textColor="#B8C0C8"
             android:textSize="15sp" />
 
+        <EditText
+            android:id="@+id/editAacLibrarySearch"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Iskanje: oznaka, ID ali govor"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnTranslationAll"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#2F5F9E"
+                android:text="VSI PREVODI"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnTranslationTranslated"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:text="PREVEDENO"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnTranslationMissing"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:text="MANJKA"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnTranslationPending"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:text="V PRIPRAVI"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnPageUsageAll"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#2F5F9E"
+                android:text="VSE"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnPageUsageNotUsed"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:text="NI NA STRANI"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnPageUsageUsed"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#34414D"
+                android:text="NA STRANI"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
         <LinearLayout
             android:id="@+id/aacItemListActions"
             android:layout_width="match_parent"
@@ -403,6 +533,13 @@
             android:layout_marginBottom="12dp"
             android:textColor="#B8C0C8"
             android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/fixedTopRowVisualActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical" />
 
         <TextView
             android:layout_width="match_parent"
@@ -556,6 +693,13 @@
             android:textColor="#B8C0C8"
             android:textSize="15sp" />
 
+        <LinearLayout
+            android:id="@+id/pageWorkspaceActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical" />
+
         <EditText
             android:id="@+id/editPlacementItemId"
             android:layout_width="match_parent"
@@ -615,6 +759,45 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
+            android:orientation="vertical" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="PREDOGLED PACIENTOVEGA TOKA"
+            android:textColor="#F4F7FA"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/previewFixedTopRowActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:id="@+id/previewGridActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="PREGLED KOMUNIKATORJA"
+            android:textColor="#F4F7FA"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/communicatorStructureActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:orientation="vertical" />
 
         <Button
@@ -982,6 +1165,13 @@
             android:contentDescription="Predogled AAC slike"
             android:padding="8dp"
             android:scaleType="fitCenter" />
+
+        <LinearLayout
+            android:id="@+id/aacItemUsageInspectorActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical" />
 
         <EditText
             android:id="@+id/editAacCategoryId"

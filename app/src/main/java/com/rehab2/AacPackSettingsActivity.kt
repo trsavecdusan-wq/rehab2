@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Gravity
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -91,12 +92,16 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var txtStatus: TextView
     private lateinit var txtLastImportStatus: TextView
     private lateinit var txtAacHealthSummary: TextView
+    private lateinit var communicatorDashboardActions: LinearLayout
     private lateinit var txtFixedTopRowStatus: TextView
     private lateinit var editFixedTopRowItemId: EditText
     private lateinit var editFixedTopRowPosition: EditText
     private lateinit var btnChooseFixedTopRowItem: Button
     private lateinit var btnSaveFixedTopRowPosition: Button
     private lateinit var btnClearFixedTopRowPosition: Button
+    private lateinit var fixedTopRowVisualActions: LinearLayout
+    private lateinit var previewFixedTopRowActions: LinearLayout
+    private lateinit var previewGridActions: LinearLayout
     private lateinit var txtFixedTopRowAvailableItems: TextView
     private lateinit var iconSourceFilterButtons: Map<TherapistIconSourceFilter, Button>
     private lateinit var txtSourceActivationStatus: TextView
@@ -106,6 +111,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnDeactivateCustomLibrary: Button
     private lateinit var btnActivateArasaacLibrary: Button
     private lateinit var btnDeactivateArasaacLibrary: Button
+    private lateinit var editAacLibrarySearch: EditText
+    private lateinit var translationFilterButtons: Map<TherapistTranslationFilter, Button>
+    private lateinit var pageUsageFilterButtons: Map<TherapistPageUsageFilter, Button>
     private lateinit var aacItemListActions: LinearLayout
     private lateinit var editAacItemId: EditText
     private lateinit var editAacLabelSl: EditText
@@ -123,6 +131,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var editAacImagePath: EditText
     private lateinit var btnChooseAacImage: Button
     private lateinit var imgAacImagePreview: ImageView
+    private lateinit var aacItemUsageInspectorActions: LinearLayout
     private lateinit var editAacCategoryId: EditText
     private lateinit var checkAacAddsToSentence: CheckBox
     private lateinit var checkAacSpeaksImmediately: CheckBox
@@ -143,7 +152,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var editPatientPageTitle: EditText
     private lateinit var btnSavePatientPage: Button
     private lateinit var btnSetDefaultPatientPage: Button
+    private lateinit var pageWorkspaceActions: LinearLayout
     private lateinit var placementGridActions: LinearLayout
+    private lateinit var communicatorStructureActions: LinearLayout
     private lateinit var editSubiconParentId: EditText
     private lateinit var editSubiconChildId: EditText
     private lateinit var btnChooseSubiconParent: Button
@@ -159,6 +170,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private val mainHandler = Handler(Looper.getMainLooper())
     private var lastExportedZipPath: String? = null
     private var therapistIconSourceFilter = TherapistIconSourceFilter.ALL
+    private var therapistTranslationFilter = TherapistTranslationFilter.ALL
+    private var therapistPageUsageFilter = TherapistPageUsageFilter.ALL
+    private var previewPageStack: MutableList<String> = mutableListOf()
     private val pickZipForPreflight = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -190,12 +204,16 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtStatus = findViewById(R.id.txtExportStatus)
         txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
         txtAacHealthSummary = findViewById(R.id.txtAacHealthSummary)
+        communicatorDashboardActions = findViewById(R.id.communicatorDashboardActions)
         txtFixedTopRowStatus = findViewById(R.id.txtFixedTopRowStatus)
         editFixedTopRowItemId = findViewById(R.id.editFixedTopRowItemId)
         editFixedTopRowPosition = findViewById(R.id.editFixedTopRowPosition)
         btnChooseFixedTopRowItem = findViewById(R.id.btnChooseFixedTopRowItem)
         btnSaveFixedTopRowPosition = findViewById(R.id.btnSaveFixedTopRowPosition)
         btnClearFixedTopRowPosition = findViewById(R.id.btnClearFixedTopRowPosition)
+        fixedTopRowVisualActions = findViewById(R.id.fixedTopRowVisualActions)
+        previewFixedTopRowActions = findViewById(R.id.previewFixedTopRowActions)
+        previewGridActions = findViewById(R.id.previewGridActions)
         txtFixedTopRowAvailableItems = findViewById(R.id.txtFixedTopRowAvailableItems)
         iconSourceFilterButtons = mapOf(
             TherapistIconSourceFilter.ALL to findViewById(R.id.btnIconSourceAll),
@@ -211,6 +229,18 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnDeactivateCustomLibrary = findViewById(R.id.btnDeactivateCustomLibrary)
         btnActivateArasaacLibrary = findViewById(R.id.btnActivateArasaacLibrary)
         btnDeactivateArasaacLibrary = findViewById(R.id.btnDeactivateArasaacLibrary)
+        editAacLibrarySearch = findViewById(R.id.editAacLibrarySearch)
+        translationFilterButtons = mapOf(
+            TherapistTranslationFilter.ALL to findViewById(R.id.btnTranslationAll),
+            TherapistTranslationFilter.TRANSLATED to findViewById(R.id.btnTranslationTranslated),
+            TherapistTranslationFilter.MISSING to findViewById(R.id.btnTranslationMissing),
+            TherapistTranslationFilter.PENDING to findViewById(R.id.btnTranslationPending)
+        )
+        pageUsageFilterButtons = mapOf(
+            TherapistPageUsageFilter.ALL to findViewById(R.id.btnPageUsageAll),
+            TherapistPageUsageFilter.NOT_USED to findViewById(R.id.btnPageUsageNotUsed),
+            TherapistPageUsageFilter.USED_ON_PAGE to findViewById(R.id.btnPageUsageUsed)
+        )
         aacItemListActions = findViewById(R.id.aacItemListActions)
         editAacItemId = findViewById(R.id.editAacItemId)
         editAacLabelSl = findViewById(R.id.editAacLabelSl)
@@ -228,6 +258,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         editAacImagePath = findViewById(R.id.editAacImagePath)
         btnChooseAacImage = findViewById(R.id.btnChooseAacImage)
         imgAacImagePreview = findViewById(R.id.imgAacImagePreview)
+        aacItemUsageInspectorActions = findViewById(R.id.aacItemUsageInspectorActions)
         editAacCategoryId = findViewById(R.id.editAacCategoryId)
         checkAacAddsToSentence = findViewById(R.id.checkAacAddsToSentence)
         checkAacSpeaksImmediately = findViewById(R.id.checkAacSpeaksImmediately)
@@ -248,7 +279,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         editPatientPageTitle = findViewById(R.id.editPatientPageTitle)
         btnSavePatientPage = findViewById(R.id.btnSavePatientPage)
         btnSetDefaultPatientPage = findViewById(R.id.btnSetDefaultPatientPage)
+        pageWorkspaceActions = findViewById(R.id.pageWorkspaceActions)
         placementGridActions = findViewById(R.id.placementGridActions)
+        communicatorStructureActions = findViewById(R.id.communicatorStructureActions)
         editSubiconParentId = findViewById(R.id.editSubiconParentId)
         editSubiconChildId = findViewById(R.id.editSubiconChildId)
         btnChooseSubiconParent = findViewById(R.id.btnChooseSubiconParent)
@@ -306,9 +339,27 @@ class AacPackSettingsActivity : AppCompatActivity() {
         iconSourceFilterButtons.forEach { (filter, button) ->
             button.setOnClickListener {
                 therapistIconSourceFilter = filter
-                updateIconSourceFilterButtons()
+                updateLibraryFilterButtons()
                 refreshLocalAacOverview()
             }
+        }
+        translationFilterButtons.forEach { (filter, button) ->
+            button.setOnClickListener {
+                therapistTranslationFilter = filter
+                updateLibraryFilterButtons()
+                refreshLocalAacOverview()
+            }
+        }
+        pageUsageFilterButtons.forEach { (filter, button) ->
+            button.setOnClickListener {
+                therapistPageUsageFilter = filter
+                updateLibraryFilterButtons()
+                refreshLocalAacOverview()
+            }
+        }
+        editAacLibrarySearch.setOnEditorActionListener { _, _, _ ->
+            refreshLocalAacOverview()
+            false
         }
 
         btnSaveAacItem.setOnClickListener {
@@ -369,20 +420,16 @@ class AacPackSettingsActivity : AppCompatActivity() {
         AacStoragePaths.ensureAacContentDirs(this)
         setShareEnabled(false)
         txtStatus.text = "Pripravljeno za izvoz ali predpreverjanje ZIP paketa."
-        updateIconSourceFilterButtons()
+        updateLibraryFilterButtons()
         refreshAacLanguageManagerStatus()
         refreshLastImportDiagnostic()
         refreshLocalAacOverview()
     }
 
     private fun configureSettingsModuleNavigation() {
-        val scrollView = findViewById<ScrollView>(R.id.aacSettingsScrollView)
         fun bind(buttonId: Int, targetId: Int) {
             findViewById<Button>(buttonId).setOnClickListener {
-                val target = findViewById<android.view.View>(targetId)
-                scrollView.post {
-                    scrollView.smoothScrollTo(0, target.top)
-                }
+                scrollToSettingsSection(targetId)
             }
         }
         bind(R.id.btnModuleCommunicator, R.id.sectionAacLibrary)
@@ -956,14 +1003,19 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun refreshLocalAacOverview() {
         val overview = buildLocalAacOverview()
         txtAacHealthSummary.text = buildAacHealthSummary(overview)
+        renderCommunicatorDashboard(overview)
         txtSourceActivationStatus.text = buildSourceActivationStatus()
         renderAacItemEditorList(overview.relationAnalysis.availableItems)
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
+        renderFixedTopRowVisualEditor()
         txtFixedTopRowAvailableItems.text = buildFixedTopRowAvailableItems(overview.relationAnalysis.availableItems)
         txtPatientPagesStatus.text = buildPatientPagesStatus()
         renderPatientPageBrowser()
         txtPlacementStatus.text = buildPlacementStatus(overview.relationAnalysis.availableItems)
+        renderPageWorkspace()
         renderPlacementGrid()
+        renderPatientFlowPreview()
+        renderCommunicatorStructureOverview(overview)
         txtSubiconStatus.text = buildSubiconStatus()
         txtActiveProfileStatus.text = buildActiveProfileStatus()
         txtIconFolderStatus.text = buildIconFolderStatus()
@@ -1042,6 +1094,192 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun renderCommunicatorDashboard(overview: LocalAacOverview) {
+        communicatorDashboardActions.removeAllViews()
+        val pages = loadPatientPages()
+        val defaultPageId = defaultPatientPageId().ifBlank { "varna privzeta" }
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText)
+        val translationStatus = itemsArray?.let { buildTranslationStatus(it, loadAacActiveLanguages()) }
+            ?: TranslationStatus.empty(loadAacActiveLanguages())
+        val subiconStatus = itemsArray?.let { buildSubiconDashboardStatus(it) } ?: SubiconDashboardStatus.empty()
+        val warnings = buildCommunicatorWarnings(overview, translationStatus)
+
+        addDashboardCard(
+            title = "PAGES",
+            accentColor = 0xFF2F5F9E.toInt(),
+            lines = listOf("Strani: ${pages.size}", "Zacetna: $defaultPageId"),
+            actionText = "UREDI STRANI",
+            targetId = R.id.sectionAacPlacement
+        )
+        addDashboardCard(
+            title = "AAC ITEMS",
+            accentColor = 0xFF3E7C4A.toInt(),
+            lines = listOf("Elementi: ${overview.relationAnalysis.availableItems.size}"),
+            actionText = "UREDI IKONE",
+            targetId = R.id.sectionAacLibrary
+        )
+        addDashboardCard(
+            title = "TRANSLATIONS",
+            accentColor = if (translationStatus.missingCount > 0) 0xFF8F6B2D.toInt() else 0xFF3E7C4A.toInt(),
+            lines = listOf(
+                "Prevedeno: ${translationStatus.translatedCount}",
+                "Manjka: ${translationStatus.missingCount}",
+                "V pripravi: ${translationStatus.pendingCount}"
+            ),
+            actionText = "JEZIKI",
+            targetId = R.id.sectionAacLanguages
+        )
+        addDashboardCard(
+            title = "SUBICONS",
+            accentColor = 0xFF5B6672.toInt(),
+            lines = listOf(
+                "Starsi: ${subiconStatus.parentCount}",
+                "Podikone: ${subiconStatus.childCount}",
+                "Brez povezave: ${subiconStatus.orphanCount}"
+            ),
+            actionText = "UREDI PODIKONE",
+            targetId = R.id.sectionAacPlacement
+        )
+        addDashboardCard(
+            title = "FIXED ROW",
+            accentColor = if (overview.relationAnalysis.fixedTopRowItems.size < 5) 0xFF8F6B2D.toInt() else 0xFF3E7C4A.toInt(),
+            lines = listOf(
+                "Nastavljeno: ${overview.relationAnalysis.fixedTopRowItems.size}/5",
+                "Manjka: ${5 - overview.relationAnalysis.fixedTopRowItems.size}"
+            ),
+            actionText = "FIKSNA VRSTICA",
+            targetId = R.id.sectionAacPlacement
+        )
+        addDashboardCard(
+            title = "WARNINGS",
+            accentColor = if (warnings.isEmpty()) 0xFF3E7C4A.toInt() else 0xFF8F3A3A.toInt(),
+            lines = warnings.ifEmpty { listOf("Ni kriticnih opozoril.") },
+            actionText = "PREGLED",
+            targetId = R.id.sectionAacPlacement
+        )
+    }
+
+    private fun addDashboardCard(
+        title: String,
+        accentColor: Int,
+        lines: List<String>,
+        actionText: String,
+        targetId: Int
+    ) {
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF26323D.toInt())
+            setPadding(14.dp(), 12.dp(), 14.dp(), 12.dp())
+        }
+        card.addView(
+            TextView(this).apply {
+                text = title
+                textSize = 16f
+                setTextColor(0xFFF4F7FA.toInt())
+            }
+        )
+        card.addView(
+            android.view.View(this).apply {
+                setBackgroundColor(accentColor)
+            },
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                3.dp()
+            ).apply {
+                topMargin = 6.dp()
+                bottomMargin = 6.dp()
+            }
+        )
+        lines.forEach { line ->
+            card.addView(
+                TextView(this).apply {
+                    text = line
+                    textSize = 15f
+                    setTextColor(0xFFB8C0C8.toInt())
+                    setPadding(0, 2.dp(), 0, 0)
+                }
+            )
+        }
+        card.addView(
+            Button(this).apply {
+                text = actionText
+                setAllCaps(false)
+                textSize = 13f
+                setTextColor(0xFFF4F7FA.toInt())
+                backgroundTintList = ColorStateList.valueOf(accentColor)
+                setOnClickListener { scrollToSettingsSection(targetId) }
+            },
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                48.dp()
+            ).apply {
+                topMargin = 8.dp()
+            }
+        )
+        communicatorDashboardActions.addView(
+            card,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                bottomMargin = 8.dp()
+            }
+        )
+    }
+
+    private fun scrollToSettingsSection(targetId: Int) {
+        val scrollView = findViewById<ScrollView>(R.id.aacSettingsScrollView)
+        val target = findViewById<android.view.View>(targetId)
+        scrollView.post {
+            scrollView.smoothScrollTo(0, target.top)
+        }
+    }
+
+    private fun buildSubiconDashboardStatus(itemsArray: org.json.JSONArray): SubiconDashboardStatus {
+        val allItemIds = linkedSetOf<String>()
+        val parentIds = linkedSetOf<String>()
+        val childIds = linkedSetOf<String>()
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val itemId = item.optString("id").trim()
+            if (itemId.isBlank()) continue
+            allItemIds += itemId
+            val children = stringArrayValues(item.optJSONArray("children"))
+            if (children.isNotEmpty()) {
+                parentIds += itemId
+                childIds += children
+            }
+        }
+        val orphanCount = allItemIds.count { itemId -> itemId !in parentIds && itemId !in childIds }
+        return SubiconDashboardStatus(
+            parentCount = parentIds.size,
+            childCount = childIds.size,
+            orphanCount = orphanCount
+        )
+    }
+
+    private fun buildCommunicatorWarnings(
+        overview: LocalAacOverview,
+        translationStatus: TranslationStatus
+    ): List<String> {
+        val warnings = mutableListOf<String>()
+        if (translationStatus.missingCount > 0) {
+            warnings += "Manjkajo prevodi: ${translationStatus.missingCount}"
+        }
+        if (overview.orphanItemCount > 0) {
+            warnings += "Elementi brez profila: ${overview.orphanItemCount}"
+        }
+        if (overview.relationAnalysis.invalidIconReferenceCount > 0) {
+            warnings += "Neveljavne poti slik: ${overview.relationAnalysis.invalidIconReferenceCount}"
+        }
+        if (overview.relationAnalysis.availableItems.any { it.pageCount == 0 }) {
+            warnings += "Elementi brez strani: ${overview.relationAnalysis.availableItems.count { it.pageCount == 0 }}"
+        }
+        return warnings
+    }
+
     private fun buildFixedTopRowStatus(fixedItems: List<FixedTopRowItem>): String {
         return buildString {
             append("FIKSNA PRVA VRSTICA\n")
@@ -1084,6 +1322,98 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }.trimEnd()
     }
 
+    private fun renderFixedTopRowVisualEditor() {
+        fixedTopRowVisualActions.removeAllViews()
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val fixedCells = fixedTopRowCellItems()
+        for (position in 1..5) {
+            val cellItem = fixedCells[position]
+            val cell = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
+                setBackgroundColor(if (cellItem == null) 0xFF1E252C.toInt() else 0xFF34414D.toInt())
+                isClickable = true
+                isFocusable = true
+                setOnClickListener {
+                    editFixedTopRowPosition.setText(position.toString())
+                    if (cellItem == null) {
+                        showFixedPlacementCellItemChooser(position, null)
+                    } else {
+                        showFixedPlacementCellActions(position, cellItem)
+                    }
+                }
+            }
+            val image = ImageView(this).apply {
+                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                setBackgroundColor(0xFF172029.toInt())
+                setPadding(2.dp(), 2.dp(), 2.dp(), 2.dp())
+            }
+            val label = TextView(this).apply {
+                text = cellItem?.let { item ->
+                    "F$position\n${item.label.ifBlank { item.itemId }}"
+                } ?: "F$position\nprosto"
+                gravity = Gravity.CENTER
+                maxLines = 3
+                textSize = 11f
+                setTextColor(if (cellItem == null) 0xFF9CA8B5.toInt() else 0xFFF4F7FA.toInt())
+            }
+            if (cellItem != null) {
+                bindPlacementCellIconPreview(image, cellItem)
+                cell.addView(
+                    image,
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        38.dp()
+                    )
+                )
+            }
+            cell.addView(
+                label,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    0,
+                    1f
+                )
+            )
+            row.addView(
+                cell,
+                LinearLayout.LayoutParams(
+                    0,
+                    88.dp(),
+                    1f
+                ).apply {
+                    marginEnd = if (position < 5) 4.dp() else 0
+                }
+            )
+        }
+        fixedTopRowVisualActions.addView(
+            row,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        )
+    }
+
+    private fun fixedTopRowCellItems(): Map<Int, PlacementCellItem> {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText) ?: return emptyMap()
+        val cells = linkedMapOf<Int, PlacementCellItem>()
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val fixedPosition = itemFixedTopRowPosition(item)
+            if (fixedPosition == null || fixedPosition !in 1..5) continue
+            val itemId = item.optString("id").trim()
+            if (itemId.isBlank()) continue
+            cells[fixedPosition] = placementCellItemFromJson(item, fixedPosition, isFixedTopRowCell = true)
+        }
+        return cells
+    }
+
     private fun showFixedTopRowItemChooser() {
         val items = buildLocalAacOverview()
             .relationAnalysis
@@ -1110,53 +1440,52 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
     private fun renderAacItemEditorList(items: List<AacListItem>) {
         aacItemListActions.removeAllViews()
-        val filteredItems = items.filter { item -> therapistIconSourceFilter.matches(item.iconSource) }
+        val searchText = editAacLibrarySearch.text.toString().trim().lowercase(Locale.ROOT)
+        val filteredItems = items
+            .filter { item -> therapistIconSourceFilter.matches(item.iconSource) }
+            .filter { item -> therapistTranslationFilter.matches(item.translationStatus) }
+            .filter { item -> therapistPageUsageFilter.matches(item.pageCount) }
+            .filter { item -> item.matchesLibrarySearch(searchText) }
         if (filteredItems.isEmpty()) {
-            aacItemListActions.addView(buildAacItemListMessage("Ni AAC elementov za trenutni filter."))
+            aacItemListActions.addView(buildAacItemListMessage("Ni AAC elementov za trenutne filtre."))
             return
         }
 
-        filteredItems.take(MAX_EDITOR_LIST_ITEMS).forEach { item ->
+        filteredItems.take(MAX_EDITOR_LIST_ITEMS).chunked(3).forEach { rowItems ->
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                setBackgroundColor(0xFF34414D.toInt())
-                setPadding(10.dp(), 8.dp(), 10.dp(), 8.dp())
-                isClickable = true
-                isFocusable = true
-                setOnClickListener { loadAacItemIntoEditor(item.itemId) }
             }
-            val preview = ImageView(this).apply {
-                scaleType = ImageView.ScaleType.CENTER_INSIDE
-                setBackgroundColor(0xFF1E252C.toInt())
-                setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
-            }
-            bindAacListIconPreview(preview, item)
-            val text = TextView(this).apply {
-                this.text = "${item.label.ifBlank { "brez oznake" }}\n${item.itemId} · ${item.iconSource.name}"
-                textSize = 15f
-                setTextColor(0xFFF4F7FA.toInt())
-                setPadding(12.dp(), 0, 0, 0)
-            }
-            row.addView(
-                preview,
-                LinearLayout.LayoutParams(54.dp(), 54.dp())
-            )
-            row.addView(
-                text,
-                LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    1f
+            rowItems.forEachIndexed { index, item ->
+                row.addView(
+                    buildAacGalleryCard(item),
+                    LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f
+                    ).apply {
+                        marginEnd = if (index < rowItems.lastIndex) 8.dp() else 0
+                    }
                 )
-            )
+            }
+            repeat(3 - rowItems.size) {
+                row.addView(
+                    LinearLayout(this),
+                    LinearLayout.LayoutParams(
+                        0,
+                        1,
+                        1f
+                    ).apply {
+                        marginEnd = 8.dp()
+                    }
+                )
+            }
             aacItemListActions.addView(
                 row,
                 LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    72.dp()
+                    LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    bottomMargin = 8.dp()
+                    bottomMargin = 10.dp()
                 }
             )
         }
@@ -1166,6 +1495,145 @@ class AacPackSettingsActivity : AppCompatActivity() {
             aacItemListActions.addView(
                 buildAacItemListMessage("Prikazanih je prvih $MAX_EDITOR_LIST_ITEMS elementov. Preostalih: $remaining.")
             )
+        }
+    }
+
+    private fun buildAacGalleryCard(item: AacListItem): LinearLayout {
+        val isMissingImage = itemHasMissingImage(item)
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            setBackgroundColor(0xFF26323D.toInt())
+            setPadding(8.dp(), 8.dp(), 8.dp(), 8.dp())
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { loadAacItemIntoEditor(item.itemId) }
+        }
+        val preview = ImageView(this).apply {
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            setBackgroundColor(0xFF172029.toInt())
+            setPadding(8.dp(), 8.dp(), 8.dp(), 8.dp())
+        }
+        bindAacListIconPreview(preview, item)
+        card.addView(
+            preview,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                96.dp()
+            )
+        )
+        card.addView(TextView(this).apply {
+            text = item.label.ifBlank { "brez oznake" }
+            gravity = Gravity.CENTER
+            maxLines = 2
+            textSize = 15f
+            setTextColor(0xFFF4F7FA.toInt())
+            setPadding(0, 8.dp(), 0, 2.dp())
+        })
+        card.addView(TextView(this).apply {
+            text = item.itemId
+            gravity = Gravity.CENTER
+            maxLines = 1
+            textSize = 11f
+            setTextColor(0xFF9CA8B5.toInt())
+        })
+        val badges = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            setPadding(0, 8.dp(), 0, 0)
+        }
+        badges.addView(buildGalleryBadge(item.iconSource.name, 0xFF2F5F9E.toInt()))
+        badges.addView(
+            buildGalleryBadge(
+                item.translationStatus.label,
+                when (item.translationStatus) {
+                    ItemTranslationStatus.TRANSLATED -> 0xFF2F6F50.toInt()
+                    ItemTranslationStatus.MISSING -> 0xFF8A5A24.toInt()
+                    ItemTranslationStatus.PENDING -> 0xFF5A4F8A.toInt()
+                }
+            )
+        )
+        card.addView(badges)
+        val indicators = galleryIndicators(item, isMissingImage)
+        if (indicators.isNotEmpty()) {
+            card.addView(TextView(this).apply {
+                text = indicators.joinToString(" · ")
+                gravity = Gravity.CENTER
+                maxLines = 3
+                textSize = 12f
+                setTextColor(if (isMissingImage || item.translationStatus == ItemTranslationStatus.MISSING) 0xFFFFD27A.toInt() else 0xFFB8C0C8.toInt())
+                setPadding(0, 8.dp(), 0, 0)
+            })
+        }
+        val quickActions = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, 8.dp(), 0, 0)
+        }
+        quickActions.addView(buildLibraryQuickButton("STRAN") {
+            editPlacementItemId.setText(item.itemId)
+            editPlacementPageId.setText(selectedPlacementPageId())
+            txtStatus.text = "Ikona izbrana za postavitev.\n${item.itemId}"
+        })
+        quickActions.addView(buildLibraryQuickButton("FIKSNO") {
+            editFixedTopRowItemId.setText(item.itemId)
+            txtStatus.text = "Ikona izbrana za fiksno vrstico.\n${item.itemId}"
+        })
+        quickActions.addView(buildLibraryQuickButton("POD") {
+            editSubiconChildId.setText(item.itemId)
+            txtStatus.text = "Ikona izbrana kot podikona.\n${item.itemId}"
+        })
+        card.addView(quickActions)
+        return card
+    }
+
+    private fun buildGalleryBadge(label: String, color: Int): TextView {
+        return TextView(this).apply {
+            text = label
+            gravity = Gravity.CENTER
+            textSize = 10f
+            setTextColor(0xFFF4F7FA.toInt())
+            setBackgroundColor(color)
+            setPadding(6.dp(), 3.dp(), 6.dp(), 3.dp())
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                marginEnd = 4.dp()
+            }
+        }
+    }
+
+    private fun galleryIndicators(item: AacListItem, isMissingImage: Boolean): List<String> {
+        return buildList {
+            if (item.pageCount > 0) add("na ${item.pageCount} str.")
+            if (item.fixedTopRowPosition != null) add("F${item.fixedTopRowPosition}")
+            if (item.subiconCount > 0) add("${item.subiconCount} podikon")
+            if (item.translationStatus == ItemTranslationStatus.MISSING) add("manjka prevod")
+            if (isMissingImage) add("manjka slika")
+        }
+    }
+
+    private fun itemHasMissingImage(item: AacListItem): Boolean {
+        return item.imagePath.isNotBlank() &&
+            item.iconSource != IconSource.SYSTEM &&
+            AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)?.isFile != true
+    }
+
+    private fun buildLibraryQuickButton(label: String, action: () -> Unit): Button {
+        return Button(this).apply {
+            text = label
+            setAllCaps(false)
+            textSize = 12f
+            setTextColor(0xFFF4F7FA.toInt())
+            backgroundTintList = ColorStateList.valueOf(0xFF26323D.toInt())
+            setOnClickListener { action() }
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                48.dp(),
+                1f
+            ).apply {
+                marginEnd = 4.dp()
+            }
         }
     }
 
@@ -1239,6 +1707,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             editFixedTopRowPosition.setText("")
         }
         updateAacImagePreview(imagePath, iconSource)
+        renderAacItemUsageInspector(item)
         txtStatus.text = "AAC element naložen v urejevalnik.\n$itemId"
     }
 
@@ -1253,6 +1722,200 @@ class AacPackSettingsActivity : AppCompatActivity() {
         checkLearningImageText.isChecked = modes.isEmpty() || "image_text" in modes
         checkLearningImageOnly.isChecked = "image_only" in modes
         checkLearningTextOnly.isChecked = "text_only" in modes
+    }
+
+    private fun renderAacItemUsageInspector(item: org.json.JSONObject) {
+        aacItemUsageInspectorActions.removeAllViews()
+        val itemId = item.optString("id").trim()
+        if (itemId.isBlank()) {
+            aacItemUsageInspectorActions.addView(buildAacItemListMessage("Izberi AAC element za pregled uporabe."))
+            return
+        }
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val usage = buildAacItemUsage(item, currentItemsArray(itemsText))
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF26323D.toInt())
+            setPadding(12.dp(), 10.dp(), 12.dp(), 10.dp())
+        }
+        card.addView(TextView(this).apply {
+            text = "UPORABA AAC ELEMENTA"
+            textSize = 17f
+            setTextColor(0xFFF4F7FA.toInt())
+        })
+        card.addView(TextView(this).apply {
+            text = buildString {
+                append("Osnovno: ${usage.label.ifBlank { usage.itemId }} · ${usage.iconSource.name}\n")
+                append("Prevodi: ${usage.translatedLanguages.joinToString(", ").ifBlank { "ni shranjenih" }}\n")
+                append("Manjkajo: ${usage.missingLanguages.joinToString(", ").ifBlank { "nič" }}\n")
+                append("Vprašanje: ${if (usage.hasQuestion) "prisotno" else "ni nastavljeno"}\n")
+                append("Fiksna vrstica: ${usage.fixedTopRowPosition?.let { "F$it" } ?: "ni nastavljena"}")
+            }
+            textSize = 14f
+            setTextColor(0xFFB8C0C8.toInt())
+            setPadding(0, 6.dp(), 0, 8.dp())
+        })
+        addUsageSection(
+            card = card,
+            title = "STRANI (${usage.pageUsages.size})",
+            emptyText = "Element ni postavljen na pacientovi strani.",
+            rows = usage.pageUsages.map { page ->
+                UsageNavigationRow(
+                    label = "${page.pageTitle} (${page.pageId}) · pozicija ${page.position5x5}",
+                    action = { openPageInEditor(page.pageId, page.pageTitle) }
+                )
+            }
+        )
+        addUsageSection(
+            card = card,
+            title = "STARŠI (${usage.parentItems.size})",
+            emptyText = "Element ni podikona druge ikone.",
+            rows = usage.parentItems.map { parent ->
+                UsageNavigationRow(
+                    label = "${parent.label.ifBlank { parent.itemId }} (${parent.itemId})",
+                    action = { loadAacItemIntoEditor(parent.itemId) }
+                )
+            }
+        )
+        addUsageSection(
+            card = card,
+            title = "PODIKONE (${usage.childItems.size})",
+            emptyText = "Element nima podikon.",
+            rows = usage.childItems.map { child ->
+                UsageNavigationRow(
+                    label = "${child.label.ifBlank { child.itemId }} (${child.itemId})",
+                    action = { loadAacItemIntoEditor(child.itemId) }
+                )
+            }
+        )
+        aacItemUsageInspectorActions.addView(card)
+    }
+
+    private fun addUsageSection(
+        card: LinearLayout,
+        title: String,
+        emptyText: String,
+        rows: List<UsageNavigationRow>
+    ) {
+        card.addView(TextView(this).apply {
+            text = title
+            textSize = 14f
+            setTextColor(0xFFF4F7FA.toInt())
+            setPadding(0, 8.dp(), 0, 4.dp())
+        })
+        if (rows.isEmpty()) {
+            card.addView(TextView(this).apply {
+                text = emptyText
+                textSize = 13f
+                setTextColor(0xFF9CA8B5.toInt())
+            })
+            return
+        }
+        rows.forEach { row ->
+            card.addView(Button(this).apply {
+                text = row.label
+                setAllCaps(false)
+                textSize = 13f
+                setTextColor(0xFFF4F7FA.toInt())
+                backgroundTintList = ColorStateList.valueOf(0xFF1E252C.toInt())
+                setOnClickListener { row.action() }
+            })
+        }
+    }
+
+    private fun buildAacItemUsage(
+        item: org.json.JSONObject,
+        itemsArray: org.json.JSONArray?
+    ): AacItemUsage {
+        val itemId = item.optString("id").trim()
+        val pageTitles = loadPatientPages().associate { page -> page.pageId to page.pageTitle }
+        val translatedLanguages = storedTextLanguages(item)
+        val activeLanguages = loadAacActiveLanguages()
+        val missingLanguages = activeLanguages.filterNot { language -> language in translatedLanguages }
+        val pageUsages = item.optJSONArray("placements")?.let { placements ->
+            buildList {
+                for (index in 0 until placements.length()) {
+                    val placement = placements.optJSONObject(index) ?: continue
+                    if (placement.optBoolean("generated", false)) continue
+                    val pageId = placement.optString("pageId").trim()
+                    val position = placement.optInt("position5x5", 0)
+                    if (isSafePatientPageId(pageId) && position in 1..25) {
+                        add(
+                            AacItemPageUsage(
+                                pageId = pageId,
+                                pageTitle = pageTitles[pageId] ?: pageId,
+                                position5x5 = position
+                            )
+                        )
+                    }
+                }
+            }
+        }.orEmpty()
+        val children = stringArrayValues(item.optJSONArray("children"))
+        val parentIdsFromItem = buildList {
+            addAll(stringArrayValues(item.optJSONArray("visibleUnderIds")))
+            addAll(stringArrayValues(item.optJSONArray("parentIds")))
+            item.optString("parentId").trim().takeIf { it.isNotBlank() }?.let { add(it) }
+        }
+        val parents = mutableMapOf<String, UsageItemRef>()
+        val childItems = mutableMapOf<String, UsageItemRef>()
+        if (itemsArray != null) {
+            for (index in 0 until itemsArray.length()) {
+                val other = itemsArray.optJSONObject(index) ?: continue
+                val otherId = other.optString("id").trim()
+                if (otherId.isBlank()) continue
+                if (otherId in children) {
+                    childItems[otherId] = UsageItemRef(otherId, itemLabel(other))
+                }
+                if (itemId in stringArrayValues(other.optJSONArray("children")) || otherId in parentIdsFromItem) {
+                    parents[otherId] = UsageItemRef(otherId, itemLabel(other))
+                }
+            }
+        }
+        return AacItemUsage(
+            itemId = itemId,
+            label = itemLabel(item),
+            iconSource = itemIconSource(item),
+            pageUsages = pageUsages.sortedWith(compareBy<AacItemPageUsage> { it.pageTitle }.thenBy { it.position5x5 }),
+            parentItems = parents.values.sortedBy { it.label.ifBlank { it.itemId }.lowercase(Locale.ROOT) },
+            childItems = childItems.values.sortedBy { it.label.ifBlank { it.itemId }.lowercase(Locale.ROOT) },
+            fixedTopRowPosition = itemFixedTopRowPosition(item),
+            translatedLanguages = translatedLanguages.sorted(),
+            missingLanguages = missingLanguages,
+            hasQuestion = itemHasQuestion(item)
+        )
+    }
+
+    private fun storedTextLanguages(item: org.json.JSONObject): Set<String> {
+        val languages = mutableSetOf<String>()
+        listOf("labelByLanguage", "speechTextByLanguage").forEach { key ->
+            val values = item.optJSONObject(key) ?: return@forEach
+            val keys = values.keys()
+            while (keys.hasNext()) {
+                val language = keys.next().trim().lowercase(Locale.ROOT)
+                if (language.isNotBlank() && values.optString(language).isNotBlank()) {
+                    languages += language
+                }
+            }
+        }
+        if (item.optString("labelSl").isNotBlank() || item.optString("speechText").isNotBlank() || item.optString("speakTextSl").isNotBlank()) languages += "sl"
+        if (item.optString("labelUk").isNotBlank() || item.optString("speakTextUk").isNotBlank() || item.optString("speechTextUk").isNotBlank()) languages += "uk"
+        if (item.optString("labelEn").isNotBlank() || item.optString("speakTextEn").isNotBlank() || item.optString("speechTextEn").isNotBlank()) languages += "en"
+        return languages
+    }
+
+    private fun itemHasQuestion(item: org.json.JSONObject): Boolean {
+        val questionByLanguage = item.optJSONObject("questionByLanguage")
+        if (questionByLanguage != null) {
+            val keys = questionByLanguage.keys()
+            while (keys.hasNext()) {
+                if (questionByLanguage.optString(keys.next()).trim().isNotBlank()) {
+                    return true
+                }
+            }
+        }
+        return item.optString("questionSl").isNotBlank() || item.optString("questionUk").isNotBlank()
     }
 
     private fun itemLanguageText(item: org.json.JSONObject, objectKey: String, languageCode: String): String {
@@ -1629,6 +2292,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         patientPageActions.removeAllViews()
         val pages = loadPatientPages()
         val itemCounts = patientPageItemCounts()
+        val fixedRowCount = fixedTopRowCellItems().size
         val defaultPageId = defaultPatientPageId()
         if (pages.isEmpty()) {
             patientPageActions.addView(buildAacItemListMessage("Ni pacientovih strani. Ustvari stran, nato izberi postavitve."))
@@ -1637,24 +2301,29 @@ class AacPackSettingsActivity : AppCompatActivity() {
         pages.forEach { page ->
             val button = Button(this).apply {
                 val marker = if (page.pageId == defaultPageId) " · začetna" else ""
-                text = "${page.pageTitle}\n${page.pageId} · ${itemCounts[page.pageId] ?: 0} ikon$marker"
+                text = "${page.pageTitle}\n${page.pageId} · ${itemCounts[page.pageId] ?: 0} ikon · fiksnih: $fixedRowCount$marker"
                 setAllCaps(false)
                 textSize = 15f
                 setTextColor(0xFFF4F7FA.toInt())
-                setBackgroundColor(0xFF34414D.toInt())
-                setPadding(12.dp(), 6.dp(), 12.dp(), 6.dp())
+                setBackgroundColor(if (page.pageId == defaultPageId) 0xFF2F5F9E.toInt() else 0xFF34414D.toInt())
+                setPadding(14.dp(), 8.dp(), 14.dp(), 8.dp())
                 setOnClickListener {
                     editPatientPageId.setText(page.pageId)
                     editPatientPageTitle.setText(page.pageTitle)
                     editPlacementPageId.setText(page.pageId)
+                    previewPageStack.clear()
+                    previewPageStack += page.pageId
                     txtStatus.text = "Stran izbrana.\n${page.pageTitle} (${page.pageId})"
+                    renderPageWorkspace()
+                    renderPlacementGrid()
+                    renderPatientFlowPreview()
                 }
             }
             patientPageActions.addView(
                 button,
                 LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    64.dp()
+                    76.dp()
                 ).apply {
                     bottomMargin = 8.dp()
                 }
@@ -1684,28 +2353,87 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
     private fun renderPlacementGrid() {
         placementGridActions.removeAllViews()
+        val pageId = selectedPlacementPageId()
+        if (!isSafePatientPageId(pageId)) {
+            placementGridActions.addView(buildAacItemListMessage("Izberi ali vnesi stran za vizualni predogled 5x5."))
+            return
+        }
+        val pageTitle = loadPatientPages()
+            .firstOrNull { it.pageId == pageId }
+            ?.pageTitle
+            ?: pageId
+        val placedItems = pageCellItems(pageId)
+        placementGridActions.addView(
+            buildAacItemListMessage("Predogled strani: $pageTitle ($pageId)\nTapni celico za dodelitev, zamenjavo ali brisanje ikone.")
+        )
         for (rowIndex in 0 until 5) {
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
             }
             for (columnIndex in 0 until 5) {
                 val position = rowIndex * 5 + columnIndex + 1
-                val button = Button(this).apply {
-                    text = position.toString()
-                    setAllCaps(false)
-                    textSize = 14f
-                    setTextColor(0xFFF4F7FA.toInt())
-                    setBackgroundColor(0xFF34414D.toInt())
+                val cellItem = placedItems[position]
+                val cell = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = Gravity.CENTER
+                    setPadding(3.dp(), 3.dp(), 3.dp(), 3.dp())
+                    setBackgroundColor(if (cellItem == null) 0xFF1E252C.toInt() else 0xFF34414D.toInt())
+                    isClickable = true
+                    isFocusable = true
                     setOnClickListener {
+                        editPlacementPageId.setText(pageId)
                         editPlacementPosition5x5.setText(position.toString())
-                        txtStatus.text = "Pozicija izbrana: $position"
+                        if (cellItem == null) {
+                            showPlacementCellItemChooser(pageId, position, null)
+                        } else if (cellItem.isFixedTopRowCell) {
+                            showFixedPlacementCellActions(position, cellItem)
+                        } else {
+                            showPlacementCellActions(pageId, position, cellItem)
+                        }
                     }
                 }
+                val image = ImageView(this).apply {
+                    scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    setBackgroundColor(0xFF172029.toInt())
+                    setPadding(2.dp(), 2.dp(), 2.dp(), 2.dp())
+                }
+                val label = TextView(this).apply {
+                    text = cellItem?.let { item ->
+                        buildString {
+                            append(item.label.ifBlank { item.itemId })
+                            item.fixedTopRowPosition?.let { fixedPosition ->
+                                append("\nF$fixedPosition")
+                            }
+                        }
+                    } ?: position.toString()
+                    gravity = Gravity.CENTER
+                    maxLines = 3
+                    textSize = if (cellItem == null) 14f else 11f
+                    setTextColor(if (cellItem == null) 0xFF7F8A96.toInt() else 0xFFF4F7FA.toInt())
+                }
+                if (cellItem != null) {
+                    bindPlacementCellIconPreview(image, cellItem)
+                    cell.addView(
+                        image,
+                        LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            34.dp()
+                        )
+                    )
+                }
+                cell.addView(
+                    label,
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        0,
+                        1f
+                    )
+                )
                 row.addView(
-                    button,
+                    cell,
                     LinearLayout.LayoutParams(
                         0,
-                        48.dp(),
+                        76.dp(),
                         1f
                     ).apply {
                         marginEnd = if (columnIndex < 4) 4.dp() else 0
@@ -1722,6 +2450,55 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 }
             )
         }
+    }
+
+    private fun renderPageWorkspace() {
+        pageWorkspaceActions.removeAllViews()
+        val pageId = selectedPlacementPageId()
+        if (!isSafePatientPageId(pageId)) {
+            pageWorkspaceActions.addView(buildAacItemListMessage("Izberi stran za delovni prostor."))
+            return
+        }
+        val pageTitle = loadPatientPages().firstOrNull { it.pageId == pageId }?.pageTitle ?: pageId
+        val cells = pageCellItems(pageId)
+        val diagnostics = pageWorkspaceDiagnostics(pageId, cells)
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF26323D.toInt())
+            setPadding(14.dp(), 12.dp(), 14.dp(), 12.dp())
+        }
+        card.addView(TextView(this).apply {
+            text = "DELOVNI PROSTOR: $pageTitle"
+            textSize = 16f
+            setTextColor(0xFFF4F7FA.toInt())
+        })
+        card.addView(TextView(this).apply {
+            text = buildString {
+                append("$pageId · ${cells.values.count { !it.isFixedTopRowCell }} ikon na strani · fiksnih: ${fixedTopRowCellItems().size}/5\n")
+                append("Podikone na strani: ${diagnostics.subiconCount}\n")
+                append("Manjkajoči prevodi: ${diagnostics.missingTranslations}\n")
+                append("Manjkajoče slike: ${diagnostics.missingImages}\n")
+                append("Podvojene pozicije: ${diagnostics.duplicatePlacements}")
+            }
+            textSize = 14f
+            setTextColor(0xFFB8C0C8.toInt())
+            setPadding(0, 6.dp(), 0, 0)
+        })
+        if (diagnostics.warningLines.isNotEmpty()) {
+            card.addView(TextView(this).apply {
+                text = diagnostics.warningLines.joinToString("\n")
+                textSize = 14f
+                setTextColor(0xFFFFD27A.toInt())
+                setPadding(0, 8.dp(), 0, 0)
+            })
+        }
+        pageWorkspaceActions.addView(
+            card,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        )
     }
 
     private fun savePatientPage() {
@@ -1895,6 +2672,18 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateLibraryFilterButtons() {
+        updateIconSourceFilterButtons()
+        translationFilterButtons.forEach { (filter, button) ->
+            val color = if (filter == therapistTranslationFilter) 0xFF2F5F9E.toInt() else 0xFF34414D.toInt()
+            button.backgroundTintList = ColorStateList.valueOf(color)
+        }
+        pageUsageFilterButtons.forEach { (filter, button) ->
+            val color = if (filter == therapistPageUsageFilter) 0xFF2F5F9E.toInt() else 0xFF34414D.toInt()
+            button.backgroundTintList = ColorStateList.valueOf(color)
+        }
+    }
+
     private fun saveFixedTopRowPosition() {
         val itemId = editFixedTopRowItemId.text.toString().trim()
         val position = editFixedTopRowPosition.text.toString().trim().toIntOrNull()
@@ -1922,6 +2711,759 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 txtStatus.text = "Fiksne pozicije ni bilo mogoce shraniti."
             }
         }
+    }
+
+    private fun selectedPlacementPageId(): String {
+        return editPlacementPageId.text.toString().trim()
+            .ifBlank { editPatientPageId.text.toString().trim() }
+            .ifBlank { defaultPatientPageId() }
+    }
+
+    private fun pageCellItems(pageId: String): Map<Int, PlacementCellItem> {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText) ?: return emptyMap()
+        val cells = linkedMapOf<Int, PlacementCellItem>()
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val fixedPosition = itemFixedTopRowPosition(item)
+            if (fixedPosition == null || fixedPosition !in 1..5) continue
+            val itemId = item.optString("id").trim()
+            if (itemId.isBlank()) continue
+            cells[fixedPosition] = placementCellItemFromJson(item, fixedPosition, isFixedTopRowCell = true)
+        }
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val itemId = item.optString("id").trim()
+            if (itemId.isBlank()) continue
+            val placements = item.optJSONArray("placements") ?: continue
+            for (placementIndex in 0 until placements.length()) {
+                val placement = placements.optJSONObject(placementIndex) ?: continue
+                if (placement.optBoolean("generated", false)) continue
+                val placementPageId = placement.optString("pageId").trim()
+                val position = placement.optInt("position5x5", 0)
+                if (placementPageId == pageId && position in 1..25 && !cells.containsKey(position)) {
+                    cells[position] = placementCellItemFromJson(item, itemFixedTopRowPosition(item), isFixedTopRowCell = false)
+                }
+            }
+        }
+        return cells
+    }
+
+    private fun placementCellItemFromJson(
+        item: org.json.JSONObject,
+        fixedTopRowPosition: Int?,
+        isFixedTopRowCell: Boolean
+    ): PlacementCellItem {
+        val targetPageId = item.optString("targetPageId")
+            .ifBlank { item.optString("opensPageId") }
+            .ifBlank { item.optString("pageIdToOpen") }
+            .trim()
+        return PlacementCellItem(
+            itemId = item.optString("id").trim(),
+            label = itemLabel(item),
+            iconSource = itemIconSource(item),
+            imagePath = item.optString("imagePath")
+                .ifBlank { item.optString("image_path") }
+                .ifBlank { item.optString("icon") },
+            fixedTopRowPosition = fixedTopRowPosition,
+            isFixedTopRowCell = isFixedTopRowCell,
+            targetPageId = targetPageId.ifBlank { null },
+            translationStatus = itemTranslationStatus(item, loadAacActiveLanguages())
+        )
+    }
+
+    private fun bindPlacementCellIconPreview(preview: ImageView, item: PlacementCellItem) {
+        val imageFile = AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
+        if (imageFile?.isFile != true) {
+            preview.setImageDrawable(null)
+            return
+        }
+        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+        if (bitmap == null) {
+            preview.setImageDrawable(null)
+        } else {
+            preview.setImageBitmap(bitmap)
+        }
+    }
+
+    private fun showPlacementCellActions(pageId: String, position: Int, currentItem: PlacementCellItem) {
+        val title = "Pozicija $position"
+        val message = "${currentItem.label.ifBlank { currentItem.itemId }}\n${currentItem.itemId}"
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("Uredi ikono") { _, _ ->
+                loadAacItemIntoEditor(currentItem.itemId)
+            }
+            .setNegativeButton("Zamenjaj") { _, _ ->
+                showPlacementCellItemChooser(pageId, position, currentItem)
+            }
+            .setNeutralButton("Počisti") { _, _ ->
+                confirmClearPlacementCell(pageId, position, currentItem)
+            }
+            .show()
+    }
+
+    private fun showFixedPlacementCellActions(position: Int, currentItem: PlacementCellItem) {
+        AlertDialog.Builder(this)
+            .setTitle("Fiksna pozicija $position")
+            .setMessage("${currentItem.label.ifBlank { currentItem.itemId }}\n${currentItem.itemId}\nTa celica je nadzorovana prek fiksne prve vrstice.")
+            .setPositiveButton("Zamenjaj") { _, _ ->
+                showFixedPlacementCellItemChooser(position, currentItem)
+            }
+            .setNegativeButton("Počisti") { _, _ ->
+                confirmClearFixedPlacementCell(position, currentItem)
+            }
+            .setNeutralButton("Prekliči", null)
+            .show()
+    }
+
+    private fun showFixedPlacementCellItemChooser(position: Int, currentItem: PlacementCellItem?) {
+        val items = buildLocalAacOverview()
+            .relationAnalysis
+            .availableItems
+            .filter { item -> therapistIconSourceFilter.matches(item.iconSource) }
+        if (items.isEmpty()) {
+            txtStatus.text = "Ni AAC elementov za trenutni filter vira."
+            return
+        }
+        val labels = items.map { item ->
+            val title = item.label.ifBlank { item.itemId }
+            "$title (${item.itemId}, ${item.iconSource.name})"
+        }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("Izberi fiksno ikono $position")
+            .setItems(labels) { _, index ->
+                val selectedItem = items[index]
+                when (writeFixedTopRowPosition(selectedItem.itemId, position)) {
+                    FixedTopRowWriteResult.Success -> {
+                        editFixedTopRowItemId.setText(selectedItem.itemId)
+                        editFixedTopRowPosition.setText(position.toString())
+                        txtStatus.text = if (currentItem == null) {
+                            "Fiksna ikona nastavljena.\nF$position -> ${selectedItem.itemId}"
+                        } else {
+                            "Fiksna ikona zamenjana.\n${currentItem.itemId} -> ${selectedItem.itemId}"
+                        }
+                        refreshLocalAacOverview()
+                    }
+                    FixedTopRowWriteResult.ItemsFileMissing -> txtStatus.text = "AAC elementi niso najdeni."
+                    FixedTopRowWriteResult.ItemNotFound -> txtStatus.text = "ID AAC elementa ne obstaja."
+                    FixedTopRowWriteResult.WriteFailed -> txtStatus.text = "Fiksne pozicije ni bilo mogoce shraniti."
+                }
+            }
+            .setNegativeButton("Prekliči", null)
+            .show()
+    }
+
+    private fun confirmClearFixedPlacementCell(position: Int, currentItem: PlacementCellItem) {
+        AlertDialog.Builder(this)
+            .setTitle("Počisti fiksno pozicijo?")
+            .setMessage("Odstrani ${currentItem.label.ifBlank { currentItem.itemId }} iz fiksne prve vrstice, pozicija $position?\nIkona, prevodi, postavitve in podikone ostanejo shranjeni.")
+            .setPositiveButton("Počisti") { _, _ ->
+                when (clearFixedTopRowPositionInJson(position)) {
+                    FixedTopRowWriteResult.Success -> {
+                        editFixedTopRowPosition.setText(position.toString())
+                        txtStatus.text = "Fiksna pozicija počiščena.\n$position"
+                        refreshLocalAacOverview()
+                    }
+                    FixedTopRowWriteResult.ItemsFileMissing -> txtStatus.text = "AAC elementi niso najdeni."
+                    FixedTopRowWriteResult.ItemNotFound -> txtStatus.text = "Na poziciji $position ni fiksnega AAC elementa."
+                    FixedTopRowWriteResult.WriteFailed -> txtStatus.text = "Fiksne pozicije ni bilo mogoce počistiti."
+                }
+            }
+            .setNegativeButton("Prekliči", null)
+            .show()
+    }
+
+    private fun showPlacementCellItemChooser(pageId: String, position: Int, currentItem: PlacementCellItem?) {
+        val items = buildLocalAacOverview()
+            .relationAnalysis
+            .availableItems
+            .filter { item -> therapistIconSourceFilter.matches(item.iconSource) }
+        if (items.isEmpty()) {
+            txtStatus.text = "Ni AAC elementov za trenutni filter vira."
+            return
+        }
+        val labels = items.map { item ->
+            val title = item.label.ifBlank { item.itemId }
+            "$title (${item.itemId}, ${item.iconSource.name})"
+        }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("Izberi ikono za pozicijo $position")
+            .setItems(labels) { _, index ->
+                val selectedItem = items[index]
+                when (replacePlacementCell(pageId, position, selectedItem.itemId)) {
+                    AacMetadataWriteResult.Success -> {
+                        editPlacementItemId.setText(selectedItem.itemId)
+                        editPlacementPageId.setText(pageId)
+                        editPlacementPosition5x5.setText(position.toString())
+                        txtStatus.text = if (currentItem == null) {
+                            "Ikona postavljena.\n${selectedItem.itemId} -> $pageId / $position"
+                        } else {
+                            "Ikona zamenjana.\n${currentItem.itemId} -> ${selectedItem.itemId}"
+                        }
+                        refreshLocalAacOverview()
+                    }
+                    AacMetadataWriteResult.ItemNotFound -> txtStatus.text = "ID AAC elementa ne obstaja."
+                    AacMetadataWriteResult.WriteFailed -> txtStatus.text = "Postavitve ni bilo mogoce shraniti."
+                }
+            }
+            .setNegativeButton("Prekliči", null)
+            .show()
+    }
+
+    private fun confirmClearPlacementCell(pageId: String, position: Int, currentItem: PlacementCellItem) {
+        AlertDialog.Builder(this)
+            .setTitle("Počisti pozicijo?")
+            .setMessage("Odstrani ${currentItem.label.ifBlank { currentItem.itemId }} iz strani $pageId, pozicija $position?\nIkona, prevodi in podikone ostanejo shranjeni.")
+            .setPositiveButton("Počisti") { _, _ ->
+                when (clearPlacementCell(pageId, position)) {
+                    AacMetadataWriteResult.Success -> {
+                        txtStatus.text = "Pozicija počiščena.\n$pageId / $position"
+                        refreshLocalAacOverview()
+                    }
+                    AacMetadataWriteResult.ItemNotFound -> txtStatus.text = "Na tej poziciji ni ikone."
+                    AacMetadataWriteResult.WriteFailed -> txtStatus.text = "Postavitve ni bilo mogoce počistiti."
+                }
+            }
+            .setNegativeButton("Prekliči", null)
+            .show()
+    }
+
+    private fun renderPatientFlowPreview() {
+        previewFixedTopRowActions.removeAllViews()
+        previewGridActions.removeAllViews()
+        renderPreviewFixedTopRow()
+        val pageId = currentPreviewPageId()
+        if (!isSafePatientPageId(pageId)) {
+            previewGridActions.addView(buildAacItemListMessage("Ni izbrane pacientove strani za predogled."))
+            return
+        }
+        val pageTitle = loadPatientPages().firstOrNull { it.pageId == pageId }?.pageTitle ?: pageId
+        previewGridActions.addView(
+            buildAacItemListMessage("Predogled: $pageTitle ($pageId)\nTapni ikono, da simuliras odpiranje strani ali podikon. Podatki se ne spreminjajo.")
+        )
+        val pageItems = previewPageCellItems(pageId)
+        for (rowIndex in 0 until 5) {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+            }
+            for (columnIndex in 0 until 5) {
+                val position = rowIndex * 5 + columnIndex + 1
+                val item = pageItems[position]
+                val cell = if (position == 25) {
+                    buildPreviewBackCell()
+                } else {
+                    buildPreviewCell(item, position)
+                }
+                row.addView(
+                    cell,
+                    LinearLayout.LayoutParams(
+                        0,
+                        78.dp(),
+                        1f
+                    ).apply {
+                        marginEnd = if (columnIndex < 4) 4.dp() else 0
+                    }
+                )
+            }
+            previewGridActions.addView(
+                row,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = 4.dp()
+                }
+            )
+        }
+    }
+
+    private fun renderPreviewFixedTopRow() {
+        val fixedCells = fixedTopRowCellItems()
+        previewFixedTopRowActions.addView(buildAacItemListMessage("Fiksna vrstica ostane vidna na vseh straneh:"))
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        for (position in 1..5) {
+            row.addView(
+                buildPreviewCell(fixedCells[position], position, fixedLabel = "F$position"),
+                LinearLayout.LayoutParams(
+                    0,
+                    78.dp(),
+                    1f
+                ).apply {
+                    marginEnd = if (position < 5) 4.dp() else 0
+                }
+            )
+        }
+        previewFixedTopRowActions.addView(row)
+    }
+
+    private fun buildPreviewCell(
+        item: PlacementCellItem?,
+        position: Int,
+        fixedLabel: String? = null
+    ): LinearLayout {
+        val cell = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(3.dp(), 3.dp(), 3.dp(), 3.dp())
+            setBackgroundColor(if (item == null) 0xFF1E252C.toInt() else 0xFF26323D.toInt())
+            isClickable = item != null
+            isFocusable = item != null
+            if (item != null) {
+                setOnClickListener { openPreviewItem(item) }
+            }
+        }
+        val image = ImageView(this).apply {
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            setBackgroundColor(0xFF172029.toInt())
+            setPadding(2.dp(), 2.dp(), 2.dp(), 2.dp())
+        }
+        val label = TextView(this).apply {
+            text = item?.let { previewCellLabel(it, fixedLabel) } ?: fixedLabel ?: position.toString()
+            gravity = Gravity.CENTER
+            maxLines = 3
+            textSize = if (item == null) 12f else 11f
+            setTextColor(if (item == null) 0xFF7F8A96.toInt() else 0xFFF4F7FA.toInt())
+        }
+        if (item != null) {
+            bindPlacementCellIconPreview(image, item)
+            cell.addView(
+                image,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    34.dp()
+                )
+            )
+        }
+        cell.addView(
+            label,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1f
+            )
+        )
+        return cell
+    }
+
+    private fun buildPreviewBackCell(): LinearLayout {
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(3.dp(), 3.dp(), 3.dp(), 3.dp())
+            setBackgroundColor(0xFF34414D.toInt())
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                if (previewPageStack.size > 1) {
+                    previewPageStack.removeAt(previewPageStack.lastIndex)
+                } else {
+                    previewPageStack.clear()
+                }
+                renderPatientFlowPreview()
+            }
+            addView(
+                TextView(this@AacPackSettingsActivity).apply {
+                    text = if (previewPageStack.size > 1) "NAZAJ" else "DOMOV"
+                    gravity = Gravity.CENTER
+                    textSize = 13f
+                    setTextColor(0xFFF4F7FA.toInt())
+                },
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+            )
+        }
+    }
+
+    private fun previewCellLabel(item: PlacementCellItem, fixedLabel: String?): String {
+        return buildString {
+            if (fixedLabel != null) {
+                append(fixedLabel)
+                append("\n")
+            }
+            append(item.label.ifBlank { item.itemId })
+            append("\n")
+            append(item.iconSource.name)
+            append(" · ")
+            append(item.translationStatus.label)
+        }
+    }
+
+    private fun openPreviewItem(item: PlacementCellItem) {
+        val targetPage = item.targetPageId?.takeIf { isSafePatientPageId(it) }
+        val childPageId = "children_${item.itemId}"
+        when {
+            targetPage != null -> {
+                previewPageStack += targetPage
+                renderPatientFlowPreview()
+            }
+            previewChildItems(item.itemId).isNotEmpty() -> {
+                previewPageStack += childPageId
+                renderPatientFlowPreview()
+            }
+            else -> {
+                txtStatus.text = "Predogled: ${item.label.ifBlank { item.itemId }}\nKončna ikona bi spregovorila po pacientovem toku."
+            }
+        }
+    }
+
+    private fun currentPreviewPageId(): String {
+        if (previewPageStack.isEmpty()) {
+            val startPage = editPlacementPageId.text.toString().trim()
+                .ifBlank { editPatientPageId.text.toString().trim() }
+                .ifBlank { defaultPatientPageId() }
+            if (isSafePatientPageId(startPage)) {
+                previewPageStack += startPage
+            }
+        }
+        return previewPageStack.lastOrNull().orEmpty()
+    }
+
+    private fun previewChildItems(parentId: String): List<PlacementCellItem> {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText) ?: return emptyList()
+        val parent = findItemById(itemsArray, parentId) ?: return emptyList()
+        val childIds = stringArrayValues(parent.optJSONArray("children"))
+        return childIds.mapNotNull { childId ->
+            findItemById(itemsArray, childId)?.let { item ->
+                placementCellItemFromJson(
+                    item = item,
+                    fixedTopRowPosition = itemFixedTopRowPosition(item),
+                    isFixedTopRowCell = false
+                )
+            }
+        }
+    }
+
+    private fun previewPageCellItems(pageId: String): Map<Int, PlacementCellItem> {
+        if (!pageId.startsWith("children_")) {
+            return pageCellItems(pageId)
+        }
+        val parentId = pageId.removePrefix("children_")
+        val children = previewChildItems(parentId)
+        return children
+            .take(24)
+            .mapIndexed { index, item -> index + 1 to item }
+            .toMap()
+    }
+
+    private fun pageWorkspaceDiagnostics(
+        pageId: String,
+        cells: Map<Int, PlacementCellItem>
+    ): PageWorkspaceDiagnostics {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText)
+        val duplicatePlacements = itemsArray?.let { countDuplicatePlacementsForPage(it, pageId) } ?: 0
+        val pageItems = cells.values.filter { !it.isFixedTopRowCell }
+        val missingTranslations = pageItems.count { it.translationStatus == ItemTranslationStatus.MISSING }
+        val missingImages = pageItems.count { item ->
+            item.imagePath.isNotBlank() &&
+                item.iconSource != IconSource.SYSTEM &&
+                AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)?.isFile != true
+        }
+        val subiconCount = pageItems.count { previewChildItems(it.itemId).isNotEmpty() }
+        val warningLines = mutableListOf<String>()
+        if (missingTranslations > 0) warningLines += "Opozorilo: na strani manjkajo prevodi."
+        if (missingImages > 0) warningLines += "Opozorilo: nekatere slike niso najdene."
+        if (duplicatePlacements > 0) warningLines += "Opozorilo: podvojene pozicije na strani."
+        if (pageItems.isEmpty()) warningLines += "Stran je prazna."
+        return PageWorkspaceDiagnostics(
+            subiconCount = subiconCount,
+            missingTranslations = missingTranslations,
+            missingImages = missingImages,
+            duplicatePlacements = duplicatePlacements,
+            warningLines = warningLines
+        )
+    }
+
+    private fun countDuplicatePlacementsForPage(itemsArray: org.json.JSONArray, pageId: String): Int {
+        val counts = mutableMapOf<Int, Int>()
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val placements = item.optJSONArray("placements") ?: continue
+            for (placementIndex in 0 until placements.length()) {
+                val placement = placements.optJSONObject(placementIndex) ?: continue
+                if (placement.optBoolean("generated", false)) continue
+                val placementPageId = placement.optString("pageId").trim()
+                val position = placement.optInt("position5x5", 0)
+                if (placementPageId == pageId && position in 1..25) {
+                    counts[position] = (counts[position] ?: 0) + 1
+                }
+            }
+        }
+        return counts.values.count { count -> count > 1 }
+    }
+
+    private fun renderCommunicatorStructureOverview(overview: LocalAacOverview) {
+        communicatorStructureActions.removeAllViews()
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText)
+        val activeLanguages = loadAacActiveLanguages()
+        val translationStatus = itemsArray?.let { buildTranslationStatus(it, activeLanguages) }
+            ?: TranslationStatus.empty(activeLanguages)
+        communicatorStructureActions.addView(
+            buildAacItemListMessage(
+                buildString {
+                    append("Strani: ${loadPatientPages().size}\n")
+                    append("AAC elementi: ${overview.relationAnalysis.availableItems.size}\n")
+                    append("Fiksna vrstica: ${overview.relationAnalysis.fixedTopRowItems.size}/5\n")
+                    append("Elementi brez profila: ${overview.orphanItemCount}\n")
+                    append("Prevodi manjkajo: ${translationStatus.missingCount}\n")
+                    append("Prevodi pripravljeni: ${translationStatus.translatedCount}\n")
+                    append("Prevodi v pripravi: ${translationStatus.pendingCount}")
+                }
+            )
+        )
+        if (itemsArray == null) {
+            communicatorStructureActions.addView(buildAacItemListMessage("AAC elementi niso najdeni."))
+            return
+        }
+        val structure = buildCommunicatorStructure(itemsArray)
+        if (structure.pages.isEmpty()) {
+            communicatorStructureActions.addView(buildAacItemListMessage("Ni pacientovih strani za prikaz."))
+            return
+        }
+        structure.pages.forEach { page ->
+            addStructurePageCard(page)
+        }
+    }
+
+    private fun addStructurePageCard(page: StructurePage) {
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF26323D.toInt())
+            setPadding(12.dp(), 10.dp(), 12.dp(), 10.dp())
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                openPageInEditor(page.pageId, page.pageTitle)
+            }
+        }
+        val title = TextView(this).apply {
+            text = "${page.pageTitle} (${page.pageId})"
+            textSize = 16f
+            setTextColor(0xFFF4F7FA.toInt())
+        }
+        val detail = TextView(this).apply {
+            text = "${page.items.size} ikon · tapni za urejanje strani"
+            textSize = 13f
+            setTextColor(0xFFB8C0C8.toInt())
+        }
+        card.addView(title)
+        card.addView(detail)
+        page.items.take(12).forEach { item ->
+            card.addView(buildStructureItemRow(item, indentLevel = 1))
+            item.children.take(8).forEach { child ->
+                card.addView(buildStructureItemRow(child, indentLevel = 2))
+            }
+        }
+        if (page.items.size > 12) {
+            card.addView(buildAacItemListMessage("... se ${page.items.size - 12} ikon"))
+        }
+        communicatorStructureActions.addView(
+            card,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                bottomMargin = 10.dp()
+            }
+        )
+    }
+
+    private fun buildStructureItemRow(item: StructureItem, indentLevel: Int): TextView {
+        return TextView(this).apply {
+            val prefix = if (indentLevel == 1) "  ├ " else "      └ "
+            val translationText = when (item.translationStatus) {
+                ItemTranslationStatus.TRANSLATED -> "prevedeno"
+                ItemTranslationStatus.MISSING -> "manjka prevod"
+                ItemTranslationStatus.PENDING -> "v pripravi"
+            }
+            text = "$prefix${item.label.ifBlank { item.itemId }} (${item.itemId}) · $translationText"
+            textSize = if (indentLevel == 1) 14f else 13f
+            setTextColor(if (item.translationStatus == ItemTranslationStatus.MISSING) 0xFFFFD27A.toInt() else 0xFFDEE5EC.toInt())
+            setBackgroundColor(if (indentLevel == 1) 0xFF1E252C.toInt() else 0xFF202A33.toInt())
+            setPadding(8.dp(), 6.dp(), 8.dp(), 6.dp())
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                loadAacItemIntoEditor(item.itemId)
+            }
+        }
+    }
+
+    private fun openPageInEditor(pageId: String, pageTitle: String) {
+        editPatientPageId.setText(pageId)
+        editPatientPageTitle.setText(pageTitle)
+        editPlacementPageId.setText(pageId)
+        txtStatus.text = "Stran odprta v urejevalniku.\n$pageTitle ($pageId)"
+        previewPageStack.clear()
+        previewPageStack.add(pageId)
+        renderPageWorkspace()
+        renderPlacementGrid()
+        renderPatientFlowPreview()
+    }
+
+    private fun buildCommunicatorStructure(itemsArray: org.json.JSONArray): CommunicatorStructure {
+        val pagesById = loadPatientPages().associateBy { it.pageId }
+        val pageItems = linkedMapOf<String, MutableList<StructureItem>>()
+        val labelsById = mutableMapOf<String, String>()
+        val itemsById = mutableMapOf<String, org.json.JSONObject>()
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val itemId = item.optString("id").trim()
+            if (itemId.isBlank()) continue
+            labelsById[itemId] = itemLabel(item).ifBlank { itemId }
+            itemsById[itemId] = item
+        }
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val itemId = item.optString("id").trim()
+            if (itemId.isBlank()) continue
+            val placements = item.optJSONArray("placements") ?: continue
+            for (placementIndex in 0 until placements.length()) {
+                val placement = placements.optJSONObject(placementIndex) ?: continue
+                if (placement.optBoolean("generated", false)) continue
+                val pageId = placement.optString("pageId").trim()
+                val position = placement.optInt("position5x5", 0)
+                if (!isSafePatientPageId(pageId) || position !in 1..25) continue
+                pageItems.getOrPut(pageId) { mutableListOf() } += structureItemFromJson(
+                    item = item,
+                    position = position,
+                    labelsById = labelsById,
+                    itemsById = itemsById
+                )
+            }
+        }
+        val pages = pageItems.map { (pageId, items) ->
+            val page = pagesById[pageId]
+            StructurePage(
+                pageId = pageId,
+                pageTitle = page?.pageTitle ?: pageId,
+                items = items.sortedWith(compareBy<StructureItem> { it.position }.thenBy { it.itemId })
+            )
+        }.sortedBy { page -> page.pageTitle.lowercase(Locale.ROOT) }
+        return CommunicatorStructure(pages)
+    }
+
+    private fun structureItemFromJson(
+        item: org.json.JSONObject,
+        position: Int,
+        labelsById: Map<String, String>,
+        itemsById: Map<String, org.json.JSONObject>
+    ): StructureItem {
+        val itemId = item.optString("id").trim()
+        val children = stringArrayValues(item.optJSONArray("children"))
+            .mapNotNull { childId ->
+                val childItem = itemsById[childId] ?: return@mapNotNull null
+                StructureItem(
+                    itemId = childId,
+                    label = labelsById[childId].orEmpty(),
+                    position = 0,
+                    children = emptyList(),
+                    translationStatus = itemTranslationStatus(childItem, loadAacActiveLanguages())
+                )
+            }
+        return StructureItem(
+            itemId = itemId,
+            label = labelsById[itemId].orEmpty(),
+            position = position,
+            children = children,
+            translationStatus = itemTranslationStatus(item, loadAacActiveLanguages())
+        )
+    }
+
+    private fun buildTranslationStatus(
+        itemsArray: org.json.JSONArray,
+        activeLanguages: List<String>
+    ): TranslationStatus {
+        var translated = 0
+        var missing = 0
+        var pending = 0
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            when (itemTranslationStatus(item, activeLanguages)) {
+                ItemTranslationStatus.TRANSLATED -> translated += 1
+                ItemTranslationStatus.MISSING -> missing += 1
+                ItemTranslationStatus.PENDING -> pending += 1
+            }
+        }
+        return TranslationStatus(activeLanguages, translated, missing, pending)
+    }
+
+    private fun itemTranslationStatus(
+        item: org.json.JSONObject,
+        activeLanguages: List<String>
+    ): ItemTranslationStatus {
+        val languages = activeLanguages.ifEmpty { listOf("sl") }
+        val labelMap = item.optJSONObject("labelByLanguage")
+        val speechMap = item.optJSONObject("speechTextByLanguage")
+        val missingLanguage = languages.any { language ->
+            !hasStoredLabelForLanguage(item, labelMap, language) ||
+                !hasStoredSpeechForLanguage(item, speechMap, language)
+        }
+        if (!missingLanguage) return ItemTranslationStatus.TRANSLATED
+        val generated = item.optBoolean("translationGenerated", false)
+        val source = item.optString("translationSource").trim()
+        return if (generated && source.isNotBlank()) ItemTranslationStatus.PENDING else ItemTranslationStatus.MISSING
+    }
+
+    private fun manualPlacementPageIds(item: org.json.JSONObject): Set<String> {
+        val placements = item.optJSONArray("placements") ?: return emptySet()
+        val pageIds = linkedSetOf<String>()
+        for (index in 0 until placements.length()) {
+            val placement = placements.optJSONObject(index) ?: continue
+            if (placement.optBoolean("generated", false)) continue
+            val pageId = placement.optString("pageId").trim()
+            val position = placement.optInt("position5x5", 0)
+            if (isSafePatientPageId(pageId) && position in 1..25) {
+                pageIds += pageId
+            }
+        }
+        return pageIds
+    }
+
+    private fun hasStoredLabelForLanguage(
+        item: org.json.JSONObject,
+        labelMap: org.json.JSONObject?,
+        language: String
+    ): Boolean {
+        val normalizedLanguage = language.trim().lowercase(Locale.ROOT)
+        return labelMap?.optString(normalizedLanguage)?.trim()?.isNotBlank() == true ||
+            (normalizedLanguage == "sl" && itemLabel(item).isNotBlank()) ||
+            (normalizedLanguage == "uk" && item.optString("labelUk").trim().isNotBlank()) ||
+            (normalizedLanguage == "en" && item.optString("labelEn").trim().isNotBlank())
+    }
+
+    private fun hasStoredSpeechForLanguage(
+        item: org.json.JSONObject,
+        speechMap: org.json.JSONObject?,
+        language: String
+    ): Boolean {
+        val normalizedLanguage = language.trim().lowercase(Locale.ROOT)
+        return speechMap?.optString(normalizedLanguage)?.trim()?.isNotBlank() == true ||
+            (normalizedLanguage == "sl" && (
+                item.optString("speechText").trim().isNotBlank() ||
+                    item.optString("speakTextSl").trim().isNotBlank() ||
+                    itemLabel(item).isNotBlank()
+                )) ||
+            (normalizedLanguage == "uk" && (
+                item.optString("speechTextUk").trim().isNotBlank() ||
+                    item.optString("speakTextUk").trim().isNotBlank()
+                )) ||
+            (normalizedLanguage == "en" && (
+                item.optString("speechTextEn").trim().isNotBlank() ||
+                    item.optString("speakTextEn").trim().isNotBlank()
+                ))
     }
 
     private fun clearFixedTopRowPosition() {
@@ -2131,6 +3673,54 @@ class AacPackSettingsActivity : AppCompatActivity() {
             }
             AacMetadataWriteResult.Success
         }
+    }
+
+    private fun replacePlacementCell(pageId: String, position: Int, itemId: String): AacMetadataWriteResult {
+        return updateItemsJsonMetadata { itemsArray ->
+            val targetItem = findItemById(itemsArray, itemId)
+                ?: return@updateItemsJsonMetadata AacMetadataWriteResult.ItemNotFound
+            removePlacementFromAllItems(itemsArray, pageId, position)
+            val placements = targetItem.optJSONArray("placements") ?: org.json.JSONArray()
+            placements.put(org.json.JSONObject().put("pageId", pageId).put("position5x5", position))
+            targetItem.put("placements", placements)
+            AacMetadataWriteResult.Success
+        }
+    }
+
+    private fun clearPlacementCell(pageId: String, position: Int): AacMetadataWriteResult {
+        return updateItemsJsonMetadata { itemsArray ->
+            val removed = removePlacementFromAllItems(itemsArray, pageId, position)
+            if (removed) AacMetadataWriteResult.Success else AacMetadataWriteResult.ItemNotFound
+        }
+    }
+
+    private fun removePlacementFromAllItems(
+        itemsArray: org.json.JSONArray,
+        pageId: String,
+        position: Int
+    ): Boolean {
+        var removed = false
+        for (itemIndex in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(itemIndex) ?: continue
+            val placements = item.optJSONArray("placements") ?: continue
+            val nextPlacements = org.json.JSONArray()
+            for (placementIndex in 0 until placements.length()) {
+                val placement = placements.optJSONObject(placementIndex) ?: continue
+                val samePlacement = placement.optString("pageId").trim() == pageId &&
+                    placement.optInt("position5x5", 0) == position
+                if (samePlacement && !placement.optBoolean("generated", false)) {
+                    removed = true
+                } else {
+                    nextPlacements.put(placement)
+                }
+            }
+            if (nextPlacements.length() > 0) {
+                item.put("placements", nextPlacements)
+            } else {
+                item.remove("placements")
+            }
+        }
+        return removed
     }
 
     private fun updateSubiconInJson(parentId: String, childId: String, add: Boolean): AacMetadataWriteResult {
@@ -2766,13 +4356,22 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     invalidItemCount += 1
                 }
                 if (itemId.isNotBlank()) {
+                    val manualPages = manualPlacementPageIds(item)
+                    val children = stringArrayValues(item.optJSONArray("children"))
                     availableItems += AacListItem(
                         itemId = itemId,
                         label = itemLabel(item),
+                        speechText = item.optString("speechText")
+                            .ifBlank { item.optString("speakTextSl") }
+                            .ifBlank { item.optString("text") },
                         iconSource = itemIconSource(item),
                         imagePath = item.optString("imagePath")
                             .ifBlank { item.optString("image_path") }
-                            .ifBlank { item.optString("icon") }
+                            .ifBlank { item.optString("icon") },
+                        fixedTopRowPosition = itemFixedTopRowPosition(item),
+                        pageCount = manualPages.size,
+                        subiconCount = children.size,
+                        translationStatus = itemTranslationStatus(item, loadAacActiveLanguages())
                     )
                 }
                 val fixedTopRowPosition = itemFixedTopRowPosition(item)
@@ -3008,14 +4607,132 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private data class AacListItem(
         val itemId: String,
         val label: String,
+        val speechText: String,
         val iconSource: IconSource,
-        val imagePath: String
+        val imagePath: String,
+        val fixedTopRowPosition: Int?,
+        val pageCount: Int,
+        val subiconCount: Int,
+        val translationStatus: ItemTranslationStatus
+    ) {
+        fun matchesLibrarySearch(searchText: String): Boolean {
+            if (searchText.isBlank()) return true
+            return itemId.lowercase(Locale.ROOT).contains(searchText) ||
+                label.lowercase(Locale.ROOT).contains(searchText) ||
+                speechText.lowercase(Locale.ROOT).contains(searchText)
+        }
+    }
+
+    private data class AacItemUsage(
+        val itemId: String,
+        val label: String,
+        val iconSource: IconSource,
+        val pageUsages: List<AacItemPageUsage>,
+        val parentItems: List<UsageItemRef>,
+        val childItems: List<UsageItemRef>,
+        val fixedTopRowPosition: Int?,
+        val translatedLanguages: List<String>,
+        val missingLanguages: List<String>,
+        val hasQuestion: Boolean
+    )
+
+    private data class AacItemPageUsage(
+        val pageId: String,
+        val pageTitle: String,
+        val position5x5: Int
+    )
+
+    private data class UsageItemRef(
+        val itemId: String,
+        val label: String
+    )
+
+    private data class UsageNavigationRow(
+        val label: String,
+        val action: () -> Unit
     )
 
     private data class PatientPage(
         val pageId: String,
         val pageTitle: String
     )
+
+    private data class PlacementCellItem(
+        val itemId: String,
+        val label: String,
+        val iconSource: IconSource,
+        val imagePath: String,
+        val fixedTopRowPosition: Int?,
+        val isFixedTopRowCell: Boolean,
+        val targetPageId: String?,
+        val translationStatus: ItemTranslationStatus
+    )
+
+    private data class CommunicatorStructure(
+        val pages: List<StructurePage>
+    )
+
+    private data class StructurePage(
+        val pageId: String,
+        val pageTitle: String,
+        val items: List<StructureItem>
+    )
+
+    private data class StructureItem(
+        val itemId: String,
+        val label: String,
+        val position: Int,
+        val children: List<StructureItem>,
+        val translationStatus: ItemTranslationStatus
+    )
+
+    private data class TranslationStatus(
+        val languages: List<String>,
+        val translatedCount: Int,
+        val missingCount: Int,
+        val pendingCount: Int
+    ) {
+        companion object {
+            fun empty(languages: List<String>): TranslationStatus {
+                return TranslationStatus(
+                    languages = languages,
+                    translatedCount = 0,
+                    missingCount = 0,
+                    pendingCount = 0
+                )
+            }
+        }
+    }
+
+    private data class SubiconDashboardStatus(
+        val parentCount: Int,
+        val childCount: Int,
+        val orphanCount: Int
+    ) {
+        companion object {
+            fun empty(): SubiconDashboardStatus {
+                return SubiconDashboardStatus(
+                    parentCount = 0,
+                    childCount = 0,
+                    orphanCount = 0
+                )
+            }
+        }
+    }
+
+    private data class PageWorkspaceDiagnostics(
+        val subiconCount: Int,
+        val missingTranslations: Int,
+        val missingImages: Int,
+        val duplicatePlacements: Int,
+        val warningLines: List<String>
+    )
+
+    private enum class ItemTranslationStatus(val label: String) {
+        TRANSLATED("prevedeno"),
+        MISSING("manjka prevod"),
+        PENDING("v pripravi")
+    }
 
     private enum class TherapistIconSourceFilter(val label: String) {
         ALL("ALL"),
@@ -3031,6 +4748,36 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 CUSTOM -> iconSource == IconSource.CUSTOM || iconSource == IconSource.PATIENT
                 ARASAAC -> iconSource == IconSource.ARASAAC
                 SYSTEM -> iconSource == IconSource.SYSTEM
+            }
+        }
+    }
+
+    private enum class TherapistTranslationFilter(val label: String) {
+        ALL("ALL"),
+        TRANSLATED("TRANSLATED"),
+        MISSING("MISSING"),
+        PENDING("PENDING");
+
+        fun matches(status: ItemTranslationStatus): Boolean {
+            return when (this) {
+                ALL -> true
+                TRANSLATED -> status == ItemTranslationStatus.TRANSLATED
+                MISSING -> status == ItemTranslationStatus.MISSING
+                PENDING -> status == ItemTranslationStatus.PENDING
+            }
+        }
+    }
+
+    private enum class TherapistPageUsageFilter(val label: String) {
+        ALL("ALL"),
+        NOT_USED("NOT_USED"),
+        USED_ON_PAGE("USED_ON_PAGE");
+
+        fun matches(pageCount: Int): Boolean {
+            return when (this) {
+                ALL -> true
+                NOT_USED -> pageCount == 0
+                USED_ON_PAGE -> pageCount > 0
             }
         }
     }
