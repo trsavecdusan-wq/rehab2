@@ -1069,7 +1069,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 textSize = 15f
                 setTextColor(0xFFF4F7FA.toInt())
                 setBackgroundColor(0xFF34414D.toInt())
-                setPadding(dp(12), dp(8), dp(12), dp(8))
+                setPadding(12.dp(), 8.dp(), 12.dp(), 8.dp())
                 setOnClickListener {
                     loadAacItemIntoEditor(item.itemId)
                 }
@@ -1078,9 +1078,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 button,
                 LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    dp(64)
+                    64.dp()
                 ).apply {
-                    bottomMargin = dp(8)
+                    bottomMargin = 8.dp()
                 }
             )
         }
@@ -1098,7 +1098,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             text = message
             setTextColor(0xFFB8C0C8.toInt())
             textSize = 15f
-            setPadding(0, dp(4), 0, dp(8))
+            setPadding(0, 4.dp(), 0, 8.dp())
         }
     }
 
@@ -2540,10 +2540,6 @@ class AacPackSettingsActivity : AppCompatActivity() {
         return normalizedPath.contains("../") ||
             normalizedPath.startsWith("/") ||
             Regex("^[A-Za-z]:").containsMatchIn(normalizedPath)
-    }
-
-    private fun dp(value: Int): Int {
-        return (value * resources.displayMetrics.density).toInt()
     }
 
     private fun readTextSafely(file: File, maxBytes: Int): String? {
