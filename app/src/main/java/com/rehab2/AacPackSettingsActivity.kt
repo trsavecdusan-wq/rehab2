@@ -95,6 +95,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var txtLastImportStatus: TextView
     private lateinit var txtAacHealthSummary: TextView
     private lateinit var communicatorDashboardActions: LinearLayout
+    private lateinit var txtAacBootstrapStatus: TextView
+    private lateinit var btnRepairAacBootstrap: Button
     private lateinit var txtFixedTopRowStatus: TextView
     private lateinit var editFixedTopRowItemId: EditText
     private lateinit var editFixedTopRowPosition: EditText
@@ -223,6 +225,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtLastImportStatus = findViewById(R.id.txtLastImportStatus)
         txtAacHealthSummary = findViewById(R.id.txtAacHealthSummary)
         communicatorDashboardActions = findViewById(R.id.communicatorDashboardActions)
+        txtAacBootstrapStatus = findViewById(R.id.txtAacBootstrapStatus)
+        btnRepairAacBootstrap = findViewById(R.id.btnRepairAacBootstrap)
         txtFixedTopRowStatus = findViewById(R.id.txtFixedTopRowStatus)
         editFixedTopRowItemId = findViewById(R.id.editFixedTopRowItemId)
         editFixedTopRowPosition = findViewById(R.id.editFixedTopRowPosition)
@@ -443,6 +447,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
         btnBulkPlaceSequentially.setOnClickListener {
             showBulkPlacementDryRun()
+        }
+        btnRepairAacBootstrap.setOnClickListener {
+            repairPatientAacBootstrap()
         }
         editAacLibrarySearch.setOnEditorActionListener { _, _, _ ->
             refreshLocalAacOverview()
@@ -1092,6 +1099,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val overview = buildLocalAacOverview()
         txtAacHealthSummary.text = buildAacHealthSummary(overview)
         renderCommunicatorDashboard(overview)
+        txtAacBootstrapStatus.text = buildAacBootstrapStatus(overview)
         txtSourceActivationStatus.text = buildSourceActivationStatus()
         renderAacItemEditorList(overview.relationAnalysis.availableItems)
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
@@ -1184,6 +1192,48 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Neveljavne ikonske reference: ${overview.relationAnalysis.invalidIconReferenceCount}\n")
             append("Zadnji uvoz: ${overview.lastImportSummary}")
         }
+    }
+
+    private fun buildAacBootstrapStatus(overview: LocalAacOverview): String {
+        val pages = loadPatientPages()
+        val defaultPageId = defaultPatientPageId()
+        val visibleItemCount = defaultPageId
+            .takeIf { it.isNotBlank() }
+            ?.let { patientPageItemCounts()[it] ?: 0 }
+            ?: 0
+        val fixedRowCount = fixedTopRowCellItems().size
+        val domLinkedCount = overview.relationAnalysis.profileRelations["dom"]?.itemCount ?: 0
+        val health = when {
+            overview.relationAnalysis.availableItems.isEmpty() -> "NI AAC ELEMENTOV"
+            pages.isEmpty() -> "MANJKA STRAN"
+            defaultPageId.isBlank() -> "MANJKA DEFAULT STRAN"
+            visibleItemCount == 0 -> "PRAZNA STRAN"
+            domLinkedCount == 0 -> "DOM PROFIL PRAZEN"
+            else -> "OK"
+        }
+        return buildString {
+            append("ZAGON KOMUNIKATORJA\n")
+            append("Stanje: $health\n")
+            append("AAC ikon: ${overview.relationAnalysis.availableItems.size}\n")
+            append("Pacientovih strani: ${pages.size}\n")
+            append("Začetna stran: ${defaultPageId.ifBlank { "ni nastavljena" }}\n")
+            append("Vidnih ikon na začetni strani: $visibleItemCount\n")
+            append("Fiksna vrstica: $fixedRowCount/5\n")
+            append("DOM profil povezanih ikon: $domLinkedCount\n")
+            append("Lokalne PNG ikone: ${overview.iconCount}")
+        }
+    }
+
+    private fun repairPatientAacBootstrap() {
+        val result = AacContentBootstrap.ensurePatientStartupContent(this, AacLocalJsonLoader.loadItems(this, emptyList()))
+        txtStatus.text = buildString {
+            append("Popravilo pacientove strani končano.\n")
+            append("Stanje: ${result.reason}\n")
+            append("Začetna stran: ${result.defaultPageId.ifBlank { "ni nastavljena" }}\n")
+            append("Dodanih postavitev: ${result.addedPlacements}\n")
+            append("DOM povezanih ikon: ${result.domProfileLinkedItemCount}")
+        }
+        refreshLocalAacOverview()
     }
 
     private fun renderCommunicatorDashboard(overview: LocalAacOverview) {

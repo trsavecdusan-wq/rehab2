@@ -145,13 +145,18 @@ object AacContentBootstrap {
         if (itemsFile?.isFile == true) {
             return try {
                 val raw = itemsFile.readText(Charsets.UTF_8).trim()
-                val root = if (raw.startsWith("[")) JSONArray(raw) else JSONObject(raw)
-                val itemsArray = when (root) {
-                    is JSONArray -> root
-                    is JSONObject -> root.optJSONArray("items") ?: JSONArray()
-                    else -> JSONArray()
+                if (raw.startsWith("[")) {
+                    val itemsArray = JSONArray(raw)
+                    RawItemsJson(rootObject = null, rootArray = itemsArray, itemsArray = itemsArray, createdFromFallback = false)
+                } else {
+                    val rootObject = JSONObject(raw)
+                    RawItemsJson(
+                        rootObject = rootObject,
+                        rootArray = null,
+                        itemsArray = rootObject.optJSONArray("items") ?: JSONArray(),
+                        createdFromFallback = false
+                    )
                 }
-                RawItemsJson(root = root, itemsArray = itemsArray, createdFromFallback = false)
             } catch (error: Exception) {
                 Log.w(TAG, "AAC_BOOTSTRAP_ITEMS_READ_FAILED", error)
                 fallbackRawItems(fallbackItems)
@@ -164,18 +169,26 @@ object AacContentBootstrap {
         val itemsArray = JSONArray().apply {
             fallbackItems.forEach { item -> put(item.toBootstrapJson()) }
         }
-        return RawItemsJson(root = JSONObject().put("items", itemsArray), itemsArray = itemsArray, createdFromFallback = true)
+        return RawItemsJson(
+            rootObject = JSONObject().put("items", itemsArray),
+            rootArray = null,
+            itemsArray = itemsArray,
+            createdFromFallback = true
+        )
     }
 
     private fun saveItemsJson(itemsFile: File?, rawItems: RawItemsJson, itemsArray: JSONArray) {
         val file = itemsFile ?: return
         file.parentFile?.let { parent -> if (!parent.exists()) parent.mkdirs() }
-        val output = when (val root = rawItems.root) {
-            is JSONArray -> itemsArray
-            is JSONObject -> root.put("items", itemsArray)
-            else -> JSONObject().put("items", itemsArray)
+        val outputText = rawItems.rootArray?.toString(2)
+            ?: (rawItems.rootObject ?: JSONObject()).put("items", itemsArray).toString(2)
+        file.writeText(outputText, Charsets.UTF_8)
+    }
+
+    private fun jsonArrayOf(values: List<String>): JSONArray {
+        return JSONArray().apply {
+            values.forEach { value -> put(value) }
         }
-        file.writeText(output.toString(2), Charsets.UTF_8)
     }
 
     private fun currentPatientPages(context: Context): List<Pair<String, String>> {
@@ -332,12 +345,12 @@ object AacContentBootstrap {
                 speakTextUk?.let { json.put("speakTextUk", it) }
                 speechTextEn?.let { json.put("speechTextEn", it) }
                 categoryId?.let { json.put("categoryId", it) }
-                if (scenarioIds.isNotEmpty()) json.put("scenarioIds", JSONArray(scenarioIds))
+                if (scenarioIds.isNotEmpty()) json.put("scenarioIds", jsonArrayOf(scenarioIds))
                 conceptId?.let { json.put("conceptId", it) }
                 parentId?.let { json.put("parentId", it) }
                 fixedTopRowPosition?.let { json.put("fixedTopRowPosition", it) }
-                if (children.isNotEmpty()) json.put("children", JSONArray(children))
-                if (visibleUnderIds.isNotEmpty()) json.put("visibleUnderIds", JSONArray(visibleUnderIds))
+                if (children.isNotEmpty()) json.put("children", jsonArrayOf(children))
+                if (visibleUnderIds.isNotEmpty()) json.put("visibleUnderIds", jsonArrayOf(visibleUnderIds))
                 if (questionByLanguage.isNotEmpty()) json.put("questionByLanguage", JSONObject(questionByLanguage))
                 if (labelByLanguage.isNotEmpty()) json.put("labelByLanguage", JSONObject(labelByLanguage))
                 if (speechTextByLanguage.isNotEmpty()) json.put("speechTextByLanguage", JSONObject(speechTextByLanguage))
@@ -352,7 +365,8 @@ object AacContentBootstrap {
     }
 
     private data class RawItemsJson(
-        val root: Any,
+        val rootObject: JSONObject?,
+        val rootArray: JSONArray?,
         val itemsArray: JSONArray,
         val createdFromFallback: Boolean
     )
