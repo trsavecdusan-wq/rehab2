@@ -94,6 +94,10 @@ object AacContentBootstrap {
 
         val pageItemIds = itemIdsOnPage(itemsArray, defaultPageId)
         val domProfileResult = ensureDomProfileLinked(context, pageItemIds.ifEmpty { rootItemIds(itemsArray) })
+        val syncedDomRelations = syncDomProfileRelations(context, itemsArray)
+        if (syncedDomRelations > 0) {
+            saveItemsJson(itemsFile, rawItems, itemsArray)
+        }
         val fixedRowCount = fixedRowItemIds(itemsArray).size
         val visibleNormalItemCount = pageItemIds.filter { it !in fixedRowItemIds(itemsArray) }.size
 
@@ -112,7 +116,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations reason=${result.reason}"
         )
         return result
     }
@@ -245,6 +249,43 @@ object AacContentBootstrap {
             itemIdsBefore = prefs.getInt(KEY_DEBUG_ITEM_IDS_BEFORE, currentItemIdsCount),
             itemIdsAfter = prefs.getInt(KEY_DEBUG_ITEM_IDS_AFTER, currentItemIdsCount)
         )
+    }
+
+    private fun syncDomProfileRelations(context: Context, itemsArray: JSONArray): Int {
+        val domItemIds = domProfileItemIds(context).toSet()
+        if (domItemIds.isEmpty()) return 0
+        var updatedCount = 0
+        itemObjects(itemsArray).forEach { item ->
+            val itemId = item.optString("id").trim()
+            if (itemId.isBlank() || itemId !in domItemIds || itemHasDomProfileRelation(item)) {
+                return@forEach
+            }
+            val profileIds = item.optJSONArray("profileIds") ?: JSONArray()
+            profileIds.put(DOM_PROFILE_ID)
+            item.put("profileIds", profileIds)
+            updatedCount += 1
+        }
+        if (updatedCount > 0) {
+            Log.d(TAG, "AAC_BOOTSTRAP_DOM_PROFILE_RELATIONS_SYNCED count=$updatedCount")
+        }
+        return updatedCount
+    }
+
+    private fun domProfileItemIds(context: Context): List<String> {
+        val profileFile = AacStoragePaths.getProfilesDataDir(context)?.let { profilesDir ->
+            File(profilesDir, DOM_PROFILE_FILE)
+        } ?: return emptyList()
+        val rootJson = readProfileJson(profileFile)
+        val profileJson = domProfileJson(rootJson) ?: return emptyList()
+        return stringList(profileJson.optJSONArray("itemIds"))
+    }
+
+    private fun itemHasDomProfileRelation(item: JSONObject): Boolean {
+        val directIds = listOf("profileId", "profile_id", "profile")
+            .map { key -> item.optString(key).trim() }
+        val arrayIds = listOf("profileIds", "profile_ids", "profiles")
+            .flatMap { key -> stringList(item.optJSONArray(key)) }
+        return DOM_PROFILE_ID in (directIds + arrayIds)
     }
 
     private fun domProfileJson(rootJson: JSONObject?): JSONObject? {
