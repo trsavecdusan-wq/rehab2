@@ -799,12 +799,12 @@ class MainActivity : AppCompatActivity() {
         val iconView = binding.icon ?: return
         val iconFile = AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
         if (iconFile?.isFile != true) {
-            restoreMainAacFallbackIcon(binding)
+            restoreMainAacFallbackIcon(binding, item)
             return
         }
         val bitmap = BitmapFactory.decodeFile(iconFile.absolutePath)
         if (bitmap == null) {
-            restoreMainAacFallbackIcon(binding)
+            restoreMainAacFallbackIcon(binding, item)
             return
         }
         val drawable = BitmapDrawable(resources, bitmap).apply {
@@ -815,11 +815,40 @@ class MainActivity : AppCompatActivity() {
         iconView.setCompoundDrawables(null, drawable, null, null)
     }
 
-    private fun restoreMainAacFallbackIcon(binding: MainAacTileBinding) {
+    private fun restoreMainAacFallbackIcon(binding: MainAacTileBinding, item: AacItem?) {
         binding.icon?.apply {
             setCompoundDrawables(null, null, null, null)
-            text = binding.fallbackIconText
+            text = mainAacFallbackIconFor(item) ?: binding.fallbackIconText
         }
+    }
+
+    private fun mainAacFallbackIconFor(item: AacItem?): CharSequence? {
+        val keys = listOfNotNull(
+            item?.id?.trim()?.lowercase(Locale.ROOT),
+            item?.conceptId?.trim()?.lowercase(Locale.ROOT)
+        ).filter { it.isNotBlank() }
+        keys.forEach { key ->
+            when (key) {
+                "drink", "drinks", "thirsty", "water", "juice", "tea", "coffee", "soca_water" -> return "\uD83E\uDD64"
+                "food", "soup", "bread", "fruit" -> return "\uD83C\uDF7D"
+                "help", "soca_help" -> return "\uD83C\uDD98"
+                "yes" -> return "✅"
+                "wc", "toilet", "soca_wc" -> return "\uD83D\uDEBD"
+                "good" -> return "\uD83D\uDE42"
+                "bad" -> return "\uD83D\uDE1F"
+                "no", "no_understand", "dont_understand" -> return "❌"
+                "will" -> return "\uD83D\uDCAC"
+                "calm" -> return "\uD83C\uDF3F"
+                "tired" -> return "\uD83C\uDF19"
+                "cold" -> return "❄"
+                "hot" -> return "☀"
+                "pain", "soca_pain", "head", "arm", "leg", "belly" -> return "⚕"
+                "doctor" -> return "\uD83D\uDC68\u200D⚕️"
+                "family" -> return "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67"
+                "stop" -> return "\uD83D\uDED1"
+            }
+        }
+        return null
     }
 
     private fun isSafeMainAacPageId(pageId: String): Boolean {
