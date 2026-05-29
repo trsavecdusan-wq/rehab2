@@ -127,7 +127,8 @@ object AacContentBootstrap {
             return ProfileBootstrapResult(0, false)
         }
         val profileFile = File(profilesDir, DOM_PROFILE_FILE)
-        val profileJson = readProfileJson(profileFile) ?: JSONObject()
+        val rootJson = readProfileJson(profileFile)
+        val profileJson = domProfileJson(rootJson) ?: JSONObject()
             .put("id", DOM_PROFILE_ID)
             .put("displayName", "DOM")
             .put("context", AacCommunicationContext.NORMAL_COMMUNICATION.name)
@@ -137,8 +138,40 @@ object AacContentBootstrap {
             return ProfileBootstrapResult(linkedItemCount = existingItemIds.size, updated = false)
         }
         profileJson.put("itemIds", JSONArray().apply { safeItemIds.forEach { itemId -> put(itemId) } })
-        profileFile.writeText(profileJson.toString(2), Charsets.UTF_8)
+        val outputJson = if (rootJson?.has("profiles") == true) {
+            ensureDomProfileInRoot(rootJson, profileJson)
+        } else {
+            profileJson
+        }
+        profileFile.writeText(outputJson.toString(2), Charsets.UTF_8)
         return ProfileBootstrapResult(linkedItemCount = safeItemIds.size, updated = true)
+    }
+
+    private fun domProfileJson(rootJson: JSONObject?): JSONObject? {
+        if (rootJson == null) return null
+        if (rootJson.optString("id").trim() == DOM_PROFILE_ID) {
+            return rootJson
+        }
+        val profiles = rootJson.optJSONArray("profiles") ?: return null
+        for (index in 0 until profiles.length()) {
+            val profile = profiles.optJSONObject(index) ?: continue
+            if (profile.optString("id").trim() == DOM_PROFILE_ID) {
+                return profile
+            }
+        }
+        return null
+    }
+
+    private fun ensureDomProfileInRoot(rootJson: JSONObject, profileJson: JSONObject): JSONObject {
+        val profiles = rootJson.optJSONArray("profiles") ?: JSONArray().also { rootJson.put("profiles", it) }
+        for (index in 0 until profiles.length()) {
+            val profile = profiles.optJSONObject(index) ?: continue
+            if (profile.optString("id").trim() == DOM_PROFILE_ID) {
+                return rootJson
+            }
+        }
+        profiles.put(profileJson)
+        return rootJson
     }
 
     private fun loadItemsJson(itemsFile: File?, fallbackItems: List<AacItem>): RawItemsJson {
