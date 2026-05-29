@@ -82,6 +82,9 @@ class MainActivity : AppCompatActivity() {
         private const val MAIN_AAC_HOME_PAGE_ID = "home"
         private const val PREFS_AAC_PATIENT_PAGES = "aac_patient_pages"
         private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
+        private const val PREFS_AAC_GRID_SETTINGS = "aac_grid_settings"
+        private const val KEY_AAC_GRID_SIZE = "aac_grid_size"
+        private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
         private const val PREF_DISTANCE_TODAY_METERS = "distance_today_meters"
@@ -432,11 +435,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showMainAacItems(items: List<AacItem>) {
-        currentMainAacItems = items
+        val visibleItems = items.take(mainAacVisibleContentCapacity())
+        currentMainAacItems = visibleItems
         val languageCode = getActiveSpeechLanguage()
         lastMainAacRenderedLanguage = languageCode
         mainAacTileBindings.forEachIndexed { index, binding ->
-            val item = items.getOrNull(index)
+            val item = visibleItems.getOrNull(index)
             binding.item = item
             binding.view.visibility = if (item == null) View.INVISIBLE else View.VISIBLE
             item?.let {
@@ -446,6 +450,8 @@ class MainActivity : AppCompatActivity() {
                 binding.view.setOnClickListener {
                     handleMainAacItemAction(item)
                 }
+            } ?: run {
+                binding.view.setOnClickListener(null)
             }
         }
     }
@@ -757,12 +763,12 @@ class MainActivity : AppCompatActivity() {
                     .filter { placement -> placement.pageId == normalizedPageId }
                     .map { placement -> placement.position5x5 to item.id }
             }
-            .filter { (position, itemId) -> position in 1..25 && itemsById.containsKey(itemId) }
+            .filter { (position, itemId) -> position in 1..mainAacSelectedGridCellCount() && itemsById.containsKey(itemId) }
             .sortedBy { (position, _) -> position }
             .mapNotNull { (_, itemId) -> itemsById[itemId] }
             .filter { item -> item.id !in fixedItemIds }
         return (visibleFixedItems + overflowFixedItems + placedItems)
-            .take(mainAacTileBindings.size)
+            .take(mainAacVisibleContentCapacity())
     }
 
     private fun orderedMainAacItemsWithFixedTopRow(items: List<AacItem>): List<AacItem> {
@@ -786,13 +792,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacFixedTopRowCapacity(): Int {
-        val visibleSlotCount = mainAacTileBindings.size
-        val inferredGridWidth = when {
-            visibleSlotCount <= 9 -> 3
-            visibleSlotCount <= 16 -> 4
-            else -> MAIN_AAC_FIXED_TOP_ROW_MAX
-        }
-        return inferredGridWidth.coerceAtMost(MAIN_AAC_FIXED_TOP_ROW_MAX)
+        return mainAacSelectedGridSize().coerceAtMost(MAIN_AAC_FIXED_TOP_ROW_MAX)
+    }
+
+    private fun mainAacVisibleContentCapacity(): Int {
+        return mainAacSelectedGridCellCount().coerceAtMost(mainAacTileBindings.size)
+    }
+
+    private fun mainAacSelectedGridCellCount(): Int {
+        val gridSize = mainAacSelectedGridSize()
+        return gridSize * gridSize
+    }
+
+    private fun mainAacSelectedGridSize(): Int {
+        return getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
+            .getInt(KEY_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE)
+            .takeIf { it in 3..6 }
+            ?: DEFAULT_AAC_GRID_SIZE
     }
 
     private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
@@ -836,10 +852,12 @@ class MainActivity : AppCompatActivity() {
                 "wc", "toilet", "soca_wc" -> return "\uD83D\uDEBD"
                 "good" -> return "\uD83D\uDE42"
                 "bad" -> return "\uD83D\uDE1F"
-                "no", "no_understand", "dont_understand" -> return "❌"
+                "no" -> return "❌"
+                "no_understand", "dont_understand" -> return "❓"
                 "will" -> return "\uD83D\uDCAC"
                 "calm" -> return "\uD83C\uDF3F"
-                "tired" -> return "\uD83C\uDF19"
+                "tired" -> return "\uD83D\uDE34"
+                "night", "sleep", "rest", "pocitek", "spanje" -> return "\uD83C\uDF19"
                 "cold" -> return "❄"
                 "hot" -> return "☀"
                 "pain", "soca_pain", "head", "arm", "leg", "belly" -> return "⚕"
