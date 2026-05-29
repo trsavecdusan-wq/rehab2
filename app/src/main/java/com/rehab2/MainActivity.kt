@@ -127,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         private const val RADIO_STATION_TILE_COUNT = 5
         private const val MP3_TILE_INDEX = 5
         private const val RADIO_SWIPE_THRESHOLD_PX = 80f
+        private const val MAIN_AAC_AUTO_SENTENCE_DELAY_MS = 4_000L
         private const val MAIN_AAC_SENTENCE_CLEAR_DELAY_MS = 30_000L
     }
 
@@ -208,11 +209,16 @@ class MainActivity : AppCompatActivity() {
     private var mainAacItemsById: Map<String, AacItem> = emptyMap()
     private var currentMainAacItems: List<AacItem> = emptyList()
     private val mainAacHistory = ArrayDeque<List<AacItem>>()
+    private var mainAacAutoSentenceMaySpeakSingle = false
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
     private val mainHandler = Handler(Looper.getMainLooper())
     private val mainAacSentenceClearRunnable = Runnable {
         mainAacSentenceManager.clear()
+        mainAacAutoSentenceMaySpeakSingle = false
+    }
+    private val mainAacAutoSentenceSpeakRunnable = Runnable {
+        speakMainAacSentenceIfReady()
     }
     private val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
     private val dateFormat = SimpleDateFormat("dd.MM.", Locale.getDefault())
@@ -337,11 +343,11 @@ class MainActivity : AppCompatActivity() {
             if (mainAacHistory.isNotEmpty()) {
                 showPreviousMainAacItems()
             } else {
-                startActivity(Intent(this, AacCommunicatorActivity::class.java))
+                resetMainAacRoot()
             }
         }
         findViewById<View>(R.id.tileAacDomov).setOnLongClickListener {
-            startActivity(Intent(this, AacCommunicatorActivity::class.java))
+            resetMainAacRoot()
             true
         }
 
@@ -381,6 +387,7 @@ class MainActivity : AppCompatActivity() {
         stopSpeedUpdates()
         stopPowerMonitoring()
         unregisterPowerReceiver()
+        mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
         radioPlayerController.release()
         aacAudioPlayer.release()
@@ -440,6 +447,19 @@ class MainActivity : AppCompatActivity() {
         showMainAacItems(mainAacHistory.removeLast())
     }
 
+    private fun resetMainAacRoot() {
+        mainAacHistory.clear()
+        val fallbackItems = buildMainAacItems()
+        val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
+        val startPageItems = selectMainStartPlacementItems(loadedItems)
+        val items = if (startPageItems.isEmpty()) fallbackItems else loadedItems
+        mainAacItemsById = items.associateBy { it.id }
+        val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
+            fallbackItems.filter { it.isRootItem && !it.isHiddenUntilParent }
+        )
+        showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
+    }
+
     private fun handleMainAacItemAction(item: AacItem) {
         val targetPageItems = mainAacPageItems(item.targetPageId)
         if (targetPageItems.isNotEmpty()) {
@@ -467,7 +487,7 @@ class MainActivity : AppCompatActivity() {
                     role = item.sentenceRole
                 )
             )
-            scheduleMainAacSentenceClear()
+            scheduleMainAacSentenceSpeech(item.speaksImmediately)
         }
         if (item.speaksImmediately) {
             aacAudioPlayer.speakText(AacLocalizedTextResolver.resolveSpeakText(item, languageCode), languageCode)
@@ -581,9 +601,25 @@ class MainActivity : AppCompatActivity() {
         return explicitChildren + visibleUnderChildren
     }
 
-    private fun scheduleMainAacSentenceClear() {
+    private fun scheduleMainAacSentenceSpeech(itemSpeaksImmediately: Boolean) {
+        mainAacAutoSentenceMaySpeakSingle = mainAacAutoSentenceMaySpeakSingle || !itemSpeaksImmediately
+        mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
+        mainHandler.postDelayed(mainAacAutoSentenceSpeakRunnable, MAIN_AAC_AUTO_SENTENCE_DELAY_MS)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
         mainHandler.postDelayed(mainAacSentenceClearRunnable, MAIN_AAC_SENTENCE_CLEAR_DELAY_MS)
+    }
+
+    private fun speakMainAacSentenceIfReady() {
+        val items = mainAacSentenceManager.getItems()
+        val shouldSpeakSentence = items.size > 1 || mainAacAutoSentenceMaySpeakSingle
+        val languageCode = getActiveSpeechLanguage()
+        val sentence = mainAacSentenceManager.getSpeakText(languageCode).trim()
+        if (shouldSpeakSentence && sentence.isNotBlank()) {
+            aacAudioPlayer.speakText(sentence, languageCode)
+            mainAacSentenceManager.clear()
+            mainAacAutoSentenceMaySpeakSingle = false
+            mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
+        }
     }
 
     private fun buildMainAacItems(): List<AacItem> {
