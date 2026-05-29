@@ -244,7 +244,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnAacSettings).setOnClickListener {
-            Toast.makeText(this, getString(R.string.aac_settings_not_ready), Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, AacPackSettingsActivity::class.java))
         }
 
         findViewById<Button>(R.id.btnCreateSampleAacPack).setOnClickListener {
