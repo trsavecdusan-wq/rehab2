@@ -48,6 +48,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.rehab2.aac.AacAudioPlayer
+import com.rehab2.aac.AacContentBootstrap
 import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacLocalizedTextResolver
@@ -419,6 +420,7 @@ class MainActivity : AppCompatActivity() {
             MainAacTileBinding.from(findViewById(R.id.tileAacStop))
         )
         val fallbackItems = buildMainAacItems()
+        AacContentBootstrap.ensurePatientStartupContent(this, fallbackItems)
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
         val items = mergeMainAacFallbackItems(fallbackItems, loadedItems)
         val startPageItems = selectMainStartPlacementItems(items)
@@ -458,6 +460,7 @@ class MainActivity : AppCompatActivity() {
     private fun resetMainAacRoot() {
         mainAacHistory.clear()
         val fallbackItems = buildMainAacItems()
+        AacContentBootstrap.ensurePatientStartupContent(this, fallbackItems)
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
         val items = mergeMainAacFallbackItems(fallbackItems, loadedItems)
         val startPageItems = selectMainStartPlacementItems(items)
@@ -709,6 +712,7 @@ class MainActivity : AppCompatActivity() {
             imagePath = storedItem.imagePath.ifBlank { fallbackItem.imagePath },
             iconSource = if (storedItem.imagePath.isNotBlank()) storedItem.iconSource else fallbackItem.iconSource,
             categoryId = storedItem.categoryId ?: fallbackItem.categoryId,
+            scenarioIds = storedItem.scenarioIds.ifEmpty { fallbackItem.scenarioIds },
             conceptId = storedItem.conceptId ?: fallbackItem.conceptId,
             children = storedItem.children.ifEmpty { fallbackItem.children },
             visibleUnderIds = storedItem.visibleUnderIds.ifEmpty { fallbackItem.visibleUnderIds },

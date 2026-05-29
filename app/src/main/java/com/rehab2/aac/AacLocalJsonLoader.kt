@@ -151,6 +151,7 @@ object AacLocalJsonLoader {
             learningRepresentations = parseLearningRepresentations(json.optJSONArray("learningRepresentations")),
             categoryId = json.optNullableString("categoryId")
                 ?: json.optNullableString("category"),
+            scenarioIds = parseStringList(json.optJSONArray("scenarioIds")),
             conceptId = json.optNullableString("conceptId"),
             children = children,
             sentenceRole = json.optNullableString("sentenceRole"),

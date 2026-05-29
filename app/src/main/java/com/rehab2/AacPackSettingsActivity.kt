@@ -22,7 +22,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import com.rehab2.aac.AacContentBootstrap
 import com.rehab2.aac.AacIconZipImporter
+import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacPackExporter
 import com.rehab2.aac.AacPackImporter
 import com.rehab2.aac.AacPackImportPreflight
@@ -503,6 +505,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
 
         AacStoragePaths.ensureAacContentDirs(this)
+        AacContentBootstrap.ensurePatientStartupContent(this, AacLocalJsonLoader.loadItems(this, emptyList()))
         setShareEnabled(false)
         txtStatus.text = "Pripravljeno za izvoz ali predpreverjanje ZIP paketa."
         updateLibraryFilterButtons()
@@ -1135,7 +1138,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
             val linkedItemCount = relation?.itemCount ?: 0
             val extraWarnings = mutableListOf<String>()
             if (linkedItemCount == 0) {
-                extraWarnings += "profil nima povezanih AAC elementov"
+                extraWarnings += if (summary.profileId == "real_world" || summary.profileId == "video_call") {
+                    "pripravljeno, ni se nastavljeno"
+                } else {
+                    "profil nima povezanih AAC elementov"
+                }
             }
             if (summary.profileId in duplicateProfileIds) {
                 extraWarnings += "ID profila je podvojen"
@@ -2681,8 +2688,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val itemCounts = patientPageItemCounts()
         return buildString {
             append("PACIENTOVE STRANI\n")
-            append("Strani so terapevtsko določene. pageTitle je samo prikazno ime.\n")
-            append("Knjižnične strani iz aktivacije virov so ločene in ne spreminjajo teh strani.\n")
+            append("Ustvari pacientovo stran, izberi ikono in jo postavi na stran.\n")
+            append("Kategorije so za iskanje ikon; pacientove strani so zaporedne strani.\n")
             if (defaultPageId.isBlank()) {
                 append("Začetna stran: varna privzeta stran aplikacije.\n")
             } else {

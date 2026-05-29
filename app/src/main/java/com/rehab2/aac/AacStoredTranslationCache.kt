@@ -239,6 +239,7 @@ object AacStoredTranslationCache {
             translationSource?.let { put("translationSource", it) }
             put("translationManualOverride", translationManualOverride)
             categoryId?.let { put("categoryId", it) }
+            if (scenarioIds.isNotEmpty()) put("scenarioIds", JSONArray(scenarioIds))
             conceptId?.let { put("conceptId", it) }
             if (children.isNotEmpty()) put("children", JSONArray(children))
             sentenceRole?.let { put("sentenceRole", it) }

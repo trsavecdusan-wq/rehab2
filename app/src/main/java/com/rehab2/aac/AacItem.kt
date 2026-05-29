@@ -45,6 +45,9 @@ data class AacItem(
     val learningRepresentations: List<AacLearningRepresentation> = emptyList(),
     // Therapist organization only. Patient placement is controlled by placements/visibility metadata.
     val categoryId: String? = null,
+    // Scenario metadata is for future guided helper flows (for example vending or restaurant use).
+    // It must not replace profiles, categories, or patient page placement.
+    val scenarioIds: List<String> = emptyList(),
     val conceptId: String? = null,
     val children: List<String> = emptyList(),
     val sentenceRole: String? = null,
