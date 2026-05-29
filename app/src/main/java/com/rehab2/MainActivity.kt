@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         private const val PREFS_FILE = "rehab2_prefs"
         private const val PREF_PATIENT_LANGUAGE_1 = "patient_language_1"
         private const val PREF_PATIENT_LANGUAGE_2 = "patient_language_2"
+        private const val PREF_PATIENT_LANGUAGE_3 = "patient_language_3"
         private const val PREF_ACTIVE_SPEECH_LANGUAGE = "active_speech_language"
         private const val PREF_ADMIN_PIN = "admin_pin"
         private const val DEFAULT_ADMIN_PIN = "0416"
@@ -212,6 +213,7 @@ class MainActivity : AppCompatActivity() {
     private val mainAacHistory = ArrayDeque<List<AacItem>>()
     private val pendingMainAacTranslationKeys = mutableSetOf<String>()
     private var mainAacAutoSentenceMaySpeakSingle = false
+    private var lastMainAacRenderedLanguage = ""
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -416,23 +418,25 @@ class MainActivity : AppCompatActivity() {
         )
         val fallbackItems = buildMainAacItems()
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
-        val startPageItems = selectMainStartPlacementItems(loadedItems)
-        val items = if (startPageItems.isEmpty()) fallbackItems else loadedItems
+        val items = mergeMainAacFallbackItems(fallbackItems, loadedItems)
+        val startPageItems = selectMainStartPlacementItems(items)
         mainAacItemsById = items.associateBy { it.id }
         val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
-            fallbackItems.filter { it.isRootItem && !it.isHiddenUntilParent }
+            items.filter { it.isRootItem && !it.isHiddenUntilParent }
         )
         showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
     }
 
     private fun showMainAacItems(items: List<AacItem>) {
         currentMainAacItems = items
+        val languageCode = getActiveSpeechLanguage()
+        lastMainAacRenderedLanguage = languageCode
         mainAacTileBindings.forEachIndexed { index, binding ->
             val item = items.getOrNull(index)
             binding.item = item
             binding.view.visibility = if (item == null) View.INVISIBLE else View.VISIBLE
             item?.let {
-                binding.label.text = AacLocalizedTextResolver.resolveLabel(it, getActiveSpeechLanguage())
+                binding.label.text = AacLocalizedTextResolver.resolveLabel(it, languageCode)
                     .uppercase(Locale.ROOT)
                 bindMainAacIcon(binding, it)
                 binding.view.setOnClickListener {
@@ -453,11 +457,11 @@ class MainActivity : AppCompatActivity() {
         mainAacHistory.clear()
         val fallbackItems = buildMainAacItems()
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
-        val startPageItems = selectMainStartPlacementItems(loadedItems)
-        val items = if (startPageItems.isEmpty()) fallbackItems else loadedItems
+        val items = mergeMainAacFallbackItems(fallbackItems, loadedItems)
+        val startPageItems = selectMainStartPlacementItems(items)
         mainAacItemsById = items.associateBy { it.id }
         val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
-            fallbackItems.filter { it.isRootItem && !it.isHiddenUntilParent }
+            items.filter { it.isRootItem && !it.isHiddenUntilParent }
         )
         showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
     }
@@ -571,8 +575,81 @@ class MainActivity : AppCompatActivity() {
         currentMainAacItems = currentMainAacItems.map { item ->
             if (item.id == updatedItem.id) updatedItem else item
         }
+        val remappedHistory = mainAacHistory.map { pageItems ->
+            pageItems.map { item -> if (item.id == updatedItem.id) updatedItem else item }
+        }
         mainAacHistory.clear()
+        remappedHistory.forEach { mainAacHistory.addLast(it) }
         showMainAacItems(currentMainAacItems)
+    }
+
+    private fun refreshMainAacLanguageText() {
+        if (!::mainAacTileBindings.isInitialized || currentMainAacItems.isEmpty()) {
+            return
+        }
+        val fallbackItems = buildMainAacItems()
+        val mergedItemsById = mergeMainAacFallbackItems(
+            fallbackItems = fallbackItems,
+            loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
+        ).associateBy { it.id }
+        if (mergedItemsById.isNotEmpty()) {
+            mainAacItemsById = mergedItemsById
+            currentMainAacItems = currentMainAacItems.map { item -> mergedItemsById[item.id] ?: item }
+            val remappedHistory = mainAacHistory.map { pageItems ->
+                pageItems.map { item -> mergedItemsById[item.id] ?: item }
+            }
+            mainAacHistory.clear()
+            remappedHistory.forEach { mainAacHistory.addLast(it) }
+        }
+        showMainAacItems(currentMainAacItems)
+    }
+
+    private fun mergeMainAacFallbackItems(
+        fallbackItems: List<AacItem>,
+        loadedItems: List<AacItem>
+    ): List<AacItem> {
+        val loadedById = loadedItems.associateBy { it.id }
+        val fallbackIds = fallbackItems.map { it.id }.toSet()
+        val mergedFallbackItems = fallbackItems.map { fallbackItem ->
+            loadedById[fallbackItem.id]?.let { storedItem ->
+                mergeMainAacFallbackItem(fallbackItem, storedItem)
+            } ?: fallbackItem
+        }
+        val extraLoadedItems = loadedItems.filter { it.id !in fallbackIds }
+        return mergedFallbackItems + extraLoadedItems
+    }
+
+    private fun mergeMainAacFallbackItem(fallbackItem: AacItem, storedItem: AacItem): AacItem {
+        return fallbackItem.copy(
+            labelSl = storedItem.labelSl.ifBlank { fallbackItem.labelSl },
+            speakTextSl = storedItem.speakTextSl ?: fallbackItem.speakTextSl,
+            labelUk = storedItem.labelUk ?: fallbackItem.labelUk,
+            labelEn = storedItem.labelEn ?: fallbackItem.labelEn,
+            speakTextUk = storedItem.speakTextUk ?: fallbackItem.speakTextUk,
+            speechText = storedItem.speechText ?: fallbackItem.speechText,
+            speechTextEn = storedItem.speechTextEn ?: fallbackItem.speechTextEn,
+            labelByLanguage = storedItem.labelByLanguage.ifEmpty { fallbackItem.labelByLanguage },
+            speechTextByLanguage = storedItem.speechTextByLanguage.ifEmpty { fallbackItem.speechTextByLanguage },
+            activeLanguages = storedItem.activeLanguages.ifEmpty { fallbackItem.activeLanguages },
+            baseLanguage = storedItem.baseLanguage,
+            translationGenerated = storedItem.translationGenerated,
+            translationSource = storedItem.translationSource,
+            translationManualOverride = storedItem.translationManualOverride,
+            imagePath = storedItem.imagePath.ifBlank { fallbackItem.imagePath },
+            iconSource = if (storedItem.imagePath.isNotBlank()) storedItem.iconSource else fallbackItem.iconSource,
+            categoryId = storedItem.categoryId ?: fallbackItem.categoryId,
+            conceptId = storedItem.conceptId ?: fallbackItem.conceptId,
+            children = storedItem.children.ifEmpty { fallbackItem.children },
+            visibleUnderIds = storedItem.visibleUnderIds.ifEmpty { fallbackItem.visibleUnderIds },
+            placements = storedItem.placements.ifEmpty { fallbackItem.placements },
+            isRootItem = storedItem.isRootItem,
+            isHiddenUntilParent = storedItem.isHiddenUntilParent,
+            fixedTopRowPosition = storedItem.fixedTopRowPosition ?: fallbackItem.fixedTopRowPosition,
+            addsToSentence = storedItem.addsToSentence,
+            speaksImmediately = storedItem.speaksImmediately,
+            opensSubicons = storedItem.opensSubicons,
+            priority = storedItem.priority
+        )
     }
 
     private fun selectMainStartPlacementItems(items: List<AacItem>): List<AacItem> {
@@ -847,6 +924,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshStatusModule() {
         val activeLanguage = getActiveSpeechLanguage()
+        if (::mainAacTileBindings.isInitialized &&
+            currentMainAacItems.isNotEmpty() &&
+            activeLanguage != lastMainAacRenderedLanguage
+        ) {
+            refreshMainAacLanguageText()
+        }
         val flagDrawable = flagDrawableForLanguage(activeLanguage)
         if (flagDrawable != 0) {
             txtStatusLanguageFlag.text = ""
@@ -923,7 +1006,10 @@ class MainActivity : AppCompatActivity() {
     private fun getConfiguredSpeechLanguages(): List<String> {
         val first = prefs.getString(PREF_PATIENT_LANGUAGE_1, "sl").orEmpty().trim().lowercase(Locale.ROOT)
         val second = prefs.getString(PREF_PATIENT_LANGUAGE_2, "uk").orEmpty().trim().lowercase(Locale.ROOT)
-        return listOf(first.ifBlank { "sl" }, second.ifBlank { "uk" }).distinct()
+        val third = prefs.getString(PREF_PATIENT_LANGUAGE_3, "").orEmpty().trim().lowercase(Locale.ROOT)
+        return listOf(first.ifBlank { "sl" }, second.ifBlank { "uk" }, third)
+            .filter { it.isNotBlank() }
+            .distinct()
     }
 
     private fun flagForLanguage(languageCode: String): String {
@@ -970,6 +1056,7 @@ class MainActivity : AppCompatActivity() {
             container.addView(createLanguageOptionView(languageCode) {
                 prefs.edit().putString(PREF_ACTIVE_SPEECH_LANGUAGE, languageCode).apply()
                 refreshStatusModule()
+                refreshMainAacLanguageText()
                 dialog.dismiss()
             })
         }

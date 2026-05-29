@@ -37,7 +37,7 @@ object AacStoredTranslationCache {
         }
 
         val generated = generateTranslation(context, item, normalizedLanguage) ?: return null
-        return if (saveTranslation(context, item.id, normalizedLanguage, generated)) {
+        return if (saveTranslation(context, item, normalizedLanguage, generated)) {
             generated
         } else {
             null
@@ -109,19 +109,24 @@ object AacStoredTranslationCache {
 
     private fun saveTranslation(
         context: Context,
-        itemId: String,
+        sourceItem: AacItem,
         languageCode: String,
         translation: Translation
     ): Boolean {
         val itemsFile = AacStoragePaths.getAacItemsFile(context) ?: return false
-        if (!itemsFile.isFile || itemsFile.length() > MAX_ITEMS_BYTES) return false
+        if (itemsFile.exists() && (!itemsFile.isFile || itemsFile.length() > MAX_ITEMS_BYTES)) return false
         return try {
-            val itemsText = itemsFile.readText(Charsets.UTF_8)
+            itemsFile.parentFile?.mkdirs()
+            val itemsText = if (itemsFile.isFile) itemsFile.readText(Charsets.UTF_8) else ""
             val trimmed = itemsText.trimStart()
-            val rootObject = if (trimmed.startsWith("[")) null else JSONObject(itemsText)
+            val rootObject = when {
+                trimmed.isBlank() -> JSONObject()
+                trimmed.startsWith("[") -> null
+                else -> JSONObject(itemsText)
+            }
             val itemsArray = rootObject?.optJSONArray("items")
-                ?: if (rootObject == null) JSONArray(itemsText) else return false
-            val item = findItemById(itemsArray, itemId) ?: return false
+                ?: if (rootObject == null) JSONArray(itemsText) else JSONArray().also { rootObject.put("items", it) }
+            val item = findItemById(itemsArray, sourceItem.id) ?: sourceItem.toJson().also { itemsArray.put(it) }
             val labelByLanguage = item.optJSONObject("labelByLanguage") ?: JSONObject()
             val speechTextByLanguage = item.optJSONObject("speechTextByLanguage") ?: JSONObject()
             labelByLanguage.put(languageCode, translation.label)
@@ -136,6 +141,59 @@ object AacStoredTranslationCache {
         } catch (error: Exception) {
             Log.w(TAG, "AAC translation save failed: ${error.javaClass.simpleName}")
             false
+        }
+    }
+
+    private fun AacItem.toJson(): JSONObject {
+        return JSONObject().apply {
+            put("id", id)
+            put("labelSl", labelSl)
+            put("imagePath", imagePath)
+            put("audioSl", audioSl)
+            put("actionType", actionType)
+            put("targetPageId", targetPageId)
+            speakTextSl?.let { put("speakTextSl", it) }
+            speakTextUk?.let { put("speakTextUk", it) }
+            labelUk?.let { put("labelUk", it) }
+            labelEn?.let { put("labelEn", it) }
+            speechText?.let { put("speechText", it) }
+            speechTextEn?.let { put("speechTextEn", it) }
+            put("baseLanguage", baseLanguage)
+            put("activeLanguages", JSONArray(activeLanguages))
+            if (labelByLanguage.isNotEmpty()) put("labelByLanguage", JSONObject(labelByLanguage))
+            if (speechTextByLanguage.isNotEmpty()) put("speechTextByLanguage", JSONObject(speechTextByLanguage))
+            put("translationGenerated", translationGenerated)
+            translationSource?.let { put("translationSource", it) }
+            put("translationManualOverride", translationManualOverride)
+            categoryId?.let { put("categoryId", it) }
+            conceptId?.let { put("conceptId", it) }
+            if (children.isNotEmpty()) put("children", JSONArray(children))
+            sentenceRole?.let { put("sentenceRole", it) }
+            questionSl?.let { put("questionSl", it) }
+            questionUk?.let { put("questionUk", it) }
+            put("iconSource", iconSource.name)
+            parentId?.let { put("parentId", it) }
+            if (visibleUnderIds.isNotEmpty()) put("visibleUnderIds", JSONArray(visibleUnderIds))
+            if (placements.isNotEmpty()) {
+                put(
+                    "placements",
+                    JSONArray().apply {
+                        placements.forEach { placement ->
+                            put(JSONObject().apply {
+                                put("pageId", placement.pageId)
+                                put("position5x5", placement.position5x5)
+                            })
+                        }
+                    }
+                )
+            }
+            put("isRootItem", isRootItem)
+            put("isHiddenUntilParent", isHiddenUntilParent)
+            fixedTopRowPosition?.let { put("fixedTopRowPosition", it) }
+            put("addsToSentence", addsToSentence)
+            put("speaksImmediately", speaksImmediately)
+            put("opensSubicons", opensSubicons)
+            put("priority", priority)
         }
     }
 
