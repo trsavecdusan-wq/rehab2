@@ -98,7 +98,7 @@ class BackupSettingsActivity : AppCompatActivity() {
             packageInfo.versionCode.toLong()
         }
 
-        txtCurrentVersion.text = "Trenutna verzija: $currentVersionName ($currentVersionCode)"
+        txtCurrentVersion.text = "Trenutna verzija: $currentVersionName (code $currentVersionCode)"
         txtLatestVersion.text = "Zadnja verzija: -"
         txtUpdateStatus.text = ""
         syncCurrentInstalledReleaseIfNeeded()
@@ -179,7 +179,7 @@ class BackupSettingsActivity : AppCompatActivity() {
                 mainHandler.post {
                     latestRelease = release
                     latestReleaseBody = release.body
-                    txtLatestVersion.text = "Zadnja verzija: $remoteVersion"
+                    txtLatestVersion.text = "Zadnja verzija: tag ${release.tagName} / code ${latestVersionCode ?: "-"}"
                     updateReleaseNotes()
 
                     if (updateAvailable) {
@@ -643,13 +643,16 @@ class BackupSettingsActivity : AppCompatActivity() {
         remoteVersionCode: Long?,
         updateAvailable: Boolean
     ): String {
+        val latestCodeText = remoteVersionCode?.toString() ?: "-"
+        val updateText = if (updateAvailable) "DA" else "NE"
         return buildString {
-            appendLine("Installed: $installedVersionCode")
-            appendLine("Remote versionName: $remoteVersionName")
-            appendLine("Remote VERSION_CODE: ${release.versionCodeFromBody ?: "-"}")
-            appendLine("Remote versionCode used: ${remoteVersionCode ?: "-"}")
-            appendLine("VersionCode source: ${release.versionCodeSource}")
-            append("Update available: $updateAvailable")
+            appendLine("Trenutna verzija: $currentVersionName (code $installedVersionCode)")
+            appendLine("Zadnja verzija: tag ${release.tagName} / code $latestCodeText")
+            appendLine("GitHub verzija: $remoteVersionName")
+            appendLine("VERSION_CODE iz release opisa: ${release.versionCodeFromBody ?: "-"}")
+            appendLine("Uporabljen latest versionCode: $latestCodeText")
+            appendLine("Vir versionCode: ${release.versionCodeSource}")
+            append("Primerjava: $latestCodeText > $installedVersionCode = posodobitev $updateText")
         }
     }
 
