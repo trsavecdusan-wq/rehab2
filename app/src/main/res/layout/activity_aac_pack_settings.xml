@@ -420,6 +420,226 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/txtBulkAacSelectionStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:padding="12dp"
+            android:text="Izbranih ikon: 0"
+            android:textColor="#F4F7FA"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnBulkSelectVisible"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#214A78"
+                android:text="IZBERI VIDNE"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnBulkClearSelection"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#5B6672"
+                android:text="POČISTI IZBOR"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/editBulkAacCategory"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Skupinska kategorija / group"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editBulkAacSource"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Skupinski vir: SOCA / CUSTOM / ARASAAC / SYSTEM"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editBulkAacLanguages"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Jeziki za izbrane ikone, npr. sl,uk,en"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editBulkPlacementPageId"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Stran za zaporedno postavitev"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editBulkPlacementStartPosition"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E252C"
+            android:backgroundTint="#5B6672"
+            android:hint="Začetna pozicija 1-25"
+            android:inputType="number"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#B8C0C8"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnBulkAssignCategory"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#214A78"
+                android:text="KATEGORIJA"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnBulkAssignSource"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#214A78"
+                android:text="VIR"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnBulkAssignLanguages"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#214A78"
+                android:text="JEZIKI"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnBulkPlaceSequentially"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#3E7C4A"
+                android:text="POSTAVI"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnBulkActivate"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#3E7C4A"
+                android:text="AKTIVIRAJ"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnBulkDeactivate"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:backgroundTint="#5B6672"
+                android:text="DEAKTIVIRAJ"
+                android:textAllCaps="false"
+                android:textColor="#F4F7FA"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
         <LinearLayout
             android:id="@+id/aacItemListActions"
             android:layout_width="match_parent"
