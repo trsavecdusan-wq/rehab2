@@ -1204,6 +1204,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val fixedRowCount = fixedTopRowCellItems().size
         val domLinkedCount = overview.relationAnalysis.profileRelations["dom"]?.itemCount ?: 0
         val domDebug = AacContentBootstrap.inspectDomProfileDebug(this)
+        val domCountDebug = buildDomProfileCountDebug(domLinkedCount)
         val health = when {
             overview.relationAnalysis.availableItems.isEmpty() -> "NI AAC ELEMENTOV"
             pages.isEmpty() -> "MANJKA STRAN"
@@ -1229,8 +1230,57 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("DOM profile found: ${if (domDebug.domProfileFound) "YES" else "NO"}\n")
             append("DOM profile id: ${domDebug.domProfileId.ifBlank { "ni zaznan" }}\n")
             append("ItemIds before: ${domDebug.itemIdsBefore}\n")
-            append("ItemIds after: ${domDebug.itemIdsAfter}")
+            append("ItemIds after: ${domDebug.itemIdsAfter}\n\n")
+            append("DOM PROFILE COUNT DEBUG\n")
+            append("Count source:\n${domCountDebug.countSource}\n")
+            append("File:\n${domCountDebug.filePath.ifBlank { "ni poti" }}\n")
+            append("Profile id: ${domCountDebug.profileId.ifBlank { "ni zaznan" }}\n")
+            append("Loaded itemIds:\n${domCountDebug.loadedItemIds.ifEmpty { "ni povezav" }}\n")
+            append("Loaded itemIds count: ${domCountDebug.loadedItemIdsCount}\n")
+            append("Displayed count: ${domCountDebug.displayedCount}")
         }
+    }
+
+    private fun buildDomProfileCountDebug(displayedCount: Int): DomProfileCountDebug {
+        val profileFile = AacStoragePaths.getProfilesDataDir(this)?.let { profilesDir ->
+            java.io.File(profilesDir, "dom.json")
+        }
+        val profileJson = profileFile
+            ?.takeIf { it.isFile }
+            ?.let { file ->
+                try {
+                    org.json.JSONObject(file.readText(Charsets.UTF_8))
+                } catch (_: Exception) {
+                    null
+                }
+            }
+        val domProfile = when {
+            profileJson == null -> null
+            profileJson.optString("id").trim() == "dom" -> profileJson
+            else -> {
+                val profiles = profileJson.optJSONArray("profiles")
+                var found: org.json.JSONObject? = null
+                if (profiles != null) {
+                    for (index in 0 until profiles.length()) {
+                        val candidate = profiles.optJSONObject(index) ?: continue
+                        if (candidate.optString("id").trim() == "dom") {
+                            found = candidate
+                            break
+                        }
+                    }
+                }
+                found
+            }
+        }
+        val loadedItemIds = stringArrayValues(domProfile?.optJSONArray("itemIds"))
+        return DomProfileCountDebug(
+            countSource = "aac_items.json profileId/profileIds/profiles -> relationAnalysis.profileRelations[\"dom\"].itemCount",
+            filePath = profileFile?.absolutePath.orEmpty(),
+            profileId = domProfile?.optString("id")?.trim().orEmpty(),
+            loadedItemIds = loadedItemIds.joinToString(", "),
+            loadedItemIdsCount = loadedItemIds.size,
+            displayedCount = displayedCount
+        )
     }
 
     private fun repairPatientAacBootstrap() {
@@ -5222,6 +5272,15 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val isEmptyOrInvalid: Boolean,
         val linkedItemCount: Int,
         val missingIconCount: Int
+    )
+
+    private data class DomProfileCountDebug(
+        val countSource: String,
+        val filePath: String,
+        val profileId: String,
+        val loadedItemIds: String,
+        val loadedItemIdsCount: Int,
+        val displayedCount: Int
     )
 
     private data class AacRelationAnalysis(
