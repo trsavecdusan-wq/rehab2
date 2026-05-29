@@ -846,7 +846,7 @@ class MainActivity : AppCompatActivity() {
         keys.forEach { key ->
             when (key) {
                 "drink", "drinks", "thirsty", "water", "juice", "tea", "coffee", "soca_water" -> return "\uD83E\uDD64"
-                "food", "soup", "bread", "fruit" -> return "\uD83C\uDF7D"
+                "food", "hungry", "soup", "bread", "fruit" -> return "\uD83C\uDF7D"
                 "help", "soca_help" -> return "\uD83C\uDD98"
                 "yes" -> return "✅"
                 "wc", "toilet", "soca_wc" -> return "\uD83D\uDEBD"
@@ -856,11 +856,12 @@ class MainActivity : AppCompatActivity() {
                 "no_understand", "dont_understand" -> return "❓"
                 "will" -> return "\uD83D\uDCAC"
                 "calm" -> return "\uD83C\uDF3F"
+                "turn_me" -> return "\uD83D\uDD04"
                 "tired" -> return "\uD83D\uDE34"
                 "night", "sleep", "rest", "pocitek", "spanje" -> return "\uD83C\uDF19"
                 "cold" -> return "❄"
                 "hot" -> return "☀"
-                "pain", "soca_pain", "head", "arm", "leg", "belly" -> return "⚕"
+                "pain", "soca_pain", "head", "arm", "leg", "belly" -> return "\uD83E\uDD15"
                 "doctor" -> return "\uD83D\uDC68\u200D⚕️"
                 "family" -> return "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67"
                 "stop" -> return "\uD83D\uDED1"
@@ -945,18 +946,140 @@ class MainActivity : AppCompatActivity() {
                     "en" to "What do you want to eat?"
                 )
             ),
-            mainAacItem("help", "POMOČ", "pomoč"),
-            mainAacItem("yes", "DA", "da"),
-            mainAacItem("wc", "WC", "WC"),
-            mainAacItem("good", "DOBRO", "dobro"),
-            mainAacItem("bad", "SLABO", "slabo"),
-            mainAacItem("no_understand", "NE\nRAZUMEM", "ne razumem"),
-            mainAacItem("tired", "UTRUJENA", "utrujena"),
-            mainAacItem("cold", "MRAZ", "mraz"),
-            mainAacItem("hot", "VROČE", "vroče"),
+            mainAacItem(
+                "thirsty",
+                "ŽEJNA",
+                "žejna sem",
+                labelUk = "ХОЧУ ПИТИ",
+                labelEn = "THIRSTY",
+                speakTextUk = "Я хочу пити",
+                speechTextEn = "I am thirsty"
+            ),
+            mainAacItem(
+                "hungry",
+                "LAČNA",
+                "lačna sem",
+                labelUk = "ХОЧУ ЇСТИ",
+                labelEn = "HUNGRY",
+                speakTextUk = "Я хочу їсти",
+                speechTextEn = "I am hungry"
+            ),
+            mainAacItem(
+                "help",
+                "POMOČ",
+                "pomagaj mi",
+                labelUk = "ДОПОМОГА",
+                labelEn = "HELP",
+                speakTextUk = "Допоможіть мені",
+                speechTextEn = "Help me"
+            ),
+            mainAacItem(
+                "yes",
+                "DA",
+                "da",
+                labelUk = "ТАК",
+                labelEn = "YES",
+                speakTextUk = "так",
+                speechTextEn = "yes"
+            ),
+            mainAacItem(
+                "wc",
+                "WC",
+                "moram na WC",
+                labelUk = "ТУАЛЕТ",
+                labelEn = "TOILET",
+                speakTextUk = "Мені потрібно в туалет",
+                speechTextEn = "I need the toilet"
+            ),
+            mainAacItem(
+                "good",
+                "DOBRO",
+                "dobro sem",
+                labelUk = "ДОБРЕ",
+                labelEn = "GOOD",
+                speakTextUk = "Мені добре",
+                speechTextEn = "I am good"
+            ),
+            mainAacItem(
+                "bad",
+                "SLABO",
+                "slabo mi je",
+                labelUk = "ПОГАНО",
+                labelEn = "BAD",
+                speakTextUk = "Мені погано",
+                speechTextEn = "I feel bad"
+            ),
+            mainAacItem(
+                "turn_me",
+                "OBRNI ME",
+                "prosim, obrni me",
+                labelUk = "ПОВЕРНІТЬ МЕНЕ",
+                labelEn = "TURN ME",
+                speakTextUk = "Будь ласка, поверніть мене",
+                speechTextEn = "Please turn me"
+            ),
+            mainAacItem(
+                "no_understand",
+                "NE RAZUMEM",
+                "ne razumem",
+                labelUk = "Я НЕ РОЗУМІЮ",
+                labelEn = "I DON'T UNDERSTAND",
+                speakTextUk = "Я не розумію",
+                speechTextEn = "I don't understand"
+            ),
+            mainAacItem(
+                "no",
+                "NE",
+                "ne",
+                labelUk = "НІ",
+                labelEn = "NO",
+                speakTextUk = "ні",
+                speechTextEn = "no"
+            ),
+            mainAacItem(
+                "sleep",
+                "SPATI",
+                "želim spati",
+                labelUk = "СПАТИ",
+                labelEn = "SLEEP",
+                speakTextUk = "Я хочу спати",
+                speechTextEn = "I want to sleep"
+            ),
+            mainAacItem(
+                "tired",
+                "UTRUJENA",
+                "utrujena sem",
+                labelUk = "ВТОМЛЕНА",
+                labelEn = "TIRED",
+                speakTextUk = "Я втомлена",
+                speechTextEn = "I am tired"
+            ),
+            mainAacItem(
+                "cold",
+                "MRAZ",
+                "zebe me",
+                labelUk = "ХОЛОДНО",
+                labelEn = "COLD",
+                speakTextUk = "Мені холодно",
+                speechTextEn = "I am cold"
+            ),
+            mainAacItem(
+                "hot",
+                "VROČE",
+                "vroče mi je",
+                labelUk = "ЖАРКО",
+                labelEn = "HOT",
+                speakTextUk = "Мені жарко",
+                speechTextEn = "I am hot"
+            ),
             mainAacItem(
                 "pain",
-                "BOLEČINA",
+                "BOLI",
+                "boli me",
+                labelUk = "БОЛИТЬ",
+                labelEn = "PAIN",
+                speakTextUk = "Мені болить",
+                speechTextEn = "I am in pain",
                 opensSubicons = true,
                 children = listOf("head", "arm", "leg", "belly"),
                 questionByLanguage = mapOf(
@@ -965,8 +1088,24 @@ class MainActivity : AppCompatActivity() {
                     "en" to "Where does it hurt?"
                 )
             ),
-            mainAacItem("doctor", "ZDRAVNIK", "zdravnik"),
-            mainAacItem("family", "DRUŽINA", "družina"),
+            mainAacItem(
+                "doctor",
+                "ZDRAVNIK",
+                "pokličite zdravnika",
+                labelUk = "ЛІКАР",
+                labelEn = "DOCTOR",
+                speakTextUk = "Покличте лікаря",
+                speechTextEn = "Call the doctor"
+            ),
+            mainAacItem(
+                "family",
+                "DRUŽINA",
+                "pokličite družino",
+                labelUk = "СІМ'Я",
+                labelEn = "FAMILY",
+                speakTextUk = "Покличте сім'ю",
+                speechTextEn = "Call my family"
+            ),
             mainAacItem("stop", "STOP", "stop"),
             mainAacItem("water", "VODA", "voda", isRootItem = false, visibleUnderIds = listOf("drink")),
             mainAacItem("juice", "SOK", "sok", isRootItem = false, visibleUnderIds = listOf("drink")),
@@ -991,16 +1130,24 @@ class MainActivity : AppCompatActivity() {
         isRootItem: Boolean = true,
         visibleUnderIds: List<String> = emptyList(),
         fixedTopRowPosition: Int? = null,
+        labelUk: String? = null,
+        labelEn: String? = null,
+        speakTextUk: String? = null,
+        speechTextEn: String? = null,
         questionByLanguage: Map<String, String> = emptyMap()
     ): AacItem {
         return AacItem(
             id = id,
             labelSl = labelSl,
+            labelUk = labelUk,
+            labelEn = labelEn,
             imagePath = "",
             actionType = if (opensSubicons) "open_subicons" else "speak",
             targetPageId = "",
             speakTextSl = speechText,
+            speakTextUk = speakTextUk,
             speechText = speechText,
+            speechTextEn = speechTextEn,
             iconSource = IconSource.SYSTEM,
             visibleUnderIds = visibleUnderIds,
             children = children,

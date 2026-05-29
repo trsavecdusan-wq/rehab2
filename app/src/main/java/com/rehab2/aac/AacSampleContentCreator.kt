@@ -87,6 +87,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "yes",
                         label = "DA",
+                        labelUk = "ТАК",
+                        labelEn = "YES",
+                        speechSl = "da",
+                        speechUk = "так",
+                        speechEn = "yes",
                         imagePath = "",
                         isRootItem = true,
                         priority = 0,
@@ -96,19 +101,30 @@ object AacSampleContentCreator {
                 .put(
                     sampleItem(
                         id = "dont_understand",
-                        label = "NE\nRAZUMEM",
+                        label = "NE RAZUMEM",
+                        labelUk = "Я НЕ РОЗУМІЮ",
+                        labelEn = "I DON'T UNDERSTAND",
                         speechSl = "ne razumem",
+                        speechUk = "Я не розумію",
+                        speechEn = "I don't understand",
                         imagePath = "",
                         conceptId = "dont_understand",
                         isRootItem = true,
                         priority = 1,
                         fixedTopRowPosition = 2
                     )
+                        .put("labelUk", "Я НЕ РОЗУМІЮ")
+                        .put("speakTextUk", "Я не розумію")
                 )
                 .put(
                     sampleItem(
                         id = "no",
                         label = "NE",
+                        labelUk = "НІ",
+                        labelEn = "NO",
+                        speechSl = "ne",
+                        speechUk = "ні",
+                        speechEn = "no",
                         imagePath = "",
                         isRootItem = true,
                         priority = 2,
@@ -145,6 +161,15 @@ object AacSampleContentCreator {
                         isRootItem = true,
                         priority = 5
                     )
+                        .put("labelSl", "POMOČ")
+                        .put("text", "POMOČ")
+                        .put("baseText", "POMOČ")
+                        .put("labelUk", "ДОПОМОГА")
+                        .put("labelEn", "HELP")
+                        .put("speechText", "pomagaj mi")
+                        .put("speakTextSl", "pomagaj mi")
+                        .put("speakTextUk", "Допоможіть мені")
+                        .put("speechTextEn", "Help me")
                 )
                 .put(
                     sampleItem(
@@ -154,6 +179,12 @@ object AacSampleContentCreator {
                         isRootItem = true,
                         priority = 6
                     )
+                        .put("labelUk", "БОЛИТЬ")
+                        .put("labelEn", "PAIN")
+                        .put("speechText", "boli me")
+                        .put("speakTextSl", "boli me")
+                        .put("speakTextUk", "Мені болить")
+                        .put("speechTextEn", "I am in pain")
                 )
                 .put(
                     sampleItem(
@@ -164,13 +195,189 @@ object AacSampleContentCreator {
                         isRootItem = true,
                         priority = 7,
                         followUpQuestion = "Kaj želiš piti?"
-                    ).put(
+                    )
+                        .put("labelSl", "ŽEJNA")
+                        .put("text", "ŽEJNA")
+                        .put("baseText", "ŽEJNA")
+                        .put("labelUk", "ХОЧУ ПИТИ")
+                        .put("labelEn", "THIRSTY")
+                        .put("speechText", "žejna sem")
+                        .put("speakTextSl", "žejna sem")
+                        .put("speakTextUk", "Я хочу пити")
+                        .put("speechTextEn", "I am thirsty")
+                        .put("followUpQuestion", "Kaj želiš piti?")
+                        .put(
                         "children",
                         JSONArray()
                             .put("water")
                             .put("juice")
                             .put("coffee")
                             .put("tea")
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "hungry",
+                        label = "LAČNA",
+                        labelUk = "ХОЧУ ЇСТИ",
+                        labelEn = "HUNGRY",
+                        speechSl = "lačna sem",
+                        speechUk = "Я хочу їсти",
+                        speechEn = "I am hungry",
+                        imagePath = "",
+                        conceptId = "hungry",
+                        isRootItem = true,
+                        priority = 8
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "wc",
+                        label = "WC",
+                        labelUk = "ТУАЛЕТ",
+                        labelEn = "TOILET",
+                        speechSl = "moram na WC",
+                        speechUk = "Мені потрібно в туалет",
+                        speechEn = "I need the toilet",
+                        imagePath = "",
+                        conceptId = "wc",
+                        isRootItem = true,
+                        priority = 9
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "turn_me",
+                        label = "OBRNI ME",
+                        labelUk = "ПОВЕРНІТЬ МЕНЕ",
+                        labelEn = "TURN ME",
+                        speechSl = "prosim, obrni me",
+                        speechUk = "Будь ласка, поверніть мене",
+                        speechEn = "Please turn me",
+                        imagePath = "",
+                        conceptId = "turn_me",
+                        isRootItem = true,
+                        priority = 10
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "sleep",
+                        label = "SPATI",
+                        labelUk = "СПАТИ",
+                        labelEn = "SLEEP",
+                        speechSl = "želim spati",
+                        speechUk = "Я хочу спати",
+                        speechEn = "I want to sleep",
+                        imagePath = "",
+                        conceptId = "sleep",
+                        isRootItem = true,
+                        priority = 11
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "tired",
+                        label = "UTRUJENA",
+                        labelUk = "ВТОМЛЕНА",
+                        labelEn = "TIRED",
+                        speechSl = "utrujena sem",
+                        speechUk = "Я втомлена",
+                        speechEn = "I am tired",
+                        imagePath = "",
+                        conceptId = "tired",
+                        isRootItem = true,
+                        priority = 12
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "cold",
+                        label = "MRAZ",
+                        labelUk = "ХОЛОДНО",
+                        labelEn = "COLD",
+                        speechSl = "zebe me",
+                        speechUk = "Мені холодно",
+                        speechEn = "I am cold",
+                        imagePath = "",
+                        conceptId = "cold",
+                        isRootItem = true,
+                        priority = 13
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "hot",
+                        label = "VROČE",
+                        labelUk = "ЖАРКО",
+                        labelEn = "HOT",
+                        speechSl = "vroče mi je",
+                        speechUk = "Мені жарко",
+                        speechEn = "I am hot",
+                        imagePath = "",
+                        conceptId = "hot",
+                        isRootItem = true,
+                        priority = 14
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "good",
+                        label = "DOBRO",
+                        labelUk = "ДОБРЕ",
+                        labelEn = "GOOD",
+                        speechSl = "dobro sem",
+                        speechUk = "Мені добре",
+                        speechEn = "I am good",
+                        imagePath = "",
+                        conceptId = "good",
+                        isRootItem = true,
+                        priority = 15
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "bad",
+                        label = "SLABO",
+                        labelUk = "ПОГАНО",
+                        labelEn = "BAD",
+                        speechSl = "slabo mi je",
+                        speechUk = "Мені погано",
+                        speechEn = "I feel bad",
+                        imagePath = "",
+                        conceptId = "bad",
+                        isRootItem = true,
+                        priority = 16
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "doctor",
+                        label = "ZDRAVNIK",
+                        labelUk = "ЛІКАР",
+                        labelEn = "DOCTOR",
+                        speechSl = "pokličite zdravnika",
+                        speechUk = "Покличте лікаря",
+                        speechEn = "Call the doctor",
+                        imagePath = "",
+                        conceptId = "doctor",
+                        isRootItem = true,
+                        priority = 17
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "family",
+                        label = "DRUŽINA",
+                        labelUk = "СІМ'Я",
+                        labelEn = "FAMILY",
+                        speechSl = "pokličite družino",
+                        speechUk = "Покличте сім'ю",
+                        speechEn = "Call my family",
+                        imagePath = "",
+                        conceptId = "family",
+                        isRootItem = true,
+                        priority = 18
                     )
                 )
                 .put(
@@ -332,7 +539,10 @@ object AacSampleContentCreator {
         id: String,
         label: String,
         labelUk: String? = null,
+        labelEn: String? = null,
         speechSl: String? = null,
+        speechUk: String? = null,
+        speechEn: String? = null,
         imagePath: String,
         conceptId: String? = null,
         categoryId: String? = null,
@@ -350,10 +560,12 @@ object AacSampleContentCreator {
             .put("id", id)
             .put("labelSl", label)
             .put("labelUk", labelUk)
+            .put("labelEn", labelEn)
             .put("text", label)
             .put("speechText", speechSl ?: label.lowercase())
             .put("speakTextSl", speechSl ?: label.lowercase())
-            .put("speakTextUk", labelUk?.lowercase())
+            .put("speakTextUk", speechUk ?: labelUk?.lowercase())
+            .put("speechTextEn", speechEn ?: labelEn?.lowercase())
             .put("baseText", label)
             .put("categoryId", categoryId)
             .put("imagePath", imagePath)
