@@ -398,36 +398,49 @@ class AacPackSettingsActivity : AppCompatActivity() {
             renderAacItemEditorList(currentFilteredAacItems)
         }
         btnBulkAssignCategory.setOnClickListener {
-            confirmBulkAacAction("Dodeli kategorijo izbranim ikonam?") {
+            showBulkAacDryRun(
+                title = "Kategorija",
+                changeLines = listOf("categoryId -> ${editBulkAacCategory.text.toString().trim().ifBlank { "(pocisti)" }}")
+            ) {
                 bulkUpdateSelectedItems { item ->
                     putOptionalString(item, "categoryId", editBulkAacCategory.text.toString())
                 }
             }
         }
         btnBulkAssignSource.setOnClickListener {
-            confirmBulkAacAction("Dodeli vir ikon izbranim ikonam?") {
+            showBulkAacDryRun(
+                title = "Vir ikon",
+                changeLines = listOf("iconSource -> ${editBulkAacSource.text.toString().trim().uppercase(Locale.ROOT)}")
+            ) {
                 bulkAssignIconSource()
             }
         }
         btnBulkActivate.setOnClickListener {
-            confirmBulkAacAction("Aktiviraj izbrane ikone?") {
+            showBulkAacDryRun(
+                title = "Aktivacija",
+                changeLines = listOf("active -> true")
+            ) {
                 bulkUpdateSelectedItems { item -> item.put("active", true) }
             }
         }
         btnBulkDeactivate.setOnClickListener {
-            confirmBulkAacAction("Deaktiviraj izbrane ikone?") {
+            showBulkAacDryRun(
+                title = "Deaktivacija",
+                changeLines = listOf("active -> false", "Postavitve in slike ostanejo shranjene.")
+            ) {
                 bulkUpdateSelectedItems { item -> item.put("active", false) }
             }
         }
         btnBulkAssignLanguages.setOnClickListener {
-            confirmBulkAacAction("Dodeli aktivne jezike izbranim ikonam? Prevodi ostanejo shranjeni.") {
+            showBulkAacDryRun(
+                title = "Jeziki",
+                changeLines = listOf("activeLanguages -> ${editBulkAacLanguages.text.toString().trim()}", "Prevodi ostanejo shranjeni.")
+            ) {
                 bulkAssignActiveLanguages()
             }
         }
         btnBulkPlaceSequentially.setOnClickListener {
-            confirmBulkAacAction("Postavi izbrane ikone zaporedno na stran? Zasedene ali zaklenjene celice se preskocijo.") {
-                bulkPlaceSelectedItemsSequentially()
-            }
+            showBulkPlacementDryRun()
         }
         editAacLibrarySearch.setOnEditorActionListener { _, _, _ ->
             refreshLocalAacOverview()
@@ -1760,15 +1773,42 @@ class AacPackSettingsActivity : AppCompatActivity() {
             "Skupinske postavitve dodajajo samo proste celice in ne spreminjajo fiksne vrstice."
     }
 
-    private fun confirmBulkAacAction(message: String, action: () -> Unit) {
+    private fun showBulkAacDryRun(
+        title: String,
+        changeLines: List<String>,
+        action: () -> Unit
+    ) {
         if (bulkSelectedAacItemIds.isEmpty()) {
             txtStatus.text = "Najprej izberi AAC ikone. Kartico drzi za izbor ali uporabi IZBERI VIDNE."
             return
         }
+        val selectedItems = buildLocalAacOverview()
+            .relationAnalysis
+            .availableItems
+            .filter { item -> item.itemId in bulkSelectedAacItemIds }
+        val skippedCount = bulkSelectedAacItemIds.size - selectedItems.size
+        val warningLines = buildList {
+            if (skippedCount > 0) add("Preskoceno: $skippedCount ikon ni vec najdenih v lokalnem JSON.")
+            add("Ne brise prevodov, slik, podikon, visibleUnderIds, postavitev ali fiksne vrstice.")
+            add("categoryId je samo terapevtska organizacija, ne pacientova postavitev.")
+        }
+        val previewText = buildString {
+            append("Izbranih ikon: ${bulkSelectedAacItemIds.size}\n")
+            append("Spremenilo se bo:\n")
+            changeLines.forEach { line -> append("- $line\n") }
+            append("\nPrimer izbranih ikon:\n")
+            selectedItems.take(12).forEach { item ->
+                append("- ${item.label.ifBlank { item.itemId }} (${item.itemId})\n")
+            }
+            val remaining = selectedItems.size - 12
+            if (remaining > 0) append("... se $remaining\n")
+            append("\nOpozorila:\n")
+            warningLines.forEach { warning -> append("- $warning\n") }
+        }.trimEnd()
         AlertDialog.Builder(this)
-            .setTitle("Skupinska sprememba")
-            .setMessage("$message\n\nIzbranih ikon: ${bulkSelectedAacItemIds.size}\nFiksna vrstica, prevodi in obstojece postavitve se ne brisejo.")
-            .setPositiveButton("Potrdi") { _, _ -> action() }
+            .setTitle("Predogled: $title")
+            .setMessage(previewText)
+            .setPositiveButton("Potrdi spremembe za izbrane ikone") { _, _ -> action() }
             .setNegativeButton("Preklici", null)
             .show()
     }
@@ -1787,7 +1827,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
             AacMetadataWriteResult.Success
         }
         if (result == AacMetadataWriteResult.Success) {
-            txtStatus.text = "Skupinska sprememba shranjena.\nPosodobljenih ikon: $updatedCount"
+            val skippedCount = (selectedIds.size - updatedCount).coerceAtLeast(0)
+            txtStatus.text = "Skupinska sprememba shranjena.\nSpremenjeno: $updatedCount\nPreskoceno: $skippedCount\nOpozorila: 0"
             refreshLocalAacOverview()
         } else {
             txtStatus.text = "Skupinske spremembe ni bilo mogoce shraniti."
@@ -1822,24 +1863,131 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun bulkPlaceSelectedItemsSequentially() {
+    private fun showBulkPlacementDryRun() {
+        val preview = buildBulkPlacementPreview()
+        if (preview == null) return
+        val previewText = buildString {
+            append("Ciljna stran: ${preview.pageId}\n")
+            append("Zacetna pozicija: ${preview.startPosition}\n")
+            append("Izbranih ikon: ${bulkSelectedAacItemIds.size}\n")
+            append("Za postavitev: ${preview.toPlace.size}\n")
+            append("Preskoceno: ${preview.skippedLines.size}\n")
+            append("Prostora dovolj: ${if (preview.hasEnoughSpace) "DA" else "NE"}\n\n")
+            append("Postavile se bodo:\n")
+            preview.toPlace.take(15).forEach { line -> append("- $line\n") }
+            val remainingToPlace = preview.toPlace.size - 15
+            if (remainingToPlace > 0) append("... se $remainingToPlace\n")
+            append("\nPreskoceno / opozorila:\n")
+            if (preview.skippedLines.isEmpty()) {
+                append("- Ni preskocenih ikon.\n")
+            } else {
+                preview.skippedLines.take(15).forEach { line -> append("- $line\n") }
+                val remainingSkipped = preview.skippedLines.size - 15
+                if (remainingSkipped > 0) append("... se $remainingSkipped\n")
+            }
+            append("\nVarnost:\n")
+            append("- Ne prepisuje zasedenih celic.\n")
+            append("- Ne spreminja fiksne vrstice.\n")
+            append("- Ne brise obstojecih postavitev, prevodov, slik ali podikon.")
+        }.trimEnd()
+        AlertDialog.Builder(this)
+            .setTitle("Predogled: zaporedna postavitev")
+            .setMessage(previewText)
+            .setPositiveButton("Potrdi spremembe za izbrane ikone") { _, _ ->
+                bulkPlaceSelectedItemsSequentially(preview)
+            }
+            .setNegativeButton("Preklici", null)
+            .show()
+    }
+
+    private fun buildBulkPlacementPreview(): BulkPlacementPreview? {
+        if (bulkSelectedAacItemIds.isEmpty()) {
+            txtStatus.text = "Najprej izberi AAC ikone."
+            return null
+        }
         val pageId = editBulkPlacementPageId.text.toString().trim()
             .ifBlank { selectedPlacementPageId() }
         val startPosition = editBulkPlacementStartPosition.text.toString().trim().toIntOrNull() ?: 1
         if (!isSafePatientPageId(pageId)) {
             txtStatus.text = "Vnesi veljaven ID strani za postavitev."
-            return
+            return null
         }
         if (startPosition !in 1..25) {
             txtStatus.text = "Zacetna pozicija mora biti 1-25."
-            return
+            return null
         }
-        val orderedSelectedIds = currentFilteredAacItems
+        val orderedSelectedIds = orderedBulkSelectedItemIds()
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText)
+        if (itemsArray == null) {
+            txtStatus.text = "AAC elementi niso najdeni."
+            return null
+        }
+        val itemById = mutableMapOf<String, org.json.JSONObject>()
+        val occupiedPositions = mutableSetOf<Int>()
+        for (index in 0 until itemsArray.length()) {
+            val item = itemsArray.optJSONObject(index) ?: continue
+            val itemId = item.optString("id").trim()
+            if (itemId.isNotBlank()) itemById[itemId] = item
+            val placements = item.optJSONArray("placements") ?: continue
+            for (placementIndex in 0 until placements.length()) {
+                val placement = placements.optJSONObject(placementIndex) ?: continue
+                val position = placement.optInt("position5x5", 0)
+                if (placement.optString("pageId").trim() == pageId && position in 1..25) {
+                    occupiedPositions += position
+                }
+            }
+        }
+        val toPlace = mutableListOf<String>()
+        val skippedLines = mutableListOf<String>()
+        var nextPosition = startPosition
+        orderedSelectedIds.forEach { itemId ->
+            val item = itemById[itemId]
+            if (item == null) {
+                skippedLines += "$itemId: element ni najden"
+                return@forEach
+            }
+            if (itemAlreadyPlacedOnPage(item, pageId)) {
+                skippedLines += "$itemId: ze je na strani $pageId"
+                return@forEach
+            }
+            while (nextPosition <= 25 && nextPosition in occupiedPositions) {
+                skippedLines += "pozicija $nextPosition: zasedena"
+                nextPosition += 1
+            }
+            if (nextPosition > 25) {
+                skippedLines += "$itemId: ni dovolj prostih polj"
+                return@forEach
+            }
+            val label = itemLabel(item).ifBlank { itemId }
+            toPlace += "$label ($itemId) -> $pageId / $nextPosition"
+            occupiedPositions += nextPosition
+            nextPosition += 1
+        }
+        return BulkPlacementPreview(
+            pageId = pageId,
+            startPosition = startPosition,
+            toPlace = toPlace,
+            skippedLines = skippedLines,
+            hasEnoughSpace = toPlace.isNotEmpty() && skippedLines.none { it.contains("ni dovolj prostih polj") }
+        )
+    }
+
+    private fun orderedBulkSelectedItemIds(): List<String> {
+        return currentFilteredAacItems
             .map { item -> item.itemId }
             .filter { itemId -> itemId in bulkSelectedAacItemIds } +
             bulkSelectedAacItemIds.filterNot { itemId -> currentFilteredAacItems.any { it.itemId == itemId } }
+    }
+
+    private fun bulkPlaceSelectedItemsSequentially(preview: BulkPlacementPreview) {
+        val pageId = preview.pageId
+        val startPosition = preview.startPosition
+        val orderedSelectedIds = orderedBulkSelectedItemIds()
         var placedCount = 0
         var skippedCount = 0
+        var warningCount = preview.skippedLines.size
         val result = updateItemsJsonMetadata { itemsArray ->
             val itemById = mutableMapOf<String, org.json.JSONObject>()
             val occupiedPositions = mutableSetOf<Int>()
@@ -1865,6 +2013,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     return@forEach
                 }
                 while (nextPosition <= 25 && nextPosition in occupiedPositions) {
+                    warningCount += 1
                     nextPosition += 1
                 }
                 if (nextPosition > 25) {
@@ -1882,7 +2031,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
         if (result == AacMetadataWriteResult.Success) {
             editPlacementPageId.setText(pageId)
-            txtStatus.text = "Skupinska postavitev shranjena.\nDodano: $placedCount\nPreskoceno: $skippedCount"
+            txtStatus.text = "Skupinska postavitev shranjena.\nSpremenjeno: $placedCount\nPreskoceno: $skippedCount\nOpozorila: $warningCount"
             refreshLocalAacOverview()
         } else {
             txtStatus.text = "Skupinske postavitve ni bilo mogoce shraniti."
@@ -5077,6 +5226,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val pageId: String,
         val pageTitle: String,
         val position5x5: Int
+    )
+
+    private data class BulkPlacementPreview(
+        val pageId: String,
+        val startPosition: Int,
+        val toPlace: List<String>,
+        val skippedLines: List<String>,
+        val hasEnoughSpace: Boolean
     )
 
     private data class UsageItemRef(
