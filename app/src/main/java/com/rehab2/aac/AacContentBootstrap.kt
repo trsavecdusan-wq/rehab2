@@ -180,8 +180,18 @@ object AacContentBootstrap {
     private fun saveItemsJson(itemsFile: File?, rawItems: RawItemsJson, itemsArray: JSONArray) {
         val file = itemsFile ?: return
         file.parentFile?.let { parent -> if (!parent.exists()) parent.mkdirs() }
-        val outputText = rawItems.rootArray?.toString(2)
-            ?: (rawItems.rootObject ?: JSONObject()).put("items", itemsArray).toString(2)
+        val outputText = when {
+            rawItems.rootArray != null -> {
+                itemsArray.toString(2)
+            }
+            rawItems.rootObject != null -> {
+                rawItems.rootObject.put("items", itemsArray)
+                rawItems.rootObject.toString(2)
+            }
+            else -> {
+                JSONObject().put("items", itemsArray).toString(2)
+            }
+        }
         file.writeText(outputText, Charsets.UTF_8)
     }
 
