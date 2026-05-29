@@ -1106,22 +1106,28 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val subiconStatus = itemsArray?.let { buildSubiconDashboardStatus(it) } ?: SubiconDashboardStatus.empty()
         val warnings = buildCommunicatorWarnings(overview, translationStatus)
 
+        communicatorDashboardActions.addView(TextView(this).apply {
+            text = "KOMUNIKATOR — NADZORNA PLOŠČA"
+            textSize = 22f
+            setTextColor(0xFFF4F7FA.toInt())
+            setPadding(0, 0, 0, 10.dp())
+        })
         addDashboardCard(
-            title = "PAGES",
+            title = "STRANI",
             accentColor = 0xFF2F5F9E.toInt(),
-            lines = listOf("Strani: ${pages.size}", "Zacetna: $defaultPageId"),
+            lines = listOf("Število strani: ${pages.size}", "Začetna stran: $defaultPageId"),
             actionText = "UREDI STRANI",
             targetId = R.id.sectionAacPlacement
         )
         addDashboardCard(
-            title = "AAC ITEMS",
+            title = "IKONE",
             accentColor = 0xFF3E7C4A.toInt(),
-            lines = listOf("Elementi: ${overview.relationAnalysis.availableItems.size}"),
+            lines = listOf("AAC ikone: ${overview.relationAnalysis.availableItems.size}"),
             actionText = "UREDI IKONE",
             targetId = R.id.sectionAacLibrary
         )
         addDashboardCard(
-            title = "TRANSLATIONS",
+            title = "PREVODI",
             accentColor = if (translationStatus.missingCount > 0) 0xFF8F6B2D.toInt() else 0xFF3E7C4A.toInt(),
             lines = listOf(
                 "Prevedeno: ${translationStatus.translatedCount}",
@@ -1132,10 +1138,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
             targetId = R.id.sectionAacLanguages
         )
         addDashboardCard(
-            title = "SUBICONS",
+            title = "PODIKONE",
             accentColor = 0xFF5B6672.toInt(),
             lines = listOf(
-                "Starsi: ${subiconStatus.parentCount}",
+                "Starši: ${subiconStatus.parentCount}",
                 "Podikone: ${subiconStatus.childCount}",
                 "Brez povezave: ${subiconStatus.orphanCount}"
             ),
@@ -1143,7 +1149,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             targetId = R.id.sectionAacPlacement
         )
         addDashboardCard(
-            title = "FIXED ROW",
+            title = "FIKSNA VRSTICA",
             accentColor = if (overview.relationAnalysis.fixedTopRowItems.size < 5) 0xFF8F6B2D.toInt() else 0xFF3E7C4A.toInt(),
             lines = listOf(
                 "Nastavljeno: ${overview.relationAnalysis.fixedTopRowItems.size}/5",
@@ -1153,9 +1159,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
             targetId = R.id.sectionAacPlacement
         )
         addDashboardCard(
-            title = "WARNINGS",
+            title = "OPOZORILA",
             accentColor = if (warnings.isEmpty()) 0xFF3E7C4A.toInt() else 0xFF8F3A3A.toInt(),
-            lines = warnings.ifEmpty { listOf("Ni kriticnih opozoril.") },
+            lines = warnings.ifEmpty { listOf("Ni kritičnih opozoril.") },
             actionText = "PREGLED",
             targetId = R.id.sectionAacPlacement
         )
@@ -1171,12 +1177,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(0xFF26323D.toInt())
-            setPadding(14.dp(), 12.dp(), 14.dp(), 12.dp())
+            setPadding(18.dp(), 16.dp(), 18.dp(), 16.dp())
         }
         card.addView(
             TextView(this).apply {
                 text = title
-                textSize = 16f
+                textSize = 20f
                 setTextColor(0xFFF4F7FA.toInt())
             }
         )
@@ -1196,9 +1202,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
             card.addView(
                 TextView(this).apply {
                     text = line
-                    textSize = 15f
+                    textSize = 17f
                     setTextColor(0xFFB8C0C8.toInt())
-                    setPadding(0, 2.dp(), 0, 0)
+                    setPadding(0, 4.dp(), 0, 0)
                 }
             )
         }
@@ -1206,16 +1212,16 @@ class AacPackSettingsActivity : AppCompatActivity() {
             Button(this).apply {
                 text = actionText
                 setAllCaps(false)
-                textSize = 13f
+                textSize = 17f
                 setTextColor(0xFFF4F7FA.toInt())
                 backgroundTintList = ColorStateList.valueOf(accentColor)
                 setOnClickListener { scrollToSettingsSection(targetId) }
             },
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                48.dp()
+                58.dp()
             ).apply {
-                topMargin = 8.dp()
+                topMargin = 12.dp()
             }
         )
         communicatorDashboardActions.addView(
@@ -1224,7 +1230,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                bottomMargin = 8.dp()
+                bottomMargin = 12.dp()
             }
         )
     }
@@ -1333,8 +1339,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
             val cell = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER
-                setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
-                setBackgroundColor(if (cellItem == null) 0xFF1E252C.toInt() else 0xFF34414D.toInt())
+                setPadding(6.dp(), 6.dp(), 6.dp(), 6.dp())
+                setBackgroundColor(if (cellItem == null) 0xFF172029.toInt() else 0xFF214A78.toInt())
                 isClickable = true
                 isFocusable = true
                 setOnClickListener {
@@ -1349,7 +1355,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             val image = ImageView(this).apply {
                 scaleType = ImageView.ScaleType.CENTER_INSIDE
                 setBackgroundColor(0xFF172029.toInt())
-                setPadding(2.dp(), 2.dp(), 2.dp(), 2.dp())
+                setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
             }
             val label = TextView(this).apply {
                 text = cellItem?.let { item ->
@@ -1357,7 +1363,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 } ?: "F$position\nprosto"
                 gravity = Gravity.CENTER
                 maxLines = 3
-                textSize = 11f
+                textSize = 13f
                 setTextColor(if (cellItem == null) 0xFF9CA8B5.toInt() else 0xFFF4F7FA.toInt())
             }
             if (cellItem != null) {
@@ -1366,7 +1372,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     image,
                     LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        38.dp()
+                        54.dp()
                     )
                 )
             }
@@ -1382,7 +1388,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 cell,
                 LinearLayout.LayoutParams(
                     0,
-                    88.dp(),
+                    116.dp(),
                     1f
                 ).apply {
                     marginEnd = if (position < 5) 4.dp() else 0
@@ -1463,7 +1469,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         1f
                     ).apply {
-                        marginEnd = if (index < rowItems.lastIndex) 8.dp() else 0
+                        marginEnd = if (index < rowItems.lastIndex) 10.dp() else 0
                     }
                 )
             }
@@ -1474,9 +1480,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                         0,
                         1,
                         1f
-                    ).apply {
-                        marginEnd = 8.dp()
-                    }
+                    )
                 )
             }
             aacItemListActions.addView(
@@ -1485,7 +1489,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    bottomMargin = 10.dp()
+                    bottomMargin = 12.dp()
                 }
             )
         }
@@ -1504,7 +1508,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
             setBackgroundColor(0xFF26323D.toInt())
-            setPadding(8.dp(), 8.dp(), 8.dp(), 8.dp())
+            setPadding(12.dp(), 12.dp(), 12.dp(), 12.dp())
             isClickable = true
             isFocusable = true
             setOnClickListener { loadAacItemIntoEditor(item.itemId) }
@@ -1519,22 +1523,22 @@ class AacPackSettingsActivity : AppCompatActivity() {
             preview,
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                96.dp()
+                132.dp()
             )
         )
         card.addView(TextView(this).apply {
             text = item.label.ifBlank { "brez oznake" }
             gravity = Gravity.CENTER
             maxLines = 2
-            textSize = 15f
+            textSize = 18f
             setTextColor(0xFFF4F7FA.toInt())
-            setPadding(0, 8.dp(), 0, 2.dp())
+            setPadding(0, 10.dp(), 0, 2.dp())
         })
         card.addView(TextView(this).apply {
             text = item.itemId
             gravity = Gravity.CENTER
             maxLines = 1
-            textSize = 11f
+            textSize = 12f
             setTextColor(0xFF9CA8B5.toInt())
         })
         val badges = LinearLayout(this).apply {
@@ -1560,7 +1564,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 text = indicators.joinToString(" · ")
                 gravity = Gravity.CENTER
                 maxLines = 3
-                textSize = 12f
+                textSize = 14f
                 setTextColor(if (isMissingImage || item.translationStatus == ItemTranslationStatus.MISSING) 0xFFFFD27A.toInt() else 0xFFB8C0C8.toInt())
                 setPadding(0, 8.dp(), 0, 0)
             })
@@ -1590,15 +1594,15 @@ class AacPackSettingsActivity : AppCompatActivity() {
         return TextView(this).apply {
             text = label
             gravity = Gravity.CENTER
-            textSize = 10f
+            textSize = 12f
             setTextColor(0xFFF4F7FA.toInt())
             setBackgroundColor(color)
-            setPadding(6.dp(), 3.dp(), 6.dp(), 3.dp())
+            setPadding(8.dp(), 4.dp(), 8.dp(), 4.dp())
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                marginEnd = 4.dp()
+                marginEnd = 6.dp()
             }
         }
     }
@@ -1623,16 +1627,16 @@ class AacPackSettingsActivity : AppCompatActivity() {
         return Button(this).apply {
             text = label
             setAllCaps(false)
-            textSize = 12f
+            textSize = 13f
             setTextColor(0xFFF4F7FA.toInt())
             backgroundTintList = ColorStateList.valueOf(0xFF26323D.toInt())
             setOnClickListener { action() }
             layoutParams = LinearLayout.LayoutParams(
                 0,
-                48.dp(),
+                56.dp(),
                 1f
             ).apply {
-                marginEnd = 4.dp()
+                marginEnd = 6.dp()
             }
         }
     }
@@ -1737,11 +1741,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(0xFF26323D.toInt())
-            setPadding(12.dp(), 10.dp(), 12.dp(), 10.dp())
+            setPadding(18.dp(), 16.dp(), 18.dp(), 16.dp())
         }
         card.addView(TextView(this).apply {
-            text = "UPORABA AAC ELEMENTA"
-            textSize = 17f
+            text = "OSNOVNO / UPORABA AAC ELEMENTA"
+            textSize = 19f
             setTextColor(0xFFF4F7FA.toInt())
         })
         card.addView(TextView(this).apply {
@@ -1752,13 +1756,13 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 append("Vprašanje: ${if (usage.hasQuestion) "prisotno" else "ni nastavljeno"}\n")
                 append("Fiksna vrstica: ${usage.fixedTopRowPosition?.let { "F$it" } ?: "ni nastavljena"}")
             }
-            textSize = 14f
+            textSize = 16f
             setTextColor(0xFFB8C0C8.toInt())
-            setPadding(0, 6.dp(), 0, 8.dp())
+            setPadding(0, 8.dp(), 0, 12.dp())
         })
         addUsageSection(
             card = card,
-            title = "STRANI (${usage.pageUsages.size})",
+            title = "UPORABA NA STRANEH (${usage.pageUsages.size})",
             emptyText = "Element ni postavljen na pacientovi strani.",
             rows = usage.pageUsages.map { page ->
                 UsageNavigationRow(
@@ -1800,14 +1804,14 @@ class AacPackSettingsActivity : AppCompatActivity() {
     ) {
         card.addView(TextView(this).apply {
             text = title
-            textSize = 14f
+            textSize = 16f
             setTextColor(0xFFF4F7FA.toInt())
-            setPadding(0, 8.dp(), 0, 4.dp())
+            setPadding(0, 10.dp(), 0, 6.dp())
         })
         if (rows.isEmpty()) {
             card.addView(TextView(this).apply {
                 text = emptyText
-                textSize = 13f
+                textSize = 14f
                 setTextColor(0xFF9CA8B5.toInt())
             })
             return
@@ -1816,7 +1820,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             card.addView(Button(this).apply {
                 text = row.label
                 setAllCaps(false)
-                textSize = 13f
+                textSize = 17f
                 setTextColor(0xFFF4F7FA.toInt())
                 backgroundTintList = ColorStateList.valueOf(0xFF1E252C.toInt())
                 setOnClickListener { row.action() }
@@ -2306,7 +2310,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 textSize = 15f
                 setTextColor(0xFFF4F7FA.toInt())
                 setBackgroundColor(if (page.pageId == defaultPageId) 0xFF2F5F9E.toInt() else 0xFF34414D.toInt())
-                setPadding(14.dp(), 8.dp(), 14.dp(), 8.dp())
+                setPadding(18.dp(), 10.dp(), 18.dp(), 10.dp())
                 setOnClickListener {
                     editPatientPageId.setText(page.pageId)
                     editPatientPageTitle.setText(page.pageTitle)
@@ -2323,9 +2327,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 button,
                 LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    76.dp()
+                    96.dp()
                 ).apply {
-                    bottomMargin = 8.dp()
+                    bottomMargin = 10.dp()
                 }
             )
         }
@@ -2376,8 +2380,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 val cell = LinearLayout(this).apply {
                     orientation = LinearLayout.VERTICAL
                     gravity = Gravity.CENTER
-                    setPadding(3.dp(), 3.dp(), 3.dp(), 3.dp())
-                    setBackgroundColor(if (cellItem == null) 0xFF1E252C.toInt() else 0xFF34414D.toInt())
+                    setPadding(5.dp(), 5.dp(), 5.dp(), 5.dp())
+                    setBackgroundColor(placementCellBackground(cellItem))
                     isClickable = true
                     isFocusable = true
                     setOnClickListener {
@@ -2395,20 +2399,13 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 val image = ImageView(this).apply {
                     scaleType = ImageView.ScaleType.CENTER_INSIDE
                     setBackgroundColor(0xFF172029.toInt())
-                    setPadding(2.dp(), 2.dp(), 2.dp(), 2.dp())
+                    setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
                 }
                 val label = TextView(this).apply {
-                    text = cellItem?.let { item ->
-                        buildString {
-                            append(item.label.ifBlank { item.itemId })
-                            item.fixedTopRowPosition?.let { fixedPosition ->
-                                append("\nF$fixedPosition")
-                            }
-                        }
-                    } ?: position.toString()
+                    text = placementCellLabel(position, cellItem)
                     gravity = Gravity.CENTER
-                    maxLines = 3
-                    textSize = if (cellItem == null) 14f else 11f
+                    maxLines = 4
+                    textSize = 13f
                     setTextColor(if (cellItem == null) 0xFF7F8A96.toInt() else 0xFFF4F7FA.toInt())
                 }
                 if (cellItem != null) {
@@ -2417,7 +2414,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                         image,
                         LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
-                            34.dp()
+                            52.dp()
                         )
                     )
                 }
@@ -2433,10 +2430,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     cell,
                     LinearLayout.LayoutParams(
                         0,
-                        76.dp(),
+                        104.dp(),
                         1f
                     ).apply {
-                        marginEnd = if (columnIndex < 4) 4.dp() else 0
+                        marginEnd = if (columnIndex < 4) 6.dp() else 0
                     }
                 )
             }
@@ -2446,10 +2443,44 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    bottomMargin = 4.dp()
+                    bottomMargin = 6.dp()
                 }
             )
         }
+    }
+
+    private fun placementCellBackground(cellItem: PlacementCellItem?): Int {
+        return when {
+            cellItem == null -> 0xFF172029.toInt()
+            placementCellHasProblem(cellItem) -> 0xFF604B24.toInt()
+            cellItem.isFixedTopRowCell -> 0xFF214A78.toInt()
+            else -> 0xFF34414D.toInt()
+        }
+    }
+
+    private fun placementCellLabel(position: Int, cellItem: PlacementCellItem?): String {
+        if (cellItem == null) {
+            return "PROSTO\n$position"
+        }
+        return buildString {
+            append(cellItem.label.ifBlank { cellItem.itemId })
+            cellItem.fixedTopRowPosition?.let { fixedPosition ->
+                append("\nF$fixedPosition")
+            }
+            if (placementCellHasProblem(cellItem)) {
+                append("\nPOZOR")
+            }
+        }
+    }
+
+    private fun placementCellHasProblem(cellItem: PlacementCellItem): Boolean {
+        return cellItem.translationStatus == ItemTranslationStatus.MISSING || placementCellMissingImage(cellItem)
+    }
+
+    private fun placementCellMissingImage(cellItem: PlacementCellItem): Boolean {
+        return cellItem.imagePath.isNotBlank() &&
+            cellItem.iconSource != IconSource.SYSTEM &&
+            AacStoragePaths.resolveIconFile(this, cellItem.imagePath, cellItem.iconSource)?.isFile != true
     }
 
     private fun renderPageWorkspace() {
@@ -2942,7 +2973,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
         val pageTitle = loadPatientPages().firstOrNull { it.pageId == pageId }?.pageTitle ?: pageId
         previewGridActions.addView(
-            buildAacItemListMessage("Predogled: $pageTitle ($pageId)\nTapni ikono, da simuliras odpiranje strani ali podikon. Podatki se ne spreminjajo.")
+            buildAacItemListMessage("Predogled pacienta: $pageTitle ($pageId)\nTapni ikono za simulacijo odpiranja strani ali podikon. Podatki se ne spreminjajo.")
         )
         val pageItems = previewPageCellItems(pageId)
         for (rowIndex in 0 until 5) {
@@ -2961,10 +2992,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     cell,
                     LinearLayout.LayoutParams(
                         0,
-                        78.dp(),
+                        104.dp(),
                         1f
                     ).apply {
-                        marginEnd = if (columnIndex < 4) 4.dp() else 0
+                        marginEnd = if (columnIndex < 4) 6.dp() else 0
                     }
                 )
             }
@@ -2974,7 +3005,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    bottomMargin = 4.dp()
+                    bottomMargin = 6.dp()
                 }
             )
         }
@@ -2982,7 +3013,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
     private fun renderPreviewFixedTopRow() {
         val fixedCells = fixedTopRowCellItems()
-        previewFixedTopRowActions.addView(buildAacItemListMessage("Fiksna vrstica ostane vidna na vseh straneh:"))
+        previewFixedTopRowActions.addView(
+            buildAacItemListMessage("Fiksna vrstica: 5x5 pokaže F1-F5, 4x4 F1-F4, 3x3 F1-F3. Preostale ikone ostanejo v normalnem toku.")
+        )
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
         }
@@ -2991,10 +3024,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 buildPreviewCell(fixedCells[position], position, fixedLabel = "F$position"),
                 LinearLayout.LayoutParams(
                     0,
-                    78.dp(),
+                    104.dp(),
                     1f
                 ).apply {
-                    marginEnd = if (position < 5) 4.dp() else 0
+                    marginEnd = if (position < 5) 6.dp() else 0
                 }
             )
         }
@@ -3009,8 +3042,15 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val cell = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            setPadding(3.dp(), 3.dp(), 3.dp(), 3.dp())
-            setBackgroundColor(if (item == null) 0xFF1E252C.toInt() else 0xFF26323D.toInt())
+            setPadding(5.dp(), 5.dp(), 5.dp(), 5.dp())
+            setBackgroundColor(
+                when {
+                    item == null -> 0xFF172029.toInt()
+                    fixedLabel != null -> 0xFF214A78.toInt()
+                    placementCellHasProblem(item) -> 0xFF604B24.toInt()
+                    else -> 0xFF34414D.toInt()
+                }
+            )
             isClickable = item != null
             isFocusable = item != null
             if (item != null) {
@@ -3020,13 +3060,13 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val image = ImageView(this).apply {
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             setBackgroundColor(0xFF172029.toInt())
-            setPadding(2.dp(), 2.dp(), 2.dp(), 2.dp())
+            setPadding(4.dp(), 4.dp(), 4.dp(), 4.dp())
         }
         val label = TextView(this).apply {
             text = item?.let { previewCellLabel(it, fixedLabel) } ?: fixedLabel ?: position.toString()
             gravity = Gravity.CENTER
             maxLines = 3
-            textSize = if (item == null) 12f else 11f
+            textSize = 13f
             setTextColor(if (item == null) 0xFF7F8A96.toInt() else 0xFFF4F7FA.toInt())
         }
         if (item != null) {
@@ -3035,7 +3075,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 image,
                 LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    34.dp()
+                    52.dp()
                 )
             )
         }
@@ -3054,8 +3094,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         return LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            setPadding(3.dp(), 3.dp(), 3.dp(), 3.dp())
-            setBackgroundColor(0xFF34414D.toInt())
+            setPadding(5.dp(), 5.dp(), 5.dp(), 5.dp())
+            setBackgroundColor(0xFF214A78.toInt())
             isClickable = true
             isFocusable = true
             setOnClickListener {
@@ -3070,7 +3110,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 TextView(this@AacPackSettingsActivity).apply {
                     text = if (previewPageStack.size > 1) "NAZAJ" else "DOMOV"
                     gravity = Gravity.CENTER
-                    textSize = 13f
+                    textSize = 15f
                     setTextColor(0xFFF4F7FA.toInt())
                 },
                 LinearLayout.LayoutParams(
