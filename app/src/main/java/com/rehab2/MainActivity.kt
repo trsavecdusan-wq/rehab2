@@ -54,6 +54,7 @@ import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
 import com.rehab2.aac.AacStoragePaths
+import com.rehab2.aac.AacStoredTranslationCache
 import com.rehab2.aac.IconSource
 import com.rehab2.radio.RadioPlayerController
 import com.rehab2.radio.SavedRadioStation
@@ -209,6 +210,7 @@ class MainActivity : AppCompatActivity() {
     private var mainAacItemsById: Map<String, AacItem> = emptyMap()
     private var currentMainAacItems: List<AacItem> = emptyList()
     private val mainAacHistory = ArrayDeque<List<AacItem>>()
+    private val pendingMainAacTranslationKeys = mutableSetOf<String>()
     private var mainAacAutoSentenceMaySpeakSingle = false
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
@@ -478,7 +480,24 @@ class MainActivity : AppCompatActivity() {
         }
 
         val languageCode = getActiveSpeechLanguage()
-        val resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode)
+        if (needsMainAacTranslation(item, languageCode)) {
+            translateMainAacItemForAction(item, languageCode)
+            return
+        }
+        handleMainAacResolvedSpeech(
+            item = item,
+            languageCode = languageCode,
+            resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode),
+            resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+        )
+    }
+
+    private fun handleMainAacResolvedSpeech(
+        item: AacItem,
+        languageCode: String,
+        resolvedLabel: String,
+        resolvedSpeechText: String
+    ) {
         if (item.addsToSentence) {
             mainAacSentenceManager.addItem(
                 AacSentenceItem(
@@ -490,8 +509,70 @@ class MainActivity : AppCompatActivity() {
             scheduleMainAacSentenceSpeech(item.speaksImmediately)
         }
         if (item.speaksImmediately) {
-            aacAudioPlayer.speakText(AacLocalizedTextResolver.resolveSpeakText(item, languageCode), languageCode)
+            aacAudioPlayer.speakText(resolvedSpeechText, languageCode)
         }
+    }
+
+    private fun needsMainAacTranslation(item: AacItem, languageCode: String): Boolean {
+        val normalizedLanguage = languageCode.trim().lowercase(Locale.ROOT)
+        if (normalizedLanguage.isBlank() || normalizedLanguage == "sl") {
+            return false
+        }
+        return !AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage) &&
+            !AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
+    }
+
+    private fun translateMainAacItemForAction(item: AacItem, languageCode: String) {
+        val normalizedLanguage = languageCode.trim().lowercase(Locale.ROOT)
+        val translationKey = "${item.id}:$normalizedLanguage"
+        synchronized(pendingMainAacTranslationKeys) {
+            if (!pendingMainAacTranslationKeys.add(translationKey)) {
+                return
+            }
+        }
+        Thread {
+            val translation = AacStoredTranslationCache.ensureTranslation(
+                context = applicationContext,
+                item = item,
+                languageCode = normalizedLanguage
+            )
+            mainHandler.post {
+                synchronized(pendingMainAacTranslationKeys) {
+                    pendingMainAacTranslationKeys.remove(translationKey)
+                }
+                if (translation == null) {
+                    handleMainAacResolvedSpeech(
+                        item = item,
+                        languageCode = normalizedLanguage,
+                        resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, normalizedLanguage),
+                        resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, normalizedLanguage)
+                    )
+                    return@post
+                }
+                val updatedItem = item.copy(
+                    labelByLanguage = item.labelByLanguage + (normalizedLanguage to translation.label),
+                    speechTextByLanguage = item.speechTextByLanguage + (normalizedLanguage to translation.speechText),
+                    translationGenerated = true,
+                    translationSource = "ai"
+                )
+                replaceMainAacItem(updatedItem)
+                handleMainAacResolvedSpeech(
+                    item = updatedItem,
+                    languageCode = normalizedLanguage,
+                    resolvedLabel = translation.label,
+                    resolvedSpeechText = translation.speechText
+                )
+            }
+        }.start()
+    }
+
+    private fun replaceMainAacItem(updatedItem: AacItem) {
+        mainAacItemsById = mainAacItemsById + (updatedItem.id to updatedItem)
+        currentMainAacItems = currentMainAacItems.map { item ->
+            if (item.id == updatedItem.id) updatedItem else item
+        }
+        mainAacHistory.clear()
+        showMainAacItems(currentMainAacItems)
     }
 
     private fun selectMainStartPlacementItems(items: List<AacItem>): List<AacItem> {

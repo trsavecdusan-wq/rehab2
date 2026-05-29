@@ -27,6 +27,7 @@ import com.rehab2.aac.AacPackImportPreflight
 import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.IconSource
 import java.io.File
+import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,6 +67,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val PATIENT_PAGE_FIELD_SEPARATOR = "\u001F"
         private const val LIBRARY_PLACEMENT_SOURCE = "library_activation"
         private const val LIBRARY_PAGE_SIZE = 25
+        private const val MAX_EDITOR_LIST_ITEMS = 80
         private const val MAX_PROFILE_PREVIEW_BYTES = 64 * 1024
         private const val MAX_ITEMS_PREVIEW_BYTES = 512 * 1024
         private const val SUSPICIOUS_ITEMS_PER_PROFILE = 250
@@ -94,6 +96,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnDeactivateCustomLibrary: Button
     private lateinit var btnActivateArasaacLibrary: Button
     private lateinit var btnDeactivateArasaacLibrary: Button
+    private lateinit var aacItemListActions: LinearLayout
     private lateinit var editAacItemId: EditText
     private lateinit var editAacLabelSl: EditText
     private lateinit var editAacLabelUk: EditText
@@ -191,6 +194,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnDeactivateCustomLibrary = findViewById(R.id.btnDeactivateCustomLibrary)
         btnActivateArasaacLibrary = findViewById(R.id.btnActivateArasaacLibrary)
         btnDeactivateArasaacLibrary = findViewById(R.id.btnDeactivateArasaacLibrary)
+        aacItemListActions = findViewById(R.id.aacItemListActions)
         editAacItemId = findViewById(R.id.editAacItemId)
         editAacLabelSl = findViewById(R.id.editAacLabelSl)
         editAacLabelUk = findViewById(R.id.editAacLabelUk)
@@ -901,6 +905,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val overview = buildLocalAacOverview()
         txtAacHealthSummary.text = buildAacHealthSummary(overview)
         txtSourceActivationStatus.text = buildSourceActivationStatus()
+        renderAacItemEditorList(overview.relationAnalysis.availableItems)
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
         txtFixedTopRowAvailableItems.text = buildFixedTopRowAvailableItems(overview.relationAnalysis.availableItems)
         txtPatientPagesStatus.text = buildPatientPagesStatus()
@@ -1047,6 +1052,123 @@ class AacPackSettingsActivity : AppCompatActivity() {
             }
             .setNegativeButton("Prekliči", null)
             .show()
+    }
+
+    private fun renderAacItemEditorList(items: List<AacListItem>) {
+        aacItemListActions.removeAllViews()
+        val filteredItems = items.filter { item -> therapistIconSourceFilter.matches(item.iconSource) }
+        if (filteredItems.isEmpty()) {
+            aacItemListActions.addView(buildAacItemListMessage("Ni AAC elementov za trenutni filter."))
+            return
+        }
+
+        filteredItems.take(MAX_EDITOR_LIST_ITEMS).forEach { item ->
+            val button = Button(this).apply {
+                text = "${item.label.ifBlank { "brez oznake" }}\n${item.itemId} · ${item.iconSource.name}"
+                setAllCaps(false)
+                textSize = 15f
+                setTextColor(0xFFF4F7FA.toInt())
+                setBackgroundColor(0xFF34414D.toInt())
+                setPadding(dp(12), dp(8), dp(12), dp(8))
+                setOnClickListener {
+                    loadAacItemIntoEditor(item.itemId)
+                }
+            }
+            aacItemListActions.addView(
+                button,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(64)
+                ).apply {
+                    bottomMargin = dp(8)
+                }
+            )
+        }
+
+        val remaining = filteredItems.size - MAX_EDITOR_LIST_ITEMS
+        if (remaining > 0) {
+            aacItemListActions.addView(
+                buildAacItemListMessage("Prikazanih je prvih $MAX_EDITOR_LIST_ITEMS elementov. Preostalih: $remaining.")
+            )
+        }
+    }
+
+    private fun buildAacItemListMessage(message: String): TextView {
+        return TextView(this).apply {
+            text = message
+            setTextColor(0xFFB8C0C8.toInt())
+            textSize = 15f
+            setPadding(0, dp(4), 0, dp(8))
+        }
+    }
+
+    private fun loadAacItemIntoEditor(itemId: String) {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val item = currentItemsArray(itemsText)?.let { findItemById(it, itemId) }
+        if (item == null) {
+            txtStatus.text = "AAC element ni bil najden.\n$itemId"
+            return
+        }
+
+        editAacItemId.setText(item.optString("id").trim())
+        editAacLabelSl.setText(itemLabel(item))
+        editAacLabelUk.setText(item.optString("labelUk").ifBlank { itemLanguageText(item, "labelByLanguage", "uk") })
+        editAacLabelEn.setText(item.optString("labelEn").ifBlank { itemLanguageText(item, "labelByLanguage", "en") })
+        val baseLanguage = item.optString("baseLanguage").ifBlank { "sl" }
+        editAacBaseLanguage.setText(baseLanguage)
+        editAacActiveLanguages.setText(
+            stringArrayValues(item.optJSONArray("activeLanguages"))
+                .ifEmpty { listOf("sl") }
+                .take(3)
+                .joinToString(",")
+        )
+        editAacSpeechText.setText(
+            item.optString("speechText")
+                .ifBlank { itemLanguageText(item, "speechTextByLanguage", baseLanguage) }
+                .ifBlank { item.optString("speakTextSl") }
+        )
+        val iconSource = itemIconSource(item)
+        val imagePath = item.optString("imagePath")
+            .ifBlank { item.optString("image_path") }
+            .ifBlank { item.optString("icon") }
+        editAacIconSource.setText(iconSource.name)
+        editAacImagePath.setText(imagePath)
+        editAacCategoryId.setText(item.optString("categoryId"))
+        checkAacAddsToSentence.isChecked = item.optBoolean("addsToSentence", true)
+        checkAacSpeaksImmediately.isChecked = item.optBoolean("speaksImmediately", true)
+        checkAacOpensSubicons.isChecked = item.optBoolean("opensSubicons", false)
+        loadLearningRepresentationChecks(item.optJSONArray("learningRepresentations"))
+        val fixedTopRowPosition = itemFixedTopRowPosition(item)
+        if (fixedTopRowPosition != null) {
+            editFixedTopRowItemId.setText(itemId)
+            editFixedTopRowPosition.setText(fixedTopRowPosition.toString())
+        } else {
+            editFixedTopRowItemId.setText(itemId)
+            editFixedTopRowPosition.setText("")
+        }
+        updateAacImagePreview(imagePath, iconSource)
+        txtStatus.text = "AAC element naložen v urejevalnik.\n$itemId"
+    }
+
+    private fun loadLearningRepresentationChecks(array: org.json.JSONArray?) {
+        val modes = mutableSetOf<String>()
+        if (array != null) {
+            for (index in 0 until array.length()) {
+                val mode = array.optJSONObject(index)?.optString("mode")?.trim().orEmpty()
+                if (mode.isNotBlank()) modes += mode
+            }
+        }
+        checkLearningImageText.isChecked = modes.isEmpty() || "image_text" in modes
+        checkLearningImageOnly.isChecked = "image_only" in modes
+        checkLearningTextOnly.isChecked = "text_only" in modes
+    }
+
+    private fun itemLanguageText(item: org.json.JSONObject, objectKey: String, languageCode: String): String {
+        return item.optJSONObject(objectKey)
+            ?.optString(languageCode.trim().lowercase(Locale.ROOT))
+            ?.trim()
+            .orEmpty()
     }
 
     private fun buildSourceActivationStatus(): String {
@@ -1495,16 +1617,29 @@ class AacPackSettingsActivity : AppCompatActivity() {
     }
 
     private fun saveTherapistAacItem() {
-        val itemId = editAacItemId.text.toString().trim()
-        if (itemId.isBlank()) {
-            txtStatus.text = "Vnesi ID AAC elementa."
-            return
-        }
-
         val labelSl = editAacLabelSl.text.toString().trim()
         if (labelSl.isBlank()) {
             txtStatus.text = "Vnesi slovenski tekst."
             return
+        }
+
+        val existingItemIds = currentAacItemIds()
+        val rawItemId = editAacItemId.text.toString().trim()
+        val itemId = if (rawItemId.isBlank()) {
+            generateUniqueAacItemId(labelSl, existingItemIds)
+        } else {
+            rawItemId
+        }
+        if (itemId.isBlank()) {
+            txtStatus.text = "ID AAC elementa ni varen."
+            return
+        }
+        if (rawItemId.isNotBlank() && !rawItemId.matches(Regex("[A-Za-z0-9_-]+"))) {
+            txtStatus.text = "ID AAC elementa sme vsebovati samo crke, stevilke, _ ali -."
+            return
+        }
+        if (rawItemId.isBlank()) {
+            editAacItemId.setText(itemId)
         }
 
         val iconSource = editAacIconSource.text.toString().trim().uppercase(Locale.ROOT)
@@ -1795,13 +1930,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
             item.put("addsToSentence", checkAacAddsToSentence.isChecked)
             item.put("speaksImmediately", checkAacSpeaksImmediately.isChecked)
             item.put("opensSubicons", checkAacOpensSubicons.isChecked)
-            item.put("labelByLanguage", buildLabelByLanguageJson(labelSl))
-            item.put("speechTextByLanguage", buildSpeechByLanguageJson())
+            item.put("labelByLanguage", buildLabelByLanguageJson(item.optJSONObject("labelByLanguage"), labelSl))
+            item.put("speechTextByLanguage", buildSpeechByLanguageJson(item.optJSONObject("speechTextByLanguage")))
             val learningRepresentations = buildLearningRepresentationsJson()
             if (learningRepresentations.length() > 0) {
                 item.put("learningRepresentations", learningRepresentations)
-            } else {
-                item.remove("learningRepresentations")
             }
 
             val parentDir = itemsFile.parentFile ?: return AacItemEditorWriteResult.WriteFailed
@@ -1819,6 +1952,36 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
     private fun iconSourceForEditor(): String {
         return editAacIconSource.text.toString().trim().uppercase(Locale.ROOT).ifBlank { "SYSTEM" }
+    }
+
+    private fun currentAacItemIds(): Set<String> {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText) ?: return emptySet()
+        return buildSet {
+            for (index in 0 until itemsArray.length()) {
+                val itemId = itemsArray.optJSONObject(index)?.optString("id")?.trim().orEmpty()
+                if (itemId.isNotBlank()) add(itemId)
+            }
+        }
+    }
+
+    private fun generateUniqueAacItemId(label: String, existingIds: Set<String>): String {
+        val baseId = sanitizeAacItemId(label).ifBlank { "aac_item" }
+        if (baseId !in existingIds) return baseId
+        for (suffix in 2..999) {
+            val candidate = "${baseId}_$suffix"
+            if (candidate !in existingIds) return candidate
+        }
+        return ""
+    }
+
+    private fun sanitizeAacItemId(rawValue: String): String {
+        val normalized = Normalizer.normalize(rawValue.trim().lowercase(Locale.ROOT), Normalizer.Form.NFD)
+            .replace(Regex("\\p{Mn}+"), "")
+            .replace(Regex("[^a-z0-9_-]+"), "_")
+            .trim('_', '-')
+        return normalized.take(80)
     }
 
     private fun iconSourceDir(iconSource: IconSource): File? {
@@ -1866,8 +2029,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun buildLabelByLanguageJson(labelSl: String): org.json.JSONObject {
-        return org.json.JSONObject().apply {
+    private fun buildLabelByLanguageJson(existing: org.json.JSONObject?, labelSl: String): org.json.JSONObject {
+        return org.json.JSONObject(existing?.toString() ?: "{}").apply {
             put("sl", labelSl)
             val labelUk = editAacLabelUk.text.toString().trim()
             val labelEn = editAacLabelEn.text.toString().trim()
@@ -1876,8 +2039,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun buildSpeechByLanguageJson(): org.json.JSONObject {
-        return org.json.JSONObject().apply {
+    private fun buildSpeechByLanguageJson(existing: org.json.JSONObject?): org.json.JSONObject {
+        return org.json.JSONObject(existing?.toString() ?: "{}").apply {
             val speechText = editAacSpeechText.text.toString().trim()
             if (speechText.isNotBlank()) {
                 put(editAacBaseLanguage.text.toString().trim().lowercase(Locale.ROOT).ifBlank { "sl" }, speechText)
@@ -2377,6 +2540,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
         return normalizedPath.contains("../") ||
             normalizedPath.startsWith("/") ||
             Regex("^[A-Za-z]:").containsMatchIn(normalizedPath)
+    }
+
+    private fun dp(value: Int): Int {
+        return (value * resources.displayMetrics.density).toInt()
     }
 
     private fun readTextSafely(file: File, maxBytes: Int): String? {

@@ -19,6 +19,16 @@ object AacLocalizedTextResolver {
         return resolveText(localizedTexts, languageCode) { it.question }
     }
 
+    fun hasStoredLabelForLanguage(item: AacItem, languageCode: String): Boolean {
+        val selectedCode = AacLanguageResolver.normalize(languageCode)
+        return item.toLocalizedTexts()[selectedCode]?.label.clean() != null
+    }
+
+    fun hasStoredSpeakTextForLanguage(item: AacItem, languageCode: String): Boolean {
+        val selectedCode = AacLanguageResolver.normalize(languageCode)
+        return item.toLocalizedTexts()[selectedCode]?.speakText.clean() != null
+    }
+
     private fun resolveText(
         localizedTexts: Map<String, AacLocalizedText>,
         languageCode: String,
@@ -60,7 +70,6 @@ object AacLocalizedTextResolver {
                 .map(AacLanguageResolver::normalize)
                 .filter { it.isNotBlank() }
                 .distinct()
-                .take(MAX_ACTIVE_LANGUAGES)
             localLanguageCodes.forEach { languageCode ->
                 val existingText = get(languageCode)
                 val localText = AacLocalizedText(
@@ -84,6 +93,4 @@ object AacLocalizedTextResolver {
     private fun String?.clean(): String? {
         return this?.trim()?.takeIf { it.isNotEmpty() }
     }
-
-    private const val MAX_ACTIVE_LANGUAGES = 3
 }
