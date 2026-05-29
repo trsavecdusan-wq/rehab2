@@ -86,7 +86,8 @@ object AacContentBootstrap {
         } else {
             0
         }
-        if (createdDefaultPage && addedPlacements > 0) {
+        val repairedNoUnderstandLabels = repairNoUnderstandSystemLabels(itemsArray)
+        if ((createdDefaultPage && addedPlacements > 0) || repairedNoUnderstandLabels > 0) {
             saveItemsJson(itemsFile, rawItems, itemsArray)
         } else if (itemsFile?.exists() != true && rawItems.createdFromFallback) {
             saveItemsJson(itemsFile, rawItems, itemsArray)
@@ -116,9 +117,48 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations noUnderstandRepaired=$repairedNoUnderstandLabels reason=${result.reason}"
         )
         return result
+    }
+
+    private fun repairNoUnderstandSystemLabels(itemsArray: JSONArray): Int {
+        var repaired = 0
+        itemObjects(itemsArray).forEach { item ->
+            val id = item.optString("id").trim()
+            if (id != "no_understand" && id != "dont_understand") return@forEach
+
+            val currentLabel = item.optString("labelSl")
+                .replace("\r\n", "\n")
+                .replace('\r', '\n')
+                .trim()
+            val isKnownUnsafeLabel = currentLabel.isBlank() ||
+                currentLabel == "NE" ||
+                currentLabel == "NE\nRAZUMEM"
+            if (!isKnownUnsafeLabel) return@forEach
+
+            item.put("labelSl", "NE RAZUMEM")
+            item.put("text", "NE RAZUMEM")
+            item.put("baseText", "NE RAZUMEM")
+            item.put("labelUk", "Я НЕ РОЗУМІЮ")
+            item.put("labelEn", "I DON'T UNDERSTAND")
+            item.put("speechText", "ne razumem")
+            item.put("speakTextSl", "ne razumem")
+            item.put("speakTextUk", "Я не розумію")
+            item.put("speechTextEn", "I don't understand")
+            item.put("labelByLanguage", JSONObject(item.optJSONObject("labelByLanguage")?.toString() ?: "{}").apply {
+                put("sl", "NE RAZUMEM")
+                put("uk", "Я НЕ РОЗУМІЮ")
+                put("en", "I DON'T UNDERSTAND")
+            })
+            item.put("speechTextByLanguage", JSONObject(item.optJSONObject("speechTextByLanguage")?.toString() ?: "{}").apply {
+                put("sl", "ne razumem")
+                put("uk", "Я не розумію")
+                put("en", "I don't understand")
+            })
+            repaired++
+        }
+        return repaired
     }
 
     private fun addDefaultPagePlacements(itemsArray: JSONArray, pageId: String): Int {
