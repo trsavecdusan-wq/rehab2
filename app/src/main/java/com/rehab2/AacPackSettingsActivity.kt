@@ -432,7 +432,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 scrollToSettingsSection(targetId)
             }
         }
-        bind(R.id.btnModuleCommunicator, R.id.sectionAacLibrary)
+        bind(R.id.btnModuleCommunicator, R.id.communicatorDashboardActions)
         bind(R.id.btnModuleVideoCalls, R.id.sectionFutureModules)
         bind(R.id.btnModuleMessages, R.id.sectionFutureModules)
         bind(R.id.btnModuleGallery, R.id.sectionFutureModules)
