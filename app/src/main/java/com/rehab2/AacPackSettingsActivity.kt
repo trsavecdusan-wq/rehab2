@@ -28,6 +28,7 @@ import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacPackExporter
 import com.rehab2.aac.AacPackImporter
 import com.rehab2.aac.AacPackImportPreflight
+import com.rehab2.aac.AacStarterContentV1
 import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.AacStoredTranslationCache
 import com.rehab2.aac.IconSource
@@ -88,6 +89,26 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val MAX_PROFILE_PREVIEW_BYTES = 64 * 1024
         private const val MAX_ITEMS_PREVIEW_BYTES = 512 * 1024
         private const val SUSPICIOUS_ITEMS_PER_PROFILE = 250
+        private val STARTER_DIAGNOSTIC_PRIORITY = listOf(
+            "yes",
+            "no",
+            "help",
+            "no_understand",
+            "dont_understand",
+            "wait",
+            "water",
+            "coffee",
+            "diaper",
+            "body_position",
+            "uncomfortable",
+            "pain",
+            "bad",
+            "tired",
+            "afraid",
+            "not_safe",
+            "stop_movement",
+            "fear_falling"
+        )
     }
 
     private lateinit var btnExport: Button
@@ -1262,7 +1283,127 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("Profile id: ${domCountDebug.profileId.ifBlank { "ni zaznan" }}\n")
             append("Loaded itemIds:\n${domCountDebug.loadedItemIds.ifEmpty { "ni povezav" }}\n")
             append("Loaded itemIds count: ${domCountDebug.loadedItemIdsCount}\n")
-            append("Displayed count: ${domCountDebug.displayedCount}")
+            append("Displayed count: ${domCountDebug.displayedCount}\n\n")
+            append(buildStarterPackDebug(defaultPageId, pages.size))
+        }
+    }
+
+    private fun buildStarterPackDebug(defaultPageId: String, patientPageCount: Int): String {
+        val itemsFile = AacStoragePaths.getAacItemsFile(this)
+        val itemsText = itemsFile?.let { readTextSafely(it, MAX_ITEMS_PREVIEW_BYTES) }
+        val itemsArray = currentItemsArray(itemsText)
+        val localItemIds = itemIdsInArray(itemsArray)
+        val starterIds = AacStarterContentV1.items()
+            .map { item -> item.id.trim() }
+            .filter { itemId -> itemId.isNotBlank() }
+            .distinct()
+        val starterIdSet = starterIds.toSet()
+        val localStarterIds = starterIds.filter { itemId -> itemId in localItemIds }
+        val missingStarterIds = starterIds.filterNot { itemId -> itemId in localItemIds }
+        val starterIdsOnAnyPage = starterIds.filter { itemId -> itemId in itemIdsPlacedOnAnyPage(itemsArray) }
+        val starterIdsOnDefaultPage = if (defaultPageId.isNotBlank()) {
+            starterIds.filter { itemId -> itemId in itemIdsPlacedOnPage(itemsArray, defaultPageId) }
+        } else {
+            emptyList()
+        }
+        val occupiedDefaultSlots = if (defaultPageId.isNotBlank()) {
+            occupiedPagePositions(itemsArray, defaultPageId)
+        } else {
+            emptySet()
+        }
+        val freeDefaultSlots = (6..25).count { position -> position !in occupiedDefaultSlots }
+        val patientPagesPrefsPresent = getSharedPreferences(PATIENT_PAGE_PREFS_NAME, Context.MODE_PRIVATE)
+            .contains(KEY_PATIENT_PAGES)
+        val selectedProfileId = loadSelectedProfile()?.profileId.orEmpty()
+        val priorityNotVisible = STARTER_DIAGNOSTIC_PRIORITY
+            .filter { itemId -> itemId in starterIdSet }
+            .filter { itemId -> itemId in localItemIds }
+            .filterNot { itemId -> itemId in starterIdsOnDefaultPage }
+
+        return buildString {
+            append("STARTER PACK DEBUG\n")
+            append("aac_items.json path:\n${itemsFile?.absolutePath.orEmpty().ifBlank { "ni poti" }}\n")
+            append("aac_items.json exists: ${if (itemsFile?.isFile == true) "YES" else "NO"}\n")
+            append("Total AAC items: ${itemsArray?.length() ?: 0}\n")
+            append("Starter definition count: ${starterIds.size}\n")
+            append("Starter items merged locally: ${localStarterIds.size}\n")
+            append("Starter items missing locally: ${missingStarterIds.size}\n")
+            append("Starter items placed on any page: ${starterIdsOnAnyPage.size}\n")
+            append("Starter items placed on default page: ${starterIdsOnDefaultPage.size}\n")
+            append("Current/default page id: ${defaultPageId.ifBlank { "ni nastavljena" }}\n")
+            append("Patient page count: $patientPageCount\n")
+            append("Patient page storage:\nSharedPreferences $PATIENT_PAGE_PREFS_NAME / $KEY_PATIENT_PAGES\n")
+            append("Patient pages prefs present: ${if (patientPagesPrefsPresent) "YES" else "NO"}\n")
+            append("Selected profile id: ${selectedProfileId.ifBlank { "ni izbran" }}\n")
+            append("Free default page slots 6..25: $freeDefaultSlots\n")
+            append("High-priority starter ids not yet visible:\n${priorityNotVisible.joinToString(", ").ifBlank { "vsi vidni ali niso lokalno prisotni" }}")
+        }
+    }
+
+    private fun itemIdsInArray(itemsArray: org.json.JSONArray?): Set<String> {
+        if (itemsArray == null) return emptySet()
+        return buildSet {
+            for (index in 0 until itemsArray.length()) {
+                val itemId = itemsArray.optJSONObject(index)?.optString("id")?.trim().orEmpty()
+                if (itemId.isNotBlank()) add(itemId)
+            }
+        }
+    }
+
+    private fun itemIdsPlacedOnAnyPage(itemsArray: org.json.JSONArray?): Set<String> {
+        if (itemsArray == null) return emptySet()
+        return buildSet {
+            for (index in 0 until itemsArray.length()) {
+                val item = itemsArray.optJSONObject(index) ?: continue
+                val itemId = item.optString("id").trim()
+                if (itemId.isBlank()) continue
+                val placements = item.optJSONArray("placements") ?: continue
+                for (placementIndex in 0 until placements.length()) {
+                    val placement = placements.optJSONObject(placementIndex) ?: continue
+                    val pageId = placement.optString("pageId").trim()
+                    val position = placement.optInt("position5x5", 0)
+                    if (isSafePatientPageId(pageId) && position in 1..25) {
+                        add(itemId)
+                        break
+                    }
+                }
+            }
+        }
+    }
+
+    private fun itemIdsPlacedOnPage(itemsArray: org.json.JSONArray?, pageId: String): Set<String> {
+        if (itemsArray == null || pageId.isBlank()) return emptySet()
+        return buildSet {
+            for (index in 0 until itemsArray.length()) {
+                val item = itemsArray.optJSONObject(index) ?: continue
+                val itemId = item.optString("id").trim()
+                if (itemId.isBlank()) continue
+                val placements = item.optJSONArray("placements") ?: continue
+                for (placementIndex in 0 until placements.length()) {
+                    val placement = placements.optJSONObject(placementIndex) ?: continue
+                    val position = placement.optInt("position5x5", 0)
+                    if (placement.optString("pageId").trim() == pageId && position in 1..25) {
+                        add(itemId)
+                        break
+                    }
+                }
+            }
+        }
+    }
+
+    private fun occupiedPagePositions(itemsArray: org.json.JSONArray?, pageId: String): Set<Int> {
+        if (itemsArray == null || pageId.isBlank()) return emptySet()
+        return buildSet {
+            for (index in 0 until itemsArray.length()) {
+                val placements = itemsArray.optJSONObject(index)?.optJSONArray("placements") ?: continue
+                for (placementIndex in 0 until placements.length()) {
+                    val placement = placements.optJSONObject(placementIndex) ?: continue
+                    val position = placement.optInt("position5x5", 0)
+                    if (placement.optString("pageId").trim() == pageId && position in 1..25) {
+                        add(position)
+                    }
+                }
+            }
         }
     }
 
