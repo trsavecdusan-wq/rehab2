@@ -152,6 +152,7 @@ object AacLocalJsonLoader {
             learningRepresentations = parseLearningRepresentations(json.optJSONArray("learningRepresentations")),
             categoryId = json.optNullableString("categoryId")
                 ?: json.optNullableString("category"),
+            meaning = json.optNullableString("meaning"),
             scenarioIds = parseStringList(json.optJSONArray("scenarioIds")),
             conceptId = json.optNullableString("conceptId"),
             children = children,
@@ -178,7 +179,9 @@ object AacLocalJsonLoader {
             vendingNumber = json.optNullableString("vendingNumber"),
             vendingInstructionImagePath = json.optNullableString("vendingInstructionImagePath"),
             largeCupImagePath = json.optNullableString("largeCupImagePath"),
-            hasLargeCupOption = json.optBoolean("hasLargeCupOption", false)
+            hasLargeCupOption = json.optBoolean("hasLargeCupOption", false),
+            locked = json.optBoolean("locked", false),
+            userEdited = json.optBoolean("userEdited", false)
         )
     }
 

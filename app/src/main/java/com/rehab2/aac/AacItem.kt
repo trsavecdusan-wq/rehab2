@@ -56,6 +56,8 @@ data class AacItem(
     val learningRepresentations: List<AacLearningRepresentation> = emptyList(),
     // Therapist organization only. Patient placement is controlled by placements/visibility metadata.
     val categoryId: String? = null,
+    // Stable meaning/category semantics for future large content sets. This is not patient placement.
+    val meaning: String? = null,
     // Scenario metadata is for future guided helper flows (for example vending or restaurant use).
     // It must not replace profiles, categories, or patient page placement.
     val scenarioIds: List<String> = emptyList(),
@@ -86,7 +88,10 @@ data class AacItem(
     val vendingNumber: String? = null,
     val vendingInstructionImagePath: String? = null,
     val largeCupImagePath: String? = null,
-    val hasLargeCupOption: Boolean = false
+    val hasLargeCupOption: Boolean = false,
+    // Upgrade safety: protected local items must win over bundled starter repairs.
+    val locked: Boolean = false,
+    val userEdited: Boolean = false
 ) {
     val text: String
         get() = labelSl

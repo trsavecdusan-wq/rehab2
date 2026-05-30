@@ -154,6 +154,7 @@ object AacContentBootstrap {
         itemObjects(itemsArray).forEach { item ->
             val id = item.optString("id").trim()
             if (id != "no_understand" && id != "dont_understand") return@forEach
+            if (isUserProtected(item)) return@forEach
 
             val currentLabel = item.optString("labelSl")
                 .replace("\r\n", "\n")
@@ -196,6 +197,7 @@ object AacContentBootstrap {
 
         listOf("drink", "thirsty").forEach { parentId ->
             itemsById[parentId]?.let { parent ->
+                if (isUserProtected(parent)) return@let
                 repaired += ensureParentQuestionMetadata(
                     item = parent,
                     childRepairs = DRINK_CHILD_REPAIRS,
@@ -212,6 +214,7 @@ object AacContentBootstrap {
                 itemsArray.put(repair.toJson())
                 repaired++
             } else {
+                if (isUserProtected(item)) return@forEach
                 repaired += repair.applyTo(item)
             }
         }
@@ -226,13 +229,15 @@ object AacContentBootstrap {
 
         val food = itemsById["food"]
         if (food != null) {
-            repaired += ensureParentQuestionMetadata(
-                item = food,
-                childRepairs = FOOD_CHILD_REPAIRS,
-                questionSl = "Kaj želiš jesti?",
-                questionUk = "Що ти хочеш їсти?",
-                questionEn = "What do you want to eat?"
-            )
+            if (!isUserProtected(food)) {
+                repaired += ensureParentQuestionMetadata(
+                    item = food,
+                    childRepairs = FOOD_CHILD_REPAIRS,
+                    questionSl = "Kaj želiš jesti?",
+                    questionUk = "Що ти хочеш їсти?",
+                    questionEn = "What do you want to eat?"
+                )
+            }
         }
 
         FOOD_CHILD_REPAIRS.forEach { repair ->
@@ -241,6 +246,7 @@ object AacContentBootstrap {
                 itemsArray.put(repair.toJson())
                 repaired++
             } else {
+                if (isUserProtected(item)) return@forEach
                 repaired += repair.applyTo(item)
             }
         }
@@ -255,13 +261,15 @@ object AacContentBootstrap {
 
         val pain = itemsById["pain"]
         if (pain != null) {
-            repaired += ensureParentQuestionMetadata(
-                item = pain,
-                childRepairs = PAIN_CHILD_REPAIRS,
-                questionSl = "Kje te boli?",
-                questionUk = "Де тебе болить?",
-                questionEn = "Where does it hurt?"
-            )
+            if (!isUserProtected(pain)) {
+                repaired += ensureParentQuestionMetadata(
+                    item = pain,
+                    childRepairs = PAIN_CHILD_REPAIRS,
+                    questionSl = "Kje te boli?",
+                    questionUk = "Де тебе болить?",
+                    questionEn = "Where does it hurt?"
+                )
+            }
         }
 
         PAIN_CHILD_REPAIRS.forEach { repair ->
@@ -270,6 +278,7 @@ object AacContentBootstrap {
                 itemsArray.put(repair.toJson())
                 repaired++
             } else {
+                if (isUserProtected(item)) return@forEach
                 repaired += repair.applyTo(item)
             }
         }
@@ -283,6 +292,7 @@ object AacContentBootstrap {
         questionUk: String,
         questionEn: String
     ): Int {
+        if (isUserProtected(item)) return 0
         var repaired = 0
         val children = item.optJSONArray("children") ?: JSONArray()
         val childIds = stringList(children).toMutableSet()
@@ -674,6 +684,10 @@ object AacContentBootstrap {
         }
     }
 
+    private fun isUserProtected(item: JSONObject): Boolean {
+        return item.optBoolean("userEdited", false) || item.optBoolean("locked", false)
+    }
+
     private fun rootItemIds(itemsArray: JSONArray): List<String> {
         return rootItemObjects(itemsArray).map { it.optString("id").trim() }.filter { it.isNotBlank() }
     }
@@ -792,6 +806,7 @@ object AacContentBootstrap {
                 speakTextUk?.let { json.put("speakTextUk", it) }
                 speechTextEn?.let { json.put("speechTextEn", it) }
                 categoryId?.let { json.put("categoryId", it) }
+                meaning?.let { json.put("meaning", it) }
                 if (scenarioIds.isNotEmpty()) json.put("scenarioIds", jsonArrayOf(scenarioIds))
                 conceptId?.let { json.put("conceptId", it) }
                 parentId?.let { json.put("parentId", it) }
@@ -801,6 +816,8 @@ object AacContentBootstrap {
                 if (questionByLanguage.isNotEmpty()) json.put("questionByLanguage", JSONObject(questionByLanguage))
                 if (labelByLanguage.isNotEmpty()) json.put("labelByLanguage", JSONObject(labelByLanguage))
                 if (speechTextByLanguage.isNotEmpty()) json.put("speechTextByLanguage", JSONObject(speechTextByLanguage))
+                if (locked) json.put("locked", true)
+                if (userEdited) json.put("userEdited", true)
                 if (placements.isNotEmpty()) {
                     json.put("placements", JSONArray().apply {
                         placements.forEach { placement ->

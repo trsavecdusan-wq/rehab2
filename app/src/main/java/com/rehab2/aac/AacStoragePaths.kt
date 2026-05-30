@@ -10,8 +10,10 @@ object AacStoragePaths {
     const val SYSTEM_ICONS_DIR = "NovaRehab/icons/system/"
     const val ARASAAC_ICONS_DIR = "NovaRehab/icons/arasaac/"
     const val CUSTOM_ICONS_DIR = "NovaRehab/icons/custom/"
+    const val PATIENT_ICONS_DIR = "NovaRehab/icons/patient/"
     const val TRANSLATIONS_DATA_DIR = "NovaRehab/data/translations/"
     const val AUDIO_DATA_DIR = "NovaRehab/data/audio/"
+    const val TTS_CACHE_DIR = "NovaRehab/audio/tts_cache/"
     const val IMPORT_DIR = "NovaRehab/import/"
     const val AAC_ITEMS_FILE = "NovaRehab/data/aac_items.json"
     const val PROFILES_DIR = "NovaRehab/profiles/"
@@ -50,6 +52,11 @@ object AacStoragePaths {
         return File(externalFilesDir, CUSTOM_ICONS_DIR)
     }
 
+    fun getIconsPatientDir(context: Context): File? {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        return File(externalFilesDir, PATIENT_ICONS_DIR)
+    }
+
     fun getImportDir(context: Context): File? {
         val externalFilesDir = context.getExternalFilesDir(null) ?: return null
         return File(externalFilesDir, IMPORT_DIR)
@@ -65,6 +72,11 @@ object AacStoragePaths {
         return File(externalFilesDir, AUDIO_DATA_DIR)
     }
 
+    fun getTtsCacheDir(context: Context): File? {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        return File(externalFilesDir, TTS_CACHE_DIR)
+    }
+
     fun ensureAacContentDirs(context: Context): Boolean {
         val dirs = listOfNotNull(
             getAacItemsFile(context)?.parentFile,
@@ -72,12 +84,14 @@ object AacStoragePaths {
             getIconsSocaDir(context),
             getIconsSystemDir(context),
             getIconsCustomDir(context),
+            getIconsPatientDir(context),
             getIconsArasaacDir(context),
             getTranslationsDataDir(context),
             getAudioDataDir(context),
+            getTtsCacheDir(context),
             getImportDir(context)
         )
-        return dirs.size == 9 && dirs.all { dir -> dir.exists() || dir.mkdirs() }
+        return dirs.size == 11 && dirs.all { dir -> dir.exists() || dir.mkdirs() }
     }
 
     fun resolveIconFile(context: Context, imagePath: String, iconSource: IconSource): File? {
@@ -105,13 +119,14 @@ object AacStoragePaths {
         val baseRelativeDir = when (iconSource) {
             IconSource.SOCA -> SOCA_ICONS_DIR
             IconSource.ARASAAC -> ARASAAC_ICONS_DIR
-            IconSource.CUSTOM,
-            IconSource.PATIENT -> CUSTOM_ICONS_DIR
+            IconSource.CUSTOM -> CUSTOM_ICONS_DIR
+            IconSource.PATIENT -> PATIENT_ICONS_DIR
             IconSource.SYSTEM -> SYSTEM_ICONS_DIR
         }
 
         val fullRelativePath = if (
             normalizedPath.startsWith("custom/", ignoreCase = true) ||
+            normalizedPath.startsWith("patient/", ignoreCase = true) ||
             normalizedPath.startsWith("soca/", ignoreCase = true) ||
             normalizedPath.startsWith("system/", ignoreCase = true) ||
             normalizedPath.startsWith("arasaac/", ignoreCase = true)
