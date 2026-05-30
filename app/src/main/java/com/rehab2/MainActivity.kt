@@ -773,8 +773,7 @@ class MainActivity : AppCompatActivity() {
         if (normalizedLanguage.isBlank() || normalizedLanguage == "sl") {
             return false
         }
-        return !AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage) ||
-            !AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
+        return AacStoredTranslationCache.needsTranslationRefresh(item, normalizedLanguage)
     }
 
     private fun translateMainAacItemForAction(item: AacItem, languageCode: String) {
@@ -808,6 +807,9 @@ class MainActivity : AppCompatActivity() {
                 val updatedItem = item.copy(
                     labelByLanguage = item.labelByLanguage + (normalizedLanguage to translation.label),
                     speechTextByLanguage = item.speechTextByLanguage + (normalizedLanguage to translation.speechText),
+                    translationCacheMeta = translation.cacheEntry?.let { cacheEntry ->
+                        item.translationCacheMeta + (normalizedLanguage to cacheEntry)
+                    } ?: item.translationCacheMeta,
                     translationGenerated = true,
                     translationSource = "ai"
                 )

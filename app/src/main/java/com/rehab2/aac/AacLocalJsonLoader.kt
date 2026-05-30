@@ -145,6 +145,7 @@ object AacLocalJsonLoader {
             activeLanguages = parseActiveLanguages(json),
             labelByLanguage = parseLanguageTextMap(json.optJSONObject("labelByLanguage")),
             speechTextByLanguage = parseLanguageTextMap(json.optJSONObject("speechTextByLanguage")),
+            translationCacheMeta = parseTranslationCacheMeta(json.optJSONObject("translationCacheMeta")),
             translationGenerated = json.optBoolean("translationGenerated", false),
             translationSource = json.optNullableString("translationSource"),
             translationManualOverride = json.optBoolean("translationManualOverride", false),
@@ -207,6 +208,31 @@ object AacLocalJsonLoader {
             for (index in 0 until array.length()) {
                 val value = array.optString(index).trim()
                 if (value.isNotEmpty()) add(value)
+            }
+        }
+    }
+
+    private fun parseTranslationCacheMeta(json: JSONObject?): Map<String, AacTranslationCacheEntry> {
+        if (json == null) return emptyMap()
+        return buildMap {
+            val keys = json.keys()
+            while (keys.hasNext()) {
+                val languageCode = AacLanguageResolver.normalize(keys.next())
+                val entry = json.optJSONObject(languageCode) ?: continue
+                val sourceTextHash = entry.optString("sourceTextHash").trim()
+                if (languageCode.isBlank() || sourceTextHash.isBlank()) continue
+                put(
+                    languageCode,
+                    AacTranslationCacheEntry(
+                        sourceLanguage = AacLanguageResolver.normalize(entry.optString("sourceLanguage")),
+                        sourceText = entry.optString("sourceText"),
+                        sourceTextHash = sourceTextHash,
+                        targetLanguage = AacLanguageResolver.normalize(entry.optString("targetLanguage").ifBlank { languageCode }),
+                        translatedAt = entry.optString("translatedAt"),
+                        provider = entry.optNullableString("provider"),
+                        model = entry.optNullableString("model")
+                    )
+                )
             }
         }
     }

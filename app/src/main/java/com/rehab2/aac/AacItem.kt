@@ -18,6 +18,16 @@ data class AacLearningRepresentation(
     val answerVariants: List<AacLearningAnswerVariant> = emptyList()
 )
 
+data class AacTranslationCacheEntry(
+    val sourceLanguage: String,
+    val sourceText: String,
+    val sourceTextHash: String,
+    val targetLanguage: String,
+    val translatedAt: String,
+    val provider: String? = null,
+    val model: String? = null
+)
+
 data class AacItem(
     val id: String,
     // Keep current JSON fields compatible while future content can add base_text,
@@ -37,6 +47,7 @@ data class AacItem(
     val activeLanguages: List<String> = listOf(AacLanguageResolver.DEFAULT_LANGUAGE_CODE),
     val labelByLanguage: Map<String, String> = emptyMap(),
     val speechTextByLanguage: Map<String, String> = emptyMap(),
+    val translationCacheMeta: Map<String, AacTranslationCacheEntry> = emptyMap(),
     // Translations are saved metadata. Patient runtime must resolve local text only, never live-translate.
     val translationGenerated: Boolean = false,
     val translationSource: String? = null,

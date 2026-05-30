@@ -8,13 +8,15 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
+import java.security.MessageDigest
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 object AacStoredTranslationCache {
     data class Translation(
         val label: String,
-        val speechText: String
+        val speechText: String,
+        val cacheEntry: AacTranslationCacheEntry? = null
     )
 
     data class PretranslationResult(
@@ -38,19 +40,43 @@ object AacStoredTranslationCache {
         val hasStoredSpeechText = AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
         val storedLabel = AacLocalizedTextResolver.resolveLabel(item, normalizedLanguage)
         val storedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, normalizedLanguage)
-        if (hasStoredLabel && hasStoredSpeechText) {
-            return Translation(storedLabel, storedSpeechText)
+        val refreshNeeded = needsTranslationRefresh(item, normalizedLanguage)
+        if (hasStoredLabel && hasStoredSpeechText && !refreshNeeded) {
+            return Translation(storedLabel, storedSpeechText, item.translationCacheMeta[normalizedLanguage])
         }
 
         val generated = generateTranslation(context, item, normalizedLanguage) ?: return null
         return if (saveTranslation(context, item, normalizedLanguage, generated)) {
             Translation(
-                label = if (hasStoredLabel) storedLabel else generated.label,
-                speechText = if (hasStoredSpeechText) storedSpeechText else generated.speechText
+                label = if (hasStoredLabel && !refreshNeeded) storedLabel else generated.label,
+                speechText = if (hasStoredSpeechText && !refreshNeeded) storedSpeechText else generated.speechText,
+                cacheEntry = generated.cacheEntry
             )
         } else {
             null
         }
+    }
+
+    fun needsTranslationRefresh(item: AacItem, languageCode: String): Boolean {
+        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
+        if (normalizedLanguage == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            return false
+        }
+
+        val hasStoredLabel = AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage)
+        val hasStoredSpeechText = AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
+        if (!hasStoredLabel || !hasStoredSpeechText) {
+            return true
+        }
+        if (item.translationManualOverride) {
+            return false
+        }
+
+        val meta = item.translationCacheMeta[normalizedLanguage]
+        if (meta == null) {
+            return item.translationGenerated || item.translationSource == "ai"
+        }
+        return meta.sourceTextHash != sourceTextHash(item)
     }
 
     fun ensureTranslationsForLanguage(
@@ -72,9 +98,7 @@ object AacStoredTranslationCache {
             .filter { item -> item.id.isNotBlank() && item.labelSl.isNotBlank() }
             .distinctBy { item -> item.id }
             .forEach { item ->
-                val hasLabel = AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage)
-                val hasSpeech = AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
-                if (hasLabel && hasSpeech) {
+                if (!needsTranslationRefresh(item, normalizedLanguage)) {
                     return@forEach
                 }
                 missingCount += 1
@@ -118,10 +142,16 @@ object AacStoredTranslationCache {
             ?.takeIf { it.isNotBlank() }
             ?: item.speechText?.trim()?.takeIf { it.isNotBlank() }
             ?: sourceLabel
+        val sourceText = sourceTextFor(item)
+        val sourceLanguage = AacLanguageResolver.normalize(item.baseLanguage).ifBlank {
+            AacLanguageResolver.DEFAULT_LANGUAGE_CODE
+        }
+        val sourceTextHash = sourceTextHash(item)
+        val model = translationModel(config.normalizedModel())
 
         return try {
             val requestJson = JSONObject().apply {
-                put("model", translationModel(config.normalizedModel()))
+                put("model", model)
                 put("messages", JSONArray().apply {
                     put(JSONObject().apply {
                         put("role", "system")
@@ -158,7 +188,19 @@ object AacStoredTranslationCache {
                     ?.optJSONObject("message")
                     ?.optString("content")
                     .orEmpty()
-                parseTranslation(content)
+                parseTranslation(content)?.let { translation ->
+                    translation.copy(
+                        cacheEntry = AacTranslationCacheEntry(
+                            sourceLanguage = sourceLanguage,
+                            sourceText = sourceText,
+                            sourceTextHash = sourceTextHash,
+                            targetLanguage = languageCode,
+                            translatedAt = System.currentTimeMillis().toString(),
+                            provider = "openai",
+                            model = model
+                        )
+                    )
+                }
             }
         } catch (error: Exception) {
             Log.w(TAG, "AAC translation failed: ${error.javaClass.simpleName}")
@@ -188,14 +230,24 @@ object AacStoredTranslationCache {
             val item = findItemById(itemsArray, sourceItem.id) ?: sourceItem.toJson().also { itemsArray.put(it) }
             val labelByLanguage = item.optJSONObject("labelByLanguage") ?: JSONObject()
             val speechTextByLanguage = item.optJSONObject("speechTextByLanguage") ?: JSONObject()
-            if (labelByLanguage.optString(languageCode).trim().isBlank()) {
+            val existingMeta = parseCacheEntry(item.optJSONObject("translationCacheMeta")?.optJSONObject(languageCode))
+            val stale = existingMeta?.sourceTextHash != sourceTextHash(sourceItem)
+            val generatedLegacyTranslation = sourceItem.translationGenerated || sourceItem.translationSource == "ai"
+            val mayOverwrite = !sourceItem.translationManualOverride &&
+                ((existingMeta != null && stale) || (existingMeta == null && generatedLegacyTranslation))
+            if (labelByLanguage.optString(languageCode).trim().isBlank() || mayOverwrite) {
                 labelByLanguage.put(languageCode, translation.label)
             }
-            if (speechTextByLanguage.optString(languageCode).trim().isBlank()) {
+            if (speechTextByLanguage.optString(languageCode).trim().isBlank() || mayOverwrite) {
                 speechTextByLanguage.put(languageCode, translation.speechText)
             }
             item.put("labelByLanguage", labelByLanguage)
             item.put("speechTextByLanguage", speechTextByLanguage)
+            val translationCacheMeta = item.optJSONObject("translationCacheMeta") ?: JSONObject()
+            translation.cacheEntry?.let { cacheEntry ->
+                translationCacheMeta.put(languageCode, cacheEntry.toJson(sourceItem.id))
+                item.put("translationCacheMeta", translationCacheMeta)
+            }
             item.put("translationGenerated", true)
             item.put("translationSource", "ai")
             val output = rootObject?.toString(2) ?: itemsArray.toString(2)
@@ -235,6 +287,13 @@ object AacStoredTranslationCache {
             put("activeLanguages", JSONArray(activeLanguages))
             if (labelByLanguage.isNotEmpty()) put("labelByLanguage", JSONObject(labelByLanguage))
             if (speechTextByLanguage.isNotEmpty()) put("speechTextByLanguage", JSONObject(speechTextByLanguage))
+            if (translationCacheMeta.isNotEmpty()) {
+                put("translationCacheMeta", JSONObject().apply {
+                    translationCacheMeta.forEach { (languageCode, entry) ->
+                        put(languageCode, entry.toJson(id))
+                    }
+                })
+            }
             put("translationGenerated", translationGenerated)
             translationSource?.let { put("translationSource", it) }
             put("translationManualOverride", translationManualOverride)
@@ -301,6 +360,49 @@ object AacStoredTranslationCache {
             val clean = jsonText.lineSequence().firstOrNull()?.trim().orEmpty()
             if (clean.isBlank()) null else Translation(label = clean, speechText = clean)
         }
+    }
+
+    private fun AacTranslationCacheEntry.toJson(itemId: String): JSONObject {
+        return JSONObject().apply {
+            put("itemId", itemId)
+            put("sourceLanguage", sourceLanguage)
+            put("sourceText", sourceText)
+            put("sourceTextHash", sourceTextHash)
+            put("targetLanguage", targetLanguage)
+            put("translatedAt", translatedAt)
+            provider?.let { put("provider", it) }
+            model?.let { put("model", it) }
+        }
+    }
+
+    private fun parseCacheEntry(json: JSONObject?): AacTranslationCacheEntry? {
+        if (json == null) return null
+        val sourceTextHash = json.optString("sourceTextHash").trim()
+        if (sourceTextHash.isBlank()) return null
+        return AacTranslationCacheEntry(
+            sourceLanguage = AacLanguageResolver.normalize(json.optString("sourceLanguage")),
+            sourceText = json.optString("sourceText"),
+            sourceTextHash = sourceTextHash,
+            targetLanguage = AacLanguageResolver.normalize(json.optString("targetLanguage")),
+            translatedAt = json.optString("translatedAt"),
+            provider = json.optString("provider").trim().takeIf { it.isNotBlank() },
+            model = json.optString("model").trim().takeIf { it.isNotBlank() }
+        )
+    }
+
+    private fun sourceTextFor(item: AacItem): String {
+        val label = item.labelSl.trim().ifBlank { item.id.trim() }
+        val speech = item.speakTextSl?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?: item.speechText?.trim()?.takeIf { it.isNotBlank() }
+            ?: label
+        return "label=$label\nspeech=$speech"
+    }
+
+    private fun sourceTextHash(item: AacItem): String {
+        val normalized = sourceTextFor(item).trim().replace(Regex("\\s+"), " ")
+        val digest = MessageDigest.getInstance("SHA-256").digest(normalized.toByteArray(Charsets.UTF_8))
+        return digest.joinToString("") { byte -> "%02x".format(byte) }
     }
 
     private fun translationModel(configuredModel: String): String {
