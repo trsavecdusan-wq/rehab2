@@ -88,12 +88,14 @@ object AacContentBootstrap {
             0
         }
         val repairedNoUnderstandLabels = repairNoUnderstandSystemLabels(itemsArray)
+        val repairedDrinkSpeechItems = repairDrinkChildSpeechItems(itemsArray)
         val repairedFoodSpeechItems = repairFoodChildSpeechItems(itemsArray)
         val repairedPainSpeechItems = repairPainSpeechItems(itemsArray)
         if (
             (createdDefaultPage && addedPlacements > 0) ||
             mergedMissingSystemItems > 0 ||
             repairedNoUnderstandLabels > 0 ||
+            repairedDrinkSpeechItems > 0 ||
             repairedFoodSpeechItems > 0 ||
             repairedPainSpeechItems > 0
         ) {
@@ -126,7 +128,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems noUnderstandRepaired=$repairedNoUnderstandLabels foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -186,6 +188,36 @@ object AacContentBootstrap {
         return repaired
     }
 
+    private fun repairDrinkChildSpeechItems(itemsArray: JSONArray): Int {
+        var repaired = 0
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item -> item.optString("id").trim().takeIf { it.isNotBlank() }?.let { it to item } }
+            .toMap()
+
+        listOf("drink", "thirsty").forEach { parentId ->
+            itemsById[parentId]?.let { parent ->
+                repaired += ensureParentQuestionMetadata(
+                    item = parent,
+                    childRepairs = DRINK_CHILD_REPAIRS,
+                    questionSl = "Kaj želiš piti?",
+                    questionUk = "Що ти хочеш пити?",
+                    questionEn = "What do you want to drink?"
+                )
+            }
+        }
+
+        DRINK_CHILD_REPAIRS.forEach { repair ->
+            val item = itemsById[repair.id]
+            if (item == null) {
+                itemsArray.put(repair.toJson())
+                repaired++
+            } else {
+                repaired += repair.applyTo(item)
+            }
+        }
+        return repaired
+    }
+
     private fun repairFoodChildSpeechItems(itemsArray: JSONArray): Int {
         var repaired = 0
         val itemsById = itemObjects(itemsArray)
@@ -194,7 +226,13 @@ object AacContentBootstrap {
 
         val food = itemsById["food"]
         if (food != null) {
-            repaired += ensureFoodParentMetadata(food)
+            repaired += ensureParentQuestionMetadata(
+                item = food,
+                childRepairs = FOOD_CHILD_REPAIRS,
+                questionSl = "Kaj želiš jesti?",
+                questionUk = "Що ти хочеш їсти?",
+                questionEn = "What do you want to eat?"
+            )
         }
 
         FOOD_CHILD_REPAIRS.forEach { repair ->
@@ -217,7 +255,13 @@ object AacContentBootstrap {
 
         val pain = itemsById["pain"]
         if (pain != null) {
-            repaired += ensurePainParentMetadata(pain)
+            repaired += ensureParentQuestionMetadata(
+                item = pain,
+                childRepairs = PAIN_CHILD_REPAIRS,
+                questionSl = "Kje te boli?",
+                questionUk = "Де тебе болить?",
+                questionEn = "Where does it hurt?"
+            )
         }
 
         PAIN_CHILD_REPAIRS.forEach { repair ->
@@ -232,11 +276,17 @@ object AacContentBootstrap {
         return repaired
     }
 
-    private fun ensurePainParentMetadata(item: JSONObject): Int {
+    private fun ensureParentQuestionMetadata(
+        item: JSONObject,
+        childRepairs: List<FoodChildRepair>,
+        questionSl: String,
+        questionUk: String,
+        questionEn: String
+    ): Int {
         var repaired = 0
         val children = item.optJSONArray("children") ?: JSONArray()
         val childIds = stringList(children).toMutableSet()
-        PAIN_CHILD_REPAIRS.forEach { repair ->
+        childRepairs.forEach { repair ->
             if (childIds.add(repair.id)) {
                 children.put(repair.id)
                 repaired++
@@ -246,11 +296,26 @@ object AacContentBootstrap {
             item.put("children", children)
         }
         val questionByLanguage = item.optJSONObject("questionByLanguage") ?: JSONObject()
-        if (questionByLanguage.optString("sl").trim() != "Kje te boli?") {
-            questionByLanguage.put("sl", "Kje te boli?")
-            item.put("questionByLanguage", questionByLanguage)
-            repaired++
-        }
+        repaired += putLanguageIfBlankOrLegacy(
+            questionByLanguage,
+            "sl",
+            questionSl,
+            legacyQuestionValues(questionSl) +
+                setOf(item.optString("speechText").trim().lowercase(), item.optString("speakTextSl").trim().lowercase())
+        )
+        repaired += putLanguageIfBlankOrLegacy(
+            questionByLanguage,
+            "uk",
+            questionUk,
+            legacyQuestionValues(questionUk) + setOf(item.optString("speakTextUk").trim().lowercase())
+        )
+        repaired += putLanguageIfBlankOrLegacy(
+            questionByLanguage,
+            "en",
+            questionEn,
+            legacyQuestionValues(questionEn) + setOf(item.optString("speechTextEn").trim().lowercase())
+        )
+        item.put("questionByLanguage", questionByLanguage)
         if (!item.optBoolean("opensSubicons", false)) {
             item.put("opensSubicons", true)
             repaired++
@@ -270,36 +335,20 @@ object AacContentBootstrap {
         return repaired
     }
 
-    private fun ensureFoodParentMetadata(item: JSONObject): Int {
-        var repaired = 0
-        val children = item.optJSONArray("children") ?: JSONArray()
-        val childIds = stringList(children).toMutableSet()
-        FOOD_CHILD_REPAIRS.forEach { repair ->
-            if (childIds.add(repair.id)) {
-                children.put(repair.id)
-                repaired++
-            }
-        }
-        if (repaired > 0 || item.optJSONArray("children") == null) {
-            item.put("children", children)
-        }
-        if (!item.optBoolean("opensSubicons", false)) {
-            item.put("opensSubicons", true)
-            repaired++
-        }
-        if (item.optBoolean("addsToSentence", true)) {
-            item.put("addsToSentence", false)
-            repaired++
-        }
-        if (item.optBoolean("speaksImmediately", true)) {
-            item.put("speaksImmediately", false)
-            repaired++
-        }
-        if (item.optString("actionType").isBlank() || item.optString("actionType") == "speak") {
-            item.put("actionType", "open_subicons")
-            repaired++
-        }
-        return repaired
+    private fun legacyQuestionValues(question: String): Set<String> {
+        return setOf(
+            question.removeSuffix("?"),
+            question
+                .replace("Що ти хочеш", "Що хочеш")
+                .removeSuffix("?"),
+            question
+                .replace("Що ти хочеш", "Що хочеш"),
+            question.replace("Де тебе болить", "Де болить").removeSuffix("?"),
+            question.replace("Де тебе болить", "Де болить")
+        )
+            .map { it.trim().lowercase() }
+            .filter { it.isNotBlank() && it != question.trim().lowercase() }
+            .toSet()
     }
 
     private fun addDefaultPagePlacements(itemsArray: JSONArray, pageId: String): Int {
@@ -800,13 +849,20 @@ object AacContentBootstrap {
 
         fun applyTo(item: JSONObject): Int {
             var repaired = 0
-            val legacySpeechValues = setOf(labelSl.lowercase(), id, speakTextSl.replace("jesti ", ""))
-            repaired += putIfBlankOrLegacy(item, "speechText", speakTextSl, legacySpeechValues)
-            repaired += putIfBlankOrLegacy(item, "speakTextSl", speakTextSl, legacySpeechValues)
+            val legacySpeechSlValues = legacyValues(labelSl, labelEn, id, speakTextSl)
+            val legacySpeechUkValues = legacyValues(labelUk, "", id, speakTextUk)
+            val legacySpeechEnValues = legacyValues(labelEn, "", id, speechTextEn)
+            repaired += putIfBlankOrLegacy(item, "speechText", speakTextSl, legacySpeechSlValues)
+            repaired += putIfBlankOrLegacy(item, "speakTextSl", speakTextSl, legacySpeechSlValues)
             repaired += putIfBlank(item, "labelUk", labelUk)
             repaired += putIfBlank(item, "labelEn", labelEn)
-            repaired += putIfBlank(item, "speakTextUk", speakTextUk)
-            repaired += putIfBlank(item, "speechTextEn", speechTextEn)
+            repaired += putIfBlankOrLegacy(item, "speakTextUk", speakTextUk, legacySpeechUkValues)
+            repaired += putIfBlankOrLegacy(item, "speechTextEn", speechTextEn, legacySpeechEnValues)
+            val speechTextByLanguage = item.optJSONObject("speechTextByLanguage") ?: JSONObject()
+            repaired += putLanguageIfBlankOrLegacy(speechTextByLanguage, "sl", speakTextSl, legacySpeechSlValues)
+            repaired += putLanguageIfBlankOrLegacy(speechTextByLanguage, "uk", speakTextUk, legacySpeechUkValues)
+            repaired += putLanguageIfBlankOrLegacy(speechTextByLanguage, "en", speechTextEn, legacySpeechEnValues)
+            item.put("speechTextByLanguage", speechTextByLanguage)
             repaired += putIfBlank(item, "parentId", parentId)
             if (!hasJsonArrayValue(item.optJSONArray("visibleUnderIds"), parentId)) {
                 val visibleUnderIds = item.optJSONArray("visibleUnderIds") ?: JSONArray()
@@ -860,6 +916,49 @@ object AacContentBootstrap {
             }
         }
 
+        private fun putLanguageIfBlankOrLegacy(
+            target: JSONObject,
+            key: String,
+            value: String,
+            legacyValues: Set<String>
+        ): Int {
+            val current = target.optString(key).trim()
+            return if (current.isBlank() || current.lowercase() in legacyValues) {
+                target.put(key, value)
+                1
+            } else {
+                0
+            }
+        }
+
+        private fun legacyValues(labelSl: String, labelEn: String, id: String, fullSpeech: String): Set<String> {
+            val values = mutableSetOf(labelSl.lowercase(), labelEn.lowercase(), id)
+            val normalizedFullSpeech = fullSpeech.trim()
+            values += normalizedFullSpeech
+                .replace("I want to eat ", "I want ")
+                .replace("I want to drink ", "I want ")
+                .replace("Я хочу їсти ", "Я хочу ")
+                .replace("Я хочу пити ", "Я хочу ")
+                .trim()
+                .lowercase()
+            values += normalizedFullSpeech
+                .replace("želim jesti ", "")
+                .replace("želim piti ", "")
+                .replace("boli me v ", "")
+                .replace("boli me ", "")
+                .replace("I want to eat ", "")
+                .replace("I want to drink ", "")
+                .replace("My ", "")
+                .replace(" hurts", "")
+                .replace("У мене болить у ", "")
+                .replace("У мене болить ", "")
+                .replace("Я хочу їсти ", "")
+                .replace("Я хочу пити ", "")
+                .trim()
+                .lowercase()
+            return values.filter { it.isNotBlank() }.toSet()
+        }
+
         private fun hasJsonArrayValue(array: JSONArray?, expected: String): Boolean {
             if (array == null) return false
             for (index in 0 until array.length()) {
@@ -869,6 +968,59 @@ object AacContentBootstrap {
         }
     }
 
+    private fun putLanguageIfBlankOrLegacy(target: JSONObject, key: String, value: String, legacyValues: Set<String>): Int {
+        val current = target.optString(key).trim()
+        return if (current.isBlank() || current.lowercase() in legacyValues) {
+            target.put(key, value)
+            1
+        } else {
+            0
+        }
+    }
+
+    private val DRINK_CHILD_REPAIRS = listOf(
+        FoodChildRepair(
+            id = "water",
+            labelSl = "VODA",
+            labelUk = "ВОДА",
+            labelEn = "WATER",
+            speakTextSl = "želim piti vodo",
+            speakTextUk = "Я хочу пити воду",
+            speechTextEn = "I want to drink water",
+            parentId = "drink"
+        ),
+        FoodChildRepair(
+            id = "juice",
+            labelSl = "SOK",
+            labelUk = "СІК",
+            labelEn = "JUICE",
+            speakTextSl = "želim piti sok",
+            speakTextUk = "Я хочу пити сік",
+            speechTextEn = "I want to drink juice",
+            parentId = "drink"
+        ),
+        FoodChildRepair(
+            id = "tea",
+            labelSl = "ČAJ",
+            labelUk = "ЧАЙ",
+            labelEn = "TEA",
+            speakTextSl = "želim piti čaj",
+            speakTextUk = "Я хочу пити чай",
+            speechTextEn = "I want to drink tea",
+            parentId = "drink"
+        ),
+        FoodChildRepair(
+            id = "coffee",
+            labelSl = "KAVA",
+            labelUk = "КАВА",
+            labelEn = "COFFEE",
+            speakTextSl = "želim piti kavo",
+            speakTextUk = "Я хочу пити каву",
+            speechTextEn = "I want to drink coffee",
+            parentId = "drink"
+        )
+    )
+
     private val FOOD_CHILD_REPAIRS = listOf(
         FoodChildRepair(
             id = "soup",
@@ -876,8 +1028,8 @@ object AacContentBootstrap {
             labelUk = "СУП",
             labelEn = "SOUP",
             speakTextSl = "želim jesti juho",
-            speakTextUk = "Я хочу суп",
-            speechTextEn = "I want soup"
+            speakTextUk = "Я хочу їсти суп",
+            speechTextEn = "I want to eat soup"
         ),
         FoodChildRepair(
             id = "bread",
@@ -885,8 +1037,8 @@ object AacContentBootstrap {
             labelUk = "ХЛІБ",
             labelEn = "BREAD",
             speakTextSl = "želim jesti kruh",
-            speakTextUk = "Я хочу хліб",
-            speechTextEn = "I want bread"
+            speakTextUk = "Я хочу їсти хліб",
+            speechTextEn = "I want to eat bread"
         ),
         FoodChildRepair(
             id = "fruit",
@@ -894,8 +1046,8 @@ object AacContentBootstrap {
             labelUk = "ФРУКТИ",
             labelEn = "FRUIT",
             speakTextSl = "želim jesti sadje",
-            speakTextUk = "Я хочу фрукти",
-            speechTextEn = "I want fruit"
+            speakTextUk = "Я хочу їсти фрукти",
+            speechTextEn = "I want to eat fruit"
         )
     )
 
@@ -937,7 +1089,7 @@ object AacContentBootstrap {
             labelEn = "BELLY",
             speakTextSl = "boli me trebuh",
             speakTextUk = "У мене болить живіт",
-            speechTextEn = "My belly hurts",
+            speechTextEn = "My stomach hurts",
             parentId = "pain"
         ),
         FoodChildRepair(

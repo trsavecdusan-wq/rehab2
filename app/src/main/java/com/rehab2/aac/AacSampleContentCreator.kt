@@ -191,7 +191,7 @@ object AacSampleContentCreator {
                         .put("actionType", "open_subicons")
                         .put("questionByLanguage", JSONObject()
                             .put("sl", "Kje te boli?")
-                            .put("uk", "Де болить?")
+                            .put("uk", "Де тебе болить?")
                             .put("en", "Where does it hurt?")
                         )
                         .put(
@@ -435,6 +435,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "water",
                         label = "VODA",
+                        labelUk = "ВОДА",
+                        labelEn = "WATER",
+                        speechSl = "želim piti vodo",
+                        speechUk = "Я хочу пити воду",
+                        speechEn = "I want to drink water",
                         imagePath = "custom/water.png",
                         conceptId = "water",
                         parentId = "thirsty",
@@ -448,6 +453,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "juice",
                         label = "SOK",
+                        labelUk = "СІК",
+                        labelEn = "JUICE",
+                        speechSl = "želim piti sok",
+                        speechUk = "Я хочу пити сік",
+                        speechEn = "I want to drink juice",
                         imagePath = "custom/juice.png",
                         conceptId = "juice",
                         parentId = "thirsty",
@@ -461,6 +471,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "coffee",
                         label = "KAVA",
+                        labelUk = "КАВА",
+                        labelEn = "COFFEE",
+                        speechSl = "želim piti kavo",
+                        speechUk = "Я хочу пити каву",
+                        speechEn = "I want to drink coffee",
                         imagePath = "custom/coffee.png",
                         conceptId = "coffee",
                         parentId = "thirsty",
@@ -474,6 +489,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "tea",
                         label = "ČAJ",
+                        labelUk = "ЧАЙ",
+                        labelEn = "TEA",
+                        speechSl = "želim piti čaj",
+                        speechUk = "Я хочу пити чай",
+                        speechEn = "I want to drink tea",
                         imagePath = "custom/tea.png",
                         conceptId = "tea",
                         parentId = "thirsty",
@@ -490,8 +510,8 @@ object AacSampleContentCreator {
                         labelUk = "СУП",
                         labelEn = "SOUP",
                         speechSl = "želim jesti juho",
-                        speechUk = "Я хочу суп",
-                        speechEn = "I want soup",
+                        speechUk = "Я хочу їсти суп",
+                        speechEn = "I want to eat soup",
                         imagePath = "",
                         conceptId = "soup",
                         parentId = "food",
@@ -508,8 +528,8 @@ object AacSampleContentCreator {
                         labelUk = "ХЛІБ",
                         labelEn = "BREAD",
                         speechSl = "želim jesti kruh",
-                        speechUk = "Я хочу хліб",
-                        speechEn = "I want bread",
+                        speechUk = "Я хочу їсти хліб",
+                        speechEn = "I want to eat bread",
                         imagePath = "",
                         conceptId = "bread",
                         parentId = "food",
@@ -526,8 +546,8 @@ object AacSampleContentCreator {
                         labelUk = "ФРУКТИ",
                         labelEn = "FRUIT",
                         speechSl = "želim jesti sadje",
-                        speechUk = "Я хочу фрукти",
-                        speechEn = "I want fruit",
+                        speechUk = "Я хочу їсти фрукти",
+                        speechEn = "I want to eat fruit",
                         imagePath = "",
                         conceptId = "fruit",
                         parentId = "food",
@@ -541,7 +561,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "head",
                         label = "GLAVA",
+                        labelUk = "ГОЛОВА",
+                        labelEn = "HEAD",
                         speechSl = "boli me glava",
+                        speechUk = "У мене болить голова",
+                        speechEn = "My head hurts",
                         imagePath = "",
                         conceptId = "head",
                         parentId = "pain",
@@ -555,7 +579,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "arm",
                         label = "ROKA",
+                        labelUk = "РУКА",
+                        labelEn = "ARM",
                         speechSl = "boli me roka",
+                        speechUk = "У мене болить рука",
+                        speechEn = "My arm hurts",
                         imagePath = "",
                         conceptId = "arm",
                         parentId = "pain",
@@ -569,7 +597,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "leg",
                         label = "NOGA",
+                        labelUk = "НОГА",
+                        labelEn = "LEG",
                         speechSl = "boli me noga",
+                        speechUk = "У мене болить нога",
+                        speechEn = "My leg hurts",
                         imagePath = "",
                         conceptId = "leg",
                         parentId = "pain",
@@ -583,7 +615,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "belly",
                         label = "TREBUH",
+                        labelUk = "ЖИВІТ",
+                        labelEn = "BELLY",
                         speechSl = "boli me trebuh",
+                        speechUk = "У мене болить живіт",
+                        speechEn = "My stomach hurts",
                         imagePath = "",
                         conceptId = "belly",
                         parentId = "pain",
@@ -597,7 +633,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "back",
                         label = "HRBET",
+                        labelUk = "СПИНА",
+                        labelEn = "BACK",
                         speechSl = "boli me hrbet",
+                        speechUk = "У мене болить спина",
+                        speechEn = "My back hurts",
                         imagePath = "",
                         conceptId = "back",
                         parentId = "pain",
@@ -611,7 +651,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "chest",
                         label = "PRSI",
+                        labelUk = "ГРУДИ",
+                        labelEn = "CHEST",
                         speechSl = "boli me v prsih",
+                        speechUk = "У мене болить у грудях",
+                        speechEn = "My chest hurts",
                         imagePath = "",
                         conceptId = "chest",
                         parentId = "pain",
@@ -625,7 +669,11 @@ object AacSampleContentCreator {
                     sampleItem(
                         id = "throat",
                         label = "GRLO",
+                        labelUk = "ГОРЛО",
+                        labelEn = "THROAT",
                         speechSl = "boli me grlo",
+                        speechUk = "У мене болить горло",
+                        speechEn = "My throat hurts",
                         imagePath = "",
                         conceptId = "throat",
                         parentId = "pain",
