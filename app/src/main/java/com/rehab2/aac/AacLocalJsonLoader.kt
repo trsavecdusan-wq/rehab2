@@ -153,6 +153,11 @@ object AacLocalJsonLoader {
             categoryId = json.optNullableString("categoryId")
                 ?: json.optNullableString("category"),
             meaning = json.optNullableString("meaning"),
+            meaningId = json.optNullableString("meaningId"),
+            meaningType = json.optNullableString("meaningType"),
+            meaningGroup = json.optNullableString("meaningGroup"),
+            semanticTags = parseStringList(json.optJSONArray("semanticTags")),
+            searchKeywordsByLanguage = parseLanguageStringListMap(json.optJSONObject("searchKeywordsByLanguage")),
             scenarioIds = parseStringList(json.optJSONArray("scenarioIds")),
             conceptId = json.optNullableString("conceptId"),
             children = children,
@@ -281,6 +286,19 @@ object AacLocalJsonLoader {
                 val value = obj.optString(key).trim()
                 if (languageCode.isNotBlank() && value.isNotEmpty()) {
                     put(languageCode, value)
+                }
+            }
+        }
+    }
+
+    private fun parseLanguageStringListMap(obj: JSONObject?): Map<String, List<String>> {
+        if (obj == null) return emptyMap()
+        return buildMap {
+            obj.keys().forEach { key ->
+                val languageCode = normalizeLanguageCode(key)
+                val values = parseStringList(obj.optJSONArray(key)).distinct()
+                if (languageCode.isNotBlank() && values.isNotEmpty()) {
+                    put(languageCode, values)
                 }
             }
         }

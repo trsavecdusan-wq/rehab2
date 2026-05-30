@@ -58,6 +58,11 @@ data class AacItem(
     val categoryId: String? = null,
     // Stable meaning/category semantics for future large content sets. This is not patient placement.
     val meaning: String? = null,
+    val meaningId: String? = null,
+    val meaningType: String? = null,
+    val meaningGroup: String? = null,
+    val semanticTags: List<String> = emptyList(),
+    val searchKeywordsByLanguage: Map<String, List<String>> = emptyMap(),
     // Scenario metadata is for future guided helper flows (for example vending or restaurant use).
     // It must not replace profiles, categories, or patient page placement.
     val scenarioIds: List<String> = emptyList(),

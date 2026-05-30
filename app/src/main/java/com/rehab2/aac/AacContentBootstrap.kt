@@ -807,6 +807,19 @@ object AacContentBootstrap {
                 speechTextEn?.let { json.put("speechTextEn", it) }
                 categoryId?.let { json.put("categoryId", it) }
                 meaning?.let { json.put("meaning", it) }
+                meaningId?.let { json.put("meaningId", it) }
+                meaningType?.let { json.put("meaningType", it) }
+                meaningGroup?.let { json.put("meaningGroup", it) }
+                if (semanticTags.isNotEmpty()) json.put("semanticTags", jsonArrayOf(semanticTags))
+                if (searchKeywordsByLanguage.isNotEmpty()) {
+                    json.put("searchKeywordsByLanguage", JSONObject().apply {
+                        searchKeywordsByLanguage.forEach { (languageCode, keywords) ->
+                            if (languageCode.isNotBlank() && keywords.isNotEmpty()) {
+                                put(languageCode, jsonArrayOf(keywords))
+                            }
+                        }
+                    })
+                }
                 if (scenarioIds.isNotEmpty()) json.put("scenarioIds", jsonArrayOf(scenarioIds))
                 conceptId?.let { json.put("conceptId", it) }
                 parentId?.let { json.put("parentId", it) }
