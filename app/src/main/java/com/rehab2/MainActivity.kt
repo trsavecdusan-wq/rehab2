@@ -216,6 +216,12 @@ class MainActivity : AppCompatActivity() {
     private var mainAacItemsById: Map<String, AacItem> = emptyMap()
     private var currentMainAacItems: List<AacItem> = emptyList()
     private var configuredMainAacGridSize: Int = 0
+    private var currentMainAacPageDebugId: String = "root"
+    private var lastMainAacPageItemCountBeforeFixed = 0
+    private var lastMainAacFixedRowItemCount = 0
+    private var lastMainAacNormalItemCount = 0
+    private var lastMainAacFinalOrderedItemCount = 0
+    private var lastMainAacFinalItemCountAfterCap = 0
     private val mainAacHistory = ArrayDeque<List<AacItem>>()
     private val pendingMainAacTranslationKeys = mutableSetOf<String>()
     private val pendingMainAacPretranslationLanguages = mutableSetOf<String>()
@@ -406,6 +412,10 @@ class MainActivity : AppCompatActivity() {
         val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
             items.filter { it.isRootItem && !it.isHiddenUntilParent }
         )
+        if (startPageItems.isEmpty()) {
+            currentMainAacPageDebugId = "fallback_root"
+            updateMainAacGridSelectionDebug("fallback_root", fallbackRootItems)
+        }
         showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
     }
 
@@ -517,8 +527,10 @@ class MainActivity : AppCompatActivity() {
         mainAacTileBindings.forEachIndexed { index, binding ->
             val item = visibleItems.getOrNull(index)
             binding.item = item
-            binding.view.visibility = if (item == null) View.INVISIBLE else View.VISIBLE
+            binding.view.visibility = View.VISIBLE
             item?.let {
+                binding.view.isEnabled = true
+                binding.view.alpha = 1f
                 binding.label.text = AacLocalizedTextResolver.resolveLabel(it, languageCode)
                     .uppercase(Locale.ROOT)
                 bindMainAacIcon(binding, it)
@@ -526,9 +538,20 @@ class MainActivity : AppCompatActivity() {
                     handleMainAacItemAction(item)
                 }
             } ?: run {
+                binding.view.isEnabled = false
+                binding.view.alpha = 0.45f
+                binding.label.text = ""
+                binding.icon?.apply {
+                    setCompoundDrawables(null, null, null, null)
+                    text = ""
+                }
                 binding.view.setOnClickListener(null)
             }
         }
+        logMainAacGridDebug(
+            boundItemCount = visibleItems.size,
+            visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
+        )
     }
 
     private fun showPreviousMainAacItems() {
@@ -549,6 +572,10 @@ class MainActivity : AppCompatActivity() {
         val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
             items.filter { it.isRootItem && !it.isHiddenUntilParent }
         )
+        if (startPageItems.isEmpty()) {
+            currentMainAacPageDebugId = "fallback_root"
+            updateMainAacGridSelectionDebug("fallback_root", fallbackRootItems)
+        }
         showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
     }
 
@@ -564,6 +591,7 @@ class MainActivity : AppCompatActivity() {
         if (targetPageItems.isNotEmpty()) {
             prepareMainAacContextPrompt(item)
             mainAacHistory.addLast(currentMainAacItems)
+            currentMainAacPageDebugId = item.targetPageId
             showMainAacItems(targetPageItems)
             return
         }
@@ -573,6 +601,8 @@ class MainActivity : AppCompatActivity() {
             if (childItems.isNotEmpty()) {
                 prepareMainAacContextPrompt(item)
                 mainAacHistory.addLast(currentMainAacItems)
+                currentMainAacPageDebugId = "children:${item.id}"
+                updateMainAacGridSelectionDebug(currentMainAacPageDebugId, childItems)
                 showMainAacItems(childItems)
             }
             return
@@ -815,6 +845,7 @@ class MainActivity : AppCompatActivity() {
             .trim()
             .takeIf { isSafeMainAacPageId(it) }
             ?: MAIN_AAC_HOME_PAGE_ID
+        currentMainAacPageDebugId = defaultPageId
         return mainAacPageItems(defaultPageId, items)
     }
 
@@ -842,8 +873,21 @@ class MainActivity : AppCompatActivity() {
             .sortedBy { (position, _) -> position }
             .mapNotNull { (_, itemId) -> itemsById[itemId] }
             .filter { item -> item.id !in fixedItemIds }
-        return (visibleFixedItems + overflowFixedItems + placedItems)
-            .take(mainAacVisibleContentCapacity())
+            .distinctBy { item -> item.id }
+        val usedItemIds = fixedItemIds + placedItems.map { it.id }.toSet()
+        val fillItems = items
+            .filter { item -> item.isRootItem && !item.isHiddenUntilParent }
+            .filter { item -> item.id !in usedItemIds }
+            .sortedWith(compareBy<AacItem> { it.priority }.thenBy { it.id })
+        val finalOrderedItems = (visibleFixedItems + overflowFixedItems + placedItems + fillItems)
+            .distinctBy { item -> item.id }
+        lastMainAacPageItemCountBeforeFixed = placedItems.size
+        lastMainAacFixedRowItemCount = fixedItems.size
+        lastMainAacNormalItemCount = placedItems.size + fillItems.size
+        lastMainAacFinalOrderedItemCount = finalOrderedItems.size
+        val result = finalOrderedItems.take(mainAacVisibleContentCapacity())
+        lastMainAacFinalItemCountAfterCap = result.size
+        return result
     }
 
     private fun orderedMainAacItemsWithFixedTopRow(items: List<AacItem>): List<AacItem> {
@@ -852,6 +896,18 @@ class MainActivity : AppCompatActivity() {
         val overflowFixedItems = fixedItems.filter { item -> item.id !in visibleFixedItems.map { it.id } }
         val fixedItemIds = fixedItems.map { it.id }.toSet()
         return visibleFixedItems + overflowFixedItems + items.filter { item -> item.id !in fixedItemIds }
+    }
+
+    private fun updateMainAacGridSelectionDebug(pageId: String, orderedItems: List<AacItem>) {
+        currentMainAacPageDebugId = pageId
+        val fixedCount = fixedTopRowItems(orderedItems).size
+        lastMainAacPageItemCountBeforeFixed = orderedItems.count { item ->
+            (item.fixedTopRowPosition ?: 0) !in 1..MAIN_AAC_FIXED_TOP_ROW_MAX
+        }
+        lastMainAacFixedRowItemCount = fixedCount
+        lastMainAacNormalItemCount = orderedItems.size - fixedCount
+        lastMainAacFinalOrderedItemCount = orderedItems.size
+        lastMainAacFinalItemCountAfterCap = orderedItems.take(mainAacVisibleContentCapacity()).size
     }
 
     private fun fixedTopRowItems(items: List<AacItem>): List<AacItem> {
@@ -871,7 +927,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacVisibleContentCapacity(): Int {
-        return mainAacSelectedGridCellCount().coerceAtMost(mainAacTileBindings.size)
+        return mainAacSelectedGridCellCount()
     }
 
     private fun mainAacSelectedGridCellCount(): Int {
@@ -884,6 +940,17 @@ class MainActivity : AppCompatActivity() {
             .getInt(KEY_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE)
             .takeIf { it in 3..6 }
             ?: DEFAULT_AAC_GRID_SIZE
+    }
+
+    private fun logMainAacGridDebug(boundItemCount: Int, visibleTileCount: Int) {
+        val selectedGridSize = mainAacSelectedGridSize()
+        val expectedSlotCount = selectedGridSize * selectedGridSize
+        val createdTileViewCount = if (::mainAacTileBindings.isInitialized) mainAacTileBindings.size else 0
+        val emptySlots = (expectedSlotCount - boundItemCount).coerceAtLeast(0)
+        Log.d(
+            "MainAAC",
+            "GRID DEBUG selectedGridSize=$selectedGridSize runtimeGridSize=$configuredMainAacGridSize expectedSlotCount=$expectedSlotCount createdTileViewCount=$createdTileViewCount boundItemCount=$boundItemCount visibleTileCount=$visibleTileCount currentPageId=$currentMainAacPageDebugId pageItemCountBeforeFixed=$lastMainAacPageItemCountBeforeFixed fixedRowItemCount=$lastMainAacFixedRowItemCount normalItemCount=$lastMainAacNormalItemCount finalOrderedItemCountBeforeTake=$lastMainAacFinalOrderedItemCount finalItemCountAfterTake=$lastMainAacFinalItemCountAfterCap cappedAtOldLimit=${boundItemCount < expectedSlotCount && createdTileViewCount < expectedSlotCount} emptySlots=$emptySlots"
+        )
     }
 
     private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
