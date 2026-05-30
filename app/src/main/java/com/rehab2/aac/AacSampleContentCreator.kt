@@ -185,6 +185,26 @@ object AacSampleContentCreator {
                         .put("speakTextSl", "boli me")
                         .put("speakTextUk", "Мені болить")
                         .put("speechTextEn", "I am in pain")
+                        .put("opensSubicons", true)
+                        .put("addsToSentence", false)
+                        .put("speaksImmediately", false)
+                        .put("actionType", "open_subicons")
+                        .put("questionByLanguage", JSONObject()
+                            .put("sl", "Kje te boli?")
+                            .put("uk", "Де болить?")
+                            .put("en", "Where does it hurt?")
+                        )
+                        .put(
+                            "children",
+                            JSONArray()
+                                .put("head")
+                                .put("arm")
+                                .put("leg")
+                                .put("belly")
+                                .put("back")
+                                .put("chest")
+                                .put("throat")
+                        )
                 )
                 .put(
                     sampleItem(
@@ -469,7 +489,7 @@ object AacSampleContentCreator {
                         label = "JUHA",
                         labelUk = "СУП",
                         labelEn = "SOUP",
-                        speechSl = "želim juho",
+                        speechSl = "želim jesti juho",
                         speechUk = "Я хочу суп",
                         speechEn = "I want soup",
                         imagePath = "",
@@ -487,7 +507,7 @@ object AacSampleContentCreator {
                         label = "KRUH",
                         labelUk = "ХЛІБ",
                         labelEn = "BREAD",
-                        speechSl = "želim kruh",
+                        speechSl = "želim jesti kruh",
                         speechUk = "Я хочу хліб",
                         speechEn = "I want bread",
                         imagePath = "",
@@ -505,7 +525,7 @@ object AacSampleContentCreator {
                         label = "SADJE",
                         labelUk = "ФРУКТИ",
                         labelEn = "FRUIT",
-                        speechSl = "želim sadje",
+                        speechSl = "želim jesti sadje",
                         speechUk = "Я хочу фрукти",
                         speechEn = "I want fruit",
                         imagePath = "",
@@ -515,6 +535,104 @@ object AacSampleContentCreator {
                         isRootItem = false,
                         isHiddenUntilParent = true,
                         priority = 16
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "head",
+                        label = "GLAVA",
+                        speechSl = "boli me glava",
+                        imagePath = "",
+                        conceptId = "head",
+                        parentId = "pain",
+                        visibleUnderIds = listOf("pain"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 17
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "arm",
+                        label = "ROKA",
+                        speechSl = "boli me roka",
+                        imagePath = "",
+                        conceptId = "arm",
+                        parentId = "pain",
+                        visibleUnderIds = listOf("pain"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 18
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "leg",
+                        label = "NOGA",
+                        speechSl = "boli me noga",
+                        imagePath = "",
+                        conceptId = "leg",
+                        parentId = "pain",
+                        visibleUnderIds = listOf("pain"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 19
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "belly",
+                        label = "TREBUH",
+                        speechSl = "boli me trebuh",
+                        imagePath = "",
+                        conceptId = "belly",
+                        parentId = "pain",
+                        visibleUnderIds = listOf("pain"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 20
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "back",
+                        label = "HRBET",
+                        speechSl = "boli me hrbet",
+                        imagePath = "",
+                        conceptId = "back",
+                        parentId = "pain",
+                        visibleUnderIds = listOf("pain"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 21
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "chest",
+                        label = "PRSI",
+                        speechSl = "boli me v prsih",
+                        imagePath = "",
+                        conceptId = "chest",
+                        parentId = "pain",
+                        visibleUnderIds = listOf("pain"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 22
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "throat",
+                        label = "GRLO",
+                        speechSl = "boli me grlo",
+                        imagePath = "",
+                        conceptId = "throat",
+                        parentId = "pain",
+                        visibleUnderIds = listOf("pain"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 23
                     )
                 )
                 .put(

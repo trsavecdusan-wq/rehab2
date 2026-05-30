@@ -89,11 +89,13 @@ object AacContentBootstrap {
         }
         val repairedNoUnderstandLabels = repairNoUnderstandSystemLabels(itemsArray)
         val repairedFoodSpeechItems = repairFoodChildSpeechItems(itemsArray)
+        val repairedPainSpeechItems = repairPainSpeechItems(itemsArray)
         if (
             (createdDefaultPage && addedPlacements > 0) ||
             mergedMissingSystemItems > 0 ||
             repairedNoUnderstandLabels > 0 ||
-            repairedFoodSpeechItems > 0
+            repairedFoodSpeechItems > 0 ||
+            repairedPainSpeechItems > 0
         ) {
             saveItemsJson(itemsFile, rawItems, itemsArray)
         } else if (itemsFile?.exists() != true && rawItems.createdFromFallback) {
@@ -124,7 +126,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems noUnderstandRepaired=$repairedNoUnderstandLabels foodSpeechRepaired=$repairedFoodSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems noUnderstandRepaired=$repairedNoUnderstandLabels foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -203,6 +205,67 @@ object AacContentBootstrap {
             } else {
                 repaired += repair.applyTo(item)
             }
+        }
+        return repaired
+    }
+
+    private fun repairPainSpeechItems(itemsArray: JSONArray): Int {
+        var repaired = 0
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item -> item.optString("id").trim().takeIf { it.isNotBlank() }?.let { it to item } }
+            .toMap()
+
+        val pain = itemsById["pain"]
+        if (pain != null) {
+            repaired += ensurePainParentMetadata(pain)
+        }
+
+        PAIN_CHILD_REPAIRS.forEach { repair ->
+            val item = itemsById[repair.id]
+            if (item == null) {
+                itemsArray.put(repair.toJson())
+                repaired++
+            } else {
+                repaired += repair.applyTo(item)
+            }
+        }
+        return repaired
+    }
+
+    private fun ensurePainParentMetadata(item: JSONObject): Int {
+        var repaired = 0
+        val children = item.optJSONArray("children") ?: JSONArray()
+        val childIds = stringList(children).toMutableSet()
+        PAIN_CHILD_REPAIRS.forEach { repair ->
+            if (childIds.add(repair.id)) {
+                children.put(repair.id)
+                repaired++
+            }
+        }
+        if (repaired > 0 || item.optJSONArray("children") == null) {
+            item.put("children", children)
+        }
+        val questionByLanguage = item.optJSONObject("questionByLanguage") ?: JSONObject()
+        if (questionByLanguage.optString("sl").trim() != "Kje te boli?") {
+            questionByLanguage.put("sl", "Kje te boli?")
+            item.put("questionByLanguage", questionByLanguage)
+            repaired++
+        }
+        if (!item.optBoolean("opensSubicons", false)) {
+            item.put("opensSubicons", true)
+            repaired++
+        }
+        if (item.optBoolean("addsToSentence", true)) {
+            item.put("addsToSentence", false)
+            repaired++
+        }
+        if (item.optBoolean("speaksImmediately", true)) {
+            item.put("speaksImmediately", false)
+            repaired++
+        }
+        if (item.optString("actionType").isBlank() || item.optString("actionType") == "speak") {
+            item.put("actionType", "open_subicons")
+            repaired++
         }
         return repaired
     }
@@ -706,7 +769,8 @@ object AacContentBootstrap {
         val labelEn: String,
         val speakTextSl: String,
         val speakTextUk: String,
-        val speechTextEn: String
+        val speechTextEn: String,
+        val parentId: String = "food"
     ) {
         fun toJson(): JSONObject {
             return JSONObject()
@@ -725,8 +789,8 @@ object AacContentBootstrap {
                 .put("actionType", "speak")
                 .put("targetPageId", "")
                 .put("conceptId", id)
-                .put("parentId", "food")
-                .put("visibleUnderIds", JSONArray().put("food"))
+                .put("parentId", parentId)
+                .put("visibleUnderIds", JSONArray().put(parentId))
                 .put("isRootItem", false)
                 .put("isHiddenUntilParent", true)
                 .put("addsToSentence", true)
@@ -736,16 +800,17 @@ object AacContentBootstrap {
 
         fun applyTo(item: JSONObject): Int {
             var repaired = 0
-            repaired += putIfBlankOrLegacy(item, "speechText", speakTextSl, setOf(labelSl.lowercase(), id))
-            repaired += putIfBlankOrLegacy(item, "speakTextSl", speakTextSl, setOf(labelSl.lowercase(), id))
+            val legacySpeechValues = setOf(labelSl.lowercase(), id, speakTextSl.replace("jesti ", ""))
+            repaired += putIfBlankOrLegacy(item, "speechText", speakTextSl, legacySpeechValues)
+            repaired += putIfBlankOrLegacy(item, "speakTextSl", speakTextSl, legacySpeechValues)
             repaired += putIfBlank(item, "labelUk", labelUk)
             repaired += putIfBlank(item, "labelEn", labelEn)
             repaired += putIfBlank(item, "speakTextUk", speakTextUk)
             repaired += putIfBlank(item, "speechTextEn", speechTextEn)
-            repaired += putIfBlank(item, "parentId", "food")
-            if (!hasJsonArrayValue(item.optJSONArray("visibleUnderIds"), "food")) {
+            repaired += putIfBlank(item, "parentId", parentId)
+            if (!hasJsonArrayValue(item.optJSONArray("visibleUnderIds"), parentId)) {
                 val visibleUnderIds = item.optJSONArray("visibleUnderIds") ?: JSONArray()
-                visibleUnderIds.put("food")
+                visibleUnderIds.put(parentId)
                 item.put("visibleUnderIds", visibleUnderIds)
                 repaired++
             }
@@ -810,7 +875,7 @@ object AacContentBootstrap {
             labelSl = "JUHA",
             labelUk = "СУП",
             labelEn = "SOUP",
-            speakTextSl = "želim juho",
+            speakTextSl = "želim jesti juho",
             speakTextUk = "Я хочу суп",
             speechTextEn = "I want soup"
         ),
@@ -819,7 +884,7 @@ object AacContentBootstrap {
             labelSl = "KRUH",
             labelUk = "ХЛІБ",
             labelEn = "BREAD",
-            speakTextSl = "želim kruh",
+            speakTextSl = "želim jesti kruh",
             speakTextUk = "Я хочу хліб",
             speechTextEn = "I want bread"
         ),
@@ -828,9 +893,82 @@ object AacContentBootstrap {
             labelSl = "SADJE",
             labelUk = "ФРУКТИ",
             labelEn = "FRUIT",
-            speakTextSl = "želim sadje",
+            speakTextSl = "želim jesti sadje",
             speakTextUk = "Я хочу фрукти",
             speechTextEn = "I want fruit"
+        )
+    )
+
+    private val PAIN_CHILD_REPAIRS = listOf(
+        FoodChildRepair(
+            id = "head",
+            labelSl = "GLAVA",
+            labelUk = "ГОЛОВА",
+            labelEn = "HEAD",
+            speakTextSl = "boli me glava",
+            speakTextUk = "У мене болить голова",
+            speechTextEn = "My head hurts",
+            parentId = "pain"
+        ),
+        FoodChildRepair(
+            id = "arm",
+            labelSl = "ROKA",
+            labelUk = "РУКА",
+            labelEn = "ARM",
+            speakTextSl = "boli me roka",
+            speakTextUk = "У мене болить рука",
+            speechTextEn = "My arm hurts",
+            parentId = "pain"
+        ),
+        FoodChildRepair(
+            id = "leg",
+            labelSl = "NOGA",
+            labelUk = "НОГА",
+            labelEn = "LEG",
+            speakTextSl = "boli me noga",
+            speakTextUk = "У мене болить нога",
+            speechTextEn = "My leg hurts",
+            parentId = "pain"
+        ),
+        FoodChildRepair(
+            id = "belly",
+            labelSl = "TREBUH",
+            labelUk = "ЖИВІТ",
+            labelEn = "BELLY",
+            speakTextSl = "boli me trebuh",
+            speakTextUk = "У мене болить живіт",
+            speechTextEn = "My belly hurts",
+            parentId = "pain"
+        ),
+        FoodChildRepair(
+            id = "back",
+            labelSl = "HRBET",
+            labelUk = "СПИНА",
+            labelEn = "BACK",
+            speakTextSl = "boli me hrbet",
+            speakTextUk = "У мене болить спина",
+            speechTextEn = "My back hurts",
+            parentId = "pain"
+        ),
+        FoodChildRepair(
+            id = "chest",
+            labelSl = "PRSI",
+            labelUk = "ГРУДИ",
+            labelEn = "CHEST",
+            speakTextSl = "boli me v prsih",
+            speakTextUk = "У мене болить у грудях",
+            speechTextEn = "My chest hurts",
+            parentId = "pain"
+        ),
+        FoodChildRepair(
+            id = "throat",
+            labelSl = "GRLO",
+            labelUk = "ГОРЛО",
+            labelEn = "THROAT",
+            speakTextSl = "boli me grlo",
+            speakTextUk = "У мене болить горло",
+            speechTextEn = "My throat hurts",
+            parentId = "pain"
         )
     )
 

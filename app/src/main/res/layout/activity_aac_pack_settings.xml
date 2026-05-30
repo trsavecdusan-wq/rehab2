@@ -159,6 +159,29 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/txtShowSubiconsOnMainPagesStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:padding="16dp"
+            android:text="Prikaži podikone na glavnih straneh: IZKLOPLJENO"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnToggleShowSubiconsOnMainPages"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="#34414D"
+            android:text="VKLOPI PODIKONE NA GLAVNIH STRANEH"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"

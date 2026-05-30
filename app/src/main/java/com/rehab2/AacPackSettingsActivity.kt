@@ -72,6 +72,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val PATIENT_PAGE_FIELD_SEPARATOR = "\u001F"
         private const val AAC_GRID_PREFS_NAME = "aac_grid_settings"
         private const val KEY_AAC_GRID_SIZE = "aac_grid_size"
+        private const val KEY_SHOW_SUBICONS_ON_MAIN_PAGES = "show_subicons_on_main_pages"
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val AAC_LANGUAGE_PREFS_NAME = "aac_language_settings"
         private const val KEY_AAC_ACTIVE_LANGUAGES = "active_languages"
@@ -105,6 +106,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var btnAacGrid4x4: Button
     private lateinit var btnAacGrid5x5: Button
     private lateinit var btnAacGrid6x6: Button
+    private lateinit var txtShowSubiconsOnMainPagesStatus: TextView
+    private lateinit var btnToggleShowSubiconsOnMainPages: Button
     private lateinit var txtFixedTopRowStatus: TextView
     private lateinit var editFixedTopRowItemId: EditText
     private lateinit var editFixedTopRowPosition: EditText
@@ -240,6 +243,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnAacGrid4x4 = findViewById(R.id.btnAacGrid4x4)
         btnAacGrid5x5 = findViewById(R.id.btnAacGrid5x5)
         btnAacGrid6x6 = findViewById(R.id.btnAacGrid6x6)
+        txtShowSubiconsOnMainPagesStatus = findViewById(R.id.txtShowSubiconsOnMainPagesStatus)
+        btnToggleShowSubiconsOnMainPages = findViewById(R.id.btnToggleShowSubiconsOnMainPages)
         txtFixedTopRowStatus = findViewById(R.id.txtFixedTopRowStatus)
         editFixedTopRowItemId = findViewById(R.id.editFixedTopRowItemId)
         editFixedTopRowPosition = findViewById(R.id.editFixedTopRowPosition)
@@ -468,6 +473,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnAacGrid4x4.setOnClickListener { saveAacGridSize(4) }
         btnAacGrid5x5.setOnClickListener { saveAacGridSize(5) }
         btnAacGrid6x6.setOnClickListener { saveAacGridSize(6) }
+        btnToggleShowSubiconsOnMainPages.setOnClickListener { toggleShowSubiconsOnMainPages() }
         editAacLibrarySearch.setOnEditorActionListener { _, _, _ ->
             refreshLocalAacOverview()
             false
@@ -1120,6 +1126,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtSourceActivationStatus.text = buildSourceActivationStatus()
         renderAacItemEditorList(overview.relationAnalysis.availableItems)
         refreshAacGridSizeStatus()
+        refreshShowSubiconsOnMainPagesStatus()
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
         renderFixedTopRowVisualEditor()
         txtFixedTopRowAvailableItems.text = buildFixedTopRowAvailableItems(overview.relationAnalysis.availableItems)
@@ -1323,6 +1330,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             .putInt(KEY_AAC_GRID_SIZE, gridSize)
             .apply()
         refreshAacGridSizeStatus()
+        refreshShowSubiconsOnMainPagesStatus()
         txtStatus.text = if (gridSize == 6) {
             "Shranjeno: 6x6 je napredna nastavitev za velik 14\" zaslon."
         } else {
@@ -1354,6 +1362,42 @@ class AacPackSettingsActivity : AppCompatActivity() {
             .getInt(KEY_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE)
             .takeIf { it in 3..6 }
             ?: DEFAULT_AAC_GRID_SIZE
+    }
+
+    private fun toggleShowSubiconsOnMainPages() {
+        val currentValue = showSubiconsOnMainPages()
+        val newValue = !currentValue
+        getSharedPreferences(AAC_GRID_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_SHOW_SUBICONS_ON_MAIN_PAGES, newValue)
+            .apply()
+        refreshShowSubiconsOnMainPagesStatus()
+        txtStatus.text = if (newValue) {
+            "Shranjeno: podikone se lahko prikažejo na glavnih straneh, če ostane prostor."
+        } else {
+            "Shranjeno: podikone so skrite z glavnih strani in se odprejo prek starševske ikone."
+        }
+    }
+
+    private fun refreshShowSubiconsOnMainPagesStatus() {
+        val enabled = showSubiconsOnMainPages()
+        txtShowSubiconsOnMainPagesStatus.text = buildString {
+            appendLine("Prikaži podikone na glavnih straneh: ${if (enabled) "VKLOPLJENO" else "IZKLOPLJENO"}")
+            append("Privzeto je izklopljeno. Če je izklopljeno, se JUHA/KRUH/SADJE pokažejo šele po pritisku na HRANA.")
+        }
+        btnToggleShowSubiconsOnMainPages.text = if (enabled) {
+            "IZKLOPI PODIKONE NA GLAVNIH STRANEH"
+        } else {
+            "VKLOPI PODIKONE NA GLAVNIH STRANEH"
+        }
+        btnToggleShowSubiconsOnMainPages.backgroundTintList = ColorStateList.valueOf(
+            if (enabled) 0xFF2E8B57.toInt() else 0xFF34414D.toInt()
+        )
+    }
+
+    private fun showSubiconsOnMainPages(): Boolean {
+        return getSharedPreferences(AAC_GRID_PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_SHOW_SUBICONS_ON_MAIN_PAGES, false)
     }
 
     private fun renderCommunicatorDashboard(overview: LocalAacOverview) {

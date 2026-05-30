@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
         private const val PREFS_AAC_GRID_SETTINGS = "aac_grid_settings"
         private const val KEY_AAC_GRID_SIZE = "aac_grid_size"
+        private const val KEY_SHOW_SUBICONS_ON_MAIN_PAGES = "show_subicons_on_main_pages"
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
@@ -992,10 +993,14 @@ class MainActivity : AppCompatActivity() {
             .filter { item -> item.id !in usedItemIds }
             .sortedWith(compareBy<AacItem> { it.priority }.thenBy { it.id })
         val usedAfterRootFillIds = usedItemIds + rootFillItems.map { it.id }.toSet()
-        val terminalFillItems = items
-            .filter { item -> item.id !in usedAfterRootFillIds }
-            .filter { item -> !item.opensSubicons && item.children.isEmpty() && item.addsToSentence }
-            .sortedWith(compareBy<AacItem> { it.priority }.thenBy { it.id })
+        val terminalFillItems = if (showSubiconsOnMainPages()) {
+            items
+                .filter { item -> item.id !in usedAfterRootFillIds }
+                .filter { item -> !item.opensSubicons && item.children.isEmpty() && item.addsToSentence }
+                .sortedWith(compareBy<AacItem> { it.priority }.thenBy { it.id })
+        } else {
+            emptyList()
+        }
         val fillItems = rootFillItems + terminalFillItems
         val finalOrderedItems = (visibleFixedItems + overflowFixedItems + placedItems + fillItems)
             .distinctBy { item -> item.id }
@@ -1061,6 +1066,11 @@ class MainActivity : AppCompatActivity() {
             .getInt(KEY_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE)
             .takeIf { it in 3..6 }
             ?: DEFAULT_AAC_GRID_SIZE
+    }
+
+    private fun showSubiconsOnMainPages(): Boolean {
+        return getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
+            .getBoolean(KEY_SHOW_SUBICONS_ON_MAIN_PAGES, false)
     }
 
     private fun logMainAacGridDebug(boundItemCount: Int, visibleTileCount: Int) {
@@ -1372,7 +1382,7 @@ class MainActivity : AppCompatActivity() {
                 opensSubicons = true,
                 children = listOf("head", "arm", "leg", "belly"),
                 questionByLanguage = mapOf(
-                    "sl" to "Kje boli?",
+                    "sl" to "Kje te boli?",
                     "uk" to "Де болить?",
                     "en" to "Where does it hurt?"
                 )
@@ -1443,7 +1453,7 @@ class MainActivity : AppCompatActivity() {
             mainAacItem(
                 "soup",
                 "JUHA",
-                "želim juho",
+                "želim jesti juho",
                 labelUk = "СУП",
                 labelEn = "SOUP",
                 speakTextUk = "Я хочу суп",
@@ -1454,7 +1464,7 @@ class MainActivity : AppCompatActivity() {
             mainAacItem(
                 "bread",
                 "KRUH",
-                "želim kruh",
+                "želim jesti kruh",
                 labelUk = "ХЛІБ",
                 labelEn = "BREAD",
                 speakTextUk = "Я хочу хліб",
@@ -1465,7 +1475,7 @@ class MainActivity : AppCompatActivity() {
             mainAacItem(
                 "fruit",
                 "SADJE",
-                "želim sadje",
+                "želim jesti sadje",
                 labelUk = "ФРУКТИ",
                 labelEn = "FRUIT",
                 speakTextUk = "Я хочу фрукти",
@@ -1473,10 +1483,13 @@ class MainActivity : AppCompatActivity() {
                 isRootItem = false,
                 visibleUnderIds = listOf("food")
             ),
-            mainAacItem("head", "GLAVA", "glava", isRootItem = false, visibleUnderIds = listOf("pain")),
-            mainAacItem("arm", "ROKA", "roka", isRootItem = false, visibleUnderIds = listOf("pain")),
-            mainAacItem("leg", "NOGA", "noga", isRootItem = false, visibleUnderIds = listOf("pain")),
-            mainAacItem("belly", "TREBUH", "trebuh", isRootItem = false, visibleUnderIds = listOf("pain"))
+            mainAacItem("head", "GLAVA", "boli me glava", labelUk = "ГОЛОВА", labelEn = "HEAD", speakTextUk = "У мене болить голова", speechTextEn = "My head hurts", isRootItem = false, visibleUnderIds = listOf("pain")),
+            mainAacItem("arm", "ROKA", "boli me roka", labelUk = "РУКА", labelEn = "ARM", speakTextUk = "У мене болить рука", speechTextEn = "My arm hurts", isRootItem = false, visibleUnderIds = listOf("pain")),
+            mainAacItem("leg", "NOGA", "boli me noga", labelUk = "НОГА", labelEn = "LEG", speakTextUk = "У мене болить нога", speechTextEn = "My leg hurts", isRootItem = false, visibleUnderIds = listOf("pain")),
+            mainAacItem("belly", "TREBUH", "boli me trebuh", labelUk = "ЖИВІТ", labelEn = "BELLY", speakTextUk = "У мене болить живіт", speechTextEn = "My belly hurts", isRootItem = false, visibleUnderIds = listOf("pain")),
+            mainAacItem("back", "HRBET", "boli me hrbet", labelUk = "СПИНА", labelEn = "BACK", speakTextUk = "У мене болить спина", speechTextEn = "My back hurts", isRootItem = false, visibleUnderIds = listOf("pain")),
+            mainAacItem("chest", "PRSI", "boli me v prsih", labelUk = "ГРУДИ", labelEn = "CHEST", speakTextUk = "У мене болить у грудях", speechTextEn = "My chest hurts", isRootItem = false, visibleUnderIds = listOf("pain")),
+            mainAacItem("throat", "GRLO", "boli me grlo", labelUk = "ГОРЛО", labelEn = "THROAT", speakTextUk = "У мене болить горло", speechTextEn = "My throat hurts", isRootItem = false, visibleUnderIds = listOf("pain"))
         )
     }
 
