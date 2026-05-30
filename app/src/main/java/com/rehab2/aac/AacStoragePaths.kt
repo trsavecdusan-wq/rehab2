@@ -16,6 +16,7 @@ object AacStoragePaths {
     const val TTS_CACHE_DIR = "NovaRehab/audio/tts_cache/"
     const val IMPORT_DIR = "NovaRehab/import/"
     const val AAC_ITEMS_FILE = "NovaRehab/data/aac_items.json"
+    const val PATIENT_PROFILE_FILE = "NovaRehab/data/patient_profile.json"
     const val PROFILES_DIR = "NovaRehab/profiles/"
     const val SOCA_STARTER_WATER_ICON = "voda.png"
     const val SOCA_STARTER_WC_ICON = "wc.png"
@@ -25,6 +26,11 @@ object AacStoragePaths {
     fun getAacItemsFile(context: Context): File? {
         val externalFilesDir = context.getExternalFilesDir(null) ?: return null
         return File(externalFilesDir, AAC_ITEMS_FILE)
+    }
+
+    fun getPatientProfileFile(context: Context): File? {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        return File(externalFilesDir, PATIENT_PROFILE_FILE)
     }
 
     fun getProfilesDataDir(context: Context): File? {
