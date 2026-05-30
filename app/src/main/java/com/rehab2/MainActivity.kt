@@ -136,6 +136,7 @@ class MainActivity : AppCompatActivity() {
         private const val RADIO_SWIPE_THRESHOLD_PX = 80f
         private const val MAIN_AAC_AUTO_SENTENCE_DELAY_MS = 4_000L
         private const val MAIN_AAC_SENTENCE_CLEAR_DELAY_MS = 30_000L
+        private const val MAIN_AAC_INPUT_LOCK_TIMEOUT_MS = 5_000L
     }
 
     private data class MainAacTileBinding(
@@ -232,6 +233,10 @@ class MainActivity : AppCompatActivity() {
     private val pendingMainAacTranslationKeys = mutableSetOf<String>()
     private val pendingMainAacPretranslationLanguages = mutableSetOf<String>()
     private var mainAacAutoSentenceMaySpeakSingle = false
+    private var isMainAacInputLocked = false
+    private var isMainAacTerminalSelectionAccepted = false
+    private var shouldResetMainAacRootAfterSpeech = false
+    private var selectedMainAacItemId: String? = null
     private var lastMainAacRenderedLanguage = ""
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
@@ -242,6 +247,9 @@ class MainActivity : AppCompatActivity() {
     }
     private val mainAacAutoSentenceSpeakRunnable = Runnable {
         speakMainAacSentenceIfReady()
+    }
+    private val mainAacInputUnlockRunnable = Runnable {
+        completeMainAacSpeechLock()
     }
     private val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
     private val dateFormat = SimpleDateFormat("dd.MM.", Locale.getDefault())
@@ -291,6 +299,23 @@ class MainActivity : AppCompatActivity() {
         prefs = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         aacAudioPlayer = AacAudioPlayer(this)
+        aacAudioPlayer.setSpeechListener(object : AacAudioPlayer.SpeechListener {
+            override fun onSpeechStarted() {
+                lockMainAacInput()
+            }
+
+            override fun onSpeechCompleted() {
+                completeMainAacSpeechLock()
+            }
+
+            override fun onSpeechCancelled() {
+                completeMainAacSpeechLock()
+            }
+
+            override fun onSpeechError() {
+                completeMainAacSpeechLock()
+            }
+        })
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         seekVolume = findViewById(R.id.seekVolume)
         txtStatusLanguageFlag = findViewById(R.id.txtStatusLanguageFlag)
@@ -401,7 +426,9 @@ class MainActivity : AppCompatActivity() {
         unregisterPowerReceiver()
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
+        mainHandler.removeCallbacks(mainAacInputUnlockRunnable)
         radioPlayerController.release()
+        aacAudioPlayer.setSpeechListener(null)
         aacAudioPlayer.release()
         super.onDestroy()
     }
@@ -544,8 +571,7 @@ class MainActivity : AppCompatActivity() {
             binding.item = item
             binding.view.visibility = View.VISIBLE
             item?.let {
-                binding.view.isEnabled = true
-                binding.view.alpha = 1f
+                binding.view.isEnabled = !isMainAacInputLocked
                 binding.label.text = AacLocalizedTextResolver.resolveLabel(it, languageCode)
                     .uppercase(Locale.ROOT)
                 bindMainAacIcon(binding, it)
@@ -556,6 +582,8 @@ class MainActivity : AppCompatActivity() {
             } ?: run {
                 binding.view.isEnabled = false
                 binding.view.alpha = 0.45f
+                binding.view.scaleX = 1f
+                binding.view.scaleY = 1f
                 binding.label.text = ""
                 binding.icon?.apply {
                     setCompoundDrawables(null, null, null, null)
@@ -565,6 +593,7 @@ class MainActivity : AppCompatActivity() {
                 binding.view.setOnTouchListener(null)
             }
         }
+        refreshMainAacInputLockVisualState()
         logMainAacGridDebug(
             boundItemCount = visibleItems.size,
             visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
@@ -577,6 +606,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun lockMainAacInput() {
+        isMainAacInputLocked = true
+        mainHandler.removeCallbacks(mainAacInputUnlockRunnable)
+        mainHandler.postDelayed(mainAacInputUnlockRunnable, MAIN_AAC_INPUT_LOCK_TIMEOUT_MS)
+        refreshMainAacInputLockVisualState()
+    }
+
+    private fun unlockMainAacInput() {
+        mainHandler.removeCallbacks(mainAacInputUnlockRunnable)
+        isMainAacInputLocked = false
+        selectedMainAacItemId = null
+        refreshMainAacInputLockVisualState()
+    }
+
+    private fun completeMainAacSpeechLock() {
+        val resetAfterSpeech = shouldResetMainAacRootAfterSpeech
+        shouldResetMainAacRootAfterSpeech = false
+        unlockMainAacInput()
+        if (resetAfterSpeech) {
+            resetMainAacAfterTerminalSpeech()
+        }
+    }
+
+    private fun refreshMainAacInputLockVisualState() {
+        if (!::mainAacTileBindings.isInitialized) return
+        mainAacTileBindings.forEach { binding ->
+            if (binding.item != null) {
+                binding.view.isEnabled = !isMainAacInputLocked
+                val isSelected = selectedMainAacItemId != null && binding.item?.id == selectedMainAacItemId
+                binding.view.alpha = when {
+                    isSelected -> 1f
+                    isMainAacInputLocked -> 0.62f
+                    else -> 1f
+                }
+                binding.view.scaleX = if (isSelected) 1.05f else 1f
+                binding.view.scaleY = if (isSelected) 1.05f else 1f
+            }
+        }
+    }
+
     private fun showPreviousMainAacItems() {
         if (mainAacHistory.isEmpty()) {
             return
@@ -585,6 +654,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPreviousMainAacGridPage() {
+        if (isMainAacInputLocked) {
+            return
+        }
         if (currentMainAacGridPageIndex <= 0) {
             return
         }
@@ -593,6 +665,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showNextMainAacGridPage() {
+        if (isMainAacInputLocked) {
+            return
+        }
         if (currentMainAacGridPageIndex >= lastMainAacGridPageCount - 1) {
             return
         }
@@ -601,6 +676,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleMainAacTileTouch(event: MotionEvent, item: AacItem): Boolean {
+        if (isMainAacInputLocked) {
+            return true
+        }
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 mainAacTouchStartX = event.rawX
@@ -622,6 +700,8 @@ class MainActivity : AppCompatActivity() {
                     }
                     return true
                 }
+                selectedMainAacItemId = item.id
+                refreshMainAacInputLockVisualState()
                 handleMainAacItemAction(item)
                 return true
             }
@@ -672,6 +752,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun resetMainAacRoot() {
         mainAacHistory.clear()
+        isMainAacTerminalSelectionAccepted = false
+        shouldResetMainAacRootAfterSpeech = false
+        selectedMainAacItemId = null
         val fallbackItems = buildMainAacItems()
         AacContentBootstrap.ensurePatientStartupContent(this, fallbackItems)
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
@@ -696,9 +779,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleMainAacItemAction(item: AacItem) {
+        if (isMainAacInputLocked) {
+            return
+        }
         val targetPageItems = mainAacPageItems(item.targetPageId)
         if (targetPageItems.isNotEmpty()) {
+            isMainAacTerminalSelectionAccepted = false
+            selectedMainAacItemId = item.id
             prepareMainAacContextPrompt(item)
+            lockMainAacInput()
             mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
             currentMainAacPageDebugId = item.targetPageId
             showMainAacItems(targetPageItems)
@@ -708,7 +797,10 @@ class MainActivity : AppCompatActivity() {
         val childItems = mainAacChildrenFor(item)
         if (item.opensSubicons || childItems.isNotEmpty()) {
             if (childItems.isNotEmpty()) {
+                isMainAacTerminalSelectionAccepted = false
+                selectedMainAacItemId = item.id
                 prepareMainAacContextPrompt(item)
+                lockMainAacInput()
                 mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
                 currentMainAacPageDebugId = "children:${item.id}"
                 updateMainAacGridSelectionDebug(currentMainAacPageDebugId, childItems)
@@ -718,6 +810,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         val languageCode = getActiveSpeechLanguage()
+        if (mainAacHistory.isNotEmpty()) {
+            if (isMainAacTerminalSelectionAccepted) {
+                return
+            }
+            isMainAacTerminalSelectionAccepted = true
+            selectedMainAacItemId = item.id
+            lockMainAacInput()
+        }
         if (needsMainAacTranslation(item, languageCode)) {
             translateMainAacItemForAction(item, languageCode)
             return
@@ -750,6 +850,8 @@ class MainActivity : AppCompatActivity() {
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
         if (inContextFlow && item.addsToSentence) {
+            selectedMainAacItemId = item.id
+            lockMainAacInput()
             mainAacSentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
@@ -758,14 +860,15 @@ class MainActivity : AppCompatActivity() {
                 )
             )
             speakMainAacSentenceNow(languageCode)
-            resetMainAacAfterTerminalSpeech()
             return
         }
         if (resolvedSpeechText.isNotBlank()) {
+            selectedMainAacItemId = item.id
+            lockMainAacInput()
             aacAudioPlayer.speakText(resolvedSpeechText, languageCode)
+            shouldResetMainAacRootAfterSpeech = true
         }
         clearMainAacSentenceState()
-        resetMainAacAfterTerminalSpeech()
     }
 
     private fun needsMainAacTranslation(item: AacItem, languageCode: String): Boolean {
@@ -1197,16 +1300,19 @@ class MainActivity : AppCompatActivity() {
         val languageCode = getActiveSpeechLanguage()
         val sentence = mainAacSentenceManager.getSpeakText(languageCode).trim()
         if (shouldSpeakSentence && sentence.isNotBlank()) {
+            lockMainAacInput()
             aacAudioPlayer.speakText(sentence, languageCode)
             clearMainAacSentenceState()
-            resetMainAacAfterTerminalSpeech()
+            shouldResetMainAacRootAfterSpeech = true
         }
     }
 
     private fun speakMainAacSentenceNow(languageCode: String) {
         val sentence = mainAacSentenceManager.getSpeakText(languageCode).trim()
         if (sentence.isNotBlank()) {
+            lockMainAacInput()
             aacAudioPlayer.speakText(sentence, languageCode)
+            shouldResetMainAacRootAfterSpeech = true
         }
         clearMainAacSentenceState()
     }
