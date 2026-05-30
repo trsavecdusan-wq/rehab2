@@ -210,7 +210,7 @@ object AacContentBootstrap {
     private fun ensureFoodParentMetadata(item: JSONObject): Int {
         var repaired = 0
         val children = item.optJSONArray("children") ?: JSONArray()
-        val childIds = parseStringList(children).toMutableSet()
+        val childIds = stringList(children).toMutableSet()
         FOOD_CHILD_REPAIRS.forEach { repair ->
             if (childIds.add(repair.id)) {
                 children.put(repair.id)
