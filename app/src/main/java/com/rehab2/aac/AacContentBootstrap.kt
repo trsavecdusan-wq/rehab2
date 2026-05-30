@@ -55,6 +55,7 @@ object AacContentBootstrap {
         val itemsFile = AacStoragePaths.getAacItemsFile(context)
         val rawItems = loadItemsJson(itemsFile, fallbackItems)
         val itemsArray = rawItems.itemsArray
+        val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems)
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
             return Result(
@@ -87,7 +88,13 @@ object AacContentBootstrap {
             0
         }
         val repairedNoUnderstandLabels = repairNoUnderstandSystemLabels(itemsArray)
-        if ((createdDefaultPage && addedPlacements > 0) || repairedNoUnderstandLabels > 0) {
+        val repairedFoodSpeechItems = repairFoodChildSpeechItems(itemsArray)
+        if (
+            (createdDefaultPage && addedPlacements > 0) ||
+            mergedMissingSystemItems > 0 ||
+            repairedNoUnderstandLabels > 0 ||
+            repairedFoodSpeechItems > 0
+        ) {
             saveItemsJson(itemsFile, rawItems, itemsArray)
         } else if (itemsFile?.exists() != true && rawItems.createdFromFallback) {
             saveItemsJson(itemsFile, rawItems, itemsArray)
@@ -117,9 +124,25 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations noUnderstandRepaired=$repairedNoUnderstandLabels reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems noUnderstandRepaired=$repairedNoUnderstandLabels foodSpeechRepaired=$repairedFoodSpeechItems reason=${result.reason}"
         )
         return result
+    }
+
+    private fun mergeMissingSystemItems(itemsArray: JSONArray, fallbackItems: List<AacItem>): Int {
+        val existingIds = itemObjects(itemsArray)
+            .map { item -> item.optString("id").trim() }
+            .filter { it.isNotBlank() }
+            .toMutableSet()
+        var merged = 0
+        fallbackItems.forEach { item ->
+            val id = item.id.trim()
+            if (id.isBlank() || id in existingIds) return@forEach
+            itemsArray.put(item.toBootstrapJson())
+            existingIds += id
+            merged++
+        }
+        return merged
     }
 
     private fun repairNoUnderstandSystemLabels(itemsArray: JSONArray): Int {
@@ -156,6 +179,61 @@ object AacContentBootstrap {
                 put("uk", "Я не розумію")
                 put("en", "I don't understand")
             })
+            repaired++
+        }
+        return repaired
+    }
+
+    private fun repairFoodChildSpeechItems(itemsArray: JSONArray): Int {
+        var repaired = 0
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item -> item.optString("id").trim().takeIf { it.isNotBlank() }?.let { it to item } }
+            .toMap()
+
+        val food = itemsById["food"]
+        if (food != null) {
+            repaired += ensureFoodParentMetadata(food)
+        }
+
+        FOOD_CHILD_REPAIRS.forEach { repair ->
+            val item = itemsById[repair.id]
+            if (item == null) {
+                itemsArray.put(repair.toJson())
+                repaired++
+            } else {
+                repaired += repair.applyTo(item)
+            }
+        }
+        return repaired
+    }
+
+    private fun ensureFoodParentMetadata(item: JSONObject): Int {
+        var repaired = 0
+        val children = item.optJSONArray("children") ?: JSONArray()
+        val childIds = parseStringList(children).toMutableSet()
+        FOOD_CHILD_REPAIRS.forEach { repair ->
+            if (childIds.add(repair.id)) {
+                children.put(repair.id)
+                repaired++
+            }
+        }
+        if (repaired > 0 || item.optJSONArray("children") == null) {
+            item.put("children", children)
+        }
+        if (!item.optBoolean("opensSubicons", false)) {
+            item.put("opensSubicons", true)
+            repaired++
+        }
+        if (item.optBoolean("addsToSentence", true)) {
+            item.put("addsToSentence", false)
+            repaired++
+        }
+        if (item.optBoolean("speaksImmediately", true)) {
+            item.put("speaksImmediately", false)
+            repaired++
+        }
+        if (item.optString("actionType").isBlank() || item.optString("actionType") == "speak") {
+            item.put("actionType", "open_subicons")
             repaired++
         }
         return repaired
@@ -620,6 +698,141 @@ object AacContentBootstrap {
                 }
             }
     }
+
+    private data class FoodChildRepair(
+        val id: String,
+        val labelSl: String,
+        val labelUk: String,
+        val labelEn: String,
+        val speakTextSl: String,
+        val speakTextUk: String,
+        val speechTextEn: String
+    ) {
+        fun toJson(): JSONObject {
+            return JSONObject()
+                .put("id", id)
+                .put("labelSl", labelSl)
+                .put("labelUk", labelUk)
+                .put("labelEn", labelEn)
+                .put("text", labelSl)
+                .put("baseText", labelSl)
+                .put("speechText", speakTextSl)
+                .put("speakTextSl", speakTextSl)
+                .put("speakTextUk", speakTextUk)
+                .put("speechTextEn", speechTextEn)
+                .put("imagePath", "")
+                .put("iconSource", IconSource.SYSTEM.name)
+                .put("actionType", "speak")
+                .put("targetPageId", "")
+                .put("conceptId", id)
+                .put("parentId", "food")
+                .put("visibleUnderIds", JSONArray().put("food"))
+                .put("isRootItem", false)
+                .put("isHiddenUntilParent", true)
+                .put("addsToSentence", true)
+                .put("speaksImmediately", true)
+                .put("opensSubicons", false)
+        }
+
+        fun applyTo(item: JSONObject): Int {
+            var repaired = 0
+            repaired += putIfBlankOrLegacy(item, "speechText", speakTextSl, setOf(labelSl.lowercase(), id))
+            repaired += putIfBlankOrLegacy(item, "speakTextSl", speakTextSl, setOf(labelSl.lowercase(), id))
+            repaired += putIfBlank(item, "labelUk", labelUk)
+            repaired += putIfBlank(item, "labelEn", labelEn)
+            repaired += putIfBlank(item, "speakTextUk", speakTextUk)
+            repaired += putIfBlank(item, "speechTextEn", speechTextEn)
+            repaired += putIfBlank(item, "parentId", "food")
+            if (!hasJsonArrayValue(item.optJSONArray("visibleUnderIds"), "food")) {
+                val visibleUnderIds = item.optJSONArray("visibleUnderIds") ?: JSONArray()
+                visibleUnderIds.put("food")
+                item.put("visibleUnderIds", visibleUnderIds)
+                repaired++
+            }
+            if (item.optBoolean("isRootItem", true)) {
+                item.put("isRootItem", false)
+                repaired++
+            }
+            if (!item.optBoolean("isHiddenUntilParent", false)) {
+                item.put("isHiddenUntilParent", true)
+                repaired++
+            }
+            if (!item.optBoolean("addsToSentence", true)) {
+                item.put("addsToSentence", true)
+                repaired++
+            }
+            if (!item.optBoolean("speaksImmediately", true)) {
+                item.put("speaksImmediately", true)
+                repaired++
+            }
+            if (item.optBoolean("opensSubicons", false)) {
+                item.put("opensSubicons", false)
+                repaired++
+            }
+            if (item.optString("actionType").isBlank() || item.optString("actionType") == "open_subicons") {
+                item.put("actionType", "speak")
+                repaired++
+            }
+            return repaired
+        }
+
+        private fun putIfBlank(item: JSONObject, key: String, value: String): Int {
+            return if (item.optString(key).trim().isBlank()) {
+                item.put(key, value)
+                1
+            } else {
+                0
+            }
+        }
+
+        private fun putIfBlankOrLegacy(item: JSONObject, key: String, value: String, legacyValues: Set<String>): Int {
+            val current = item.optString(key).trim()
+            return if (current.isBlank() || current.lowercase() in legacyValues) {
+                item.put(key, value)
+                1
+            } else {
+                0
+            }
+        }
+
+        private fun hasJsonArrayValue(array: JSONArray?, expected: String): Boolean {
+            if (array == null) return false
+            for (index in 0 until array.length()) {
+                if (array.optString(index).trim() == expected) return true
+            }
+            return false
+        }
+    }
+
+    private val FOOD_CHILD_REPAIRS = listOf(
+        FoodChildRepair(
+            id = "soup",
+            labelSl = "JUHA",
+            labelUk = "СУП",
+            labelEn = "SOUP",
+            speakTextSl = "želim juho",
+            speakTextUk = "Я хочу суп",
+            speechTextEn = "I want soup"
+        ),
+        FoodChildRepair(
+            id = "bread",
+            labelSl = "KRUH",
+            labelUk = "ХЛІБ",
+            labelEn = "BREAD",
+            speakTextSl = "želim kruh",
+            speakTextUk = "Я хочу хліб",
+            speechTextEn = "I want bread"
+        ),
+        FoodChildRepair(
+            id = "fruit",
+            labelSl = "SADJE",
+            labelUk = "ФРУКТИ",
+            labelEn = "FRUIT",
+            speakTextSl = "želim sadje",
+            speakTextUk = "Я хочу фрукти",
+            speechTextEn = "I want fruit"
+        )
+    )
 
     private data class RawItemsJson(
         val rootObject: JSONObject?,

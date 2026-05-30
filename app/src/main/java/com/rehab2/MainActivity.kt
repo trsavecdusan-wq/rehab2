@@ -987,10 +987,16 @@ class MainActivity : AppCompatActivity() {
             .filter { item -> item.id !in fixedItemIds }
             .distinctBy { item -> item.id }
         val usedItemIds = fixedItemIds + placedItems.map { it.id }.toSet()
-        val fillItems = items
+        val rootFillItems = items
             .filter { item -> item.isRootItem && !item.isHiddenUntilParent }
             .filter { item -> item.id !in usedItemIds }
             .sortedWith(compareBy<AacItem> { it.priority }.thenBy { it.id })
+        val usedAfterRootFillIds = usedItemIds + rootFillItems.map { it.id }.toSet()
+        val terminalFillItems = items
+            .filter { item -> item.id !in usedAfterRootFillIds }
+            .filter { item -> !item.opensSubicons && item.children.isEmpty() && item.addsToSentence }
+            .sortedWith(compareBy<AacItem> { it.priority }.thenBy { it.id })
+        val fillItems = rootFillItems + terminalFillItems
         val finalOrderedItems = (visibleFixedItems + overflowFixedItems + placedItems + fillItems)
             .distinctBy { item -> item.id }
         lastMainAacPageItemCountBeforeFixed = placedItems.size
@@ -998,6 +1004,10 @@ class MainActivity : AppCompatActivity() {
         lastMainAacNormalItemCount = placedItems.size + fillItems.size
         lastMainAacFinalOrderedItemCount = finalOrderedItems.size
         lastMainAacFinalItemCountAfterCap = finalOrderedItems.take(mainAacVisibleContentCapacity()).size
+        Log.d(
+            "MainAAC",
+            "PAGE FILL DEBUG pageId=$normalizedPageId totalItems=${items.size} placed=${placedItems.size} fixed=${fixedItems.size} rootFill=${rootFillItems.size} terminalFill=${terminalFillItems.size} finalOrdered=${finalOrderedItems.size} capacity=${mainAacVisibleContentCapacity()} excluded=${items.size - finalOrderedItems.size}"
+        )
         return finalOrderedItems
     }
 

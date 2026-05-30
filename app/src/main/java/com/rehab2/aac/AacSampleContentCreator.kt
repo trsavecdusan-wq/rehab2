@@ -232,6 +232,37 @@ object AacSampleContentCreator {
                 )
                 .put(
                     sampleItem(
+                        id = "food",
+                        label = "HRANA",
+                        labelUk = "ЇЖА",
+                        labelEn = "FOOD",
+                        speechSl = "kaj želiš jesti",
+                        speechUk = "Що ти хочеш їсти",
+                        speechEn = "What do you want to eat",
+                        imagePath = "",
+                        conceptId = "food",
+                        isRootItem = true,
+                        priority = 9
+                    )
+                        .put("opensSubicons", true)
+                        .put("addsToSentence", false)
+                        .put("speaksImmediately", false)
+                        .put("actionType", "open_subicons")
+                        .put("questionByLanguage", JSONObject()
+                            .put("sl", "Kaj želiš jesti?")
+                            .put("uk", "Що ти хочеш їсти?")
+                            .put("en", "What do you want to eat?")
+                        )
+                        .put(
+                            "children",
+                            JSONArray()
+                                .put("soup")
+                                .put("bread")
+                                .put("fruit")
+                        )
+                )
+                .put(
+                    sampleItem(
                         id = "wc",
                         label = "WC",
                         labelUk = "ТУАЛЕТ",
@@ -430,6 +461,60 @@ object AacSampleContentCreator {
                         isHiddenUntilParent = true,
                         priority = 13,
                         vendingNumber = "22"
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "soup",
+                        label = "JUHA",
+                        labelUk = "СУП",
+                        labelEn = "SOUP",
+                        speechSl = "želim juho",
+                        speechUk = "Я хочу суп",
+                        speechEn = "I want soup",
+                        imagePath = "",
+                        conceptId = "soup",
+                        parentId = "food",
+                        visibleUnderIds = listOf("food"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 14
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "bread",
+                        label = "KRUH",
+                        labelUk = "ХЛІБ",
+                        labelEn = "BREAD",
+                        speechSl = "želim kruh",
+                        speechUk = "Я хочу хліб",
+                        speechEn = "I want bread",
+                        imagePath = "",
+                        conceptId = "bread",
+                        parentId = "food",
+                        visibleUnderIds = listOf("food"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 15
+                    )
+                )
+                .put(
+                    sampleItem(
+                        id = "fruit",
+                        label = "SADJE",
+                        labelUk = "ФРУКТИ",
+                        labelEn = "FRUIT",
+                        speechSl = "želim sadje",
+                        speechUk = "Я хочу фрукти",
+                        speechEn = "I want fruit",
+                        imagePath = "",
+                        conceptId = "fruit",
+                        parentId = "food",
+                        visibleUnderIds = listOf("food"),
+                        isRootItem = false,
+                        isHiddenUntilParent = true,
+                        priority = 16
                     )
                 )
                 .put(
