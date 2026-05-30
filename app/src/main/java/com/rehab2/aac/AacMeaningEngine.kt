@@ -118,6 +118,8 @@ object AacMeaningEngine {
             .replace("č", "c")
             .replace("š", "s")
             .replace("ž", "z")
+            .replace("ć", "c")
+            .replace("đ", "d")
             .replace(Regex("\\s+"), "_")
     }
 
