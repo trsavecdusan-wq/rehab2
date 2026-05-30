@@ -82,17 +82,23 @@ object AacContentBootstrap {
             setDefaultPatientPage(context, existingPages.first().first)
         }
         val defaultPageId = currentDefaultPatientPage(context).ifBlank { DEFAULT_PAGE_ID }
-        val addedPlacements = if (createdDefaultPage) {
+        val defaultPagePlacements = if (createdDefaultPage) {
             addDefaultPagePlacements(itemsArray, defaultPageId)
         } else {
             0
         }
+        val starterPlacements = if (!createdDefaultPage) {
+            addStarterItemsToEmptyDefaultPageSlots(itemsArray, defaultPageId)
+        } else {
+            0
+        }
+        val addedPlacements = defaultPagePlacements + starterPlacements
         val repairedNoUnderstandLabels = repairNoUnderstandSystemLabels(itemsArray)
         val repairedDrinkSpeechItems = repairDrinkChildSpeechItems(itemsArray)
         val repairedFoodSpeechItems = repairFoodChildSpeechItems(itemsArray)
         val repairedPainSpeechItems = repairPainSpeechItems(itemsArray)
         if (
-            (createdDefaultPage && addedPlacements > 0) ||
+            addedPlacements > 0 ||
             mergedMissingSystemItems > 0 ||
             repairedNoUnderstandLabels > 0 ||
             repairedDrinkSpeechItems > 0 ||
@@ -128,7 +134,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -374,6 +380,38 @@ object AacContentBootstrap {
             placements.put(JSONObject().put("pageId", pageId).put("position5x5", position))
             item.put("placements", placements)
             occupiedPositions += position
+            added++
+        }
+        return added
+    }
+
+    private fun addStarterItemsToEmptyDefaultPageSlots(itemsArray: JSONArray, pageId: String): Int {
+        if (pageId.isBlank()) return 0
+        val occupiedPositions = occupiedPositions(itemsArray, pageId).toMutableSet()
+        val freePositions = (6..25).filter { it !in occupiedPositions }
+        if (freePositions.isEmpty()) return 0
+
+        val fixedIds = fixedRowItemIds(itemsArray)
+        val alreadyOnPage = itemIdsOnPage(itemsArray, pageId).toMutableSet()
+        val itemsById = rootItemObjects(itemsArray)
+            .mapNotNull { item -> item.optString("id").trim().takeIf { it.isNotBlank() }?.let { it to item } }
+            .toMap()
+        val candidates = STARTER_VISIBILITY_PRIORITY
+            .asSequence()
+            .mapNotNull { itemId -> itemsById[itemId] }
+            .filterNot(::isUserProtected)
+            .filter { item -> item.optString("id").trim() !in fixedIds }
+            .filter { item -> item.optString("id").trim() !in alreadyOnPage }
+            .distinctBy { item -> item.optString("id").trim() }
+            .toList()
+
+        var added = 0
+        candidates.zip(freePositions).forEach { (item, position) ->
+            val placements = item.optJSONArray("placements") ?: JSONArray()
+            placements.put(JSONObject().put("pageId", pageId).put("position5x5", position))
+            item.put("placements", placements)
+            occupiedPositions += position
+            alreadyOnPage += item.optString("id").trim()
             added++
         }
         return added
@@ -732,6 +770,32 @@ object AacContentBootstrap {
             .filter { it.isNotBlank() }
             .toSet()
     }
+
+    private val STARTER_VISIBILITY_PRIORITY = listOf(
+        "yes",
+        "no",
+        "help",
+        "no_understand",
+        "dont_understand",
+        "wait",
+        "water",
+        "coffee",
+        "change_diaper",
+        "diaper",
+        "body_position",
+        "uncomfortable",
+        "pain",
+        "bad_feeling",
+        "bad",
+        "tired",
+        "afraid",
+        "unsafe",
+        "not_safe",
+        "stop",
+        "stop_movement",
+        "afraid_fall",
+        "fear_falling"
+    )
 
     private fun readProfileJson(profileFile: File): JSONObject? {
         if (!profileFile.isFile) return null
