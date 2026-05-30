@@ -52,6 +52,8 @@ import com.rehab2.aac.AacContentBootstrap
 import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacLocalizedTextResolver
+import com.rehab2.aac.AacNaturalSentenceBuilder
+import com.rehab2.aac.AacQuestionEngine
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
 import com.rehab2.aac.AacStoragePaths
@@ -137,6 +139,26 @@ class MainActivity : AppCompatActivity() {
         private const val MAIN_AAC_AUTO_SENTENCE_DELAY_MS = 4_000L
         private const val MAIN_AAC_SENTENCE_CLEAR_DELAY_MS = 30_000L
         private const val MAIN_AAC_INPUT_LOCK_TIMEOUT_MS = 5_000L
+        private val MAIN_AAC_CONVERSATION_GROUP_KEYS = setOf(
+            "drink",
+            "drinks",
+            "pijaca",
+            "food",
+            "hrana",
+            "pain",
+            "boli",
+            "bolecina",
+            "feeling",
+            "feelings",
+            "pocutje",
+            "help",
+            "pomoc",
+            "people",
+            "ljudje",
+            "family",
+            "care",
+            "nega"
+        )
     }
 
     private data class MainAacTileBinding(
@@ -237,6 +259,7 @@ class MainActivity : AppCompatActivity() {
     private var isMainAacTerminalSelectionAccepted = false
     private var shouldResetMainAacRootAfterSpeech = false
     private var selectedMainAacItemId: String? = null
+    private var currentMainAacConversationParentItem: AacItem? = null
     private var lastMainAacRenderedLanguage = ""
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
@@ -650,6 +673,7 @@ class MainActivity : AppCompatActivity() {
         if (mainAacHistory.isEmpty()) {
             return
         }
+        currentMainAacConversationParentItem = null
         showMainAacItems(mainAacHistory.removeLast())
     }
 
@@ -755,6 +779,7 @@ class MainActivity : AppCompatActivity() {
         isMainAacTerminalSelectionAccepted = false
         shouldResetMainAacRootAfterSpeech = false
         selectedMainAacItemId = null
+        currentMainAacConversationParentItem = null
         val fallbackItems = buildMainAacItems()
         AacContentBootstrap.ensurePatientStartupContent(this, fallbackItems)
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
@@ -786,6 +811,7 @@ class MainActivity : AppCompatActivity() {
         if (targetPageItems.isNotEmpty()) {
             isMainAacTerminalSelectionAccepted = false
             selectedMainAacItemId = item.id
+            currentMainAacConversationParentItem = item.takeIf(::isMainAacConversationGroup)
             prepareMainAacContextPrompt(item)
             lockMainAacInput()
             mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
@@ -799,6 +825,7 @@ class MainActivity : AppCompatActivity() {
             if (childItems.isNotEmpty()) {
                 isMainAacTerminalSelectionAccepted = false
                 selectedMainAacItemId = item.id
+                currentMainAacConversationParentItem = item.takeIf(::isMainAacConversationGroup)
                 prepareMainAacContextPrompt(item)
                 lockMainAacInput()
                 mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
@@ -834,7 +861,10 @@ class MainActivity : AppCompatActivity() {
     private fun prepareMainAacContextPrompt(item: AacItem) {
         clearMainAacSentenceState()
         val languageCode = getActiveSpeechLanguage()
-        val prompt = AacLocalizedTextResolver.resolveQuestion(item, languageCode)?.trim().orEmpty()
+        val prompt = AacLocalizedTextResolver.resolveQuestion(item, languageCode)
+            ?.trim()
+            .orEmpty()
+            .ifBlank { mainAacQuestionFallback(item, languageCode) }
         if (prompt.isNotBlank()) {
             aacAudioPlayer.speakText(prompt, languageCode)
         }
@@ -852,10 +882,16 @@ class MainActivity : AppCompatActivity() {
         if (inContextFlow && item.addsToSentence) {
             selectedMainAacItemId = item.id
             lockMainAacInput()
+            val speechText = mainAacNaturalConversationSpeech(
+                item = item,
+                languageCode = languageCode,
+                resolvedLabel = resolvedLabel,
+                resolvedSpeechText = resolvedSpeechText
+            )
             mainAacSentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
-                    text = resolvedSpeechText.ifBlank { resolvedLabel },
+                    text = speechText.ifBlank { resolvedSpeechText.ifBlank { resolvedLabel } },
                     role = item.sentenceRole
                 )
             )
@@ -869,6 +905,101 @@ class MainActivity : AppCompatActivity() {
             shouldResetMainAacRootAfterSpeech = true
         }
         clearMainAacSentenceState()
+    }
+
+    private fun mainAacQuestionFallback(item: AacItem, languageCode: String): String {
+        if (languageCode.trim().lowercase(Locale.ROOT) != "sl") {
+            return ""
+        }
+        if (!isMainAacConversationGroup(item)) {
+            return ""
+        }
+        return AacQuestionEngine.nextQuestion(mainAacConversationTokens(item, null)).orEmpty()
+    }
+
+    private fun mainAacNaturalConversationSpeech(
+        item: AacItem,
+        languageCode: String,
+        resolvedLabel: String,
+        resolvedSpeechText: String
+    ): String {
+        val parentItem = currentMainAacConversationParentItem ?: return resolvedSpeechText.ifBlank { resolvedLabel }
+        if (languageCode.trim().lowercase(Locale.ROOT) != "sl" || !isMainAacConversationGroup(parentItem)) {
+            return resolvedSpeechText.ifBlank { resolvedLabel }
+        }
+        val naturalSentence = AacNaturalSentenceBuilder
+            .buildSentence(mainAacConversationTokens(parentItem, item))
+            .trim()
+        val fallback = resolvedSpeechText.ifBlank { resolvedLabel }.trim()
+        val rawLabels = listOf(
+            AacLocalizedTextResolver.resolveLabel(parentItem, languageCode),
+            resolvedLabel
+        ).joinToString(" ").trim()
+        return if (
+            naturalSentence.isNotBlank() &&
+            !naturalSentence.equals(rawLabels, ignoreCase = true) &&
+            !naturalSentence.equals(fallback, ignoreCase = true)
+        ) {
+            naturalSentence
+        } else {
+            fallback
+        }
+    }
+
+    private fun mainAacConversationTokens(parentItem: AacItem, childItem: AacItem?): List<String> {
+        val parentTokens = when (parentItem.id.trim().lowercase(Locale.ROOT)) {
+            "drink", "drinks", "thirsty" -> listOf("zelim", "pijaca")
+            "food", "hungry" -> listOf("zelim", "hrana")
+            "pain" -> listOf("boli")
+            "feeling", "feelings", "bad", "good" -> listOf("pocutje")
+            "help" -> listOf("pomoc")
+            "people", "family" -> listOf("ljudje")
+            "care", "nega", "diaper", "body_position" -> listOf("nega")
+            else -> emptyList()
+        }
+        return parentTokens +
+            mainAacItemSpeechTokens(parentItem) +
+            childItem?.let(::mainAacItemSpeechTokens).orEmpty()
+    }
+
+    private fun mainAacItemSpeechTokens(item: AacItem): List<String> {
+        return listOfNotNull(
+            item.id,
+            item.conceptId,
+            item.meaningId,
+            item.meaningType,
+            item.meaningGroup,
+            item.categoryId,
+            item.labelSl,
+            item.speakTextSl,
+            item.speechText
+        ).flatMap { value ->
+            value.split(' ', '_', '-', '/')
+        }.map { token ->
+            token.trim()
+        }.filter { token ->
+            token.isNotBlank()
+        }
+    }
+
+    private fun isMainAacConversationGroup(item: AacItem): Boolean {
+        val keys = listOfNotNull(
+            item.id,
+            item.conceptId,
+            item.meaningId,
+            item.meaningType,
+            item.meaningGroup,
+            item.categoryId,
+            item.labelSl
+        ).map { value -> value.trim().lowercase(Locale.ROOT) }
+        return keys.any { key ->
+            key in MAIN_AAC_CONVERSATION_GROUP_KEYS ||
+                key.contains("pijaca") ||
+                key.contains("hrana") ||
+                key.contains("bolecina") ||
+                key.contains("pocutje") ||
+                key.contains("nega")
+        }
     }
 
     private fun needsMainAacTranslation(item: AacItem, languageCode: String): Boolean {
@@ -1319,11 +1450,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun resetMainAacAfterTerminalSpeech() {
         mainAacHistory.clear()
+        currentMainAacConversationParentItem = null
         resetMainAacRoot()
     }
 
     private fun clearMainAacSentenceState() {
         mainAacSentenceManager.clear()
+        currentMainAacConversationParentItem = null
         mainAacAutoSentenceMaySpeakSingle = false
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)

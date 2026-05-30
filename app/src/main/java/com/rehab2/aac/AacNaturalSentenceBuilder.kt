@@ -13,8 +13,9 @@ object AacNaturalSentenceBuilder {
             normalized.isSingle("utrujen", "utrujena", "tired") -> "Utrujen sem."
             normalized.isSingle("slabo", "bad") -> "Slabo se počutim."
             normalized.isSingle("dobro", "good") -> "Dobro sem."
-            normalized.containsWant() -> buildWantSentence(normalized)
             normalized.containsPain() -> buildPainSentence(normalized)
+            normalized.containsCare() -> buildCareSentence(normalized)
+            normalized.containsWant() -> buildWantSentence(normalized)
             normalized.containsGo() -> buildGoSentence(normalized)
             else -> fallbackSentence(tokens)
         }
@@ -24,9 +25,14 @@ object AacNaturalSentenceBuilder {
 
     private fun buildWantSentence(tokens: List<String>): String {
         return when {
-            tokens.any { it in WATER_TOKENS } -> "Rad bi vodo."
-            tokens.any { it in COFFEE_TOKENS } -> "Rad bi kavo."
-            tokens.any { it in FOOD_TOKENS } -> "Rad bi jedel."
+            tokens.any { it in WATER_TOKENS } -> "Rada bi vodo."
+            tokens.any { it in COFFEE_TOKENS } -> "Rada bi kavo."
+            tokens.any { it in JUICE_TOKENS } -> "Rada bi sok."
+            tokens.any { it in TEA_TOKENS } -> "Rada bi čaj."
+            tokens.any { it in SOUP_TOKENS } -> "Rada bi juho."
+            tokens.any { it in BREAD_TOKENS } -> "Rada bi kruh."
+            tokens.any { it in FRUIT_TOKENS } -> "Rada bi sadje."
+            tokens.any { it in FOOD_TOKENS } -> "Rada bi jedla."
             else -> fallbackSentence(tokens)
         }
     }
@@ -36,6 +42,16 @@ object AacNaturalSentenceBuilder {
             tokens.any { it in LEG_TOKENS } -> "Boli me noga."
             tokens.any { it in HEAD_TOKENS } -> "Boli me glava."
             tokens.any { it in ARM_TOKENS } -> "Boli me roka."
+            else -> fallbackSentence(tokens)
+        }
+    }
+
+    private fun buildCareSentence(tokens: List<String>): String {
+        return when {
+            tokens.any { it in DIAPER_TOKENS } -> "Prosim, zamenjajte mi plenico."
+            tokens.any { it in BODY_POSITION_TOKENS } -> "Prosim, popravite moj položaj."
+            tokens.any { it in WASHING_TOKENS } -> "Prosim, pomagajte mi pri umivanju."
+            tokens.any { it in DRESSING_TOKENS } -> "Prosim, pomagajte mi pri oblačenju."
             else -> fallbackSentence(tokens)
         }
     }
@@ -79,6 +95,8 @@ object AacNaturalSentenceBuilder {
 
     private fun List<String>.containsGo(): Boolean = any { it in GO_TOKENS }
 
+    private fun List<String>.containsCare(): Boolean = any { it in CARE_TOKENS }
+
     private fun List<String>.isNoUnderstand(): Boolean {
         return isSingle("ne_razumem", "no_understand", "dont_understand") ||
             containsAll(listOf("ne", "razumem"))
@@ -93,10 +111,20 @@ object AacNaturalSentenceBuilder {
     private val GO_TOKENS = setOf("grem", "iti", "go")
     private val WATER_TOKENS = setOf("voda", "vodo", "water")
     private val COFFEE_TOKENS = setOf("kava", "kavo", "coffee")
+    private val JUICE_TOKENS = setOf("sok", "juice")
+    private val TEA_TOKENS = setOf("caj", "tea")
+    private val SOUP_TOKENS = setOf("juha", "juho", "soup")
+    private val BREAD_TOKENS = setOf("kruh", "bread")
+    private val FRUIT_TOKENS = setOf("sadje", "fruit")
     private val FOOD_TOKENS = setOf("hrana", "hrano", "jesti", "food", "hungry")
     private val LEG_TOKENS = setOf("noga", "nogo", "leg")
     private val HEAD_TOKENS = setOf("glava", "glavo", "head")
     private val ARM_TOKENS = setOf("roka", "roko", "arm")
     private val HOME_TOKENS = setOf("domov", "dom", "home")
     private val WC_TOKENS = setOf("wc", "stranisce", "toilet")
+    private val CARE_TOKENS = setOf("nega", "care")
+    private val DIAPER_TOKENS = setOf("plenica", "plenico", "diaper")
+    private val BODY_POSITION_TOKENS = setOf("polozaj", "position", "body")
+    private val WASHING_TOKENS = setOf("umivanje", "washing")
+    private val DRESSING_TOKENS = setOf("oblacenje", "dressing")
 }
