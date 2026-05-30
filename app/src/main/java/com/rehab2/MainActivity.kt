@@ -143,6 +143,9 @@ class MainActivity : AppCompatActivity() {
             "drink",
             "drinks",
             "pijaca",
+            "thirsty",
+            "zejna",
+            "žejna",
             "food",
             "hrana",
             "pain",
@@ -260,6 +263,7 @@ class MainActivity : AppCompatActivity() {
     private var shouldResetMainAacRootAfterSpeech = false
     private var selectedMainAacItemId: String? = null
     private var currentMainAacConversationParentItem: AacItem? = null
+    private var currentMainAacConversationItems: List<AacItem> = emptyList()
     private var lastMainAacRenderedLanguage = ""
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
@@ -674,6 +678,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         currentMainAacConversationParentItem = null
+        currentMainAacConversationItems = emptyList()
         showMainAacItems(mainAacHistory.removeLast())
     }
 
@@ -780,6 +785,7 @@ class MainActivity : AppCompatActivity() {
         shouldResetMainAacRootAfterSpeech = false
         selectedMainAacItemId = null
         currentMainAacConversationParentItem = null
+        currentMainAacConversationItems = emptyList()
         val fallbackItems = buildMainAacItems()
         AacContentBootstrap.ensurePatientStartupContent(this, fallbackItems)
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
@@ -807,11 +813,16 @@ class MainActivity : AppCompatActivity() {
         if (isMainAacInputLocked) {
             return
         }
+        if (mainAacHistory.isNotEmpty() && isMainAacGlobalDirectAction(item)) {
+            clearMainAacConversationContext()
+            mainAacHistory.clear()
+            isMainAacTerminalSelectionAccepted = false
+        }
         val targetPageItems = mainAacPageItems(item.targetPageId)
         if (targetPageItems.isNotEmpty()) {
             isMainAacTerminalSelectionAccepted = false
             selectedMainAacItemId = item.id
-            currentMainAacConversationParentItem = item.takeIf(::isMainAacConversationGroup)
+            updateMainAacConversationContextForBranch(item)
             prepareMainAacContextPrompt(item)
             lockMainAacInput()
             mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
@@ -821,11 +832,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         val childItems = mainAacChildrenFor(item)
-        if (item.opensSubicons || childItems.isNotEmpty()) {
+        val canOpenChildItems = item.opensSubicons ||
+            item.children.isNotEmpty() ||
+            (childItems.isNotEmpty() && mainAacHistory.isNotEmpty())
+        if (canOpenChildItems) {
             if (childItems.isNotEmpty()) {
                 isMainAacTerminalSelectionAccepted = false
                 selectedMainAacItemId = item.id
-                currentMainAacConversationParentItem = item.takeIf(::isMainAacConversationGroup)
+                updateMainAacConversationContextForBranch(item)
                 prepareMainAacContextPrompt(item)
                 lockMainAacInput()
                 mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
@@ -859,7 +873,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun prepareMainAacContextPrompt(item: AacItem) {
-        clearMainAacSentenceState()
+        clearMainAacSentenceState(clearConversationContext = false)
         val languageCode = getActiveSpeechLanguage()
         val prompt = AacLocalizedTextResolver.resolveQuestion(item, languageCode)
             ?.trim()
@@ -868,6 +882,22 @@ class MainActivity : AppCompatActivity() {
         if (prompt.isNotBlank()) {
             aacAudioPlayer.speakText(prompt, languageCode)
         }
+    }
+
+    private fun updateMainAacConversationContextForBranch(item: AacItem) {
+        val existingItems = currentMainAacConversationItems
+        val nextItems = when {
+            isMainAacConversationGroup(item) -> listOf(item)
+            existingItems.isNotEmpty() && isMainAacItemInCurrentConversationBranch(item) -> existingItems + item
+            else -> emptyList()
+        }.distinctBy { conversationItem -> conversationItem.id }
+        currentMainAacConversationItems = nextItems
+        currentMainAacConversationParentItem = nextItems.firstOrNull()
+    }
+
+    private fun clearMainAacConversationContext() {
+        currentMainAacConversationParentItem = null
+        currentMainAacConversationItems = emptyList()
     }
 
     private fun handleMainAacResolvedSpeech(
@@ -928,7 +958,7 @@ class MainActivity : AppCompatActivity() {
             return resolvedSpeechText.ifBlank { resolvedLabel }
         }
         val naturalSentence = AacNaturalSentenceBuilder
-            .buildSentence(mainAacConversationTokens(parentItem, item))
+            .buildSentence(mainAacConversationTokens(item))
             .trim()
         val fallback = resolvedSpeechText.ifBlank { resolvedLabel }.trim()
         val rawLabels = listOf(
@@ -947,6 +977,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacConversationTokens(parentItem: AacItem, childItem: AacItem?): List<String> {
+        val sequenceItems = currentMainAacConversationItems.ifEmpty { listOf(parentItem) }
+        return mainAacConversationParentTokens(parentItem) +
+            sequenceItems.flatMap(::mainAacItemSpeechTokens) +
+            childItem?.let(::mainAacItemSpeechTokens).orEmpty()
+    }
+
+    private fun mainAacConversationTokens(item: AacItem): List<String> {
+        val parentItem = currentMainAacConversationParentItem
+        val parentTokens = parentItem?.let(::mainAacConversationParentTokens).orEmpty()
+        return parentTokens +
+            currentMainAacConversationItems.flatMap(::mainAacItemSpeechTokens) +
+            mainAacItemSpeechTokens(item)
+    }
+
+    private fun mainAacConversationParentTokens(parentItem: AacItem): List<String> {
         val parentTokens = when (parentItem.id.trim().lowercase(Locale.ROOT)) {
             "drink", "drinks", "thirsty" -> listOf("zelim", "pijaca")
             "food", "hungry" -> listOf("zelim", "hrana")
@@ -957,9 +1002,7 @@ class MainActivity : AppCompatActivity() {
             "care", "nega", "diaper", "body_position" -> listOf("nega")
             else -> emptyList()
         }
-        return parentTokens +
-            mainAacItemSpeechTokens(parentItem) +
-            childItem?.let(::mainAacItemSpeechTokens).orEmpty()
+        return parentTokens
     }
 
     private fun mainAacItemSpeechTokens(item: AacItem): List<String> {
@@ -995,11 +1038,25 @@ class MainActivity : AppCompatActivity() {
         return keys.any { key ->
             key in MAIN_AAC_CONVERSATION_GROUP_KEYS ||
                 key.contains("pijaca") ||
+                key.contains("zejna") ||
+                key.contains("žejna") ||
                 key.contains("hrana") ||
                 key.contains("bolecina") ||
                 key.contains("pocutje") ||
                 key.contains("nega")
         }
+    }
+
+    private fun isMainAacGlobalDirectAction(item: AacItem): Boolean {
+        val id = item.id.trim().lowercase(Locale.ROOT)
+        return (item.fixedTopRowPosition ?: 0) in 1..MAIN_AAC_FIXED_TOP_ROW_MAX ||
+            id in setOf("yes", "no", "help", "no_understand", "dont_understand", "wait")
+    }
+
+    private fun isMainAacItemInCurrentConversationBranch(item: AacItem): Boolean {
+        val lastConversationItem = currentMainAacConversationItems.lastOrNull() ?: return false
+        return item.id in lastConversationItem.children ||
+            lastConversationItem.id in item.visibleUnderIds
     }
 
     private fun needsMainAacTranslation(item: AacItem, languageCode: String): Boolean {
@@ -1451,12 +1508,16 @@ class MainActivity : AppCompatActivity() {
     private fun resetMainAacAfterTerminalSpeech() {
         mainAacHistory.clear()
         currentMainAacConversationParentItem = null
+        currentMainAacConversationItems = emptyList()
         resetMainAacRoot()
     }
 
-    private fun clearMainAacSentenceState() {
+    private fun clearMainAacSentenceState(clearConversationContext: Boolean = true) {
         mainAacSentenceManager.clear()
-        currentMainAacConversationParentItem = null
+        if (clearConversationContext) {
+            currentMainAacConversationParentItem = null
+            currentMainAacConversationItems = emptyList()
+        }
         mainAacAutoSentenceMaySpeakSingle = false
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
@@ -1470,7 +1531,7 @@ class MainActivity : AppCompatActivity() {
                 opensSubicons = true,
                 children = listOf("water", "juice", "tea", "coffee"),
                 questionByLanguage = mapOf(
-                    "sl" to "Kaj želiš piti?",
+                    "sl" to "Kaj bi pila?",
                     "uk" to "Що ти хочеш пити?",
                     "en" to "What do you want to drink?"
                 )
@@ -1488,12 +1549,19 @@ class MainActivity : AppCompatActivity() {
             ),
             mainAacItem(
                 "thirsty",
-                "ŽEJNA",
+                "ŽEJNA SEM",
                 "žejna sem",
                 labelUk = "ХОЧУ ПИТИ",
                 labelEn = "THIRSTY",
                 speakTextUk = "Я хочу пити",
-                speechTextEn = "I am thirsty"
+                speechTextEn = "I am thirsty",
+                opensSubicons = true,
+                children = listOf("water", "juice", "tea", "coffee"),
+                questionByLanguage = mapOf(
+                    "sl" to "Kaj bi pila?",
+                    "uk" to "Що ти хочеш пити?",
+                    "en" to "What do you want to drink?"
+                )
             ),
             mainAacItem(
                 "hungry",
@@ -1656,7 +1724,12 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Я хочу пити воду",
                 speechTextEn = "I want to drink water",
                 isRootItem = false,
-                visibleUnderIds = listOf("drink")
+                visibleUnderIds = listOf("drink", "thirsty"),
+                questionByLanguage = mapOf(
+                    "sl" to "Kakšno vodo?",
+                    "uk" to "Яку воду?",
+                    "en" to "What kind of water?"
+                )
             ),
             mainAacItem(
                 "juice",
@@ -1667,7 +1740,7 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Я хочу пити сік",
                 speechTextEn = "I want to drink juice",
                 isRootItem = false,
-                visibleUnderIds = listOf("drink")
+                visibleUnderIds = listOf("drink", "thirsty")
             ),
             mainAacItem(
                 "tea",
@@ -1678,7 +1751,7 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Я хочу пити чай",
                 speechTextEn = "I want to drink tea",
                 isRootItem = false,
-                visibleUnderIds = listOf("drink")
+                visibleUnderIds = listOf("drink", "thirsty")
             ),
             mainAacItem(
                 "coffee",
@@ -1689,7 +1762,51 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Я хочу пити каву",
                 speechTextEn = "I want to drink coffee",
                 isRootItem = false,
-                visibleUnderIds = listOf("drink")
+                visibleUnderIds = listOf("drink", "thirsty")
+            ),
+            mainAacItem(
+                "cold_water",
+                "MRZLA",
+                "rada bi mrzlo vodo",
+                labelUk = "ХОЛОДНА",
+                labelEn = "COLD",
+                speakTextUk = "Я хочу холодну воду",
+                speechTextEn = "I want cold water",
+                isRootItem = false,
+                visibleUnderIds = listOf("water")
+            ),
+            mainAacItem(
+                "warm_water",
+                "TOPLA",
+                "rada bi toplo vodo",
+                labelUk = "ТЕПЛА",
+                labelEn = "WARM",
+                speakTextUk = "Я хочу теплу воду",
+                speechTextEn = "I want warm water",
+                isRootItem = false,
+                visibleUnderIds = listOf("water")
+            ),
+            mainAacItem(
+                "still_water",
+                "NAVADNA",
+                "rada bi navadno vodo",
+                labelUk = "НЕГАЗОВАНА",
+                labelEn = "STILL",
+                speakTextUk = "Я хочу негазовану воду",
+                speechTextEn = "I want still water",
+                isRootItem = false,
+                visibleUnderIds = listOf("water")
+            ),
+            mainAacItem(
+                "sparkling_water",
+                "GAZIRANA",
+                "rada bi gazirano vodo",
+                labelUk = "ГАЗОВАНА",
+                labelEn = "SPARKLING",
+                speakTextUk = "Я хочу газовану воду",
+                speechTextEn = "I want sparkling water",
+                isRootItem = false,
+                visibleUnderIds = listOf("water")
             ),
             mainAacItem(
                 "soup",

@@ -12,6 +12,10 @@ object AacStarterContentV1 {
         starter("understand", "RAZUMEM", "Razumem.", "core.understand", "CONFIRMATION", "core", listOf("razumem", "potrditev")),
 
         starter("water", "VODA", "Rada bi vodo.", "drink.water", "DRINK", "drink", listOf("voda", "piti")),
+        starter("cold_water", "MRZLA", "Rada bi mrzlo vodo.", "drink.water.cold", "DRINK", "drink", listOf("mrzla", "voda"), visibleUnderIds = listOf("water"), addsToSentence = true),
+        starter("warm_water", "TOPLA", "Rada bi toplo vodo.", "drink.water.warm", "DRINK", "drink", listOf("topla", "voda"), visibleUnderIds = listOf("water"), addsToSentence = true),
+        starter("still_water", "NAVADNA", "Rada bi navadno vodo.", "drink.water.still", "DRINK", "drink", listOf("navadna", "voda"), visibleUnderIds = listOf("water"), addsToSentence = true),
+        starter("sparkling_water", "GAZIRANA", "Rada bi gazirano vodo.", "drink.water.sparkling", "DRINK", "drink", listOf("gazirana", "voda"), visibleUnderIds = listOf("water"), addsToSentence = true),
         starter("coffee", "KAVA", "Rada bi kavo.", "drink.coffee", "DRINK", "drink", listOf("kava", "piti")),
         starter("tea", "ČAJ", "Rada bi čaj.", "drink.tea", "DRINK", "drink", listOf("čaj", "piti")),
         starter("juice", "SOK", "Rada bi sok.", "drink.juice", "DRINK", "drink", listOf("sok", "piti")),
@@ -78,7 +82,9 @@ object AacStarterContentV1 {
         meaningId: String,
         meaningType: String,
         meaningGroup: String,
-        semanticTags: List<String>
+        semanticTags: List<String>,
+        visibleUnderIds: List<String> = emptyList(),
+        addsToSentence: Boolean = false
     ): AacItem {
         return AacItem(
             id = id,
@@ -89,9 +95,10 @@ object AacStarterContentV1 {
             speakTextSl = speech,
             speechText = speech,
             iconSource = IconSource.SYSTEM,
-            isRootItem = true,
+            isRootItem = visibleUnderIds.isEmpty(),
             isHiddenUntilParent = false,
-            addsToSentence = false,
+            visibleUnderIds = visibleUnderIds,
+            addsToSentence = addsToSentence,
             speaksImmediately = true,
             opensSubicons = false,
             meaningId = meaningId,
@@ -108,7 +115,7 @@ object AacStarterContentV1 {
     private const val START_PRIORITY = 100
     private val STARTER_IDS = listOf(
         "yes", "no", "help", "dont_understand", "wait", "repeat", "slower", "understand",
-        "water", "coffee", "tea", "juice", "not_thirsty",
+        "water", "cold_water", "warm_water", "still_water", "sparkling_water", "coffee", "tea", "juice", "not_thirsty",
         "hungry", "not_hungry", "soup", "bread", "fruit",
         "diaper", "dressing_help", "washing_help", "body_position", "pillow", "blanket", "uncomfortable",
         "pain", "head", "arm", "leg", "back", "belly", "chest", "throat", "pain_light", "pain_strong",

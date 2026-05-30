@@ -25,6 +25,10 @@ object AacNaturalSentenceBuilder {
 
     private fun buildWantSentence(tokens: List<String>): String {
         return when {
+            tokens.any { it in COLD_WATER_TOKENS } -> "Rada bi mrzlo vodo."
+            tokens.any { it in WARM_WATER_TOKENS } -> "Rada bi toplo vodo."
+            tokens.any { it in STILL_WATER_TOKENS } -> "Rada bi navadno vodo."
+            tokens.any { it in SPARKLING_WATER_TOKENS } -> "Rada bi gazirano vodo."
             tokens.any { it in WATER_TOKENS } -> "Rada bi vodo."
             tokens.any { it in COFFEE_TOKENS } -> "Rada bi kavo."
             tokens.any { it in JUICE_TOKENS } -> "Rada bi sok."
@@ -110,6 +114,10 @@ object AacNaturalSentenceBuilder {
     private val PAIN_TOKENS = setOf("boli", "bolecina", "pain")
     private val GO_TOKENS = setOf("grem", "iti", "go")
     private val WATER_TOKENS = setOf("voda", "vodo", "water")
+    private val COLD_WATER_TOKENS = setOf("cold_water", "mrzla", "mrzlo", "cold")
+    private val WARM_WATER_TOKENS = setOf("warm_water", "topla", "toplo", "warm")
+    private val STILL_WATER_TOKENS = setOf("still_water", "navadna", "navadno", "still")
+    private val SPARKLING_WATER_TOKENS = setOf("sparkling_water", "gazirana", "gazirano", "sparkling")
     private val COFFEE_TOKENS = setOf("kava", "kavo", "coffee")
     private val JUICE_TOKENS = setOf("sok", "juice")
     private val TEA_TOKENS = setOf("caj", "tea")

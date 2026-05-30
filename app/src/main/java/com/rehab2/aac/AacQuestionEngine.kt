@@ -8,6 +8,7 @@ object AacQuestionEngine {
         return when {
             normalized.containsPain() && normalized.containsBodyPart() -> "Kako močno boli?"
             normalized.containsPain() -> "Kje boli?"
+            normalized.containsWant() && normalized.containsWater() -> "Kakšno vodo?"
             normalized.containsWant() && normalized.containsDrink() -> "Kaj bi pili?"
             normalized.containsWant() && normalized.containsFood() -> "Kaj bi jedli?"
             normalized.containsGo() -> "Kam bi šli?"
@@ -39,6 +40,8 @@ object AacQuestionEngine {
 
     private fun List<String>.containsDrink(): Boolean = any { it in DRINK_TOKENS }
 
+    private fun List<String>.containsWater(): Boolean = any { it in WATER_TOKENS }
+
     private fun List<String>.containsFood(): Boolean = any { it in FOOD_TOKENS }
 
     private fun List<String>.containsGo(): Boolean = any { it in GO_TOKENS }
@@ -66,6 +69,7 @@ object AacQuestionEngine {
         "throat"
     )
     private val WANT_TOKENS = setOf("zelim", "hocem", "rabim", "jaz_zelim", "want", "need")
+    private val WATER_TOKENS = setOf("voda", "vodo", "water")
     private val DRINK_TOKENS = setOf("pijaca", "piti", "voda", "sok", "caj", "kava", "drink", "water", "juice", "tea", "coffee")
     private val FOOD_TOKENS = setOf("hrana", "jesti", "juha", "kruh", "sadje", "food", "soup", "bread", "fruit")
     private val GO_TOKENS = setOf("grem", "iti", "go")
