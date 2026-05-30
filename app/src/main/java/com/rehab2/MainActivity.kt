@@ -215,6 +215,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainAacTileBindings: List<MainAacTileBinding>
     private var mainAacItemsById: Map<String, AacItem> = emptyMap()
     private var currentMainAacItems: List<AacItem> = emptyList()
+    private var currentMainAacOrderedItems: List<AacItem> = emptyList()
+    private var currentMainAacGridPageIndex = 0
+    private var lastMainAacGridPageCount = 1
+    private var mainAacTouchStartX = 0f
+    private var mainAacTouchStartY = 0f
     private var configuredMainAacGridSize: Int = 0
     private var currentMainAacPageDebugId: String = "root"
     private var lastMainAacPageItemCountBeforeFixed = 0
@@ -442,6 +447,7 @@ class MainActivity : AppCompatActivity() {
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 setBackgroundColor(0xFF232A31.toInt())
+                minimumHeight = 0
                 setPadding(dp(1), dp(1), dp(1), dp(1))
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -473,26 +479,28 @@ class MainActivity : AppCompatActivity() {
         val iconTextSize = when (gridSize) {
             3 -> 46f
             4 -> 38f
-            5 -> 30f
-            else -> 24f
+            5 -> 26f
+            else -> 20f
         }
         val labelTextSize = when (gridSize) {
             3 -> 13f
             4 -> 10f
-            5 -> 9f
-            else -> 8f
+            5 -> 8f
+            else -> 7f
         }
         return LinearLayout(this).apply {
             background = GradientDrawable().apply {
                 setColor(0xFF34414D.toInt())
                 cornerRadius = 0f
             }
+            minimumHeight = 0
             isClickable = true
             isFocusable = true
             gravity = android.view.Gravity.CENTER
             orientation = LinearLayout.VERTICAL
             setPadding(dp(1), dp(1), dp(1), dp(1))
             addView(TextView(context).apply {
+                minimumHeight = 0
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     0,
@@ -504,6 +512,7 @@ class MainActivity : AppCompatActivity() {
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, iconTextSize)
             })
             addView(TextView(context).apply {
+                minimumHeight = 0
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
@@ -518,9 +527,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showMainAacItems(items: List<AacItem>) {
+    private fun showMainAacItems(items: List<AacItem>, resetPaging: Boolean = true) {
         ensureMainAacGridBindings()
-        val visibleItems = items.take(mainAacVisibleContentCapacity())
+        if (resetPaging) {
+            currentMainAacGridPageIndex = 0
+        }
+        currentMainAacOrderedItems = items
+        val visibleItems = mainAacVisiblePageItems(items)
+        lastMainAacFinalItemCountAfterCap = visibleItems.size
         currentMainAacItems = visibleItems
         val languageCode = getActiveSpeechLanguage()
         lastMainAacRenderedLanguage = languageCode
@@ -534,8 +548,9 @@ class MainActivity : AppCompatActivity() {
                 binding.label.text = AacLocalizedTextResolver.resolveLabel(it, languageCode)
                     .uppercase(Locale.ROOT)
                 bindMainAacIcon(binding, it)
-                binding.view.setOnClickListener {
-                    handleMainAacItemAction(item)
+                binding.view.setOnClickListener(null)
+                binding.view.setOnTouchListener { _, event ->
+                    handleMainAacTileTouch(event, item)
                 }
             } ?: run {
                 binding.view.isEnabled = false
@@ -546,12 +561,19 @@ class MainActivity : AppCompatActivity() {
                     text = ""
                 }
                 binding.view.setOnClickListener(null)
+                binding.view.setOnTouchListener(null)
             }
         }
         logMainAacGridDebug(
             boundItemCount = visibleItems.size,
             visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
         )
+        mainAacGridContainer.post {
+            logMainAacGridDebug(
+                boundItemCount = currentMainAacItems.size,
+                visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
+            )
+        }
     }
 
     private fun showPreviousMainAacItems() {
@@ -559,6 +581,92 @@ class MainActivity : AppCompatActivity() {
             return
         }
         showMainAacItems(mainAacHistory.removeLast())
+    }
+
+    private fun showPreviousMainAacGridPage() {
+        if (currentMainAacGridPageIndex <= 0) {
+            return
+        }
+        currentMainAacGridPageIndex -= 1
+        showMainAacItems(currentMainAacOrderedItems, resetPaging = false)
+    }
+
+    private fun showNextMainAacGridPage() {
+        if (currentMainAacGridPageIndex >= lastMainAacGridPageCount - 1) {
+            return
+        }
+        currentMainAacGridPageIndex += 1
+        showMainAacItems(currentMainAacOrderedItems, resetPaging = false)
+    }
+
+    private fun handleMainAacTileTouch(event: MotionEvent, item: AacItem): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                mainAacTouchStartX = event.rawX
+                mainAacTouchStartY = event.rawY
+                return true
+            }
+            MotionEvent.ACTION_UP -> {
+                val deltaX = event.rawX - mainAacTouchStartX
+                val deltaY = event.rawY - mainAacTouchStartY
+                val absDeltaX = if (deltaX < 0) -deltaX else deltaX
+                val absDeltaY = if (deltaY < 0) -deltaY else deltaY
+                mainAacTouchStartX = 0f
+                mainAacTouchStartY = 0f
+                if (lastMainAacGridPageCount > 1 && absDeltaX >= RADIO_SWIPE_THRESHOLD_PX && absDeltaX > absDeltaY) {
+                    if (deltaX < 0) {
+                        showNextMainAacGridPage()
+                    } else {
+                        showPreviousMainAacGridPage()
+                    }
+                    return true
+                }
+                handleMainAacItemAction(item)
+                return true
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                mainAacTouchStartX = 0f
+                mainAacTouchStartY = 0f
+                return true
+            }
+        }
+        return true
+    }
+
+    private fun mainAacVisiblePageItems(items: List<AacItem>): List<AacItem> {
+        val capacity = mainAacVisibleContentCapacity()
+        if (capacity <= 0) {
+            lastMainAacGridPageCount = 1
+            currentMainAacGridPageIndex = 0
+            return emptyList()
+        }
+        val allFixedItems = fixedTopRowItems(mainAacItemsById.values.toList())
+        val visibleFixedItems = visibleFixedTopRowItems(allFixedItems).take(capacity)
+        val visibleFixedIds = visibleFixedItems.map { it.id }.toSet()
+        val allFixedIds = allFixedItems.map { it.id }.toSet()
+        val overflowFixedItems = allFixedItems.filter { item -> item.id !in visibleFixedIds }
+        val normalItems = (overflowFixedItems + items.filter { item ->
+            item.id !in allFixedIds
+        }).distinctBy { item -> item.id }
+        val normalCapacity = (capacity - visibleFixedItems.size).coerceAtLeast(0)
+        if (normalCapacity <= 0) {
+            lastMainAacGridPageCount = 1
+            currentMainAacGridPageIndex = 0
+            return visibleFixedItems.take(capacity)
+        }
+        if (normalItems.size <= normalCapacity) {
+            lastMainAacGridPageCount = 1
+            currentMainAacGridPageIndex = 0
+            return (visibleFixedItems + normalItems).take(capacity)
+        }
+
+        val normalPageSize = normalCapacity.coerceAtLeast(1)
+        lastMainAacGridPageCount = ((normalItems.size + normalPageSize - 1) / normalPageSize).coerceAtLeast(1)
+        currentMainAacGridPageIndex = currentMainAacGridPageIndex.coerceIn(0, lastMainAacGridPageCount - 1)
+        val pageItems = normalItems
+            .drop(currentMainAacGridPageIndex * normalPageSize)
+            .take(normalPageSize)
+        return (visibleFixedItems + pageItems).take(capacity)
     }
 
     private fun resetMainAacRoot() {
@@ -590,7 +698,7 @@ class MainActivity : AppCompatActivity() {
         val targetPageItems = mainAacPageItems(item.targetPageId)
         if (targetPageItems.isNotEmpty()) {
             prepareMainAacContextPrompt(item)
-            mainAacHistory.addLast(currentMainAacItems)
+            mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
             currentMainAacPageDebugId = item.targetPageId
             showMainAacItems(targetPageItems)
             return
@@ -600,7 +708,7 @@ class MainActivity : AppCompatActivity() {
         if (item.opensSubicons || childItems.isNotEmpty()) {
             if (childItems.isNotEmpty()) {
                 prepareMainAacContextPrompt(item)
-                mainAacHistory.addLast(currentMainAacItems)
+                mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
                 currentMainAacPageDebugId = "children:${item.id}"
                 updateMainAacGridSelectionDebug(currentMainAacPageDebugId, childItems)
                 showMainAacItems(childItems)
@@ -644,7 +752,7 @@ class MainActivity : AppCompatActivity() {
             mainAacSentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
-                    text = resolvedLabel,
+                    text = resolvedSpeechText.ifBlank { resolvedLabel },
                     role = item.sentenceRole
                 )
             )
@@ -719,12 +827,15 @@ class MainActivity : AppCompatActivity() {
         currentMainAacItems = currentMainAacItems.map { item ->
             if (item.id == updatedItem.id) updatedItem else item
         }
+        currentMainAacOrderedItems = currentMainAacOrderedItems.map { item ->
+            if (item.id == updatedItem.id) updatedItem else item
+        }
         val remappedHistory = mainAacHistory.map { pageItems ->
             pageItems.map { item -> if (item.id == updatedItem.id) updatedItem else item }
         }
         mainAacHistory.clear()
         remappedHistory.forEach { mainAacHistory.addLast(it) }
-        showMainAacItems(currentMainAacItems)
+        showMainAacItems(currentMainAacOrderedItems.ifEmpty { currentMainAacItems }, resetPaging = false)
     }
 
     private fun startMainAacPretranslation(languageCode: String) {
@@ -779,13 +890,14 @@ class MainActivity : AppCompatActivity() {
         if (mergedItemsById.isNotEmpty()) {
             mainAacItemsById = mergedItemsById
             currentMainAacItems = currentMainAacItems.map { item -> mergedItemsById[item.id] ?: item }
+            currentMainAacOrderedItems = currentMainAacOrderedItems.map { item -> mergedItemsById[item.id] ?: item }
             val remappedHistory = mainAacHistory.map { pageItems ->
                 pageItems.map { item -> mergedItemsById[item.id] ?: item }
             }
             mainAacHistory.clear()
             remappedHistory.forEach { mainAacHistory.addLast(it) }
         }
-        showMainAacItems(currentMainAacItems)
+        showMainAacItems(currentMainAacOrderedItems.ifEmpty { currentMainAacItems }, resetPaging = false)
     }
 
     private fun mergeMainAacFallbackItems(
@@ -885,9 +997,8 @@ class MainActivity : AppCompatActivity() {
         lastMainAacFixedRowItemCount = fixedItems.size
         lastMainAacNormalItemCount = placedItems.size + fillItems.size
         lastMainAacFinalOrderedItemCount = finalOrderedItems.size
-        val result = finalOrderedItems.take(mainAacVisibleContentCapacity())
-        lastMainAacFinalItemCountAfterCap = result.size
-        return result
+        lastMainAacFinalItemCountAfterCap = finalOrderedItems.take(mainAacVisibleContentCapacity()).size
+        return finalOrderedItems
     }
 
     private fun orderedMainAacItemsWithFixedTopRow(items: List<AacItem>): List<AacItem> {
@@ -946,10 +1057,27 @@ class MainActivity : AppCompatActivity() {
         val selectedGridSize = mainAacSelectedGridSize()
         val expectedSlotCount = selectedGridSize * selectedGridSize
         val createdTileViewCount = if (::mainAacTileBindings.isInitialized) mainAacTileBindings.size else 0
+        val attachedChildCount = if (::mainAacGridContainer.isInitialized) mainAacGridContainer.childCount else 0
+        val gridRowCount = attachedChildCount
+        val firstRow = if (::mainAacGridContainer.isInitialized && mainAacGridContainer.childCount > 0) {
+            mainAacGridContainer.getChildAt(0) as? ViewGroup
+        } else {
+            null
+        }
+        val gridColumnCount = firstRow?.childCount ?: 0
+        val containerHeight = if (::mainAacGridContainer.isInitialized) mainAacGridContainer.height else 0
+        val tileHeight = mainAacTileBindings.firstOrNull()?.view?.height ?: 0
+        var rowsHeight = 0
+        if (::mainAacGridContainer.isInitialized) {
+            for (index in 0 until mainAacGridContainer.childCount) {
+                rowsHeight += mainAacGridContainer.getChildAt(index).height
+            }
+        }
+        val isClippedOrScrollable = containerHeight > 0 && rowsHeight > containerHeight
         val emptySlots = (expectedSlotCount - boundItemCount).coerceAtLeast(0)
         Log.d(
             "MainAAC",
-            "GRID DEBUG selectedGridSize=$selectedGridSize runtimeGridSize=$configuredMainAacGridSize expectedSlotCount=$expectedSlotCount createdTileViewCount=$createdTileViewCount boundItemCount=$boundItemCount visibleTileCount=$visibleTileCount currentPageId=$currentMainAacPageDebugId pageItemCountBeforeFixed=$lastMainAacPageItemCountBeforeFixed fixedRowItemCount=$lastMainAacFixedRowItemCount normalItemCount=$lastMainAacNormalItemCount finalOrderedItemCountBeforeTake=$lastMainAacFinalOrderedItemCount finalItemCountAfterTake=$lastMainAacFinalItemCountAfterCap cappedAtOldLimit=${boundItemCount < expectedSlotCount && createdTileViewCount < expectedSlotCount} emptySlots=$emptySlots"
+            "GRID DEBUG selectedGridSize=$selectedGridSize runtimeGridSize=$configuredMainAacGridSize expectedSlotCount=$expectedSlotCount createdTileViewCount=$createdTileViewCount attachedChildCount=$attachedChildCount visibleTileCount=$visibleTileCount gridRowCount=$gridRowCount gridColumnCount=$gridColumnCount containerHeight=$containerHeight tileHeight=$tileHeight isClippedOrScrollable=$isClippedOrScrollable currentPageId=$currentMainAacPageDebugId pageItemCountBeforeFixed=$lastMainAacPageItemCountBeforeFixed fixedRowItemCount=$lastMainAacFixedRowItemCount normalItemCount=$lastMainAacNormalItemCount finalOrderedItemCountBeforeTake=$lastMainAacFinalOrderedItemCount finalItemCountAfterTake=$lastMainAacFinalItemCountAfterCap boundItemCount=$boundItemCount cappedAtOldLimit=${boundItemCount < expectedSlotCount && createdTileViewCount < expectedSlotCount} emptySlots=$emptySlots pageIndex=${currentMainAacGridPageIndex + 1} pageCount=$lastMainAacGridPageCount"
         )
     }
 
@@ -977,8 +1105,8 @@ class MainActivity : AppCompatActivity() {
         return when (mainAacSelectedGridSize()) {
             3 -> 76
             4 -> 58
-            5 -> 46
-            else -> 38
+            5 -> 38
+            else -> 30
         }
     }
 
@@ -1258,13 +1386,83 @@ class MainActivity : AppCompatActivity() {
                 speechTextEn = "Call my family"
             ),
             mainAacItem("stop", "STOP", "stop"),
-            mainAacItem("water", "VODA", "voda", isRootItem = false, visibleUnderIds = listOf("drink")),
-            mainAacItem("juice", "SOK", "sok", isRootItem = false, visibleUnderIds = listOf("drink")),
-            mainAacItem("tea", "ČAJ", "čaj", isRootItem = false, visibleUnderIds = listOf("drink")),
-            mainAacItem("coffee", "KAVA", "kava", isRootItem = false, visibleUnderIds = listOf("drink")),
-            mainAacItem("soup", "JUHA", "juha", isRootItem = false, visibleUnderIds = listOf("food")),
-            mainAacItem("bread", "KRUH", "kruh", isRootItem = false, visibleUnderIds = listOf("food")),
-            mainAacItem("fruit", "SADJE", "sadje", isRootItem = false, visibleUnderIds = listOf("food")),
+            mainAacItem(
+                "water",
+                "VODA",
+                "želim vodo",
+                labelUk = "ВОДА",
+                labelEn = "WATER",
+                speakTextUk = "Я хочу води",
+                speechTextEn = "I want water",
+                isRootItem = false,
+                visibleUnderIds = listOf("drink")
+            ),
+            mainAacItem(
+                "juice",
+                "SOK",
+                "želim sok",
+                labelUk = "СІК",
+                labelEn = "JUICE",
+                speakTextUk = "Я хочу сік",
+                speechTextEn = "I want juice",
+                isRootItem = false,
+                visibleUnderIds = listOf("drink")
+            ),
+            mainAacItem(
+                "tea",
+                "ČAJ",
+                "želim čaj",
+                labelUk = "ЧАЙ",
+                labelEn = "TEA",
+                speakTextUk = "Я хочу чай",
+                speechTextEn = "I want tea",
+                isRootItem = false,
+                visibleUnderIds = listOf("drink")
+            ),
+            mainAacItem(
+                "coffee",
+                "KAVA",
+                "želim kavo",
+                labelUk = "КАВА",
+                labelEn = "COFFEE",
+                speakTextUk = "Я хочу каву",
+                speechTextEn = "I want coffee",
+                isRootItem = false,
+                visibleUnderIds = listOf("drink")
+            ),
+            mainAacItem(
+                "soup",
+                "JUHA",
+                "želim juho",
+                labelUk = "СУП",
+                labelEn = "SOUP",
+                speakTextUk = "Я хочу суп",
+                speechTextEn = "I want soup",
+                isRootItem = false,
+                visibleUnderIds = listOf("food")
+            ),
+            mainAacItem(
+                "bread",
+                "KRUH",
+                "želim kruh",
+                labelUk = "ХЛІБ",
+                labelEn = "BREAD",
+                speakTextUk = "Я хочу хліб",
+                speechTextEn = "I want bread",
+                isRootItem = false,
+                visibleUnderIds = listOf("food")
+            ),
+            mainAacItem(
+                "fruit",
+                "SADJE",
+                "želim sadje",
+                labelUk = "ФРУКТИ",
+                labelEn = "FRUIT",
+                speakTextUk = "Я хочу фрукти",
+                speechTextEn = "I want fruit",
+                isRootItem = false,
+                visibleUnderIds = listOf("food")
+            ),
             mainAacItem("head", "GLAVA", "glava", isRootItem = false, visibleUnderIds = listOf("pain")),
             mainAacItem("arm", "ROKA", "roka", isRootItem = false, visibleUnderIds = listOf("pain")),
             mainAacItem("leg", "NOGA", "noga", isRootItem = false, visibleUnderIds = listOf("pain")),
