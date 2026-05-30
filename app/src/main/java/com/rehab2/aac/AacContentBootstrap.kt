@@ -55,7 +55,7 @@ object AacContentBootstrap {
         val itemsFile = AacStoragePaths.getAacItemsFile(context)
         val rawItems = loadItemsJson(itemsFile, fallbackItems)
         val itemsArray = rawItems.itemsArray
-        val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems)
+        val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems + AacStarterContentV1.items())
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
             return Result(
