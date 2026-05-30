@@ -70,6 +70,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
         private const val PATIENT_PAGE_SEPARATOR = "\u001E"
         private const val PATIENT_PAGE_FIELD_SEPARATOR = "\u001F"
+        private const val AAC_GRID_PREFS_NAME = "aac_grid_settings"
+        private const val KEY_AAC_GRID_SIZE = "aac_grid_size"
+        private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val AAC_LANGUAGE_PREFS_NAME = "aac_language_settings"
         private const val KEY_AAC_ACTIVE_LANGUAGES = "active_languages"
         private const val KEY_AAC_BASE_LANGUAGE = "base_language"
@@ -97,6 +100,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var communicatorDashboardActions: LinearLayout
     private lateinit var txtAacBootstrapStatus: TextView
     private lateinit var btnRepairAacBootstrap: Button
+    private lateinit var txtAacGridSizeStatus: TextView
+    private lateinit var btnAacGrid3x3: Button
+    private lateinit var btnAacGrid4x4: Button
+    private lateinit var btnAacGrid5x5: Button
+    private lateinit var btnAacGrid6x6: Button
     private lateinit var txtFixedTopRowStatus: TextView
     private lateinit var editFixedTopRowItemId: EditText
     private lateinit var editFixedTopRowPosition: EditText
@@ -227,6 +235,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
         communicatorDashboardActions = findViewById(R.id.communicatorDashboardActions)
         txtAacBootstrapStatus = findViewById(R.id.txtAacBootstrapStatus)
         btnRepairAacBootstrap = findViewById(R.id.btnRepairAacBootstrap)
+        txtAacGridSizeStatus = findViewById(R.id.txtAacGridSizeStatus)
+        btnAacGrid3x3 = findViewById(R.id.btnAacGrid3x3)
+        btnAacGrid4x4 = findViewById(R.id.btnAacGrid4x4)
+        btnAacGrid5x5 = findViewById(R.id.btnAacGrid5x5)
+        btnAacGrid6x6 = findViewById(R.id.btnAacGrid6x6)
         txtFixedTopRowStatus = findViewById(R.id.txtFixedTopRowStatus)
         editFixedTopRowItemId = findViewById(R.id.editFixedTopRowItemId)
         editFixedTopRowPosition = findViewById(R.id.editFixedTopRowPosition)
@@ -451,6 +464,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnRepairAacBootstrap.setOnClickListener {
             repairPatientAacBootstrap()
         }
+        btnAacGrid3x3.setOnClickListener { saveAacGridSize(3) }
+        btnAacGrid4x4.setOnClickListener { saveAacGridSize(4) }
+        btnAacGrid5x5.setOnClickListener { saveAacGridSize(5) }
+        btnAacGrid6x6.setOnClickListener { saveAacGridSize(6) }
         editAacLibrarySearch.setOnEditorActionListener { _, _, _ ->
             refreshLocalAacOverview()
             false
@@ -1102,6 +1119,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         txtAacBootstrapStatus.text = buildAacBootstrapStatus(overview)
         txtSourceActivationStatus.text = buildSourceActivationStatus()
         renderAacItemEditorList(overview.relationAnalysis.availableItems)
+        refreshAacGridSizeStatus()
         txtFixedTopRowStatus.text = buildFixedTopRowStatus(overview.relationAnalysis.fixedTopRowItems)
         renderFixedTopRowVisualEditor()
         txtFixedTopRowAvailableItems.text = buildFixedTopRowAvailableItems(overview.relationAnalysis.availableItems)
@@ -1293,6 +1311,49 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("DOM povezanih ikon: ${result.domProfileLinkedItemCount}")
         }
         refreshLocalAacOverview()
+    }
+
+    private fun saveAacGridSize(gridSize: Int) {
+        if (gridSize !in 3..6) {
+            txtStatus.text = "Velikost mreže mora biti 3x3, 4x4, 5x5 ali 6x6."
+            return
+        }
+        getSharedPreferences(AAC_GRID_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_AAC_GRID_SIZE, gridSize)
+            .apply()
+        refreshAacGridSizeStatus()
+        txtStatus.text = if (gridSize == 6) {
+            "Shranjeno: 6x6 je napredna nastavitev za velik 14\" zaslon."
+        } else {
+            "Shranjeno: mreža komunikatorja ${gridSize}x$gridSize."
+        }
+    }
+
+    private fun refreshAacGridSizeStatus() {
+        val gridSize = selectedAacGridSize()
+        txtAacGridSizeStatus.text = buildString {
+            appendLine("Trenutna mreža: ${gridSize}x$gridSize")
+            appendLine("Privzeto: 4x4. 6x6 je napredno, samo za velik 14\" zaslon.")
+            append("Fiksna vrstica: 3x3 F1-F3, 4x4 F1-F4, 5x5 F1-F5, 6x6 F1-F5; 6. polje je normalna ikona.")
+        }
+        val selectedColor = 0xFF2E8B57.toInt()
+        val normalColor = 0xFF34414D.toInt()
+        listOf(
+            3 to btnAacGrid3x3,
+            4 to btnAacGrid4x4,
+            5 to btnAacGrid5x5,
+            6 to btnAacGrid6x6
+        ).forEach { (size, button) ->
+            button.backgroundTintList = ColorStateList.valueOf(if (size == gridSize) selectedColor else normalColor)
+        }
+    }
+
+    private fun selectedAacGridSize(): Int {
+        return getSharedPreferences(AAC_GRID_PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE)
+            .takeIf { it in 3..6 }
+            ?: DEFAULT_AAC_GRID_SIZE
     }
 
     private fun renderCommunicatorDashboard(overview: LocalAacOverview) {

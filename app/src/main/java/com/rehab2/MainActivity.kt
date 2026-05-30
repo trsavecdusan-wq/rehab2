@@ -211,9 +211,11 @@ class MainActivity : AppCompatActivity() {
     private var isSleepDimActive = false
     private var isKeepScreenOnApplied = false
     private val mainAacSentenceManager = AacSentenceStateManager()
+    private lateinit var mainAacGridContainer: LinearLayout
     private lateinit var mainAacTileBindings: List<MainAacTileBinding>
     private var mainAacItemsById: Map<String, AacItem> = emptyMap()
     private var currentMainAacItems: List<AacItem> = emptyList()
+    private var configuredMainAacGridSize: Int = 0
     private val mainAacHistory = ArrayDeque<List<AacItem>>()
     private val pendingMainAacTranslationKeys = mutableSetOf<String>()
     private val pendingMainAacPretranslationLanguages = mutableSetOf<String>()
@@ -348,18 +350,6 @@ class MainActivity : AppCompatActivity() {
 
         configureMainAacTiles()
 
-        findViewById<View>(R.id.tileAacDomov).setOnClickListener {
-            if (mainAacHistory.isNotEmpty()) {
-                showPreviousMainAacItems()
-            } else {
-                resetMainAacRoot()
-            }
-        }
-        findViewById<View>(R.id.tileAacDomov).setOnLongClickListener {
-            resetMainAacRoot()
-            true
-        }
-
         refreshStatusModule()
         refreshInitialPowerState()
         applyKeepScreenOnPolicy()
@@ -405,23 +395,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configureMainAacTiles() {
-        mainAacTileBindings = listOf(
-            MainAacTileBinding.from(findViewById(R.id.tileAacZejna)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacLacna)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacPomoc)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacDa)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacWc)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacDobro)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacSlabo)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacNe)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacUtrujena)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacMraz)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacVroce)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacBolecina)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacZdravnik)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacDruzina)),
-            MainAacTileBinding.from(findViewById(R.id.tileAacStop))
-        )
+        mainAacGridContainer = findViewById(R.id.mainAacGridContainer)
+        ensureMainAacGridBindings()
         val fallbackItems = buildMainAacItems()
         AacContentBootstrap.ensurePatientStartupContent(this, fallbackItems)
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
@@ -434,7 +409,107 @@ class MainActivity : AppCompatActivity() {
         showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
     }
 
+    private fun ensureMainAacGridBindings() {
+        val gridSize = mainAacSelectedGridSize()
+        if (
+            ::mainAacTileBindings.isInitialized &&
+            configuredMainAacGridSize == gridSize &&
+            mainAacTileBindings.size == gridSize * gridSize
+        ) {
+            return
+        }
+
+        configuredMainAacGridSize = gridSize
+        mainAacGridContainer.removeAllViews()
+        mainAacGridContainer.orientation = LinearLayout.VERTICAL
+        mainAacGridContainer.setOnLongClickListener {
+            resetMainAacRoot()
+            true
+        }
+
+        val bindings = mutableListOf<MainAacTileBinding>()
+        repeat(gridSize) { rowIndex ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setBackgroundColor(0xFF232A31.toInt())
+                setPadding(dp(1), dp(1), dp(1), dp(1))
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    0,
+                    1f
+                ).apply {
+                    if (rowIndex < gridSize - 1) bottomMargin = dp(1)
+                }
+            }
+            repeat(gridSize) { columnIndex ->
+                val tile = createMainAacTileView(gridSize).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        1f
+                    ).apply {
+                        if (columnIndex > 0) leftMargin = dp(1)
+                    }
+                }
+                row.addView(tile)
+                bindings += MainAacTileBinding.from(tile)
+            }
+            mainAacGridContainer.addView(row)
+        }
+        mainAacTileBindings = bindings
+    }
+
+    private fun createMainAacTileView(gridSize: Int): LinearLayout {
+        val iconTextSize = when (gridSize) {
+            3 -> 46f
+            4 -> 38f
+            5 -> 30f
+            else -> 24f
+        }
+        val labelTextSize = when (gridSize) {
+            3 -> 13f
+            4 -> 10f
+            5 -> 9f
+            else -> 8f
+        }
+        return LinearLayout(this).apply {
+            background = GradientDrawable().apply {
+                setColor(0xFF34414D.toInt())
+                cornerRadius = 0f
+            }
+            isClickable = true
+            isFocusable = true
+            gravity = android.view.Gravity.CENTER
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(1), dp(1), dp(1), dp(1))
+            addView(TextView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    0,
+                    1f
+                )
+                gravity = android.view.Gravity.CENTER
+                includeFontPadding = false
+                setTextColor(0xFFF4F7FA.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, iconTextSize)
+            })
+            addView(TextView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                gravity = android.view.Gravity.CENTER
+                includeFontPadding = false
+                maxLines = 2
+                setTextColor(0xFFF4F7FA.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, labelTextSize)
+                setTypeface(typeface, Typeface.BOLD)
+            })
+        }
+    }
+
     private fun showMainAacItems(items: List<AacItem>) {
+        ensureMainAacGridBindings()
         val visibleItems = items.take(mainAacVisibleContentCapacity())
         currentMainAacItems = visibleItems
         val languageCode = getActiveSpeechLanguage()
@@ -824,11 +899,20 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val drawable = BitmapDrawable(resources, bitmap).apply {
-            val size = dp(58)
+            val size = dp(mainAacIconBitmapSizeDp())
             setBounds(0, 0, size, size)
         }
         iconView.text = ""
         iconView.setCompoundDrawables(null, drawable, null, null)
+    }
+
+    private fun mainAacIconBitmapSizeDp(): Int {
+        return when (mainAacSelectedGridSize()) {
+            3 -> 76
+            4 -> 58
+            5 -> 46
+            else -> 38
+        }
     }
 
     private fun restoreMainAacFallbackIcon(binding: MainAacTileBinding, item: AacItem?) {
