@@ -55,7 +55,9 @@ object AacContentBootstrap {
         val itemsFile = AacStoragePaths.getAacItemsFile(context)
         val rawItems = loadItemsJson(itemsFile, fallbackItems)
         val itemsArray = rawItems.itemsArray
-        val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems + AacStarterContentV1.items())
+        val starterItems = AacStarterContentV1.items()
+        val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems + starterItems)
+        val repairedStarterCategoryChildren = repairStarterCategoryChildren(itemsArray, starterItems)
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
             return Result(
@@ -100,6 +102,7 @@ object AacContentBootstrap {
         if (
             addedPlacements > 0 ||
             mergedMissingSystemItems > 0 ||
+            repairedStarterCategoryChildren > 0 ||
             repairedNoUnderstandLabels > 0 ||
             repairedDrinkSpeechItems > 0 ||
             repairedFoodSpeechItems > 0 ||
@@ -134,7 +137,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -153,6 +156,35 @@ object AacContentBootstrap {
             merged++
         }
         return merged
+    }
+
+    private fun repairStarterCategoryChildren(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+        var repaired = 0
+        starterItems
+            .filter { starter -> starter.children.isNotEmpty() }
+            .forEach { starter ->
+                val item = itemsById[starter.id] ?: return@forEach
+                if (isUserProtected(item)) return@forEach
+                val children = item.optJSONArray("children") ?: JSONArray()
+                val existingChildren = stringList(children).toMutableSet()
+                var itemRepaired = 0
+                starter.children.forEach { childId ->
+                    if (childId.isNotBlank() && childId in itemsById && existingChildren.add(childId)) {
+                        children.put(childId)
+                        itemRepaired++
+                        repaired++
+                    }
+                }
+                if (itemRepaired > 0 || item.optJSONArray("children") == null) {
+                    item.put("children", children)
+                }
+            }
+        return repaired
     }
 
     private fun repairNoUnderstandSystemLabels(itemsArray: JSONArray): Int {
