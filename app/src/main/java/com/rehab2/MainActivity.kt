@@ -57,6 +57,7 @@ import com.rehab2.aac.AacPlacement
 import com.rehab2.aac.AacQuestionEngine
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
+import com.rehab2.aac.AacStarterContentV1
 import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.AacStoredTranslationCache
 import com.rehab2.aac.IconSource
@@ -1828,15 +1829,31 @@ class MainActivity : AppCompatActivity() {
                 "drink", "drinks", "thirsty", "water", "juice", "soca_water" -> return "\uD83E\uDD64"
                 "coffee" -> return "☕"
                 "tea" -> return "\uD83C\uDF75"
-                "food", "hungry", "soup", "bread", "fruit" -> return "\uD83C\uDF7D"
+                "food", "hungry" -> return "\uD83C\uDF7D"
+                "soup" -> return "\uD83C\uDF72"
+                "bread" -> return "\uD83C\uDF5E"
+                "fruit" -> return "\uD83C\uDF4E"
+                "meat" -> return "\uD83C\uDF56"
+                "sweet" -> return "\uD83C\uDF6C"
+                "other_food" -> return "⋯"
                 "help", "soca_help" -> return "\uD83C\uDD98"
                 "thank_you" -> return "\uD83D\uDE4F"
                 "wait" -> return "⏳"
                 "repeat" -> return "\uD83D\uDD01"
                 "slower" -> return "\uD83D\uDC22"
-                "miss_someone" -> return "\uD83D\uDC9B"
+                "miss_someone", "miss_you" -> return "\uD83D\uDC9B"
+                "love_you" -> return "❤"
+                "sorry", "please" -> return "\uD83E\uDD32"
+                "call_me", "contact_call" -> return "\uD83D\uDCDE"
+                "come_to_me" -> return "\uD83D\uDC49"
+                "contact_message" -> return "\uD83D\uDCE9"
+                "contact_help" -> return "\uD83C\uDD98"
+                "back_to_main" -> return "↩"
                 "family_group" -> return "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67"
                 "friends_group" -> return "\uD83D\uDC65"
+                "sister_zana", "julija", "oksana", "inna" -> return "\uD83D\uDC69"
+                "grandfather_sergej", "franc" -> return "\uD83D\uDC64"
+                "who_is_coming", "when_come" -> return "?"
                 "where_go" -> return "\uD83D\uDCCD"
                 "what_do" -> return "?"
                 "feeling" -> return "\uD83D\uDE42"
@@ -1873,6 +1890,15 @@ class MainActivity : AppCompatActivity() {
                 "leg" -> return "\uD83E\uDDB5"
                 "back" -> return "\uD83E\uDDCD"
                 "belly" -> return "\uD83E\uDD30"
+                "chest" -> return "\uD83E\uDEC0"
+                "throat" -> return "\uD83D\uDDE3"
+                "left_side" -> return "←"
+                "right_side" -> return "→"
+                "other_body" -> return "⋯"
+                "pain_light" -> return "1"
+                "pain_medium" -> return "2"
+                "pain_strong" -> return "3"
+                "pain_very_strong" -> return "4"
                 "doctor" -> return "\uD83D\uDC68\u200D⚕️"
                 "therapist" -> return "\uD83E\uDDD1\u200D⚕️"
                 "nurse" -> return "\uD83D\uDC69\u200D⚕️"
@@ -1968,7 +1994,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun buildMainAacItems(): List<AacItem> {
-        return listOf(
+        val legacyItems = listOf(
             mainAacItem(
                 "drink",
                 "PIJAČA",
@@ -2362,7 +2388,9 @@ class MainActivity : AppCompatActivity() {
                     "sl" to "Kaj še potrebuješ?",
                     "uk" to "Що ще потрібно?",
                     "en" to "What else do you need?"
-                )
+                ),
+                isRootItem = false,
+                visibleUnderIds = listOf("legacy_more")
             ),
             mainAacItem(
                 "doctor",
@@ -2537,6 +2565,23 @@ class MainActivity : AppCompatActivity() {
             mainAacItem("chest", "PRSI", "boli me v prsih", labelUk = "ГРУДИ", labelEn = "CHEST", speakTextUk = "У мене болить у грудях", speechTextEn = "My chest hurts", isRootItem = false, visibleUnderIds = listOf("pain", "pain_area")),
             mainAacItem("throat", "GRLO", "boli me grlo", labelUk = "ГОРЛО", labelEn = "THROAT", speakTextUk = "У мене болить горло", speechTextEn = "My throat hurts", isRootItem = false, visibleUnderIds = listOf("pain", "pain_area"))
         )
+        val starterItems = AacStarterContentV1.items()
+        val starterItemsById = starterItems.associateBy { item -> item.id }
+        val enrichedLegacyItems = legacyItems.map { legacyItem ->
+            val starterItem = starterItemsById[legacyItem.id]
+            if (starterItem == null) {
+                legacyItem
+            } else {
+                legacyItem.copy(
+                    placements = legacyItem.placements.ifEmpty { starterItem.placements },
+                    priority = if (legacyItem.priority == 0) starterItem.priority else legacyItem.priority,
+                    isRootItem = legacyItem.isRootItem || starterItem.placements.isNotEmpty()
+                )
+            }
+        }
+        val legacyIds = legacyItems.map { item -> item.id }.toSet()
+        val starterOnlyItems = starterItems.filter { item -> item.id !in legacyIds }
+        return enrichedLegacyItems + starterOnlyItems
     }
 
     private fun mainAacItem(

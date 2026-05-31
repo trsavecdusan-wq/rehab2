@@ -2200,7 +2200,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun bulkAssignIconSource() {
         val sourceText = editBulkAacSource.text.toString().trim().uppercase(Locale.ROOT)
         if (sourceText.isBlank() || parseLocalIconSource(sourceText) == null) {
-            txtStatus.text = "Vir mora biti SOCA, CUSTOM, ARASAAC ali SYSTEM."
+            txtStatus.text = "Vir mora biti SOCA, CUSTOM, PATIENT, ARASAAC ali SYSTEM."
             return
         }
         bulkUpdateSelectedItems { item ->
@@ -4446,7 +4446,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
 
         val iconSource = editAacIconSource.text.toString().trim().uppercase(Locale.ROOT)
         if (iconSource.isNotBlank() && parseLocalIconSource(iconSource) == null) {
-            txtStatus.text = "Vir ikone mora biti SOCA, CUSTOM, ARASAAC ali SYSTEM."
+            txtStatus.text = "Vir ikone mora biti SOCA, CUSTOM, PATIENT, ARASAAC ali SYSTEM."
             return
         }
         val imagePath = editAacImagePath.text.toString().trim()
@@ -4499,7 +4499,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun showAacImageChooser() {
         val iconSource = parseLocalIconSource(iconSourceForEditor())
         if (iconSource == null || iconSource == IconSource.SYSTEM) {
-            txtStatus.text = "Najprej nastavi vir ikone: SOCA, CUSTOM ali ARASAAC."
+            txtStatus.text =
+                "Najprej nastavi vir ikone: SOCA, CUSTOM, PATIENT ali ARASAAC. PATIENT je za osebe, druzino, prijatelje in pacientove fotografije; CUSTOM je za predmete, pijace in domace slike."
             return
         }
         val sourceDir = iconSourceDir(iconSource)
@@ -4865,8 +4866,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun iconSourceDir(iconSource: IconSource): File? {
         return when (iconSource) {
             IconSource.SOCA -> AacStoragePaths.getIconsSocaDir(this)
-            IconSource.CUSTOM,
-            IconSource.PATIENT -> AacStoragePaths.getIconsCustomDir(this)
+            IconSource.CUSTOM -> AacStoragePaths.getIconsCustomDir(this)
+            IconSource.PATIENT -> AacStoragePaths.getIconsPatientDir(this)
             IconSource.ARASAAC -> AacStoragePaths.getIconsArasaacDir(this)
             IconSource.SYSTEM -> null
         }
@@ -4876,8 +4877,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val relativePath = imageFile.relativeTo(sourceDir).invariantSeparatorsPath
         val prefix = when (iconSource) {
             IconSource.SOCA -> "soca"
-            IconSource.CUSTOM,
-            IconSource.PATIENT -> "custom"
+            IconSource.CUSTOM -> "custom"
+            IconSource.PATIENT -> "patient"
             IconSource.ARASAAC -> "arasaac"
             IconSource.SYSTEM -> ""
         }
