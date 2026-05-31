@@ -35,8 +35,21 @@ object AacSentenceBuilder {
     }
 
     private fun buildWantSentence(items: List<AacItem>): String {
-        val target = items.firstNotNullOfOrNull { item -> WANT_TARGETS[item.idKey()] }
-            ?: return ""
+        val targetKey = items.firstNotNullOfOrNull { item ->
+            val key = item.idKey()
+            if (WANT_TARGETS.containsKey(key) || DRINK_TARGETS.containsKey(key)) key else null
+        } ?: return ""
+        val drinkModifier = items.firstNotNullOfOrNull { item -> DRINK_MODIFIERS[item.idKey()] }
+        DRINK_TARGETS[targetKey]?.let { target ->
+            return when (drinkModifier) {
+                "cold" -> "Rada bi ${target.coldPhrase}."
+                "warm" -> "Rada bi ${target.warmPhrase}."
+                "small" -> "Rada bi malo ${target.genitive}."
+                "more" -> "Rada bi več ${target.genitive}."
+                else -> "Rada bi ${target.accusative}."
+            }
+        }
+        val target = WANT_TARGETS[targetKey] ?: return ""
         return "Rada bi $target."
     }
 
@@ -55,7 +68,12 @@ object AacSentenceBuilder {
     private fun buildPainSentence(items: List<AacItem>): String {
         val target = items.firstNotNullOfOrNull { item -> PAIN_TARGETS[item.idKey()] }
             ?: return ""
-        return "Boli me $target."
+        return when (items.firstNotNullOfOrNull { item -> PAIN_INTENSITIES[item.idKey()] }) {
+            "light" -> "Malo me boli $target."
+            "medium" -> "Srednje močno me boli $target."
+            "very_strong" -> "Zelo me boli $target."
+            else -> "Boli me $target."
+        }
     }
 
     private fun itemKeys(item: AacItem): List<String> {
@@ -89,6 +107,13 @@ object AacSentenceBuilder {
             .trim('_')
     }
 
+    private data class DrinkTarget(
+        val accusative: String,
+        val genitive: String,
+        val coldPhrase: String,
+        val warmPhrase: String
+    )
+
     private val WANT_KEYS = setOf(
         "i_want",
         "rada",
@@ -118,18 +143,21 @@ object AacSentenceBuilder {
     private val REST_KEYS = setOf("rest", "pocitek")
     private val WC_KEYS = setOf("wc", "toilet", "stranisce")
 
+    private val DRINK_TARGETS = mapOf(
+        "drink_fanta" to DrinkTarget("Fanto", "Fante", "hladno Fanto", "toplo Fanto"),
+        "drink_coca_cola" to DrinkTarget("Coca Colo", "Coca Cole", "hladno Coca Colo", "toplo Coca Colo"),
+        "drink_pepsi" to DrinkTarget("Pepsi", "Pepsija", "hladen Pepsi", "topel Pepsi"),
+        "drink_water" to DrinkTarget("vodo", "vode", "hladno vodo", "toplo vodo"),
+        "water" to DrinkTarget("vodo", "vode", "hladno vodo", "toplo vodo"),
+        "drink_tea" to DrinkTarget("čaj", "čaja", "hladen čaj", "topel čaj"),
+        "tea" to DrinkTarget("čaj", "čaja", "hladen čaj", "topel čaj"),
+        "drink_coffee" to DrinkTarget("kavo", "kave", "hladno kavo", "toplo kavo"),
+        "coffee" to DrinkTarget("kavo", "kave", "hladno kavo", "toplo kavo"),
+        "juice" to DrinkTarget("sok", "soka", "hladen sok", "topel sok"),
+        "drink_milk" to DrinkTarget("mleko", "mleka", "hladno mleko", "toplo mleko")
+    )
+
     private val WANT_TARGETS = mapOf(
-        "drink_fanta" to "Fanto",
-        "drink_coca_cola" to "Coca Colo",
-        "drink_pepsi" to "Pepsi",
-        "drink_water" to "vodo",
-        "water" to "vodo",
-        "drink_tea" to "čaj",
-        "tea" to "čaj",
-        "drink_coffee" to "kavo",
-        "coffee" to "kavo",
-        "juice" to "sok",
-        "drink_milk" to "mleko",
         "food_soup" to "juho",
         "soup" to "juho",
         "bread" to "kruh",
@@ -188,5 +216,18 @@ object AacSentenceBuilder {
         "back" to "hrbet",
         "chest" to "v prsih",
         "throat" to "grlo"
+    )
+
+    private val DRINK_MODIFIERS = mapOf(
+        "drink_cold" to "cold",
+        "drink_warm" to "warm",
+        "drink_small" to "small",
+        "drink_more" to "more"
+    )
+
+    private val PAIN_INTENSITIES = mapOf(
+        "pain_light" to "light",
+        "pain_medium" to "medium",
+        "pain_very_strong" to "very_strong"
     )
 }

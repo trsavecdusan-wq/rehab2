@@ -929,6 +929,9 @@ class MainActivity : AppCompatActivity() {
             if (handleMainAacWaterModifierSelection(item, languageCode)) {
                 return
             }
+            if (handleMainAacGuidedFollowUpSelection(item, languageCode)) {
+                return
+            }
             selectedMainAacItemId = item.id
         }
         if (needsMainAacTranslation(item, languageCode)) {
@@ -1123,7 +1126,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
-        if (inContextFlow && item.addsToSentence) {
+        if (inContextFlow && (item.addsToSentence || AacGuidedPromptEngine.isFollowUpAnswer(item))) {
             selectedMainAacItemId = item.id
             val speechText = mainAacNaturalConversationSpeech(
                 item = item,
@@ -1200,6 +1203,31 @@ class MainActivity : AppCompatActivity() {
             "Gazirana ali negazirana?"
         }
         showMainAacQuestion(prompt)
+        return true
+    }
+
+    private fun handleMainAacGuidedFollowUpSelection(item: AacItem, languageCode: String): Boolean {
+        if (languageCode.trim().lowercase(Locale.ROOT) != "sl") {
+            return false
+        }
+        val followUp = AacGuidedPromptEngine.followUpFor(currentMainAacConversationItems, item)
+            ?: return false
+        val followUpItems = followUp.childIds.mapNotNull { childId -> mainAacItemsById[childId] }
+        if (followUpItems.isEmpty()) {
+            return false
+        }
+
+        selectedMainAacItemId = item.id
+        currentMainAacConversationItems = currentMainAacConversationItems + item
+        currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
+        cancelMainAacGuidedAutoComplete()
+        mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
+        currentMainAacPageDebugId = "guided:${item.id}"
+        updateMainAacGridSelectionDebug(currentMainAacPageDebugId, followUpItems)
+        showMainAacQuestion(followUp.questionSl)
+        aacAudioPlayer.speakText(followUp.questionSl, languageCode)
+        lockMainAacInput()
+        showMainAacItems(followUpItems)
         return true
     }
 

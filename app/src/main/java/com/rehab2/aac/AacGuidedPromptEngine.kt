@@ -20,8 +20,29 @@ object AacGuidedPromptEngine {
         return promptFor(item)?.childIds.orEmpty()
     }
 
+    fun followUpFor(sequenceItems: List<AacItem>, selectedItem: AacItem): AacGuidedPrompt? {
+        val rootItem = sequenceItems.firstOrNull() ?: return null
+        val rootId = normalize(rootItem.id)
+        val selectedId = normalize(selectedItem.id)
+        return when {
+            rootId in DRINK_ROOT_IDS && selectedId in DRINK_TARGET_IDS -> AacGuidedPrompt(
+                questionSl = "Toplo ali hladno?",
+                childIds = listOf("drink_cold", "drink_warm", "drink_small", "drink_more", "food_enough")
+            )
+            rootId in PAIN_ROOT_IDS && selectedId in PAIN_BODY_PART_IDS -> AacGuidedPrompt(
+                questionSl = "Kako mo\u010dno te boli?",
+                childIds = listOf("pain_light", "pain_medium", "pain_very_strong")
+            )
+            else -> null
+        }
+    }
+
     fun hasFlow(item: AacItem): Boolean {
         return promptFor(item) != null
+    }
+
+    fun isFollowUpAnswer(item: AacItem): Boolean {
+        return normalize(item.id) in FOLLOW_UP_ANSWER_IDS
     }
 
     private fun promptForId(id: String): AacGuidedPrompt? {
@@ -91,4 +112,28 @@ object AacGuidedPromptEngine {
             .replace(Regex("[^a-z0-9]+"), "_")
             .trim('_')
     }
+
+    private val DRINK_ROOT_IDS = setOf("thirsty", "drink")
+    private val DRINK_TARGET_IDS = setOf(
+        "water",
+        "tea",
+        "coffee",
+        "drink_fanta",
+        "drink_pepsi",
+        "drink_coca_cola",
+        "juice",
+        "drink_milk"
+    )
+    private val PAIN_ROOT_IDS = setOf("pain", "pain_area")
+    private val PAIN_BODY_PART_IDS = setOf("head", "arm", "leg", "belly", "back", "chest", "throat")
+    private val FOLLOW_UP_ANSWER_IDS = setOf(
+        "drink_cold",
+        "drink_warm",
+        "drink_small",
+        "drink_more",
+        "food_enough",
+        "pain_light",
+        "pain_medium",
+        "pain_very_strong"
+    )
 }
