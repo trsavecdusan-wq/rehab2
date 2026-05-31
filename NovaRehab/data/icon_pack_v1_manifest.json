@@ -1,0 +1,354 @@
+{
+  "id": "core_icon_pack_v1",
+  "version": 1,
+  "description": "Core AAC icon/photo manifest for NovaRehab starter communicator content. This file lists required local icon assets only; it does not overwrite local AAC items or user-edited content.",
+  "storageRoots": {
+    "system": "NovaRehab/icons/system/",
+    "customDrinks": "NovaRehab/icons/custom/drinks/",
+    "customFood": "NovaRehab/icons/custom/food/",
+    "customObjects": "NovaRehab/icons/custom/objects/",
+    "patientContacts": "NovaRehab/icons/patient/contacts/"
+  },
+  "rules": [
+    "Do not overwrite userEdited or locked AAC items.",
+    "Do not duplicate shared drink/object photos for separate AAC, vending, video, or message scenarios.",
+    "People/contact photos belong under NovaRehab/icons/patient/contacts/.",
+    "Drink and object photos belong under NovaRehab/icons/custom/.",
+    "Abstract AAC concepts belong under NovaRehab/icons/system/."
+  ],
+  "items": [
+    {
+      "itemId": "yes",
+      "labelSl": "DA",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/yes.png",
+      "required": true,
+      "priority": 1,
+      "note": "Fixed response row. Green confirmation icon."
+    },
+    {
+      "itemId": "no",
+      "labelSl": "NE",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/no.png",
+      "required": true,
+      "priority": 1,
+      "note": "Fixed response row. Red negative icon. Global confirmation rule keeps NO on the left."
+    },
+    {
+      "itemId": "dont_understand",
+      "labelSl": "NE RAZUMEM",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/dont_understand.png",
+      "required": true,
+      "priority": 1,
+      "note": "Fixed response row. Must be visually distinct from NO."
+    },
+    {
+      "itemId": "thank_you",
+      "labelSl": "HVALA",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/thank_you.png",
+      "required": true,
+      "priority": 1,
+      "note": "Fixed response row."
+    },
+    {
+      "itemId": "help",
+      "labelSl": "POMOČ",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/help.png",
+      "required": true,
+      "priority": 1,
+      "note": "Fixed response row. High-safety emergency/help concept."
+    },
+    {
+      "itemId": "wait",
+      "labelSl": "POČAKAJ",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/wait.png",
+      "required": true,
+      "priority": 1,
+      "note": "Global response/action item, not fixed-row by default."
+    },
+    {
+      "itemId": "i_want",
+      "labelSl": "RADA BI",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/i_want.png",
+      "required": true,
+      "priority": 1,
+      "note": "Core sentence-builder intent."
+    },
+    {
+      "itemId": "dont_want",
+      "labelSl": "NOČEM",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/dont_want.png",
+      "required": true,
+      "priority": 1,
+      "note": "Core refusal intent."
+    },
+    {
+      "itemId": "miss_someone",
+      "labelSl": "POGREŠAM",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/miss_someone.png",
+      "required": true,
+      "priority": 1,
+      "note": "Human communication first-page item."
+    },
+    {
+      "itemId": "pain",
+      "labelSl": "BOLI ME",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/pain.png",
+      "required": true,
+      "priority": 1,
+      "note": "Pain entry point."
+    },
+    {
+      "itemId": "wc",
+      "labelSl": "WC",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/wc.png",
+      "required": true,
+      "priority": 1,
+      "note": "Basic daily need."
+    },
+    {
+      "itemId": "tired",
+      "labelSl": "UTRUJENA",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/tired.png",
+      "required": true,
+      "priority": 1,
+      "note": "Use fatigue/tired-face symbol, not a generic moon unless representing sleep."
+    },
+    {
+      "itemId": "thirsty",
+      "labelSl": "ŽEJNA SEM",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/thirsty.png",
+      "required": true,
+      "priority": 1,
+      "note": "Drink guided-flow entry point."
+    },
+    {
+      "itemId": "hungry",
+      "labelSl": "LAČNA SEM",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/hungry.png",
+      "required": true,
+      "priority": 1,
+      "note": "Food guided-flow entry point."
+    },
+    {
+      "itemId": "drink",
+      "labelSl": "PIJAČA",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/drink.png",
+      "required": true,
+      "priority": 2,
+      "note": "Drink category/guided-flow entry point."
+    },
+    {
+      "itemId": "food",
+      "labelSl": "HRANA",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/food.png",
+      "required": true,
+      "priority": 2,
+      "note": "Food category/guided-flow entry point."
+    },
+    {
+      "itemId": "feeling",
+      "labelSl": "POČUTJE",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/feeling.png",
+      "required": true,
+      "priority": 2,
+      "note": "Feeling category/guided-flow entry point."
+    },
+    {
+      "itemId": "care",
+      "labelSl": "NEGA",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/care.png",
+      "required": true,
+      "priority": 2,
+      "note": "Care-needs category/guided-flow entry point."
+    },
+    {
+      "itemId": "health",
+      "labelSl": "ZDRAVJE",
+      "iconSource": "SYSTEM",
+      "imagePath": "system/health.png",
+      "required": true,
+      "priority": 2,
+      "note": "Health category/guided-flow entry point."
+    },
+    {
+      "itemId": "water",
+      "labelSl": "VODA",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/drinks/water.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Shared drink/object photo. Reusable by AAC, future vending, video-call AAC, and learning."
+    },
+    {
+      "itemId": "coffee",
+      "labelSl": "KAVA",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/drinks/coffee.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Shared drink/object photo."
+    },
+    {
+      "itemId": "tea",
+      "labelSl": "ČAJ",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/drinks/tea.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Shared drink/object photo."
+    },
+    {
+      "itemId": "drink_fanta",
+      "labelSl": "FANTA",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/drinks/fanta.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Shared drink identity. Do not create fanta_aac/fanta_vending/fanta_video duplicates."
+    },
+    {
+      "itemId": "drink_coca_cola",
+      "labelSl": "COCA COLA",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/drinks/coca_cola.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Shared drink identity."
+    },
+    {
+      "itemId": "drink_pepsi",
+      "labelSl": "PEPSI",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/drinks/pepsi.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Shared drink identity."
+    },
+    {
+      "itemId": "juice",
+      "labelSl": "SOK",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/drinks/juice.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Shared drink/object photo."
+    },
+    {
+      "itemId": "drink_milk",
+      "labelSl": "MLEKO",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/drinks/milk.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Shared drink/object photo."
+    },
+    {
+      "itemId": "soup",
+      "labelSl": "JUHA",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/food/soup.jpg",
+      "required": false,
+      "priority": 2,
+      "note": "Useful food photo for guided food flow."
+    },
+    {
+      "itemId": "bread",
+      "labelSl": "KRUH",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/food/bread.jpg",
+      "required": false,
+      "priority": 2,
+      "note": "Useful food photo for guided food flow."
+    },
+    {
+      "itemId": "food_yogurt",
+      "labelSl": "JOGURT",
+      "iconSource": "CUSTOM",
+      "imagePath": "custom/food/yogurt.jpg",
+      "required": false,
+      "priority": 2,
+      "note": "Existing starter content already references this path."
+    },
+    {
+      "itemId": "person_dusan",
+      "labelSl": "DUŠAN",
+      "iconSource": "PATIENT",
+      "imagePath": "patient/contacts/dusan.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Real patient/contact photo. Do not store in custom/."
+    },
+    {
+      "itemId": "person_zana",
+      "labelSl": "ŽANA",
+      "iconSource": "PATIENT",
+      "imagePath": "patient/contacts/zana.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Real patient/contact photo."
+    },
+    {
+      "itemId": "person_sergej",
+      "labelSl": "SERGEJ",
+      "iconSource": "PATIENT",
+      "imagePath": "patient/contacts/sergej.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Real patient/contact photo."
+    },
+    {
+      "itemId": "person_julija",
+      "labelSl": "JULIJA",
+      "iconSource": "PATIENT",
+      "imagePath": "patient/contacts/julija.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Real patient/contact photo."
+    },
+    {
+      "itemId": "person_oksana",
+      "labelSl": "OKSANA",
+      "iconSource": "PATIENT",
+      "imagePath": "patient/contacts/oksana.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Real patient/contact photo."
+    },
+    {
+      "itemId": "person_inna",
+      "labelSl": "INNA",
+      "iconSource": "PATIENT",
+      "imagePath": "patient/contacts/inna.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Real patient/contact photo."
+    },
+    {
+      "itemId": "person_franc",
+      "labelSl": "FRANC",
+      "iconSource": "PATIENT",
+      "imagePath": "patient/contacts/franc.jpg",
+      "required": true,
+      "priority": 1,
+      "note": "Real patient/contact photo."
+    }
+  ]
+}
