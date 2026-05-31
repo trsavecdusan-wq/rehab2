@@ -7,6 +7,7 @@ import java.io.File
 
 object AacUsageStats {
     private const val USAGE_STATS_FILE = "NovaRehab/data/aac_usage_stats.json"
+    private const val MIN_TOP_SUGGESTION_USE_COUNT = 5
 
     data class Entry(
         val itemId: String,
@@ -50,6 +51,26 @@ object AacUsageStats {
                 }
             )
             .map { indexed -> indexed.value }
+    }
+
+    fun topSuggestion(context: Context, itemIds: List<String>): String? {
+        if (itemIds.isEmpty()) {
+            return null
+        }
+        val entries = load(context)
+        if (entries.isEmpty()) {
+            return null
+        }
+        return itemIds.asSequence()
+            .mapNotNull { itemId ->
+                val entry = entries[itemId] ?: return@mapNotNull null
+                if (entry.useCount >= MIN_TOP_SUGGESTION_USE_COUNT) entry else null
+            }
+            .maxWithOrNull(
+                compareBy<Entry> { entry -> entry.useCount }
+                    .thenBy { entry -> entry.lastUsedAt }
+            )
+            ?.itemId
     }
 
     fun load(context: Context): Map<String, Entry> {

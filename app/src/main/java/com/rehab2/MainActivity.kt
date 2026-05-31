@@ -621,6 +621,7 @@ class MainActivity : AppCompatActivity() {
         currentMainAacItems = visibleItems
         val languageCode = getActiveSpeechLanguage()
         lastMainAacRenderedLanguage = languageCode
+        val topSuggestionItemId = mainAacTopSuggestionItemId(visibleItems)
         val displaySlots = mainAacDisplaySlots(visibleItems)
         mainAacTileBindings.forEachIndexed { index, binding ->
             val item = displaySlots.getOrNull(index)
@@ -629,8 +630,7 @@ class MainActivity : AppCompatActivity() {
             item?.let {
                 binding.view.background = mainAacTileBackgroundFor(it)
                 binding.view.isEnabled = !isMainAacInputLocked
-                binding.label.text = AacLocalizedTextResolver.resolveLabel(it, languageCode)
-                    .uppercase(Locale.ROOT)
+                binding.label.text = mainAacDisplayLabel(it, languageCode, topSuggestionItemId)
                 bindMainAacIcon(binding, it)
                 binding.view.setOnClickListener(null)
                 binding.view.setOnTouchListener { _, event ->
@@ -2024,6 +2024,29 @@ class MainActivity : AppCompatActivity() {
 
     private fun sortMainAacGuidedItemsByUsage(items: List<AacItem>): List<AacItem> {
         return AacUsageStats.sortByUsage(this, items)
+    }
+
+    private fun mainAacTopSuggestionItemId(items: List<AacItem>): String? {
+        if (currentMainAacPageDebugId.startsWith("children:") ||
+            currentMainAacPageDebugId.startsWith("guided:")
+        ) {
+            return AacUsageStats.topSuggestion(this, items.map { item -> item.id })
+        }
+        return null
+    }
+
+    private fun mainAacDisplayLabel(
+        item: AacItem,
+        languageCode: String,
+        topSuggestionItemId: String?
+    ): String {
+        val label = AacLocalizedTextResolver.resolveLabel(item, languageCode)
+            .uppercase(Locale.ROOT)
+        return if (item.id == topSuggestionItemId) {
+            "\u2b50 $label"
+        } else {
+            label
+        }
     }
 
     private fun scheduleMainAacSentenceSpeech(itemSpeaksImmediately: Boolean) {
