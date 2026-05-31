@@ -50,6 +50,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacContentBootstrap
 import com.rehab2.aac.AacItem
+import com.rehab2.aac.AacGuidedPromptEngine
 import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacNaturalSentenceBuilder
@@ -904,7 +905,7 @@ class MainActivity : AppCompatActivity() {
         val childItems = mainAacChildrenFor(item)
         val canOpenChildItems = item.opensSubicons ||
             item.children.isNotEmpty() ||
-            (childItems.isNotEmpty() && mainAacHistory.isNotEmpty())
+            (childItems.isNotEmpty() && (mainAacHistory.isNotEmpty() || AacGuidedPromptEngine.hasFlow(item)))
         if (canOpenChildItems) {
             if (childItems.isNotEmpty()) {
                 isMainAacTerminalSelectionAccepted = false
@@ -946,9 +947,14 @@ class MainActivity : AppCompatActivity() {
     private fun prepareMainAacContextPrompt(item: AacItem) {
         clearMainAacSentenceState(clearConversationContext = false)
         val languageCode = getActiveSpeechLanguage()
-        val prompt = AacLocalizedTextResolver.resolveQuestion(item, languageCode)
-            ?.trim()
-            .orEmpty()
+        val guidedPrompt = if (languageCode.trim().lowercase(Locale.ROOT) == "sl") {
+            AacGuidedPromptEngine.questionFor(item)
+        } else {
+            ""
+        }
+        val localizedPrompt = AacLocalizedTextResolver.resolveQuestion(item, languageCode).orEmpty()
+        val prompt = guidedPrompt.ifBlank { localizedPrompt }
+            .trim()
             .ifBlank { mainAacQuestionFallback(item, languageCode) }
         if (prompt.isNotBlank()) {
             showMainAacQuestion(prompt)
@@ -1150,6 +1156,7 @@ class MainActivity : AppCompatActivity() {
         if (isMainAacWaterDetailItem(item)) {
             return "Kakšno vodo?"
         }
+        AacGuidedPromptEngine.questionFor(item).takeIf { it.isNotBlank() }?.let { return it }
         if (isMainAacDrinkIntent(item)) {
             return "Kaj bi pila?"
         }
@@ -1371,6 +1378,7 @@ class MainActivity : AppCompatActivity() {
             item.labelSl
         ).map(::normalizeMainAacKey)
         return keys.any { key ->
+            AacGuidedPromptEngine.hasFlow(item) ||
             key in MAIN_AAC_CONVERSATION_GROUP_KEYS ||
                 key.contains("pijaca") ||
                 key.contains("zejna") ||
@@ -1938,7 +1946,9 @@ class MainActivity : AppCompatActivity() {
         val visibleUnderChildren = mainAacItemsById.values
             .filter { child -> item.id in child.visibleUnderIds && child.id !in item.children }
             .sortedBy { it.priority }
-        return explicitChildren + visibleUnderChildren
+        val existingChildren = explicitChildren + visibleUnderChildren
+        val guidedChildren = AacGuidedPromptEngine.childIdsFor(item).mapNotNull { childId -> mainAacItemsById[childId] }
+        return (existingChildren + guidedChildren).distinctBy { child -> child.id }
     }
 
     private fun scheduleMainAacSentenceSpeech(itemSpeaksImmediately: Boolean) {
