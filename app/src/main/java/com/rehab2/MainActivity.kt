@@ -707,12 +707,35 @@ class MainActivity : AppCompatActivity() {
         if (mainAacHistory.isEmpty()) {
             return
         }
+        val previousItems = mainAacHistory.removeLast()
+        if (currentMainAacConversationItems.size > 1) {
+            currentMainAacConversationItems = currentMainAacConversationItems.dropLast(1)
+            currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
+            currentMainAacModifierItemsByGroup.clear()
+            cancelMainAacGuidedAutoComplete()
+            val parentItem = currentMainAacConversationParentItem
+            val languageCode = getActiveSpeechLanguage()
+            val prompt = parentItem?.let { item ->
+                if (languageCode.trim().lowercase(Locale.ROOT) == "sl") {
+                    AacGuidedPromptEngine.questionFor(item)
+                } else {
+                    AacLocalizedTextResolver.resolveQuestion(item, languageCode).orEmpty()
+                }
+            }.orEmpty()
+            if (prompt.isNotBlank()) {
+                showMainAacQuestion(prompt)
+            } else {
+                hideMainAacQuestion()
+            }
+            showMainAacItems(previousItems)
+            return
+        }
         hideMainAacQuestion()
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
         currentMainAacModifierItemsByGroup.clear()
         cancelMainAacGuidedAutoComplete()
-        showMainAacItems(mainAacHistory.removeLast())
+        showMainAacItems(previousItems)
     }
 
     private fun showPreviousMainAacGridPage() {
@@ -882,6 +905,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleMainAacItemAction(item: AacItem) {
         if (isMainAacInputLocked) {
+            return
+        }
+        if (mainAacHistory.isNotEmpty() && normalizeMainAacKey(item.id) == "back_to_main") {
+            showPreviousMainAacItems()
             return
         }
         if (mainAacHistory.isNotEmpty() && isMainAacGlobalDirectAction(item)) {

@@ -27,11 +27,11 @@ object AacGuidedPromptEngine {
         return when {
             rootId in DRINK_ROOT_IDS && selectedId in DRINK_TARGET_IDS -> AacGuidedPrompt(
                 questionSl = "Toplo ali hladno?",
-                childIds = listOf("drink_cold", "drink_warm", "drink_small", "drink_more", "food_enough")
+                childIds = listOf("drink_cold", "drink_warm", "drink_small", "drink_more", "food_enough", "back_to_main")
             )
             rootId in PAIN_ROOT_IDS && selectedId in PAIN_BODY_PART_IDS -> AacGuidedPrompt(
                 questionSl = "Kako mo\u010dno te boli?",
-                childIds = listOf("pain_light", "pain_medium", "pain_very_strong")
+                childIds = listOf("pain_light", "pain_medium", "pain_very_strong", "back_to_main")
             )
             else -> null
         }
