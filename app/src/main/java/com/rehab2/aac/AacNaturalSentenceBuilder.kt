@@ -24,11 +24,20 @@ object AacNaturalSentenceBuilder {
     fun buildSentence(vararg tokens: String): String = buildSentence(tokens.toList())
 
     private fun buildWantSentence(tokens: List<String>): String {
+        val wantsColdWater = tokens.any { it in COLD_WATER_TOKENS }
+        val wantsWarmWater = tokens.any { it in WARM_WATER_TOKENS }
+        val wantsSparklingWater = tokens.any { it in SPARKLING_WATER_TOKENS }
+        val wantsNonSparklingWater = tokens.any { it in NON_SPARKLING_WATER_TOKENS }
         return when {
-            tokens.any { it in COLD_WATER_TOKENS } -> "Rada bi mrzlo vodo."
-            tokens.any { it in WARM_WATER_TOKENS } -> "Rada bi toplo vodo."
+            wantsColdWater && wantsSparklingWater -> "Rada bi mrzlo gazirano vodo."
+            wantsColdWater && wantsNonSparklingWater -> "Rada bi mrzlo negazirano vodo."
+            wantsWarmWater && wantsSparklingWater -> "Rada bi toplo gazirano vodo."
+            wantsWarmWater && wantsNonSparklingWater -> "Rada bi toplo negazirano vodo."
+            wantsColdWater -> "Rada bi mrzlo vodo."
+            wantsWarmWater -> "Rada bi toplo vodo."
             tokens.any { it in STILL_WATER_TOKENS } -> "Rada bi navadno vodo."
-            tokens.any { it in SPARKLING_WATER_TOKENS } -> "Rada bi gazirano vodo."
+            wantsSparklingWater -> "Rada bi gazirano vodo."
+            wantsNonSparklingWater -> "Rada bi negazirano vodo."
             tokens.any { it in WATER_TOKENS } -> "Rada bi vodo."
             tokens.any { it in COFFEE_TOKENS } -> "Rada bi kavo."
             tokens.any { it in JUICE_TOKENS } -> "Rada bi sok."
@@ -118,6 +127,15 @@ object AacNaturalSentenceBuilder {
     private val WARM_WATER_TOKENS = setOf("warm_water", "topla", "toplo", "warm")
     private val STILL_WATER_TOKENS = setOf("still_water", "navadna", "navadno", "still")
     private val SPARKLING_WATER_TOKENS = setOf("sparkling_water", "gazirana", "gazirano", "sparkling")
+    private val NON_SPARKLING_WATER_TOKENS = setOf(
+        "non_sparkling_water",
+        "still_water",
+        "negazirana",
+        "negazirano",
+        "navadna",
+        "navadno",
+        "still"
+    )
     private val COFFEE_TOKENS = setOf("kava", "kavo", "coffee")
     private val JUICE_TOKENS = setOf("sok", "juice")
     private val TEA_TOKENS = setOf("caj", "tea")

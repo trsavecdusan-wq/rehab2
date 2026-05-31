@@ -9,7 +9,7 @@ object AacQuestionEngine {
             normalized.containsPain() && normalized.containsBodyPart() -> "Kako močno boli?"
             normalized.containsPain() -> "Kje boli?"
             normalized.containsWant() && normalized.containsWater() -> "Kakšno vodo?"
-            normalized.containsWant() && normalized.containsDrink() -> "Kaj bi pili?"
+            normalized.containsWant() && normalized.containsDrink() -> "Kaj bi pila?"
             normalized.containsWant() && normalized.containsFood() -> "Kaj bi jedli?"
             normalized.containsGo() -> "Kam bi šli?"
             normalized.containsCall() -> "Koga naj pokličem?"
