@@ -56,6 +56,7 @@ import com.rehab2.aac.AacNaturalSentenceBuilder
 import com.rehab2.aac.AacPlacement
 import com.rehab2.aac.AacQuestionEngine
 import com.rehab2.aac.AacSentenceItem
+import com.rehab2.aac.AacSentenceBuilder
 import com.rehab2.aac.AacSentenceStateManager
 import com.rehab2.aac.AacStarterContentV1
 import com.rehab2.aac.AacStoragePaths
@@ -1124,7 +1125,8 @@ class MainActivity : AppCompatActivity() {
                 resolvedLabel = resolvedLabel,
                 resolvedSpeechText = resolvedSpeechText
             )
-            val finalSpeechText = speechText.ifBlank { resolvedSpeechText.ifBlank { resolvedLabel } }
+            val finalSpeechText = mainAacSentenceBuilderSpeech(item, languageCode)
+                .ifBlank { speechText.ifBlank { resolvedSpeechText.ifBlank { resolvedLabel } } }
             if (!scheduleMainAacGuidedAutoComplete(finalSpeechText, languageCode) &&
                 mainAacGuidedAutoCompleteTimeoutMs() > 0L
             ) {
@@ -1301,6 +1303,12 @@ class MainActivity : AppCompatActivity() {
         } else {
             fallback
         }
+    }
+
+    private fun mainAacSentenceBuilderSpeech(item: AacItem, languageCode: String): String {
+        if (languageCode.trim().lowercase(Locale.ROOT) != "sl") return ""
+        val builderItems = currentMainAacConversationItems + item
+        return AacSentenceBuilder.buildSlovenianSentence(builderItems).trim()
     }
 
     private fun mainAacConversationTokens(parentItem: AacItem, childItem: AacItem?): List<String> {
