@@ -88,11 +88,13 @@ class MainActivity : AppCompatActivity() {
         private const val KEY_AAC_GRID_SIZE = "aac_grid_size"
         private const val KEY_SHOW_SUBICONS_ON_MAIN_PAGES = "show_subicons_on_main_pages"
         private const val KEY_AAC_GUIDED_PROMPT_DISPLAY_MODE = "aac_guided_prompt_display_mode"
+        private const val KEY_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS = "aac_guided_auto_complete_timeout_ms"
         private const val AAC_GUIDED_PROMPT_OFF = "OFF"
         private const val AAC_GUIDED_PROMPT_FULL_TEXT = "FULL_TEXT"
         private const val AAC_GUIDED_PROMPT_WORD_BY_WORD = "WORD_BY_WORD"
         private const val AAC_GUIDED_PROMPT_LETTER_BY_LETTER = "LETTER_BY_LETTER"
         private const val DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE = AAC_GUIDED_PROMPT_FULL_TEXT
+        private const val DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS = 2_000L
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
@@ -276,6 +278,8 @@ class MainActivity : AppCompatActivity() {
     private var currentMainAacConversationParentItem: AacItem? = null
     private var currentMainAacConversationItems: List<AacItem> = emptyList()
     private val currentMainAacModifierItemsByGroup = mutableMapOf<String, AacItem>()
+    private var pendingMainAacGuidedAutoCompleteSentence = ""
+    private var pendingMainAacGuidedAutoCompleteLanguageCode = ""
     private var lastMainAacRenderedLanguage = ""
     private var savedScreenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var isPowerReceiverRegistered = false
@@ -286,6 +290,9 @@ class MainActivity : AppCompatActivity() {
     }
     private val mainAacAutoSentenceSpeakRunnable = Runnable {
         speakMainAacSentenceIfReady()
+    }
+    private val mainAacGuidedAutoCompleteRunnable = Runnable {
+        speakPendingMainAacGuidedAutoCompleteSentence()
     }
     private val mainAacInputUnlockRunnable = Runnable {
         completeMainAacSpeechLock()
@@ -464,6 +471,7 @@ class MainActivity : AppCompatActivity() {
         stopPowerMonitoring()
         unregisterPowerReceiver()
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
+        mainHandler.removeCallbacks(mainAacGuidedAutoCompleteRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
         mainHandler.removeCallbacks(mainAacInputUnlockRunnable)
         mainAacQuestionRevealRunnable?.let(mainHandler::removeCallbacks)
@@ -697,6 +705,7 @@ class MainActivity : AppCompatActivity() {
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
         currentMainAacModifierItemsByGroup.clear()
+        cancelMainAacGuidedAutoComplete()
         showMainAacItems(mainAacHistory.removeLast())
     }
 
@@ -836,6 +845,7 @@ class MainActivity : AppCompatActivity() {
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
         currentMainAacModifierItemsByGroup.clear()
+        cancelMainAacGuidedAutoComplete()
         val fallbackItems = buildMainAacItems()
         AacContentBootstrap.ensurePatientStartupContent(this, fallbackItems)
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
@@ -908,9 +918,7 @@ class MainActivity : AppCompatActivity() {
             if (handleMainAacWaterModifierSelection(item, languageCode)) {
                 return
             }
-            isMainAacTerminalSelectionAccepted = true
             selectedMainAacItemId = item.id
-            lockMainAacInput()
         }
         if (needsMainAacTranslation(item, languageCode)) {
             translateMainAacItemForAction(item, languageCode)
@@ -959,6 +967,7 @@ class MainActivity : AppCompatActivity() {
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
         currentMainAacModifierItemsByGroup.clear()
+        cancelMainAacGuidedAutoComplete()
     }
 
     private fun showMainAacQuestion(question: String) {
@@ -1069,6 +1078,26 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
+    private fun mainAacGuidedAutoCompleteTimeoutMs(): Long {
+        val rawValue = getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
+            .all[KEY_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS]
+        val timeoutMs = when (rawValue) {
+            is Number -> rawValue.toLong()
+            is String -> rawValue.trim().toLongOrNull()
+            else -> DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS
+        }
+        return when (timeoutMs) {
+            0L,
+            500L,
+            1_000L,
+            1_500L,
+            2_000L,
+            3_000L,
+            5_000L -> timeoutMs
+            else -> DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS
+        }
+    }
+
     private fun handleMainAacResolvedSpeech(
         item: AacItem,
         languageCode: String,
@@ -1080,21 +1109,18 @@ class MainActivity : AppCompatActivity() {
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
         if (inContextFlow && item.addsToSentence) {
             selectedMainAacItemId = item.id
-            lockMainAacInput()
             val speechText = mainAacNaturalConversationSpeech(
                 item = item,
                 languageCode = languageCode,
                 resolvedLabel = resolvedLabel,
                 resolvedSpeechText = resolvedSpeechText
             )
-            mainAacSentenceManager.addItem(
-                AacSentenceItem(
-                    conceptId = item.conceptId ?: item.id,
-                    text = speechText.ifBlank { resolvedSpeechText.ifBlank { resolvedLabel } },
-                    role = item.sentenceRole
-                )
-            )
-            speakMainAacSentenceNow(languageCode)
+            val finalSpeechText = speechText.ifBlank { resolvedSpeechText.ifBlank { resolvedLabel } }
+            if (!scheduleMainAacGuidedAutoComplete(finalSpeechText, languageCode) &&
+                mainAacGuidedAutoCompleteTimeoutMs() > 0L
+            ) {
+                speakMainAacGuidedAutoCompleteSentence(finalSpeechText, languageCode)
+            }
             return
         }
         if (resolvedSpeechText.isNotBlank()) {
@@ -1138,13 +1164,15 @@ class MainActivity : AppCompatActivity() {
 
         val temperatureItem = currentMainAacModifierItemsByGroup[MAIN_AAC_WATER_TEMPERATURE_GROUP]
         val carbonationItem = currentMainAacModifierItemsByGroup[MAIN_AAC_WATER_CARBONATION_GROUP]
+        val sentence = mainAacWaterModifierSentence(temperatureItem, carbonationItem, languageCode)
+        if (sentence.isNotBlank()) {
+            if (!scheduleMainAacGuidedAutoComplete(sentence, languageCode) &&
+                mainAacGuidedAutoCompleteTimeoutMs() > 0L
+            ) {
+                speakMainAacGuidedAutoCompleteSentence(sentence, languageCode)
+            }
+        }
         if (temperatureItem != null && carbonationItem != null) {
-            val sentence = mainAacWaterModifierSentence(temperatureItem, carbonationItem, languageCode)
-            lockMainAacInput()
-            showMainAacQuestion(sentence)
-            aacAudioPlayer.speakText(sentence, languageCode)
-            shouldResetMainAacRootAfterSpeech = true
-            isMainAacTerminalSelectionAccepted = true
             return true
         }
 
@@ -1153,32 +1181,88 @@ class MainActivity : AppCompatActivity() {
         } else {
             "Gazirana ali negazirana?"
         }
-        lockMainAacInput()
         showMainAacQuestion(prompt)
-        aacAudioPlayer.speakText(prompt, languageCode)
         return true
     }
 
     private fun mainAacWaterModifierSentence(
-        temperatureItem: AacItem,
-        carbonationItem: AacItem,
+        temperatureItem: AacItem?,
+        carbonationItem: AacItem?,
         languageCode: String
     ): String {
+        val selectedModifierItems = listOfNotNull(temperatureItem, carbonationItem)
+        if (selectedModifierItems.isEmpty()) {
+            return ""
+        }
         if (languageCode.trim().lowercase(Locale.ROOT) != "sl") {
-            val temperature = AacLocalizedTextResolver.resolveLabel(temperatureItem, languageCode).lowercase(Locale.ROOT)
-            val carbonation = AacLocalizedTextResolver.resolveLabel(carbonationItem, languageCode).lowercase(Locale.ROOT)
-            return listOf(temperature, carbonation, AacLocalizedTextResolver.resolveLabel(mainAacItemsById["water"] ?: carbonationItem, languageCode))
+            val modifierLabels = selectedModifierItems.map { selectedItem ->
+                AacLocalizedTextResolver.resolveLabel(selectedItem, languageCode).lowercase(Locale.ROOT)
+            }
+            return (modifierLabels + AacLocalizedTextResolver.resolveLabel(mainAacItemsById["water"] ?: selectedModifierItems.last(), languageCode))
                 .filter { it.isNotBlank() }
                 .joinToString(" ")
                 .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
         }
         return AacNaturalSentenceBuilder.buildSentence(
-            mainAacConversationTokens(temperatureItem) + mainAacItemSpeechTokens(carbonationItem)
+            mainAacConversationParentTokens(currentMainAacConversationParentItem ?: mainAacItemsById["drink"] ?: selectedModifierItems.first()) +
+                currentMainAacConversationItems.flatMap(::mainAacItemSpeechTokens) +
+                selectedModifierItems.flatMap(::mainAacItemSpeechTokens)
         ).ifBlank {
-            val temperature = AacLocalizedTextResolver.resolveLabel(temperatureItem, languageCode).lowercase(Locale("sl", "SI"))
-            val carbonation = AacLocalizedTextResolver.resolveLabel(carbonationItem, languageCode).lowercase(Locale("sl", "SI"))
-            "Rada bi $temperature $carbonation vodo."
+            val modifiers = selectedModifierItems.joinToString(" ") { selectedItem ->
+                AacLocalizedTextResolver.resolveLabel(selectedItem, languageCode).lowercase(Locale("sl", "SI"))
+            }
+            "Rada bi $modifiers vodo."
         }
+    }
+
+    private fun scheduleMainAacGuidedAutoComplete(sentence: String, languageCode: String): Boolean {
+        val safeSentence = sentence.trim()
+        if (safeSentence.isBlank()) {
+            return false
+        }
+        mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
+        mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
+        val timeoutMs = mainAacGuidedAutoCompleteTimeoutMs()
+        if (timeoutMs <= 0L) {
+            cancelMainAacGuidedAutoComplete()
+            return false
+        }
+        pendingMainAacGuidedAutoCompleteSentence = safeSentence
+        pendingMainAacGuidedAutoCompleteLanguageCode = languageCode
+        mainHandler.removeCallbacks(mainAacGuidedAutoCompleteRunnable)
+        mainHandler.postDelayed(mainAacGuidedAutoCompleteRunnable, timeoutMs)
+        return true
+    }
+
+    private fun speakPendingMainAacGuidedAutoCompleteSentence() {
+        val sentence = pendingMainAacGuidedAutoCompleteSentence.trim()
+        val languageCode = pendingMainAacGuidedAutoCompleteLanguageCode.ifBlank { getActiveSpeechLanguage() }
+        if (sentence.isBlank()) {
+            cancelMainAacGuidedAutoComplete()
+            return
+        }
+        speakMainAacGuidedAutoCompleteSentence(sentence, languageCode)
+    }
+
+    private fun speakMainAacGuidedAutoCompleteSentence(sentence: String, languageCode: String) {
+        val safeSentence = sentence.trim()
+        if (safeSentence.isBlank()) {
+            cancelMainAacGuidedAutoComplete()
+            return
+        }
+        cancelMainAacGuidedAutoComplete()
+        isMainAacTerminalSelectionAccepted = true
+        lockMainAacInput()
+        showMainAacQuestion(safeSentence)
+        aacAudioPlayer.speakText(safeSentence, languageCode)
+        shouldResetMainAacRootAfterSpeech = true
+        clearMainAacSentenceState()
+    }
+
+    private fun cancelMainAacGuidedAutoComplete() {
+        mainHandler.removeCallbacks(mainAacGuidedAutoCompleteRunnable)
+        pendingMainAacGuidedAutoCompleteSentence = ""
+        pendingMainAacGuidedAutoCompleteLanguageCode = ""
     }
 
     private fun mainAacNaturalConversationSpeech(
@@ -1774,6 +1858,7 @@ class MainActivity : AppCompatActivity() {
         val sentence = mainAacSentenceManager.getSpeakText(languageCode).trim()
         if (shouldSpeakSentence && sentence.isNotBlank()) {
             lockMainAacInput()
+            cancelMainAacGuidedAutoComplete()
             aacAudioPlayer.speakText(sentence, languageCode)
             clearMainAacSentenceState()
             shouldResetMainAacRootAfterSpeech = true
@@ -1797,6 +1882,7 @@ class MainActivity : AppCompatActivity() {
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
         currentMainAacModifierItemsByGroup.clear()
+        cancelMainAacGuidedAutoComplete()
         resetMainAacRoot()
     }
 
@@ -1807,6 +1893,7 @@ class MainActivity : AppCompatActivity() {
             currentMainAacConversationItems = emptyList()
             currentMainAacModifierItemsByGroup.clear()
         }
+        cancelMainAacGuidedAutoComplete()
         mainAacAutoSentenceMaySpeakSingle = false
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
