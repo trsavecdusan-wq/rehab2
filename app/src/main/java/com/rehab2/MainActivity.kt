@@ -87,6 +87,12 @@ class MainActivity : AppCompatActivity() {
         private const val PREFS_AAC_GRID_SETTINGS = "aac_grid_settings"
         private const val KEY_AAC_GRID_SIZE = "aac_grid_size"
         private const val KEY_SHOW_SUBICONS_ON_MAIN_PAGES = "show_subicons_on_main_pages"
+        private const val KEY_AAC_GUIDED_PROMPT_DISPLAY_MODE = "aac_guided_prompt_display_mode"
+        private const val AAC_GUIDED_PROMPT_OFF = "OFF"
+        private const val AAC_GUIDED_PROMPT_FULL_TEXT = "FULL_TEXT"
+        private const val AAC_GUIDED_PROMPT_WORD_BY_WORD = "WORD_BY_WORD"
+        private const val AAC_GUIDED_PROMPT_LETTER_BY_LETTER = "LETTER_BY_LETTER"
+        private const val DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE = AAC_GUIDED_PROMPT_FULL_TEXT
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
@@ -238,6 +244,8 @@ class MainActivity : AppCompatActivity() {
     private var isSleepDimActive = false
     private var isKeepScreenOnApplied = false
     private val mainAacSentenceManager = AacSentenceStateManager()
+    private lateinit var mainAacQuestionText: TextView
+    private var mainAacQuestionRevealRunnable: Runnable? = null
     private lateinit var mainAacGridContainer: LinearLayout
     private lateinit var mainAacTileBindings: List<MainAacTileBinding>
     private var mainAacItemsById: Map<String, AacItem> = emptyMap()
@@ -454,6 +462,7 @@ class MainActivity : AppCompatActivity() {
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
         mainHandler.removeCallbacks(mainAacInputUnlockRunnable)
+        mainAacQuestionRevealRunnable?.let(mainHandler::removeCallbacks)
         radioPlayerController.release()
         aacAudioPlayer.setSpeechListener(null)
         aacAudioPlayer.release()
@@ -461,6 +470,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configureMainAacTiles() {
+        mainAacQuestionText = findViewById(R.id.txtMainAacQuestion)
+        hideMainAacQuestion()
         mainAacGridContainer = findViewById(R.id.mainAacGridContainer)
         ensureMainAacGridBindings()
         val fallbackItems = buildMainAacItems()
@@ -677,6 +688,7 @@ class MainActivity : AppCompatActivity() {
         if (mainAacHistory.isEmpty()) {
             return
         }
+        hideMainAacQuestion()
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
         showMainAacItems(mainAacHistory.removeLast())
@@ -784,6 +796,7 @@ class MainActivity : AppCompatActivity() {
         isMainAacTerminalSelectionAccepted = false
         shouldResetMainAacRootAfterSpeech = false
         selectedMainAacItemId = null
+        hideMainAacQuestion()
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
         val fallbackItems = buildMainAacItems()
@@ -880,7 +893,10 @@ class MainActivity : AppCompatActivity() {
             .orEmpty()
             .ifBlank { mainAacQuestionFallback(item, languageCode) }
         if (prompt.isNotBlank()) {
+            showMainAacQuestion(prompt)
             aacAudioPlayer.speakText(prompt, languageCode)
+        } else {
+            hideMainAacQuestion()
         }
     }
 
@@ -896,8 +912,117 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clearMainAacConversationContext() {
+        hideMainAacQuestion()
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
+    }
+
+    private fun showMainAacQuestion(question: String) {
+        if (!::mainAacQuestionText.isInitialized) return
+        val displayQuestion = question.trim().uppercase(Locale("sl", "SI"))
+        val displayMode = mainAacGuidedPromptDisplayMode()
+        if (displayQuestion.isBlank() || displayMode == AAC_GUIDED_PROMPT_OFF) {
+            hideMainAacQuestion()
+            return
+        }
+        mainAacQuestionRevealRunnable?.let(mainHandler::removeCallbacks)
+        mainAacQuestionRevealRunnable = null
+        mainAacQuestionText.visibility = View.VISIBLE
+        try {
+            when (displayMode) {
+                AAC_GUIDED_PROMPT_WORD_BY_WORD -> revealMainAacQuestionByWord(displayQuestion, 1)
+                AAC_GUIDED_PROMPT_LETTER_BY_LETTER -> {
+                    mainAacQuestionText.text = ""
+                    revealMainAacQuestionByLetter(displayQuestion, 1)
+                }
+                else -> mainAacQuestionText.text = displayQuestion
+            }
+        } catch (_: Exception) {
+            mainAacQuestionRevealRunnable?.let(mainHandler::removeCallbacks)
+            mainAacQuestionRevealRunnable = null
+            mainAacQuestionText.text = displayQuestion
+            mainAacQuestionText.visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideMainAacQuestion() {
+        if (!::mainAacQuestionText.isInitialized) return
+        mainAacQuestionRevealRunnable?.let(mainHandler::removeCallbacks)
+        mainAacQuestionRevealRunnable = null
+        mainAacQuestionText.text = ""
+        mainAacQuestionText.visibility = View.GONE
+    }
+
+    private fun revealMainAacQuestionByWord(question: String, visibleWords: Int) {
+        if (!::mainAacQuestionText.isInitialized) return
+        val words = question.split(Regex("\\s+")).filter { it.isNotBlank() }
+        if (words.isEmpty()) {
+            hideMainAacQuestion()
+            return
+        }
+        val safeVisibleWords = visibleWords.coerceIn(1, words.size)
+        mainAacQuestionText.text = words.take(safeVisibleWords).joinToString(" ")
+        if (safeVisibleWords >= words.size) {
+            mainAacQuestionRevealRunnable = null
+            return
+        }
+        val revealRunnable = Runnable {
+            revealMainAacQuestionByWord(question, safeVisibleWords + 1)
+        }
+        mainAacQuestionRevealRunnable = revealRunnable
+        mainHandler.postDelayed(revealRunnable, 260L)
+    }
+
+    private fun revealMainAacQuestionByLetter(question: String, visibleChars: Int) {
+        if (!::mainAacQuestionText.isInitialized) return
+        if (question.isBlank()) {
+            hideMainAacQuestion()
+            return
+        }
+        val safeVisibleChars = visibleChars.coerceIn(1, question.length)
+        mainAacQuestionText.text = question.take(safeVisibleChars)
+        if (safeVisibleChars >= question.length) {
+            mainAacQuestionRevealRunnable = null
+            return
+        }
+        val nextVisibleChars = safeVisibleChars + 1
+        val delayMs = if (question[safeVisibleChars - 1].isWhitespace()) 40L else 65L
+        val revealRunnable = Runnable {
+            revealMainAacQuestionByLetter(question, nextVisibleChars)
+        }
+        mainAacQuestionRevealRunnable = revealRunnable
+        mainHandler.postDelayed(revealRunnable, delayMs)
+    }
+
+    private fun mainAacGuidedPromptDisplayMode(): String {
+        val storedMode = getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
+            .getString(KEY_AAC_GUIDED_PROMPT_DISPLAY_MODE, DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE)
+            ?.trim()
+            ?.uppercase(Locale.ROOT)
+            .orEmpty()
+        return when (storedMode) {
+            AAC_GUIDED_PROMPT_OFF,
+            AAC_GUIDED_PROMPT_FULL_TEXT,
+            AAC_GUIDED_PROMPT_WORD_BY_WORD,
+            AAC_GUIDED_PROMPT_LETTER_BY_LETTER -> storedMode
+            else -> DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE
+        }
+    }
+
+    @Suppress("unused")
+    private fun saveMainAacGuidedPromptDisplayMode(displayMode: String): Boolean {
+        val normalizedMode = displayMode.trim().uppercase(Locale.ROOT)
+        val safeMode = when (normalizedMode) {
+            AAC_GUIDED_PROMPT_OFF,
+            AAC_GUIDED_PROMPT_FULL_TEXT,
+            AAC_GUIDED_PROMPT_WORD_BY_WORD,
+            AAC_GUIDED_PROMPT_LETTER_BY_LETTER -> normalizedMode
+            else -> DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE
+        }
+        return getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
+            .edit()
+            .putString(KEY_AAC_GUIDED_PROMPT_DISPLAY_MODE, safeMode)
+            .commit()
     }
 
     private fun handleMainAacResolvedSpeech(
@@ -1507,6 +1632,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun resetMainAacAfterTerminalSpeech() {
         mainAacHistory.clear()
+        hideMainAacQuestion()
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
         resetMainAacRoot()

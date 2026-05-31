@@ -322,6 +322,22 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/txtMainAacQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginBottom="8dp"
+        android:background="#24313A"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:maxLines="2"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:textColor="#F4F7FA"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/mainAacGridContainer"
         android:layout_width="match_parent"
