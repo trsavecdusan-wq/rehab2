@@ -62,6 +62,7 @@ import com.rehab2.aac.AacSentenceStateManager
 import com.rehab2.aac.AacStarterContentV1
 import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.AacStoredTranslationCache
+import com.rehab2.aac.AacUsageStats
 import com.rehab2.aac.IconSource
 import com.rehab2.radio.RadioPlayerController
 import com.rehab2.radio.SavedRadioStation
@@ -1155,6 +1156,7 @@ class MainActivity : AppCompatActivity() {
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
         if (inContextFlow && (item.addsToSentence || AacGuidedPromptEngine.isFollowUpAnswer(item))) {
             selectedMainAacItemId = item.id
+            recordMainAacUsage(item)
             val speechText = mainAacNaturalConversationSpeech(
                 item = item,
                 languageCode = languageCode,
@@ -1172,6 +1174,7 @@ class MainActivity : AppCompatActivity() {
         }
         if (resolvedSpeechText.isNotBlank()) {
             selectedMainAacItemId = item.id
+            recordMainAacUsage(item)
             lockMainAacInput()
             aacAudioPlayer.speakText(resolvedSpeechText, languageCode)
             shouldResetMainAacRootAfterSpeech = true
@@ -1203,6 +1206,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         selectedMainAacItemId = item.id
+        recordMainAacUsage(item)
         currentMainAacModifierItemsByGroup[modifierGroup] = item
         currentMainAacConversationItems = (
             currentMainAacConversationItems.filter { existingItem ->
@@ -1239,12 +1243,15 @@ class MainActivity : AppCompatActivity() {
         }
         val followUp = AacGuidedPromptEngine.followUpFor(currentMainAacConversationItems, item)
             ?: return false
-        val followUpItems = followUp.childIds.mapNotNull { childId -> mainAacItemsById[childId] }
+        val followUpItems = sortMainAacGuidedItemsByUsage(
+            followUp.childIds.mapNotNull { childId -> mainAacItemsById[childId] }
+        )
         if (followUpItems.isEmpty()) {
             return false
         }
 
         selectedMainAacItemId = item.id
+        recordMainAacUsage(item)
         currentMainAacConversationItems = currentMainAacConversationItems + item
         currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
         cancelMainAacGuidedAutoComplete()
@@ -2003,7 +2010,20 @@ class MainActivity : AppCompatActivity() {
             .sortedBy { it.priority }
         val existingChildren = explicitChildren + visibleUnderChildren
         val guidedChildren = AacGuidedPromptEngine.childIdsFor(item).mapNotNull { childId -> mainAacItemsById[childId] }
-        return (existingChildren + guidedChildren).distinctBy { child -> child.id }
+        val children = (existingChildren + guidedChildren).distinctBy { child -> child.id }
+        return if (guidedChildren.isNotEmpty()) {
+            sortMainAacGuidedItemsByUsage(children)
+        } else {
+            children
+        }
+    }
+
+    private fun recordMainAacUsage(item: AacItem) {
+        AacUsageStats.recordUse(this, item.id)
+    }
+
+    private fun sortMainAacGuidedItemsByUsage(items: List<AacItem>): List<AacItem> {
+        return AacUsageStats.sortByUsage(this, items)
     }
 
     private fun scheduleMainAacSentenceSpeech(itemSpeaksImmediately: Boolean) {
