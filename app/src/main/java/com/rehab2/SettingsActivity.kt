@@ -35,6 +35,7 @@ import com.rehab2.aac.AacSpeechApiConfig
 import com.rehab2.aac.AacSpeechCache
 import com.rehab2.aac.AacSpeechCoordinator
 import com.rehab2.aac.AacSpeechTimingSettings
+import com.rehab2.aac.AacVendingScenario
 import com.rehab2.aac.OpenAiAacSpeechApiClient
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -163,6 +164,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtAacCommunicationContextStatus: TextView
     private lateinit var editAacCommunicationContext: EditText
     private lateinit var switchRealWorldHelpersEnabled: SwitchCompat
+    private lateinit var editVendingCodes: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
@@ -229,6 +231,7 @@ class SettingsActivity : AppCompatActivity() {
         txtAacCommunicationContextStatus = findViewById(R.id.txtAacCommunicationContextStatus)
         editAacCommunicationContext = findViewById(R.id.editAacCommunicationContext)
         switchRealWorldHelpersEnabled = findViewById(R.id.switchRealWorldHelpersEnabled)
+        editVendingCodes = findViewById(R.id.editVendingCodes)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -318,6 +321,9 @@ class SettingsActivity : AppCompatActivity() {
         editAacCommunicationContext.setOnClickListener {
             showAacProfilePicker()
         }
+        editVendingCodes.setOnClickListener {
+            showVendingCodePicker()
+        }
         bindSpeechTimingSwitchListeners()
         bindPersistentTopRowSwitchListener()
 
@@ -387,6 +393,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshPersistentTopRowSection()
         refreshGuidedFollowUpSection()
         refreshAacCommunicationContextSection()
+        refreshVendingCodesSection()
         applyKeepScreenOnWhileCharging()
     }
 
@@ -602,6 +609,23 @@ class SettingsActivity : AppCompatActivity() {
         val gridSize = getAacGridSize()
         txtAacGridSizeStatus.text = "Velikost mreže komunikatorja: $gridSize x $gridSize"
         editAacGridSize.setText("$gridSize x $gridSize")
+    }
+
+    private fun refreshVendingCodesSection() {
+        val location = AacVendingScenario.activeLocation(this)
+        editVendingCodes.setText(
+            buildString {
+                appendLine(location.labelSl)
+                location.machines.forEachIndexed { index, machine ->
+                    if (index > 0) appendLine()
+                    appendLine(machine.labelSl)
+                    AacVendingScenario.productsForMachine(machine.id).forEach { product ->
+                        val code = machine.codes[product.itemId].orEmpty().ifBlank { "brez kode" }
+                        appendLine("${product.label}: $code")
+                    }
+                }
+            }
+        )
     }
 
     private fun saveSpeechApiSettings(showSavedToast: Boolean): Boolean {
@@ -826,8 +850,62 @@ class SettingsActivity : AppCompatActivity() {
                 AacProfileStore.applyProfileDefaultsIfNeeded(this)
                 refreshGuidedFollowUpSection()
                 refreshAacCommunicationContextSection()
+                refreshVendingCodesSection()
                 dialog.dismiss()
             }
+            .show()
+    }
+
+    private fun showVendingCodePicker() {
+        val location = AacVendingScenario.activeLocation(this)
+        val editableItems = location.machines.flatMap { machine ->
+            AacVendingScenario.productsForMachine(machine.id).map { product ->
+                machine to product
+            }
+        }
+        val labels = editableItems.map { (machine, product) ->
+            val code = machine.codes[product.itemId].orEmpty().ifBlank { "brez kode" }
+            "${machine.labelSl} – ${product.label}: $code"
+        }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("AVTOMAT – KODE PO LOKACIJI")
+            .setItems(labels) { _, which ->
+                val (machine, product) = editableItems[which]
+                showVendingCodeEditor(machine, product)
+            }
+            .show()
+    }
+
+    private fun showVendingCodeEditor(
+        machine: AacVendingScenario.Machine,
+        product: AacVendingScenario.Product
+    ) {
+        val currentCode = machine.codes[product.itemId].orEmpty()
+        val input = EditText(this).apply {
+            setText(currentCode)
+            hint = "npr. B07"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+            setSelectAllOnFocus(true)
+            setPadding(40, 24, 40, 24)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("${machine.labelSl} – ${product.label}")
+            .setView(input)
+            .setPositiveButton("Shrani") { _, _ ->
+                val saved = AacVendingScenario.saveCode(
+                    this,
+                    machine.id,
+                    product.itemId,
+                    input.text?.toString().orEmpty()
+                )
+                refreshVendingCodesSection()
+                Toast.makeText(
+                    this,
+                    if (saved) "Koda shranjena lokalno." else "Kode ni bilo mogoče shraniti.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .setNegativeButton("Prekliči", null)
             .show()
     }
 

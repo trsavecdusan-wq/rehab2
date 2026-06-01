@@ -36,8 +36,10 @@ import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
 import com.rehab2.aac.AacSpeechTimingSettings
 import com.rehab2.aac.AacStoragePaths
+import com.rehab2.aac.AacUsageStats
 import com.rehab2.aac.AacV2JsonParser
 import com.rehab2.aac.AacV2PageAdapter
+import com.rehab2.aac.AacVendingScenario
 import java.io.File
 
 class AacCommunicatorActivity : AppCompatActivity() {
@@ -308,6 +310,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun handleItemClick(item: AacItem) {
+        confirmGuidedTopSuggestionIfYesItem(item)?.let { suggestedItem ->
+            handleItemClick(suggestedItem)
+            return
+        }
+
+        if (isGuidedBackNoItem(item)) {
+            cancelPendingSpeech()
+            goBack()
+            return
+        }
+
         when (item.actionType) {
             "open_page" -> {
                 cancelPendingSpeech()
@@ -344,6 +357,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     updateWaterTraceDebug("WATER CLICK CHILDREN=${childItems.size}")
                 }
             }
+            AacUsageStats.recordUse(this, item.id)
+            if (handleVendingScenarioSelection(item)) {
+                return
+            }
             sentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
@@ -372,6 +389,57 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
 
         audioPlayer.playOrSpeak(item, languageCode)
+    }
+
+    private fun confirmGuidedTopSuggestionIfYesItem(item: AacItem): AacItem? {
+        if (!isGuidedYesItem(item) || !isGuidedFollowUpAllowed() || currentV2VisibleHistory.isEmpty()) {
+            return null
+        }
+
+        val topSuggestionId = AacUsageStats.topSuggestion(
+            this,
+            currentVisibleItems.map { visibleItem -> visibleItem.id }
+        ) ?: return null
+
+        return currentVisibleItems.firstOrNull { visibleItem -> visibleItem.id == topSuggestionId }
+    }
+
+    private fun isGuidedYesItem(item: AacItem): Boolean {
+        val conceptId = item.conceptId?.trim().orEmpty()
+        return item.id == "yes" ||
+            item.id == "quick_yes" ||
+            conceptId == "yes" ||
+            conceptId == "core.yes"
+    }
+
+    private fun handleVendingScenarioSelection(item: AacItem): Boolean {
+        if (!isVendingScenarioActive() || currentV2VisibleHistory.isEmpty() || !AacVendingScenario.canHandle(item)) {
+            return false
+        }
+
+        cancelPendingSpeech()
+        setPromptText(AacVendingScenario.codePromptFor(this, item))
+        val requestId = nextSpeechRequestId("VENDING_SCENARIO:${item.id}")
+        startSingleIconSpeech(AacVendingScenario.speechFor(this, item), requestId)
+        return true
+    }
+
+    private fun isVendingScenarioActive(): Boolean {
+        return isRealWorldHelperAllowed() &&
+            getActiveAacProfileId() == AacVendingScenario.PROFILE_ID &&
+            getAacCommunicationContext() == AacCommunicationContext.REAL_WORLD_ASSISTANT
+    }
+
+    private fun isGuidedBackNoItem(item: AacItem): Boolean {
+        if (!isGuidedFollowUpAllowed() || currentV2VisibleHistory.isEmpty()) {
+            return false
+        }
+
+        val conceptId = item.conceptId?.trim().orEmpty()
+        return item.id == "no" ||
+            item.id == "quick_no" ||
+            conceptId == "no" ||
+            conceptId == "core.no"
     }
 
     private fun setupQuickAccessRow() {
@@ -1006,6 +1074,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun resolveFollowUpQuestion(item: AacItem): String? {
+        if (isVendingScenarioActive() && isDrinkFollowUpTrigger(item)) {
+            return "Kaj želiš izbrati?"
+        }
         if (isGuidedFollowUpAllowed()) {
             item.followUpQuestion?.takeIf { it.isNotBlank() }?.let { return it }
             if (isDrinkFollowUpTrigger(item)) {

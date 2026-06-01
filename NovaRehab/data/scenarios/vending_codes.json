@@ -1,0 +1,34 @@
+{
+  "activeLocationId": "default_location",
+  "locations": [
+    {
+      "id": "default_location",
+      "labelSl": "Trenutna lokacija",
+      "activeMachineId": "drinks_machine",
+      "machines": [
+        {
+          "id": "drinks_machine",
+          "labelSl": "Avtomat za pijače",
+          "type": "DRINKS",
+          "codes": {
+            "drink_fanta": "B07",
+            "drink_coca_cola": "B08",
+            "drink_pepsi": "B09",
+            "water": "A01",
+            "juice": ""
+          }
+        },
+        {
+          "id": "coffee_tea_machine",
+          "labelSl": "Avtomat za kavo in čaj",
+          "type": "COFFEE_TEA",
+          "codes": {
+            "coffee": "",
+            "tea": "",
+            "drink_milk": ""
+          }
+        }
+      ]
+    }
+  ]
+}
