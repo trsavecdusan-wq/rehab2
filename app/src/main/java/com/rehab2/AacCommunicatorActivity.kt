@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacCommunicationContext
 import com.rehab2.aac.AacCommunicationContextPrefs
+import com.rehab2.aac.AacContextSuggestions
 import com.rehab2.aac.AacGuidedFollowUpSettings
 import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacLabelMode
@@ -287,10 +288,18 @@ class AacCommunicatorActivity : AppCompatActivity() {
         waterBeforeAdapterChildrenCount = waterItem?.children?.size ?: -1
         logWaterTrace("before adapter", waterItem)
         updateWaterTraceDebug("before adapter")
+        val displayedItems = mergePersistentTopRowWithCurrentMenuItems(items)
+        val suggestionIds = AacContextSuggestions.suggest(
+            context = this,
+            currentPageId = currentPageId,
+            visibleItems = displayedItems,
+            recentItems = recentSentenceAacItems()
+        ).toSet()
         recycler.adapter = AacAdapter(
-            items = mergePersistentTopRowWithCurrentMenuItems(items),
+            items = displayedItems,
             labelMode = labelMode,
             languageCode = languageCode,
+            suggestionIds = suggestionIds,
             onItemClick = { item ->
                 handleItemClick(item)
             },
@@ -300,6 +309,21 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
         )
         updateNavigationChrome(txtTitle.text.toString().lineSequence().firstOrNull().orEmpty())
+    }
+
+    private fun recentSentenceAacItems(): List<AacItem> {
+        if (currentV2ItemsById.isEmpty()) {
+            return emptyList()
+        }
+        val itemsByConceptId = currentV2ItemsById.values
+            .mapNotNull { item -> item.conceptId?.takeIf { it.isNotBlank() }?.let { conceptId -> conceptId to item } }
+            .toMap()
+        return sentenceManager.getItems().mapNotNull { sentenceItem ->
+            currentV2ItemsById[sentenceItem.conceptId] ?:
+                itemsByConceptId[sentenceItem.conceptId] ?:
+                currentV2ItemsById[sentenceItem.text] ?:
+                itemsByConceptId[sentenceItem.text]
+        }
     }
 
     private fun readAacLabelMode(): AacLabelMode {
@@ -1287,6 +1311,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         private val items: List<AacItem>,
         private val labelMode: AacLabelMode,
         private val languageCode: String,
+        private val suggestionIds: Set<String>,
         private val onItemClick: (AacItem) -> Unit,
         private val onWaterBindTrace: (AacItem) -> Unit
     ) : RecyclerView.Adapter<AacAdapter.AacViewHolder>() {
@@ -1324,7 +1349,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): AacViewHolder {
             val view = android.view.LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_aac_tile, parent, false)
-            return AacViewHolder(view, labelMode, languageCode, onItemClick, onWaterBindTrace)
+            return AacViewHolder(view, labelMode, languageCode, suggestionIds, onItemClick, onWaterBindTrace)
         }
 
         override fun onBindViewHolder(holder: AacViewHolder, position: Int) {
@@ -1337,6 +1362,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             itemView: View,
             private val labelMode: AacLabelMode,
             private val languageCode: String,
+            private val suggestionIds: Set<String>,
             private val onItemClick: (AacItem) -> Unit,
             private val onWaterBindTrace: (AacItem) -> Unit
         ) : RecyclerView.ViewHolder(itemView) {
@@ -1362,7 +1388,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     Log.d("AacCommunicatorActivity", "TRACE water adapter bind children=${item.children.size} ids=${item.children}")
                     onWaterBindTrace(item)
                 }
-                label.text = AacLocalizedTextResolver.resolveLabel(item, languageCode)
+                val resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode)
+                label.text = if (item.id in suggestionIds) "\u2B50 $resolvedLabel" else resolvedLabel
                 label.gravity = Gravity.CENTER
                 label.setTypeface(label.typeface, Typeface.BOLD)
                 applyLabelMode()
