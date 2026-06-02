@@ -90,11 +90,12 @@ class AacPackSettingsActivity : AppCompatActivity() {
         private const val MAX_ITEMS_PREVIEW_BYTES = 512 * 1024
         private const val SUSPICIOUS_ITEMS_PER_PROFILE = 250
         private val STARTER_DIAGNOSTIC_PRIORITY = listOf(
-            "yes",
             "no",
-            "help",
-            "no_understand",
+            "yes",
             "dont_understand",
+            "thank_you",
+            "sorry",
+            "help",
             "wait",
             "water",
             "coffee",

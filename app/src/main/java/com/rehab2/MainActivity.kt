@@ -1455,7 +1455,7 @@ class MainActivity : AppCompatActivity() {
     private fun isMainAacGlobalDirectAction(item: AacItem): Boolean {
         val id = item.id.trim().lowercase(Locale.ROOT)
         return (item.fixedTopRowPosition ?: 0) in 1..MAIN_AAC_FIXED_TOP_ROW_MAX ||
-            id in setOf("yes", "no", "help", "no_understand", "dont_understand", "thank_you", "wait", "repeat", "slower", "stop")
+            id in setOf("yes", "no", "help", "dont_understand", "thank_you", "wait", "repeat", "slower", "stop")
     }
 
     private fun isMainAacItemInCurrentConversationBranch(item: AacItem): Boolean {
@@ -1947,7 +1947,7 @@ class MainActivity : AppCompatActivity() {
                 "good" -> return "\uD83D\uDE42"
                 "bad" -> return "\uD83D\uDE1F"
                 "no" -> return "❌"
-                "no_understand", "dont_understand" -> return "❓"
+                "dont_understand" -> return "❓"
                 "will" -> return "\uD83D\uDCAC"
                 "calm" -> return "\uD83C\uDF3F"
                 "turn_me" -> return "\uD83D\uDD04"
@@ -2176,8 +2176,7 @@ class MainActivity : AppCompatActivity() {
                 labelUk = "ДОПОМОГА",
                 labelEn = "HELP",
                 speakTextUk = "Допоможіть мені",
-                speechTextEn = "Help me",
-                fixedTopRowPosition = 5
+                speechTextEn = "Help me"
             ),
             mainAacItem(
                 "yes",
@@ -2187,7 +2186,7 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "YES",
                 speakTextUk = "так",
                 speechTextEn = "yes",
-                fixedTopRowPosition = 1
+                fixedTopRowPosition = 2
             ),
             mainAacItem(
                 "thank_you",
@@ -2198,6 +2197,16 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "дякую",
                 speechTextEn = "thank you",
                 fixedTopRowPosition = 4
+            ),
+            mainAacItem(
+                "sorry",
+                "OPROSTI",
+                "oprosti",
+                labelUk = "ВИБАЧТЕ",
+                labelEn = "SORRY",
+                speakTextUk = "вибачте",
+                speechTextEn = "sorry",
+                fixedTopRowPosition = 5
             ),
             mainAacItem(
                 "wc",
@@ -2386,14 +2395,14 @@ class MainActivity : AppCompatActivity() {
                 speechTextEn = "Please turn me"
             ),
             mainAacItem(
-                "no_understand",
+                "dont_understand",
                 "NE RAZUMEM",
                 "ne razumem",
                 labelUk = "Я НЕ РОЗУМІЮ",
                 labelEn = "I DON'T UNDERSTAND",
                 speakTextUk = "Я не розумію",
                 speechTextEn = "I don't understand",
-                fixedTopRowPosition = 2
+                fixedTopRowPosition = 3
             ),
             mainAacItem(
                 "no",
@@ -2403,7 +2412,7 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "NO",
                 speakTextUk = "ні",
                 speechTextEn = "no",
-                fixedTopRowPosition = 3
+                fixedTopRowPosition = 1
             ),
             mainAacItem(
                 "sleep",

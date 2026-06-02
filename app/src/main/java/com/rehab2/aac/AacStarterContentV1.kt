@@ -2,11 +2,11 @@ package com.rehab2.aac
 
 object AacStarterContentV1 {
     fun items(): List<AacItem> = listOf(
-        starter("yes", "DA", "Da.", "core.yes", "CONFIRMATION", "core", listOf("da", "potrditev"), fixedTopRowPosition = 1),
-        starter("dont_understand", "NE RAZUMEM", "Ne razumem.", "core.dont_understand", "CONFIRMATION", "core", listOf("razumevanje", "ne_razumem"), fixedTopRowPosition = 2),
-        starter("no", "NE", "Ne.", "core.no", "CONFIRMATION", "core", listOf("ne", "zavrnitev"), fixedTopRowPosition = 3),
+        starter("no", "NE", "Ne.", "core.no", "CONFIRMATION", "core", listOf("ne", "zavrnitev"), fixedTopRowPosition = 1),
+        starter("yes", "DA", "Da.", "core.yes", "CONFIRMATION", "core", listOf("da", "potrditev"), fixedTopRowPosition = 2),
+        starter("dont_understand", "NE RAZUMEM", "Ne razumem.", "core.dont_understand", "CONFIRMATION", "core", listOf("razumevanje", "ne_razumem"), fixedTopRowPosition = 3),
         starter("thank_you", "HVALA", "Hvala.", "core.thank_you", "CONFIRMATION", "core", listOf("hvala", "zahvala"), fixedTopRowPosition = 4),
-        starter("help", "POMOČ", "Prosim, pomagajte mi.", "core.help", "NEED", "core", listOf("pomoč", "nujno"), fixedTopRowPosition = 5),
+        starter("help", "POMOČ", "Prosim, pomagajte mi.", "core.help", "NEED", "core", listOf("pomoč", "nujno")),
         starter("wait", "POČAKAJ", "Počakajte, prosim.", "core.wait", "CORE_ACTION", "core", listOf("počakaj", "čas")),
         starter("repeat", "PONOVI", "Prosim, ponovite.", "core.repeat", "CORE_ACTION", "core", listOf("ponovi", "razumevanje")),
         starter("slower", "POČASNEJE", "Prosim, govorite počasneje.", "core.slower", "CORE_ACTION", "core", listOf("počasneje", "razumevanje")),
@@ -44,7 +44,7 @@ object AacStarterContentV1 {
         starter("franc", "FRANC", "Pokličite Franca.", "people.franc", "PEOPLE", "people", listOf("franc", "prijatelji"), placements = pageTwo(12)),
         starter("miss_you", "POGREŠAM TE", "Pogrešam te.", "people.miss_you", "PEOPLE", "people", listOf("pogrešam", "ljubezen"), placements = pageTwo(13)),
         starter("love_you", "RADA TE IMAM", "Rada te imam.", "people.love_you", "PEOPLE", "people", listOf("rada_te_imam", "ljubezen"), placements = pageTwo(14)),
-        starter("sorry", "OPROSTI", "Oprosti.", "core.sorry", "FEELING", "core", listOf("oprosti"), placements = pageTwo(15)),
+        starter("sorry", "OPROSTI", "Oprosti.", "core.sorry", "FEELING", "core", listOf("oprosti"), placements = pageTwo(15), fixedTopRowPosition = 5),
         starter("please", "PROSIM", "Prosim.", "core.please", "CORE_ACTION", "core", listOf("prosim"), placements = pageTwo(16)),
         starter("call_me", "POKLIČI ME", "Prosim, pokliči me.", "people.call_me", "CORE_ACTION", "people", listOf("pokliči_me"), placements = pageTwo(17)),
         starter("come_to_me", "PRIDI K MENI", "Prosim, pridi k meni.", "people.come_to_me", "CORE_ACTION", "people", listOf("pridi", "k_meni"), placements = pageTwo(19)),
@@ -226,7 +226,7 @@ object AacStarterContentV1 {
 
     private const val START_PRIORITY = 100
     private val STARTER_IDS = listOf(
-        "yes", "dont_understand", "no", "thank_you", "help", "wait", "repeat", "slower", "understand",
+        "no", "yes", "dont_understand", "thank_you", "sorry", "help", "wait", "repeat", "slower", "understand",
         "family_group", "friends_group", "call", "message", "miss_someone",
         "thirsty", "hungry", "pain", "wc", "tired", "what_do", "where_go", "i_want", "dont_want",
         "rest", "drink", "food", "feeling", "care", "health",

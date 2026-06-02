@@ -95,7 +95,7 @@ object AacSampleContentCreator {
                         imagePath = "",
                         isRootItem = true,
                         priority = 0,
-                        fixedTopRowPosition = 1
+                        fixedTopRowPosition = 2
                     )
                 )
                 .put(
@@ -111,7 +111,7 @@ object AacSampleContentCreator {
                         conceptId = "dont_understand",
                         isRootItem = true,
                         priority = 1,
-                        fixedTopRowPosition = 2
+                        fixedTopRowPosition = 3
                     )
                         .put("labelUk", "Я НЕ РОЗУМІЮ")
                         .put("speakTextUk", "Я не розумію")
@@ -128,15 +128,15 @@ object AacSampleContentCreator {
                         imagePath = "",
                         isRootItem = true,
                         priority = 2,
-                        fixedTopRowPosition = 3
+                        fixedTopRowPosition = 1
                     )
                 )
                 .put(
                     sampleItem(
-                        id = "will",
-                        label = "BOM",
+                        id = "thank_you",
+                        label = "HVALA",
                         imagePath = "",
-                        conceptId = "will",
+                        conceptId = "thank_you",
                         isRootItem = true,
                         priority = 3,
                         fixedTopRowPosition = 4
@@ -144,10 +144,10 @@ object AacSampleContentCreator {
                 )
                 .put(
                     sampleItem(
-                        id = "calm",
-                        label = "MIR",
+                        id = "sorry",
+                        label = "OPROSTI",
                         imagePath = "",
-                        conceptId = "calm",
+                        conceptId = "sorry",
                         isRootItem = true,
                         priority = 4,
                         fixedTopRowPosition = 5
@@ -744,7 +744,7 @@ object AacSampleContentCreator {
             displayName = "DOM",
             icon = "custom/dom.png",
             context = AacCommunicationContext.NORMAL_COMMUNICATION,
-            itemIds = listOf("yes", "dont_understand", "no", "will", "calm", "help", "pain", "thirsty")
+            itemIds = listOf("no", "yes", "dont_understand", "thank_you", "sorry", "help", "pain", "thirsty")
         )
     }
 
@@ -754,7 +754,7 @@ object AacSampleContentCreator {
             displayName = "VIDEO CALL",
             icon = "arasaac/video_call.png",
             context = AacCommunicationContext.VIDEO_CALL_COMMUNICATION,
-            itemIds = listOf("yes", "dont_understand", "no", "will", "calm", "help", "pain")
+            itemIds = listOf("no", "yes", "dont_understand", "thank_you", "sorry", "help", "pain")
         )
     }
 
@@ -764,7 +764,7 @@ object AacSampleContentCreator {
             displayName = "REAL WORLD",
             icon = "soca/real_world.png",
             context = AacCommunicationContext.REAL_WORLD_ASSISTANT,
-            itemIds = listOf("yes", "dont_understand", "no", "will", "calm", "soca_water", "soca_wc", "soca_help", "soca_pain", "thirsty")
+            itemIds = listOf("no", "yes", "dont_understand", "thank_you", "sorry", "soca_water", "soca_wc", "soca_help", "soca_pain", "thirsty")
         )
     }
 

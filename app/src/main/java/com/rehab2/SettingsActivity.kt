@@ -115,9 +115,9 @@ class SettingsActivity : AppCompatActivity() {
         private const val PREF_AAC_PERSISTENT_TOP_ROW_ENABLED = "aac_persistent_top_row_enabled"
         private const val PREF_AAC_PERSISTENT_TOP_ROW_COUNT = "aac_persistent_top_row_count"
         private const val PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = "aac_persistent_top_row_item_ids"
-        private const val DEFAULT_AAC_PERSISTENT_TOP_ROW_COUNT = 4
+        private const val DEFAULT_AAC_PERSISTENT_TOP_ROW_COUNT = 5
         private val AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS = arrayOf(3, 4, 5)
-        private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("yes", "no", "help", "pain", "stop")
+        private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "yes", "dont_understand", "thank_you", "sorry")
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
         private const val MAX_MISSING_ICONS_SHOWN = 15
@@ -1085,8 +1085,11 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun persistentTopRowLabel(itemId: String): String {
         return when (itemId) {
-            "yes" -> "DA"
             "no" -> "NE"
+            "yes" -> "DA"
+            "dont_understand", "no_understand" -> "NE RAZUMEM"
+            "thank_you" -> "HVALA"
+            "sorry" -> "OPROSTI"
             "help" -> "POMOČ"
             "pain" -> "BOLI"
             "stop" -> "STOP"

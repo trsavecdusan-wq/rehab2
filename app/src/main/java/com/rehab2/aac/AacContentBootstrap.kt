@@ -95,6 +95,7 @@ object AacContentBootstrap {
             0
         }
         val addedPlacements = defaultPagePlacements + starterPlacements
+        val repairedFixedTopRowMetadata = repairFixedTopRowMetadata(itemsArray)
         val repairedNoUnderstandLabels = repairNoUnderstandSystemLabels(itemsArray)
         val repairedDrinkSpeechItems = repairDrinkChildSpeechItems(itemsArray)
         val repairedFoodSpeechItems = repairFoodChildSpeechItems(itemsArray)
@@ -103,6 +104,7 @@ object AacContentBootstrap {
             addedPlacements > 0 ||
             mergedMissingSystemItems > 0 ||
             repairedStarterCategoryChildren > 0 ||
+            repairedFixedTopRowMetadata > 0 ||
             repairedNoUnderstandLabels > 0 ||
             repairedDrinkSpeechItems > 0 ||
             repairedFoodSpeechItems > 0 ||
@@ -137,7 +139,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren fixedTopRowRepaired=$repairedFixedTopRowMetadata noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -223,6 +225,35 @@ object AacContentBootstrap {
                 put("en", "I don't understand")
             })
             repaired++
+        }
+        return repaired
+    }
+
+    private fun repairFixedTopRowMetadata(itemsArray: JSONArray): Int {
+        val desiredPositions = mapOf(
+            "no" to 1,
+            "yes" to 2,
+            "dont_understand" to 3,
+            "thank_you" to 4,
+            "sorry" to 5
+        )
+        val legacyFixedRowIds = setOf("help", "pain", "stop", "no_understand")
+        var repaired = 0
+        itemObjects(itemsArray).forEach { item ->
+            if (isUserProtected(item)) return@forEach
+            val id = item.optString("id").trim()
+            val desiredPosition = desiredPositions[id]
+            if (desiredPosition != null) {
+                if (item.optInt("fixedTopRowPosition", 0) != desiredPosition) {
+                    item.put("fixedTopRowPosition", desiredPosition)
+                    repaired++
+                }
+                return@forEach
+            }
+            if (id in legacyFixedRowIds && item.optInt("fixedTopRowPosition", 0) in 1..5) {
+                item.remove("fixedTopRowPosition")
+                repaired++
+            }
         }
         return repaired
     }

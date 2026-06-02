@@ -1514,6 +1514,6 @@ class AacCommunicatorActivity : AppCompatActivity() {
         // Future therapist settings/content metadata may provide positions 1..5.
         // Runtime fixes only the first grid-width items; remaining configured items flow normally.
         const val DEFAULT_PERSISTENT_TOP_ROW_COUNT = 5
-        val DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("yes", "no", "help", "pain", "stop")
+        val DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "yes", "dont_understand", "thank_you", "sorry")
     }
 }
