@@ -58,6 +58,7 @@ object AacContentBootstrap {
         val starterItems = AacStarterContentV1.items()
         val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems + starterItems)
         val repairedStarterCategoryChildren = repairStarterCategoryChildren(itemsArray, starterItems)
+        val repairedConversationTreeV3Metadata = repairConversationTreeV3Metadata(itemsArray, starterItems)
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
             return Result(
@@ -105,6 +106,7 @@ object AacContentBootstrap {
             addedPlacements > 0 ||
             mergedMissingSystemItems > 0 ||
             repairedStarterCategoryChildren > 0 ||
+            repairedConversationTreeV3Metadata > 0 ||
             repairedFixedTopRowMetadata > 0 ||
             repairedDefaultPageV3Placements > 0 ||
             repairedNoUnderstandLabels > 0 ||
@@ -141,7 +143,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -188,6 +190,62 @@ object AacContentBootstrap {
                     item.put("children", children)
                 }
             }
+        return repaired
+    }
+
+    private fun repairConversationTreeV3Metadata(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
+        val guidedBranchIds = setOf(
+            "people",
+            "need",
+            "problem",
+            "please",
+            "what_root",
+            "where_root",
+            "when_root",
+            "person_dusan",
+            "person_zana",
+            "person_sergej",
+            "person_julija",
+            "person_oksana",
+            "person_inna",
+            "person_franc",
+            "person_other"
+        )
+        val starterById = starterItems
+            .filter { item -> item.id in guidedBranchIds }
+            .associateBy { item -> item.id }
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+        var repaired = 0
+        starterById.forEach { (id, starter) ->
+            val item = itemsById[id] ?: return@forEach
+            if (isUserProtected(item)) return@forEach
+            if (starter.opensSubicons && !item.optBoolean("opensSubicons", false)) {
+                item.put("opensSubicons", true)
+                repaired++
+            }
+            if (starter.opensSubicons && item.optBoolean("speaksImmediately", true)) {
+                item.put("speaksImmediately", false)
+                repaired++
+            }
+            if (starter.opensSubicons && (item.optString("actionType").isBlank() || item.optString("actionType") == "speak")) {
+                item.put("actionType", "open_subicons")
+                repaired++
+            }
+            if (starter.questionByLanguage.isNotEmpty()) {
+                val questions = item.optJSONObject("questionByLanguage") ?: JSONObject()
+                starter.questionByLanguage.forEach { (languageCode, question) ->
+                    if (questions.optString(languageCode).isBlank()) {
+                        questions.put(languageCode, question)
+                        repaired++
+                    }
+                }
+                item.put("questionByLanguage", questions)
+            }
+        }
         return repaired
     }
 

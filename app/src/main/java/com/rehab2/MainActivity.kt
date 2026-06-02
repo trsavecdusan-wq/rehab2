@@ -2173,9 +2173,33 @@ class MainActivity : AppCompatActivity() {
                 ),
                 placements = mainAacPageOnePlacement(5)
             ),
-            mainAacItem("people", "LJUDJE", "ljudje", placements = mainAacPageOnePlacement(1)),
-            mainAacItem("need", "POTREBUJEM", "potrebujem", placements = mainAacPageOnePlacement(2)),
-            mainAacItem("problem", "TEŽAVA", "imam težavo", placements = mainAacPageOnePlacement(3)),
+            mainAacItem(
+                "people",
+                "LJUDJE",
+                "ljudje",
+                opensSubicons = true,
+                children = listOf("person_dusan", "person_zana", "person_sergej", "person_julija", "person_oksana", "person_inna", "person_franc", "person_other"),
+                questionByLanguage = mapOf("sl" to "O kom želiš govoriti?"),
+                placements = mainAacPageOnePlacement(1)
+            ),
+            mainAacItem(
+                "need",
+                "POTREBUJEM",
+                "potrebujem",
+                opensSubicons = true,
+                children = listOf("help", "water", "food", "wc", "blanket", "wheelchair", "crutch", "doctor", "nurse", "therapy"),
+                questionByLanguage = mapOf("sl" to "Kaj potrebuješ?"),
+                placements = mainAacPageOnePlacement(2)
+            ),
+            mainAacItem(
+                "problem",
+                "TEŽAVA",
+                "imam težavo",
+                opensSubicons = true,
+                children = listOf("pain", "cannot", "cold", "hot", "afraid", "bad", "uncomfortable", "dont_know_problem"),
+                questionByLanguage = mapOf("sl" to "Kaj je narobe?"),
+                placements = mainAacPageOnePlacement(3)
+            ),
             mainAacItem(
                 "help",
                 "POMOČ",
@@ -2301,9 +2325,33 @@ class MainActivity : AppCompatActivity() {
                 visibleUnderIds = listOf("what_root"),
                 placements = emptyList()
             ),
-            mainAacItem("what_root", "KAJ?", "kaj?", placements = mainAacPageOnePlacement(11)),
-            mainAacItem("where_root", "KJE?", "kje?", placements = mainAacPageOnePlacement(12)),
-            mainAacItem("when_root", "KDAJ?", "kdaj?", placements = mainAacPageOnePlacement(13)),
+            mainAacItem(
+                "what_root",
+                "KAJ?",
+                "kaj?",
+                opensSubicons = true,
+                children = listOf("what_do", "what_is_this", "what_is_happening", "what_next", "what_did_i_say"),
+                questionByLanguage = mapOf("sl" to "Kaj želiš vprašati?"),
+                placements = mainAacPageOnePlacement(11)
+            ),
+            mainAacItem(
+                "where_root",
+                "KJE?",
+                "kje?",
+                opensSubicons = true,
+                children = listOf("where_zana", "where_dusan", "where_are_we", "where_phone", "where_wheelchair"),
+                questionByLanguage = mapOf("sl" to "Kaj iščeš ali kje je?"),
+                placements = mainAacPageOnePlacement(12)
+            ),
+            mainAacItem(
+                "when_root",
+                "KDAJ?",
+                "kdaj?",
+                opensSubicons = true,
+                children = listOf("when_come", "when_go", "when_therapy", "when_home", "when_eat"),
+                questionByLanguage = mapOf("sl" to "Kaj želiš vprašati glede časa?"),
+                placements = mainAacPageOnePlacement(13)
+            ),
             mainAacItem("home", "DOMOV", "domov", placements = mainAacPageOnePlacement(14)),
             mainAacItem("other", "DRUGO", "drugo", placements = mainAacPageOnePlacement(15)),
             mainAacItem("real_world", "REAL WORLD", "real world", placements = mainAacPageOnePlacement(16)),

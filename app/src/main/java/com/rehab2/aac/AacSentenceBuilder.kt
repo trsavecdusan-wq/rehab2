@@ -10,6 +10,10 @@ object AacSentenceBuilder {
 
         val keys = items.flatMap(::itemKeys).toSet()
         return when {
+            items.anyIdIn(PERSON_ACTION_IDS) && items.hasPersonTarget() -> buildPeopleActionSentence(items)
+            items.hasId("need") -> buildNeedSentence(items)
+            items.hasId("problem") -> buildProblemSentence(items)
+            items.hasId("please") -> buildPleaseSentence(items)
             keys.any { it in DONT_WANT_KEYS } -> buildDontWantSentence(items)
             keys.any { it in WANT_KEYS } -> buildWantSentence(items)
             keys.any { it in MISS_KEYS } -> buildMissSentence(items)
@@ -20,7 +24,9 @@ object AacSentenceBuilder {
 
     private fun simpleSentence(items: List<AacItem>): String? {
         if (items.size != 1) return null
-        val keys = itemKeys(items.first()).toSet()
+        val item = items.first()
+        SIMPLE_SENTENCES_BY_ID[item.idKey()]?.let { return it }
+        val keys = itemKeys(item).toSet()
         return when {
             keys.any { it in THANK_YOU_KEYS } -> "Hvala."
             keys.any { it in HELP_KEYS } -> "Prosim, pomagajte mi."
@@ -32,6 +38,33 @@ object AacSentenceBuilder {
             keys.any { it in WC_KEYS } -> "Moram na WC."
             else -> null
         }
+    }
+
+    private fun buildPeopleActionSentence(items: List<AacItem>): String {
+        val person = items.firstNotNullOfOrNull { item -> PERSON_TARGETS[item.idKey()] } ?: return ""
+        return when {
+            items.hasId("miss_someone") || items.hasId("miss_you") -> "Pogrešam ${person.accusative}."
+            items.hasId("contact_call") -> "Pokliči ${person.accusative}."
+            items.hasId("person_where_is") -> "Kje je ${person.nominative}?"
+            items.hasId("come_to_me") -> "Naj pride ${person.nominative}."
+            items.hasId("love_you") -> "Rada imam ${person.accusative}."
+            items.hasId("person_tell") -> "Povej ${person.dative}."
+            else -> ""
+        }
+    }
+
+    private fun buildNeedSentence(items: List<AacItem>): String {
+        val target = items.firstNotNullOfOrNull { item -> NEED_TARGETS[item.idKey()] } ?: return ""
+        return "Potrebujem $target."
+    }
+
+    private fun buildProblemSentence(items: List<AacItem>): String {
+        return items.firstNotNullOfOrNull { item -> PROBLEM_SENTENCES[item.idKey()] } ?: ""
+    }
+
+    private fun buildPleaseSentence(items: List<AacItem>): String {
+        val target = items.firstNotNullOfOrNull { item -> PLEASE_TARGETS[item.idKey()] } ?: return ""
+        return "Prosim, $target."
     }
 
     private fun buildWantSentence(items: List<AacItem>): String {
@@ -95,6 +128,18 @@ object AacSentenceBuilder {
 
     private fun AacItem.idKey(): String = normalize(id)
 
+    private fun List<AacItem>.hasId(id: String): Boolean {
+        return any { item -> item.idKey() == id }
+    }
+
+    private fun List<AacItem>.anyIdIn(ids: Set<String>): Boolean {
+        return any { item -> item.idKey() in ids }
+    }
+
+    private fun List<AacItem>.hasPersonTarget(): Boolean {
+        return any { item -> item.idKey() in PERSON_TARGETS }
+    }
+
     private fun normalize(value: String): String {
         return value.trim()
             .lowercase(Locale("sl", "SI"))
@@ -112,6 +157,12 @@ object AacSentenceBuilder {
         val genitive: String,
         val coldPhrase: String,
         val warmPhrase: String
+    )
+
+    private data class PersonTarget(
+        val nominative: String,
+        val accusative: String,
+        val dative: String
     )
 
     private val WANT_KEYS = setOf(
@@ -142,6 +193,93 @@ object AacSentenceBuilder {
     private val TIRED_KEYS = setOf("tired", "utrujena")
     private val REST_KEYS = setOf("rest", "pocitek")
     private val WC_KEYS = setOf("wc", "toilet", "stranisce")
+
+    private val PERSON_ACTION_IDS = setOf(
+        "miss_someone",
+        "miss_you",
+        "contact_call",
+        "person_where_is",
+        "come_to_me",
+        "love_you",
+        "person_tell"
+    )
+
+    private val PERSON_TARGETS = mapOf(
+        "person_dusan" to PersonTarget("Dušan", "Dušana", "Dušanu"),
+        "dusan" to PersonTarget("Dušan", "Dušana", "Dušanu"),
+        "person_zana" to PersonTarget("Žana", "Žano", "Žani"),
+        "sister_zana" to PersonTarget("Žana", "Žano", "Žani"),
+        "person_sergej" to PersonTarget("Sergej", "Sergeja", "Sergeju"),
+        "grandfather_sergej" to PersonTarget("Sergej", "Sergeja", "Sergeju"),
+        "person_julija" to PersonTarget("Julija", "Julijo", "Juliji"),
+        "julija" to PersonTarget("Julija", "Julijo", "Juliji"),
+        "person_oksana" to PersonTarget("Oksana", "Oksano", "Oksani"),
+        "oksana" to PersonTarget("Oksana", "Oksano", "Oksani"),
+        "person_inna" to PersonTarget("Inna", "Inno", "Inni"),
+        "inna" to PersonTarget("Inna", "Inno", "Inni"),
+        "person_franc" to PersonTarget("Franc", "Franca", "Francu"),
+        "franc" to PersonTarget("Franc", "Franca", "Francu")
+    )
+
+    private val NEED_TARGETS = mapOf(
+        "help" to "pomoč",
+        "water" to "vodo",
+        "food" to "hrano",
+        "wc" to "WC",
+        "blanket" to "odejo",
+        "wheelchair" to "voziček",
+        "crutch" to "berglo",
+        "doctor" to "zdravnika",
+        "nurse" to "medicinsko sestro",
+        "therapy" to "terapevta"
+    )
+
+    private val PROBLEM_SENTENCES = mapOf(
+        "pain" to "Boli me.",
+        "cannot" to "Ne morem.",
+        "cold" to "Mraz mi je.",
+        "hot" to "Vroče mi je.",
+        "afraid" to "Strah me je.",
+        "bad" to "Slabo mi je.",
+        "uncomfortable" to "Neudobno mi je.",
+        "dont_know_problem" to "Ne vem."
+    )
+
+    private val PLEASE_TARGETS = mapOf(
+        "help" to "pomagaj mi",
+        "wait" to "počakaj",
+        "repeat" to "ponovi",
+        "slower" to "govori počasneje",
+        "come_to_me" to "pridi k meni",
+        "look_at_me" to "poglej me",
+        "turn_me" to "obrni me",
+        "fix_me" to "popravi me"
+    )
+
+    private val SIMPLE_SENTENCES_BY_ID = mapOf(
+        "cannot" to "Ne morem.",
+        "cold" to "Mraz mi je.",
+        "hot" to "Vroče mi je.",
+        "afraid" to "Strah me je.",
+        "bad" to "Slabo mi je.",
+        "uncomfortable" to "Neudobno mi je.",
+        "dont_know_problem" to "Ne vem.",
+        "what_do" to "Kaj bomo delali?",
+        "what_is_this" to "Kaj je to?",
+        "what_is_happening" to "Kaj se dogaja?",
+        "what_next" to "Kaj bo potem?",
+        "what_did_i_say" to "Kaj sem rekla?",
+        "where_zana" to "Kje je Žana?",
+        "where_dusan" to "Kje je Dušan?",
+        "where_are_we" to "Kje smo?",
+        "where_phone" to "Kje je telefon?",
+        "where_wheelchair" to "Kje je voziček?",
+        "when_come" to "Kdaj pride?",
+        "when_go" to "Kdaj gremo?",
+        "when_therapy" to "Kdaj bo terapija?",
+        "when_home" to "Kdaj gremo domov?",
+        "when_eat" to "Kdaj jemo?"
+    )
 
     private val DRINK_TARGETS = mapOf(
         "drink_fanta" to DrinkTarget("Fanto", "Fante", "hladno Fanto", "toplo Fanto"),
