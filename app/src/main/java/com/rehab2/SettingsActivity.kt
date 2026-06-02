@@ -25,6 +25,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.rehab2.aac.AacAssistSettings
+import com.rehab2.aac.AiObservationSettings
 import com.rehab2.aac.AacCommunicationContext
 import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
@@ -177,6 +178,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editKeywordListenerInfo: EditText
     private lateinit var editKeywordMatcherInput: EditText
     private lateinit var txtKeywordMatcherResult: TextView
+    private lateinit var txtAiObservationStatus: TextView
+    private lateinit var editAiObservationInfo: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
@@ -251,6 +254,8 @@ class SettingsActivity : AppCompatActivity() {
         editKeywordListenerInfo = findViewById(R.id.editKeywordListenerInfo)
         editKeywordMatcherInput = findViewById(R.id.editKeywordMatcherInput)
         txtKeywordMatcherResult = findViewById(R.id.txtKeywordMatcherResult)
+        txtAiObservationStatus = findViewById(R.id.txtAiObservationStatus)
+        editAiObservationInfo = findViewById(R.id.editAiObservationInfo)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -418,6 +423,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshVendingCodesSection()
         refreshAacAssistSection()
         refreshKeywordListenerSection()
+        refreshAiObservationSection()
         bindAacAssistSwitchListeners()
         applyKeepScreenOnWhileCharging()
     }
@@ -449,6 +455,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshAacCommunicationContextSection()
         refreshAacAssistSection()
         refreshKeywordListenerSection()
+        refreshAiObservationSection()
         applyKeepScreenOnWhileCharging()
         startGpsDiagnosticsRefresh()
     }
@@ -741,6 +748,24 @@ class SettingsActivity : AppCompatActivity() {
             val label = labelsById[itemId].orEmpty()
             if (label.isBlank()) itemId else "$label ($itemId)"
         }
+    }
+
+    private fun refreshAiObservationSection() {
+        val settings = AiObservationSettings.load(this)
+        val settingsPath = AiObservationSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
+        txtAiObservationStatus.text = "AI opazovanje: PRIPRAVA, IZKLOPLJENO"
+        editAiObservationInfo.setText(
+            buildString {
+                appendLine("Funkcija je pripravljena, vendar trenutno ne uporablja mikrofona ali kamere.")
+                appendLine("Mikrofon: ${if (settings.allowMicrophoneAnalysis) "VKLOPLJEN" else "IZKLOPLJEN"}")
+                appendLine("Kamera: ${if (settings.allowCameraAnalysis) "VKLOPLJENA" else "IZKLOPLJENA"}")
+                appendLine("Ucenje mimike: ${if (settings.allowMimicLearning) "VKLOPLJENO" else "IZKLOPLJENO"}")
+                appendLine("Dnevno ucenje: ${if (settings.allowDailyLearning) "VKLOPLJENO" else "IZKLOPLJENO"}")
+                appendLine("AI dru\u017eabnik: ${if (settings.allowCompanionSuggestions) "VKLOPLJEN" else "IZKLOPLJEN"}")
+                appendLine("Potrjevanje DA/NE: ${if (settings.requireYesNoConfirmation) "OBVEZNO" else "NEOBVEZNO"}")
+                append("Lokalna datoteka: $settingsPath")
+            }
+        )
     }
 
     private fun saveSpeechApiSettings(showSavedToast: Boolean): Boolean {

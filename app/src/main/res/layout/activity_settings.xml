@@ -653,6 +653,44 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/txtAiObservationTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="AI OPAZOVANJE – PRIPRAVA"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtAiObservationStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="AI opazovanje: PRIPRAVA, IZKLOPLJENO"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editAiObservationInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:clickable="false"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:hint="Funkcija je pripravljena, vendar trenutno ne uporablja mikrofona ali kamere."
+            android:inputType="none"
+            android:maxLines="9"
+            android:minHeight="132dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <TextView
             android:id="@+id/txtActiveAacProfileStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
