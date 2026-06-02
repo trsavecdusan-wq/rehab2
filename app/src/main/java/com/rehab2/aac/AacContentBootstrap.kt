@@ -209,7 +209,15 @@ object AacContentBootstrap {
             "person_oksana",
             "person_inna",
             "person_franc",
-            "person_other"
+            "person_other",
+            "miss_someone",
+            "help",
+            "repeat",
+            "slower",
+            "turn_me",
+            "cannot",
+            "cold_hot",
+            "uncomfortable"
         )
         val starterById = starterItems
             .filter { item -> item.id in guidedBranchIds }
