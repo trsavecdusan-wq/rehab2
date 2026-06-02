@@ -57,6 +57,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var currentV2ItemsById: Map<String, AacItem> = emptyMap()
     private val currentV2VisibleHistory: ArrayDeque<List<AacItem>> = ArrayDeque()
     private var currentVisibleItems: List<AacItem> = emptyList()
+    private var currentContextSuggestionIds: List<String> = emptyList()
     private var currentV2RootItems: List<AacItem> = emptyList()
     private lateinit var audioPlayer: AacAudioPlayer
     private val autoSpeakHandler = Handler(Looper.getMainLooper())
@@ -289,17 +290,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
         logWaterTrace("before adapter", waterItem)
         updateWaterTraceDebug("before adapter")
         val displayedItems = mergePersistentTopRowWithCurrentMenuItems(items)
-        val suggestionIds = AacContextSuggestions.suggest(
+        currentContextSuggestionIds = AacContextSuggestions.suggest(
             context = this,
             currentPageId = currentPageId,
             visibleItems = displayedItems,
             recentItems = recentSentenceAacItems()
-        ).toSet()
+        )
         recycler.adapter = AacAdapter(
             items = displayedItems,
             labelMode = labelMode,
             languageCode = languageCode,
-            suggestionIds = suggestionIds,
+            suggestionIds = currentContextSuggestionIds.toSet(),
             onItemClick = { item ->
                 handleItemClick(item)
             },
@@ -335,6 +336,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun handleItemClick(item: AacItem) {
         confirmGuidedTopSuggestionIfYesItem(item)?.let { suggestedItem ->
+            handleItemClick(suggestedItem)
+            return
+        }
+
+        confirmContextSuggestionIfYesItem(item)?.let { suggestedItem ->
             handleItemClick(suggestedItem)
             return
         }
@@ -424,6 +430,16 @@ class AacCommunicatorActivity : AppCompatActivity() {
             this,
             currentVisibleItems.map { visibleItem -> visibleItem.id }
         ) ?: return null
+
+        return currentVisibleItems.firstOrNull { visibleItem -> visibleItem.id == topSuggestionId }
+    }
+
+    private fun confirmContextSuggestionIfYesItem(item: AacItem): AacItem? {
+        if (!isGuidedYesItem(item) || currentContextSuggestionIds.isEmpty()) {
+            return null
+        }
+
+        val topSuggestionId = currentContextSuggestionIds.firstOrNull() ?: return null
 
         return currentVisibleItems.firstOrNull { visibleItem -> visibleItem.id == topSuggestionId }
     }
@@ -685,6 +701,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         currentV2ItemsById = emptyMap()
         currentV2VisibleHistory.clear()
         currentVisibleItems = emptyList()
+        currentContextSuggestionIds = emptyList()
         currentV2RootItems = emptyList()
         clearPromptText()
         sentenceBar.visibility = View.GONE
