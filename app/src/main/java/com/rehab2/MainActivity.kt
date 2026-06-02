@@ -2115,7 +2115,7 @@ class MainActivity : AppCompatActivity() {
                 "drink",
                 "PIJAČA",
                 opensSubicons = true,
-                children = listOf("water", "water_detail", "juice", "tea", "coffee"),
+                children = listOf("water", "tea", "coffee", "drink_fanta", "drink_coca_cola", "drink_pepsi", "juice", "drink_milk"),
                 isRootItem = false,
                 visibleUnderIds = listOf("thirsty"),
                 questionByLanguage = mapOf(
@@ -2129,11 +2129,11 @@ class MainActivity : AppCompatActivity() {
                 "food",
                 "HRANA",
                 opensSubicons = true,
-                children = listOf("soup", "bread", "fruit"),
+                children = listOf("soup", "bread", "food_yogurt", "food_banana", "food_apple", "food_lunch", "food_dinner", "sweet"),
                 isRootItem = false,
                 visibleUnderIds = listOf("hungry"),
                 questionByLanguage = mapOf(
-                    "sl" to "Kaj želiš jesti?",
+                    "sl" to "Kaj bi jedla?",
                     "uk" to "Що ти хочеш їсти?",
                     "en" to "What do you want to eat?"
                 ),
@@ -2148,7 +2148,7 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Я хочу пити",
                 speechTextEn = "I am thirsty",
                 opensSubicons = true,
-                children = listOf("water", "water_detail", "juice", "tea", "coffee"),
+                children = listOf("water", "tea", "coffee", "drink_fanta", "drink_coca_cola", "drink_pepsi", "juice", "drink_milk"),
                 questionByLanguage = mapOf(
                     "sl" to "Kaj bi pila?",
                     "uk" to "Що ти хочеш пити?",
@@ -2165,9 +2165,9 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Я хочу їсти",
                 speechTextEn = "I am hungry",
                 opensSubicons = true,
-                children = listOf("soup", "bread", "fruit"),
+                children = listOf("soup", "bread", "food_yogurt", "food_banana", "food_apple", "food_lunch", "food_dinner", "sweet"),
                 questionByLanguage = mapOf(
-                    "sl" to "Kaj želiš jesti?",
+                    "sl" to "Kaj bi jedla?",
                     "uk" to "Що ти хочеш їсти?",
                     "en" to "What do you want to eat?"
                 ),
@@ -2209,7 +2209,10 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Допоможіть мені",
                 speechTextEn = "Help me",
                 isRootItem = false,
-                visibleUnderIds = listOf("need", "please", "care")
+                visibleUnderIds = listOf("need", "please", "care"),
+                opensSubicons = true,
+                children = listOf("wc", "dressing", "washing_help", "position", "bed", "water", "drink", "food"),
+                questionByLanguage = mapOf("sl" to "Pri čem potrebuješ pomoč?")
             ),
             mainAacItem(
                 "yes",
@@ -2249,6 +2252,9 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "TOILET",
                 speakTextUk = "Мені потрібно в туалет",
                 speechTextEn = "I need the toilet",
+                opensSubicons = true,
+                children = listOf("wc_now", "wc_soon", "wc_help", "dressing_help", "washing_help"),
+                questionByLanguage = mapOf("sl" to "Kaj potrebuješ glede WC?"),
                 placements = mainAacPageOnePlacement(7)
             ),
             mainAacItem(
@@ -2298,7 +2304,10 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Я сумую за вами",
                 speechTextEn = "I miss you",
                 isRootItem = false,
-                visibleUnderIds = listOf("people"),
+                visibleUnderIds = listOf("people", "person_dusan", "person_zana", "person_sergej", "person_julija", "person_oksana", "person_inna", "person_franc", "person_other"),
+                opensSubicons = true,
+                children = listOf("miss_little", "miss_very"),
+                questionByLanguage = mapOf("sl" to "Kako zelo?"),
                 placements = emptyList()
             ),
             mainAacItem(
@@ -2354,7 +2363,15 @@ class MainActivity : AppCompatActivity() {
             ),
             mainAacItem("home", "DOMOV", "domov", placements = mainAacPageOnePlacement(14)),
             mainAacItem("other", "DRUGO", "drugo", placements = mainAacPageOnePlacement(15)),
-            mainAacItem("real_world", "REAL WORLD", "real world", placements = mainAacPageOnePlacement(16)),
+            mainAacItem(
+                "real_world",
+                "REAL WORLD",
+                "real world",
+                opensSubicons = true,
+                children = listOf("vending_drinks", "vending_coffee_tea", "shop", "restaurant", "transport"),
+                questionByLanguage = mapOf("sl" to "Kje potrebuješ pomoč?"),
+                placements = mainAacPageOnePlacement(16)
+            ),
             mainAacItem(
                 "feeling",
                 "POČUTJE",
@@ -2473,7 +2490,12 @@ class MainActivity : AppCompatActivity() {
                 labelUk = "ПОВЕРНІТЬ МЕНЕ",
                 labelEn = "TURN ME",
                 speakTextUk = "Будь ласка, поверніть мене",
-                speechTextEn = "Please turn me"
+                speechTextEn = "Please turn me",
+                opensSubicons = true,
+                children = listOf("turn_left", "turn_right", "turn_back", "turn_side"),
+                isRootItem = false,
+                visibleUnderIds = listOf("please", "care"),
+                questionByLanguage = mapOf("sl" to "Kam?")
             ),
             mainAacItem(
                 "dont_understand",
@@ -2547,7 +2569,7 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Мені болить",
                 speechTextEn = "I am in pain",
                 opensSubicons = true,
-                children = listOf("head", "arm", "leg", "belly", "back", "chest", "throat"),
+                children = listOf("head", "arm", "leg", "belly", "back", "throat"),
                 questionByLanguage = mapOf(
                     "sl" to "Kje te boli?",
                     "uk" to "Де тебе болить?",
@@ -2621,11 +2643,52 @@ class MainActivity : AppCompatActivity() {
                 visibleUnderIds = listOf("call")
             ),
             mainAacItem("wait", "POČAKAJ", "počakajte, prosim", labelUk = "ЗАЧЕКАЙТЕ", labelEn = "WAIT", speakTextUk = "зачекайте, будь ласка", speechTextEn = "wait, please", placements = mainAacPageOnePlacement(21)),
-            mainAacItem("repeat", "PONOVI", "prosim, ponovite", labelUk = "ПОВТОРІТЬ", labelEn = "REPEAT", speakTextUk = "повторіть, будь ласка", speechTextEn = "please repeat", placements = mainAacPageOnePlacement(20)),
-            mainAacItem("slower", "POČASNEJE", "prosim, govorite počasneje", labelUk = "ПОВІЛЬНІШЕ", labelEn = "SLOWER", speakTextUk = "говоріть повільніше, будь ласка", speechTextEn = "please speak slower"),
+            mainAacItem(
+                "repeat",
+                "PONOVI",
+                "prosim, ponovite",
+                labelUk = "ПОВТОРІТЬ",
+                labelEn = "REPEAT",
+                speakTextUk = "повторіть, будь ласка",
+                speechTextEn = "please repeat",
+                opensSubicons = true,
+                children = listOf("repeat_question", "repeat_last_sentence", "repeat_slower"),
+                questionByLanguage = mapOf("sl" to "Kaj naj ponovim?"),
+                placements = mainAacPageOnePlacement(20)
+            ),
+            mainAacItem(
+                "slower",
+                "POČASNEJE",
+                "prosim, govorite počasneje",
+                labelUk = "ПОВІЛЬНІШЕ",
+                labelEn = "SLOWER",
+                speakTextUk = "говоріть повільніше, будь ласка",
+                speechTextEn = "please speak slower",
+                opensSubicons = true,
+                children = listOf("slower_little", "slower_much"),
+                isRootItem = false,
+                visibleUnderIds = listOf("please"),
+                questionByLanguage = mapOf("sl" to "Kako počasi?")
+            ),
             mainAacItem("stop", "STOP", "stop"),
-            mainAacItem("cannot", "NE MOREM", "ne morem", placements = mainAacPageOnePlacement(23)),
-            mainAacItem("cold_hot", "MRAZ/VROČE", "mraz ali vroče", placements = mainAacPageOnePlacement(24)),
+            mainAacItem(
+                "cannot",
+                "NE MOREM",
+                "ne morem",
+                opensSubicons = true,
+                children = listOf("cannot_speak", "cannot_stand", "cannot_drink", "cannot_eat", "cannot_move", "cannot_understand"),
+                questionByLanguage = mapOf("sl" to "Česa ne moreš?"),
+                placements = mainAacPageOnePlacement(23)
+            ),
+            mainAacItem(
+                "cold_hot",
+                "MRAZ/VROČE",
+                "mraz ali vroče",
+                opensSubicons = true,
+                children = listOf("cold", "hot"),
+                questionByLanguage = mapOf("sl" to "Kaj je?"),
+                placements = mainAacPageOnePlacement(24)
+            ),
             mainAacItem(
                 "water",
                 "VODA",
