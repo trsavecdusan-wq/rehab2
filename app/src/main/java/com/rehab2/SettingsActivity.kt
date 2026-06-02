@@ -167,6 +167,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var switchRealWorldHelpersEnabled: SwitchCompat
     private lateinit var editVendingCodes: EditText
     private lateinit var txtAacAssistStatus: TextView
+    private lateinit var switchAacAssistShowSuggestions: SwitchCompat
     private lateinit var editAacAssistInfo: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
     private var latestBatteryPercent: Int? = null
@@ -236,6 +237,7 @@ class SettingsActivity : AppCompatActivity() {
         switchRealWorldHelpersEnabled = findViewById(R.id.switchRealWorldHelpersEnabled)
         editVendingCodes = findViewById(R.id.editVendingCodes)
         txtAacAssistStatus = findViewById(R.id.txtAacAssistStatus)
+        switchAacAssistShowSuggestions = findViewById(R.id.switchAacAssistShowSuggestions)
         editAacAssistInfo = findViewById(R.id.editAacAssistInfo)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
@@ -400,6 +402,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshAacCommunicationContextSection()
         refreshVendingCodesSection()
         refreshAacAssistSection()
+        bindAacAssistSwitchListeners()
         applyKeepScreenOnWhileCharging()
     }
 
@@ -637,21 +640,47 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun refreshAacAssistSection() {
         val settings = AacAssistSettings.load(this)
-        val stateLabel = if (settings.enabled) "TESTNO" else "IZKLOPLJENO"
+        val contextSuggestionsReady = settings.enabled && settings.showSuggestions
+        val stateLabel = if (contextSuggestionsReady) "TESTNO" else "IZKLOPLJENO"
         val settingsPath = AacAssistSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
-        txtAacAssistStatus.text = "AI predlogi: $stateLabel"
+        switchAacAssistShowSuggestions.setOnCheckedChangeListener(null)
+        switchAacAssistShowSuggestions.isChecked = contextSuggestionsReady
+        txtAacAssistStatus.text = "AI kontekstni predlogi: pripravljeni, trenutno izklopljeni"
         editAacAssistInfo.setText(
             buildString {
                 appendLine("AI predlogi so pripravljeni, vendar še niso aktivni.")
                 appendLine("Stanje: $stateLabel")
                 appendLine("Način: ${settings.mode}")
                 appendLine("Predlogi na zaslonu: ${if (settings.showSuggestions) "DA" else "NE"}")
+                appendLine("Kontekstni predlagalnik: ${if (contextSuggestionsReady) "TESTNO" else "IZKLOPLJEN"}")
                 appendLine("Mikrofon: IZKLOPLJEN")
                 appendLine("Internet: IZKLOPLJEN")
                 appendLine("Poslušanje: NE")
                 append("Lokalna datoteka: $settingsPath")
             }
         )
+        bindAacAssistSwitchListeners()
+    }
+
+    private fun bindAacAssistSwitchListeners() {
+        switchAacAssistShowSuggestions.setOnCheckedChangeListener { _, isChecked ->
+            val current = AacAssistSettings.load(this)
+            val saved = AacAssistSettings.save(
+                this,
+                current.copy(
+                    enabled = isChecked,
+                    mode = if (isChecked) AacAssistSettings.MODE_TEST else AacAssistSettings.MODE_OFF,
+                    showSuggestions = isChecked,
+                    allowMicrophone = false,
+                    allowNetwork = false,
+                    lastUpdatedAt = System.currentTimeMillis()
+                )
+            )
+            if (!saved) {
+                Toast.makeText(this, "AI nastavitve niso bile shranjene.", Toast.LENGTH_SHORT).show()
+            }
+            refreshAacAssistSection()
+        }
     }
 
     private fun saveSpeechApiSettings(showSavedToast: Boolean): Boolean {

@@ -531,8 +531,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
-            android:text="AI predlogi: IZKLOPLJENO"
+            android:text="AI kontekstni predlogi: pripravljeni, trenutno izklopljeni"
             android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchAacAssistShowSuggestions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Prikaži AI predloge"
+            android:textColor="#F4F7FA"
             android:textSize="16sp"
             android:textStyle="bold" />
 
