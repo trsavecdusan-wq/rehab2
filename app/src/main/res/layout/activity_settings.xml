@@ -517,6 +517,44 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/txtAacAssistTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="AI PREDLOGI – TESTNO"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtAacAssistStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="AI predlogi: IZKLOPLJENO"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editAacAssistInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:clickable="false"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:hint="AI predlogi so pripravljeni, vendar še niso aktivni."
+            android:inputType="none"
+            android:maxLines="8"
+            android:minHeight="96dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <TextView
             android:id="@+id/txtActiveAacProfileStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

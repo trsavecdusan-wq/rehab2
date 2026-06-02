@@ -24,6 +24,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
+import com.rehab2.aac.AacAssistSettings
 import com.rehab2.aac.AacCommunicationContext
 import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
@@ -165,6 +166,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editAacCommunicationContext: EditText
     private lateinit var switchRealWorldHelpersEnabled: SwitchCompat
     private lateinit var editVendingCodes: EditText
+    private lateinit var txtAacAssistStatus: TextView
+    private lateinit var editAacAssistInfo: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
@@ -232,6 +235,8 @@ class SettingsActivity : AppCompatActivity() {
         editAacCommunicationContext = findViewById(R.id.editAacCommunicationContext)
         switchRealWorldHelpersEnabled = findViewById(R.id.switchRealWorldHelpersEnabled)
         editVendingCodes = findViewById(R.id.editVendingCodes)
+        txtAacAssistStatus = findViewById(R.id.txtAacAssistStatus)
+        editAacAssistInfo = findViewById(R.id.editAacAssistInfo)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -394,6 +399,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshGuidedFollowUpSection()
         refreshAacCommunicationContextSection()
         refreshVendingCodesSection()
+        refreshAacAssistSection()
         applyKeepScreenOnWhileCharging()
     }
 
@@ -422,6 +428,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshPersistentTopRowSection()
         refreshGuidedFollowUpSection()
         refreshAacCommunicationContextSection()
+        refreshAacAssistSection()
         applyKeepScreenOnWhileCharging()
         startGpsDiagnosticsRefresh()
     }
@@ -624,6 +631,25 @@ class SettingsActivity : AppCompatActivity() {
                         appendLine("${product.label}: $code")
                     }
                 }
+            }
+        )
+    }
+
+    private fun refreshAacAssistSection() {
+        val settings = AacAssistSettings.load(this)
+        val stateLabel = if (settings.enabled) "TESTNO" else "IZKLOPLJENO"
+        val settingsPath = AacAssistSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
+        txtAacAssistStatus.text = "AI predlogi: $stateLabel"
+        editAacAssistInfo.setText(
+            buildString {
+                appendLine("AI predlogi so pripravljeni, vendar še niso aktivni.")
+                appendLine("Stanje: $stateLabel")
+                appendLine("Način: ${settings.mode}")
+                appendLine("Predlogi na zaslonu: ${if (settings.showSuggestions) "DA" else "NE"}")
+                appendLine("Mikrofon: IZKLOPLJEN")
+                appendLine("Internet: IZKLOPLJEN")
+                appendLine("Poslušanje: NE")
+                append("Lokalna datoteka: $settingsPath")
             }
         )
     }
