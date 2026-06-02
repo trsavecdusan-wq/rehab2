@@ -567,6 +567,44 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/txtKeywordListenerTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="POSLUŠALEC KLJUČNIH BESED – PRIPRAVA"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtKeywordListenerStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="Poslušalec ključnih besed: IZKLOPLJENO"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editKeywordListenerInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:clickable="false"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:hint="Funkcija je pripravljena za kasnejše testiranje."
+            android:inputType="none"
+            android:maxLines="9"
+            android:minHeight="120dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <TextView
             android:id="@+id/txtActiveAacProfileStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

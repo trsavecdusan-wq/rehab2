@@ -30,6 +30,7 @@ import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacGuidedFollowUpSettings
 import com.rehab2.aac.AacContentDiagnostics
+import com.rehab2.aac.AacKeywordListenerSettings
 import com.rehab2.aac.AacProfileStore
 import com.rehab2.aac.AacSampleContentCreator
 import com.rehab2.aac.AacSpeechApiConfig
@@ -169,6 +170,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtAacAssistStatus: TextView
     private lateinit var switchAacAssistShowSuggestions: SwitchCompat
     private lateinit var editAacAssistInfo: EditText
+    private lateinit var txtKeywordListenerStatus: TextView
+    private lateinit var editKeywordListenerInfo: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
@@ -239,6 +242,8 @@ class SettingsActivity : AppCompatActivity() {
         txtAacAssistStatus = findViewById(R.id.txtAacAssistStatus)
         switchAacAssistShowSuggestions = findViewById(R.id.switchAacAssistShowSuggestions)
         editAacAssistInfo = findViewById(R.id.editAacAssistInfo)
+        txtKeywordListenerStatus = findViewById(R.id.txtKeywordListenerStatus)
+        editKeywordListenerInfo = findViewById(R.id.editKeywordListenerInfo)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -402,6 +407,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshAacCommunicationContextSection()
         refreshVendingCodesSection()
         refreshAacAssistSection()
+        refreshKeywordListenerSection()
         bindAacAssistSwitchListeners()
         applyKeepScreenOnWhileCharging()
     }
@@ -432,6 +438,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshGuidedFollowUpSection()
         refreshAacCommunicationContextSection()
         refreshAacAssistSection()
+        refreshKeywordListenerSection()
         applyKeepScreenOnWhileCharging()
         startGpsDiagnosticsRefresh()
     }
@@ -681,6 +688,25 @@ class SettingsActivity : AppCompatActivity() {
             }
             refreshAacAssistSection()
         }
+    }
+
+    private fun refreshKeywordListenerSection() {
+        val settings = AacKeywordListenerSettings.load(this)
+        val settingsPath = AacKeywordListenerSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
+        txtKeywordListenerStatus.text = "Poslu\u0161alec klju\u010dnih besed: IZKLOPLJENO"
+        editKeywordListenerInfo.setText(
+            buildString {
+                appendLine("Funkcija je pripravljena za kasnej\u0161e testiranje.")
+                appendLine("Trenutno ne poslu\u0161a, ne snema in ne uporablja interneta.")
+                appendLine("Stanje: ${if (settings.enabled) "TESTNO" else "IZKLOPLJENO"}")
+                appendLine("Na\u010din: ${settings.mode}")
+                appendLine("Mikrofon: IZKLOPLJEN")
+                appendLine("Poslu\u0161anje v ozadju: IZKLOPLJENO")
+                appendLine("Internet: IZKLOPLJEN")
+                appendLine("Klju\u010dne besede: ${settings.keywords.joinToString(", ")}")
+                append("Lokalna datoteka: $settingsPath")
+            }
+        )
     }
 
     private fun saveSpeechApiSettings(showSavedToast: Boolean): Boolean {
