@@ -2116,24 +2116,28 @@ class MainActivity : AppCompatActivity() {
                 "PIJAČA",
                 opensSubicons = true,
                 children = listOf("water", "water_detail", "juice", "tea", "coffee"),
+                isRootItem = false,
+                visibleUnderIds = listOf("thirsty"),
                 questionByLanguage = mapOf(
                     "sl" to "Kaj bi pila?",
                     "uk" to "Що ти хочеш пити?",
                     "en" to "What do you want to drink?"
                 ),
-                placements = mainAacPageOnePlacement(21)
+                placements = emptyList()
             ),
             mainAacItem(
                 "food",
                 "HRANA",
                 opensSubicons = true,
                 children = listOf("soup", "bread", "fruit"),
+                isRootItem = false,
+                visibleUnderIds = listOf("hungry"),
                 questionByLanguage = mapOf(
                     "sl" to "Kaj želiš jesti?",
                     "uk" to "Що ти хочеш їсти?",
                     "en" to "What do you want to eat?"
                 ),
-                placements = mainAacPageOnePlacement(22)
+                placements = emptyList()
             ),
             mainAacItem(
                 "thirsty",
@@ -2150,7 +2154,7 @@ class MainActivity : AppCompatActivity() {
                     "uk" to "Що ти хочеш пити?",
                     "en" to "What do you want to drink?"
                 ),
-                placements = mainAacPageOnePlacement(11)
+                placements = mainAacPageOnePlacement(4)
             ),
             mainAacItem(
                 "hungry",
@@ -2167,8 +2171,11 @@ class MainActivity : AppCompatActivity() {
                     "uk" to "Що ти хочеш їсти?",
                     "en" to "What do you want to eat?"
                 ),
-                placements = mainAacPageOnePlacement(12)
+                placements = mainAacPageOnePlacement(5)
             ),
+            mainAacItem("people", "LJUDJE", "ljudje", placements = mainAacPageOnePlacement(1)),
+            mainAacItem("need", "POTREBUJEM", "potrebujem", placements = mainAacPageOnePlacement(2)),
+            mainAacItem("problem", "TEŽAVA", "imam težavo", placements = mainAacPageOnePlacement(3)),
             mainAacItem(
                 "help",
                 "POMOČ",
@@ -2176,7 +2183,9 @@ class MainActivity : AppCompatActivity() {
                 labelUk = "ДОПОМОГА",
                 labelEn = "HELP",
                 speakTextUk = "Допоможіть мені",
-                speechTextEn = "Help me"
+                speechTextEn = "Help me",
+                isRootItem = false,
+                visibleUnderIds = listOf("need", "please", "care")
             ),
             mainAacItem(
                 "yes",
@@ -2216,7 +2225,7 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "TOILET",
                 speakTextUk = "Мені потрібно в туалет",
                 speechTextEn = "I need the toilet",
-                placements = mainAacPageOnePlacement(14)
+                placements = mainAacPageOnePlacement(7)
             ),
             mainAacItem(
                 "family_group",
@@ -2228,12 +2237,14 @@ class MainActivity : AppCompatActivity() {
                 speechTextEn = "family",
                 opensSubicons = true,
                 children = listOf("dusan", "daughter", "son", "family", "who_is_coming", "when_come"),
+                isRootItem = false,
+                visibleUnderIds = listOf("people"),
                 questionByLanguage = mapOf(
                     "sl" to "Koga iz družine?",
                     "uk" to "Кого з родини?",
                     "en" to "Which family member?"
                 ),
-                placements = mainAacPageOnePlacement(6)
+                placements = emptyList()
             ),
             mainAacItem(
                 "friends_group",
@@ -2245,12 +2256,14 @@ class MainActivity : AppCompatActivity() {
                 speechTextEn = "friends",
                 opensSubicons = true,
                 children = listOf("therapist", "doctor", "nurse", "who_is_coming", "when_come"),
+                isRootItem = false,
+                visibleUnderIds = listOf("people"),
                 questionByLanguage = mapOf(
                     "sl" to "Kateri prijatelj?",
                     "uk" to "Який друг?",
                     "en" to "Which friend?"
                 ),
-                placements = mainAacPageOnePlacement(7)
+                placements = emptyList()
             ),
             mainAacItem(
                 "miss_someone",
@@ -2260,7 +2273,9 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "I MISS",
                 speakTextUk = "Я сумую за вами",
                 speechTextEn = "I miss you",
-                placements = mainAacPageOnePlacement(10)
+                isRootItem = false,
+                visibleUnderIds = listOf("people"),
+                placements = emptyList()
             ),
             mainAacItem(
                 "where_go",
@@ -2270,7 +2285,9 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "WHERE ARE WE GOING?",
                 speakTextUk = "Куди ми йдемо?",
                 speechTextEn = "Where are we going?",
-                placements = mainAacPageOnePlacement(17)
+                isRootItem = false,
+                visibleUnderIds = listOf("where_root"),
+                placements = emptyList()
             ),
             mainAacItem(
                 "what_do",
@@ -2280,8 +2297,16 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "WHAT WILL WE DO?",
                 speakTextUk = "Що ми будемо робити?",
                 speechTextEn = "What will we do?",
-                placements = mainAacPageOnePlacement(16)
+                isRootItem = false,
+                visibleUnderIds = listOf("what_root"),
+                placements = emptyList()
             ),
+            mainAacItem("what_root", "KAJ?", "kaj?", placements = mainAacPageOnePlacement(11)),
+            mainAacItem("where_root", "KJE?", "kje?", placements = mainAacPageOnePlacement(12)),
+            mainAacItem("when_root", "KDAJ?", "kdaj?", placements = mainAacPageOnePlacement(13)),
+            mainAacItem("home", "DOMOV", "domov", placements = mainAacPageOnePlacement(14)),
+            mainAacItem("other", "DRUGO", "drugo", placements = mainAacPageOnePlacement(15)),
+            mainAacItem("real_world", "REAL WORLD", "real world", placements = mainAacPageOnePlacement(16)),
             mainAacItem(
                 "feeling",
                 "POČUTJE",
@@ -2292,7 +2317,7 @@ class MainActivity : AppCompatActivity() {
                     "uk" to "Як ти почуваєшся?",
                     "en" to "How do you feel?"
                 ),
-                placements = mainAacPageOnePlacement(23)
+                placements = mainAacPageOnePlacement(17)
             ),
             mainAacItem(
                 "care",
@@ -2304,7 +2329,7 @@ class MainActivity : AppCompatActivity() {
                     "uk" to "Що тобі потрібно?",
                     "en" to "What do you need?"
                 ),
-                placements = mainAacPageOnePlacement(24)
+                placements = mainAacPageOnePlacement(18)
             ),
             mainAacItem(
                 "i_want",
@@ -2314,7 +2339,9 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "I WANT",
                 speakTextUk = "Я хочу",
                 speechTextEn = "I want",
-                placements = mainAacPageOnePlacement(18)
+                isRootItem = false,
+                visibleUnderIds = listOf("need"),
+                placements = emptyList()
             ),
             mainAacItem(
                 "dont_want",
@@ -2324,7 +2351,9 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "I DON'T WANT",
                 speakTextUk = "Я цього не хочу",
                 speechTextEn = "I don't want that",
-                placements = mainAacPageOnePlacement(19)
+                isRootItem = false,
+                visibleUnderIds = listOf("problem", "other"),
+                placements = emptyList()
             ),
             mainAacItem(
                 "call",
@@ -2336,12 +2365,14 @@ class MainActivity : AppCompatActivity() {
                 speechTextEn = "Please call someone",
                 opensSubicons = true,
                 children = listOf("dusan", "daughter", "son", "doctor", "family"),
+                isRootItem = false,
+                visibleUnderIds = listOf("people", "need"),
                 questionByLanguage = mapOf(
                     "sl" to "Koga naj pokličem?",
                     "uk" to "Кому подзвонити?",
                     "en" to "Who should I call?"
                 ),
-                placements = mainAacPageOnePlacement(8)
+                placements = emptyList()
             ),
             mainAacItem(
                 "message",
@@ -2351,7 +2382,9 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "MESSAGE",
                 speakTextUk = "Надішліть повідомлення",
                 speechTextEn = "Send a message",
-                placements = mainAacPageOnePlacement(9)
+                isRootItem = false,
+                visibleUnderIds = listOf("people"),
+                placements = emptyList()
             ),
             mainAacItem(
                 "rest",
@@ -2361,7 +2394,7 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "REST",
                 speakTextUk = "Я хочу відпочити",
                 speechTextEn = "I want to rest",
-                placements = mainAacPageOnePlacement(20)
+                placements = mainAacPageOnePlacement(9)
             ),
             mainAacItem(
                 "good",
@@ -2433,7 +2466,7 @@ class MainActivity : AppCompatActivity() {
                 speechTextEn = "I am tired",
                 isRootItem = true,
                 visibleUnderIds = listOf("feeling"),
-                placements = mainAacPageOnePlacement(15)
+                placements = mainAacPageOnePlacement(8)
             ),
             mainAacItem(
                 "cold",
@@ -2472,7 +2505,7 @@ class MainActivity : AppCompatActivity() {
                     "uk" to "Де тебе болить?",
                     "en" to "Where does it hurt?"
                 ),
-                placements = mainAacPageOnePlacement(13)
+                placements = mainAacPageOnePlacement(6)
             ),
             mainAacItem(
                 "pain_area",
@@ -2502,7 +2535,7 @@ class MainActivity : AppCompatActivity() {
                     "uk" to "Що зі здоров'ям?",
                     "en" to "What is wrong with health?"
                 ),
-                placements = mainAacPageOnePlacement(25)
+                placements = mainAacPageOnePlacement(19)
             ),
             mainAacItem(
                 "more",
@@ -2539,10 +2572,12 @@ class MainActivity : AppCompatActivity() {
                 isRootItem = false,
                 visibleUnderIds = listOf("call")
             ),
-            mainAacItem("wait", "POČAKAJ", "počakajte, prosim", labelUk = "ЗАЧЕКАЙТЕ", labelEn = "WAIT", speakTextUk = "зачекайте, будь ласка", speechTextEn = "wait, please"),
-            mainAacItem("repeat", "PONOVI", "prosim, ponovite", labelUk = "ПОВТОРІТЬ", labelEn = "REPEAT", speakTextUk = "повторіть, будь ласка", speechTextEn = "please repeat"),
+            mainAacItem("wait", "POČAKAJ", "počakajte, prosim", labelUk = "ЗАЧЕКАЙТЕ", labelEn = "WAIT", speakTextUk = "зачекайте, будь ласка", speechTextEn = "wait, please", placements = mainAacPageOnePlacement(21)),
+            mainAacItem("repeat", "PONOVI", "prosim, ponovite", labelUk = "ПОВТОРІТЬ", labelEn = "REPEAT", speakTextUk = "повторіть, будь ласка", speechTextEn = "please repeat", placements = mainAacPageOnePlacement(20)),
             mainAacItem("slower", "POČASNEJE", "prosim, govorite počasneje", labelUk = "ПОВІЛЬНІШЕ", labelEn = "SLOWER", speakTextUk = "говоріть повільніше, будь ласка", speechTextEn = "please speak slower"),
             mainAacItem("stop", "STOP", "stop"),
+            mainAacItem("cannot", "NE MOREM", "ne morem", placements = mainAacPageOnePlacement(23)),
+            mainAacItem("cold_hot", "MRAZ/VROČE", "mraz ali vroče", placements = mainAacPageOnePlacement(24)),
             mainAacItem(
                 "water",
                 "VODA",

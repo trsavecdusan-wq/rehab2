@@ -96,6 +96,7 @@ object AacContentBootstrap {
         }
         val addedPlacements = defaultPagePlacements + starterPlacements
         val repairedFixedTopRowMetadata = repairFixedTopRowMetadata(itemsArray)
+        val repairedDefaultPageV3Placements = repairDefaultPageV3Placements(itemsArray, defaultPageId)
         val repairedNoUnderstandLabels = repairNoUnderstandSystemLabels(itemsArray)
         val repairedDrinkSpeechItems = repairDrinkChildSpeechItems(itemsArray)
         val repairedFoodSpeechItems = repairFoodChildSpeechItems(itemsArray)
@@ -105,6 +106,7 @@ object AacContentBootstrap {
             mergedMissingSystemItems > 0 ||
             repairedStarterCategoryChildren > 0 ||
             repairedFixedTopRowMetadata > 0 ||
+            repairedDefaultPageV3Placements > 0 ||
             repairedNoUnderstandLabels > 0 ||
             repairedDrinkSpeechItems > 0 ||
             repairedFoodSpeechItems > 0 ||
@@ -139,7 +141,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren fixedTopRowRepaired=$repairedFixedTopRowMetadata noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -252,6 +254,92 @@ object AacContentBootstrap {
             }
             if (id in legacyFixedRowIds && item.optInt("fixedTopRowPosition", 0) in 1..5) {
                 item.remove("fixedTopRowPosition")
+                repaired++
+            }
+        }
+        return repaired
+    }
+
+    private fun repairDefaultPageV3Placements(itemsArray: JSONArray, pageId: String): Int {
+        if (pageId.isBlank()) return 0
+        val desiredPositions = mapOf(
+            "people" to 1,
+            "need" to 2,
+            "problem" to 3,
+            "thirsty" to 4,
+            "hungry" to 5,
+            "pain" to 6,
+            "wc" to 7,
+            "tired" to 8,
+            "rest" to 9,
+            "please" to 10,
+            "what_root" to 11,
+            "where_root" to 12,
+            "when_root" to 13,
+            "home" to 14,
+            "other" to 15,
+            "real_world" to 16,
+            "feeling" to 17,
+            "care" to 18,
+            "health" to 19,
+            "repeat" to 20,
+            "wait" to 21,
+            "come_to_me" to 22,
+            "cannot" to 23,
+            "cold_hot" to 24,
+            "uncomfortable" to 25
+        )
+        val legacyNonRootIds = setOf(
+            "help",
+            "family_group",
+            "friends_group",
+            "call",
+            "message",
+            "miss_someone",
+            "what_do",
+            "where_go",
+            "when_come",
+            "i_want",
+            "dont_want",
+            "drink",
+            "food"
+        )
+        var repaired = 0
+        itemObjects(itemsArray).forEach { item ->
+            if (isUserProtected(item)) return@forEach
+            val id = item.optString("id").trim()
+            val desiredPosition = desiredPositions[id]
+            var itemRepaired = 0
+            if (id in legacyNonRootIds && item.optBoolean("isRootItem", false)) {
+                item.put("isRootItem", false)
+                itemRepaired++
+            } else if (desiredPosition != null && !item.optBoolean("isRootItem", false)) {
+                item.put("isRootItem", true)
+                itemRepaired++
+            }
+            val existingPlacements = item.optJSONArray("placements") ?: JSONArray()
+            val nextPlacements = JSONArray()
+            var removedDefaultPagePlacement = false
+            for (index in 0 until existingPlacements.length()) {
+                val placement = existingPlacements.optJSONObject(index) ?: continue
+                if (placement.optString("pageId").trim() == pageId) {
+                    removedDefaultPagePlacement = true
+                } else {
+                    nextPlacements.put(placement)
+                }
+            }
+            if (desiredPosition != null) {
+                nextPlacements.put(JSONObject().put("pageId", pageId).put("position5x5", desiredPosition))
+            }
+            if (removedDefaultPagePlacement || desiredPosition != null && existingPlacements.length() != nextPlacements.length()) {
+                if (nextPlacements.length() > 0) {
+                    item.put("placements", nextPlacements)
+                } else {
+                    item.remove("placements")
+                }
+                itemRepaired++
+            }
+            if (itemRepaired > 0) {
                 repaired++
             }
         }
