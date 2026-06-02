@@ -30,6 +30,7 @@ import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacGuidedFollowUpSettings
 import com.rehab2.aac.AacContentDiagnostics
+import com.rehab2.aac.AacKeywordMatcher
 import com.rehab2.aac.AacKeywordListenerSettings
 import com.rehab2.aac.AacProfileStore
 import com.rehab2.aac.AacSampleContentCreator
@@ -172,6 +173,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editAacAssistInfo: EditText
     private lateinit var txtKeywordListenerStatus: TextView
     private lateinit var editKeywordListenerInfo: EditText
+    private lateinit var editKeywordMatcherInput: EditText
+    private lateinit var txtKeywordMatcherResult: TextView
     private var speechApiTestPlayer: MediaPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
@@ -244,6 +247,8 @@ class SettingsActivity : AppCompatActivity() {
         editAacAssistInfo = findViewById(R.id.editAacAssistInfo)
         txtKeywordListenerStatus = findViewById(R.id.txtKeywordListenerStatus)
         editKeywordListenerInfo = findViewById(R.id.editKeywordListenerInfo)
+        editKeywordMatcherInput = findViewById(R.id.editKeywordMatcherInput)
+        txtKeywordMatcherResult = findViewById(R.id.txtKeywordMatcherResult)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -335,6 +340,9 @@ class SettingsActivity : AppCompatActivity() {
         }
         editVendingCodes.setOnClickListener {
             showVendingCodePicker()
+        }
+        findViewById<Button>(R.id.btnKeywordMatcherTest).setOnClickListener {
+            runKeywordMatcherTest()
         }
         bindSpeechTimingSwitchListeners()
         bindPersistentTopRowSwitchListener()
@@ -707,6 +715,21 @@ class SettingsActivity : AppCompatActivity() {
                 append("Lokalna datoteka: $settingsPath")
             }
         )
+    }
+
+    private fun runKeywordMatcherTest() {
+        val input = editKeywordMatcherInput.text?.toString().orEmpty().trim()
+        if (input.isBlank()) {
+            txtKeywordMatcherResult.text = "Ni vnosa."
+            return
+        }
+
+        val matches = AacKeywordMatcher.matchToAacItems(input)
+        txtKeywordMatcherResult.text = if (matches.isEmpty()) {
+            "Ni predlogov."
+        } else {
+            matches.joinToString(", ")
+        }
     }
 
     private fun saveSpeechApiSettings(showSavedToast: Boolean): Boolean {
