@@ -1,0 +1,83 @@
+{
+  "id": "core_icon_pack_v2_p1_plan",
+  "appVersion": "1.2.450",
+  "versionCode": 10650,
+  "generatedAt": "2026-06-03",
+  "purpose": "P1 asset preparation plan for the most urgent patient AAC icons. This file is a plan only and contains no image assets.",
+  "rules": [
+    "Do not add empty icons to ZIP.",
+    "Do not use generic unusable icons for patient testing.",
+    "Person icons must be real PHOTO_PERSON assets under NovaRehab/icons/patient/contacts/.",
+    "Drink and food icons should be PHOTO_OBJECT assets under NovaRehab/icons/custom/.",
+    "AAC concepts can use AAC_SYMBOL or SYSTEM_SYMBOL assets under NovaRehab/icons/system/."
+  ],
+  "summary": {
+    "p1Total": 51,
+    "missing": 51,
+    "systemSymbolOrAacSymbol": 32,
+    "photoPerson": 7,
+    "photoObject": 6,
+    "realWorldPhoto": 6,
+    "assetRootExists": false,
+    "note": "NovaRehab/icons is not present in this repo snapshot, so all P1 target paths are currently missing."
+  },
+  "items": [
+    { "itemId": "no", "labelSl": "NE", "expectedPath": "NovaRehab/icons/system/core_no.png", "missing": true, "suggestedIconType": "SYSTEM_SYMBOL", "category": "fixed_top_row", "note": "Clear negative/no symbol for locked top row." },
+    { "itemId": "yes", "labelSl": "DA", "expectedPath": "NovaRehab/icons/system/core_yes.png", "missing": true, "suggestedIconType": "SYSTEM_SYMBOL", "category": "fixed_top_row", "note": "Clear positive/yes symbol for locked top row." },
+    { "itemId": "dont_understand", "labelSl": "NE RAZUMEM", "expectedPath": "NovaRehab/icons/system/dont_understand.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "fixed_top_row", "note": "AAC concept: I do not understand." },
+    { "itemId": "thank_you", "labelSl": "HVALA", "expectedPath": "NovaRehab/icons/system/thank_you.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "fixed_top_row", "note": "AAC social phrase." },
+    { "itemId": "sorry", "labelSl": "OPROSTI", "expectedPath": "NovaRehab/icons/system/sorry.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "fixed_top_row", "note": "AAC social phrase." },
+
+    { "itemId": "people", "labelSl": "LJUDJE", "expectedPath": "NovaRehab/icons/system/people.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "need", "labelSl": "POTREBUJEM", "expectedPath": "NovaRehab/icons/system/need.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "problem", "labelSl": "TEŽAVA", "expectedPath": "NovaRehab/icons/system/problem.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "thirsty", "labelSl": "ŽEJNA SEM", "expectedPath": "NovaRehab/icons/system/thirsty.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "hungry", "labelSl": "LAČNA SEM", "expectedPath": "NovaRehab/icons/system/hungry.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "pain", "labelSl": "BOLI ME", "expectedPath": "NovaRehab/icons/system/pain.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root and problem branch." },
+    { "itemId": "wc", "labelSl": "WC", "expectedPath": "NovaRehab/icons/system/wc.png", "missing": true, "suggestedIconType": "SYSTEM_SYMBOL", "category": "page_1", "note": "Main V3 root and urgent care need." },
+    { "itemId": "tired", "labelSl": "UTRUJENA", "expectedPath": "NovaRehab/icons/system/tired.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "rest", "labelSl": "POČITEK", "expectedPath": "NovaRehab/icons/system/rest.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "please", "labelSl": "PROSIM", "expectedPath": "NovaRehab/icons/system/please.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "what_root", "labelSl": "KAJ?", "expectedPath": "NovaRehab/icons/system/what_root.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 question root." },
+    { "itemId": "where_root", "labelSl": "KJE?", "expectedPath": "NovaRehab/icons/system/where_root.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 question root." },
+    { "itemId": "when_root", "labelSl": "KDAJ?", "expectedPath": "NovaRehab/icons/system/when_root.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 question root." },
+    { "itemId": "home", "labelSl": "DOMOV", "expectedPath": "NovaRehab/icons/system/home.png", "missing": true, "suggestedIconType": "SYSTEM_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "other", "labelSl": "DRUGO", "expectedPath": "NovaRehab/icons/system/other.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "page_1", "note": "Main V3 root." },
+    { "itemId": "real_world", "labelSl": "RESNIČNI SVET", "expectedPath": "NovaRehab/icons/custom/real_world/real_world.jpg", "missing": true, "suggestedIconType": "REAL_WORLD_PHOTO", "category": "page_1", "note": "Real-world scenario root." },
+
+    { "itemId": "help", "labelSl": "POMOČ", "expectedPath": "NovaRehab/icons/system/help.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "need_please", "note": "Important need/request item, not fixed row." },
+    { "itemId": "wait", "labelSl": "POČAKAJ", "expectedPath": "NovaRehab/icons/system/wait.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "please", "note": "Important request item." },
+    { "itemId": "repeat", "labelSl": "PONOVI", "expectedPath": "NovaRehab/icons/system/repeat.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "please", "note": "Important request item." },
+    { "itemId": "slower", "labelSl": "GOVORI POČASNEJE", "expectedPath": "NovaRehab/icons/system/slower.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "please", "note": "Important request item." },
+    { "itemId": "come_to_me", "labelSl": "PRIDI", "expectedPath": "NovaRehab/icons/system/come_to_me.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "please_people", "note": "Important request/person action item." },
+    { "itemId": "miss_someone", "labelSl": "POGREŠAM", "expectedPath": "NovaRehab/icons/system/miss_someone.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "people", "note": "Important people branch action." },
+
+    { "itemId": "person_dusan", "labelSl": "DUŠAN", "expectedPath": "NovaRehab/icons/patient/contacts/dusan.jpg", "missing": true, "suggestedIconType": "PHOTO_PERSON", "category": "people", "note": "Must be real contact photo." },
+    { "itemId": "person_zana", "labelSl": "ŽANA", "expectedPath": "NovaRehab/icons/patient/contacts/zana.jpg", "missing": true, "suggestedIconType": "PHOTO_PERSON", "category": "people", "note": "Must be real contact photo." },
+    { "itemId": "person_sergej", "labelSl": "SERGEJ", "expectedPath": "NovaRehab/icons/patient/contacts/sergej.jpg", "missing": true, "suggestedIconType": "PHOTO_PERSON", "category": "people", "note": "Must be real contact photo." },
+    { "itemId": "person_julija", "labelSl": "JULIJA", "expectedPath": "NovaRehab/icons/patient/contacts/julija.jpg", "missing": true, "suggestedIconType": "PHOTO_PERSON", "category": "people", "note": "Must be real contact photo." },
+    { "itemId": "person_oksana", "labelSl": "OKSANA", "expectedPath": "NovaRehab/icons/patient/contacts/oksana.jpg", "missing": true, "suggestedIconType": "PHOTO_PERSON", "category": "people", "note": "Must be real contact photo." },
+    { "itemId": "person_inna", "labelSl": "INNA", "expectedPath": "NovaRehab/icons/patient/contacts/inna.jpg", "missing": true, "suggestedIconType": "PHOTO_PERSON", "category": "people", "note": "Must be real contact photo." },
+    { "itemId": "person_franc", "labelSl": "FRANC", "expectedPath": "NovaRehab/icons/patient/contacts/franc.jpg", "missing": true, "suggestedIconType": "PHOTO_PERSON", "category": "people", "note": "Must be real contact photo." },
+
+    { "itemId": "tea", "labelSl": "ČAJ", "expectedPath": "NovaRehab/icons/custom/drinks/tea.jpg", "missing": true, "suggestedIconType": "PHOTO_OBJECT", "category": "drinks", "note": "Common drink." },
+    { "itemId": "water", "labelSl": "VODA", "expectedPath": "NovaRehab/icons/custom/drinks/water.jpg", "missing": true, "suggestedIconType": "PHOTO_OBJECT", "category": "drinks", "note": "Common drink and need." },
+    { "itemId": "drink_fanta", "labelSl": "FANTA", "expectedPath": "NovaRehab/icons/custom/drinks/fanta.jpg", "missing": true, "suggestedIconType": "PHOTO_OBJECT", "category": "drinks", "note": "Common drink and vending scenario item." },
+    { "itemId": "coffee", "labelSl": "KAVA", "expectedPath": "NovaRehab/icons/custom/drinks/coffee.jpg", "missing": true, "suggestedIconType": "PHOTO_OBJECT", "category": "drinks", "note": "Common drink and coffee/tea vending scenario item." },
+    { "itemId": "soup", "labelSl": "JUHA", "expectedPath": "NovaRehab/icons/custom/food/soup.jpg", "missing": true, "suggestedIconType": "PHOTO_OBJECT", "category": "food", "note": "Common food." },
+    { "itemId": "bread", "labelSl": "KRUH", "expectedPath": "NovaRehab/icons/custom/food/bread.jpg", "missing": true, "suggestedIconType": "PHOTO_OBJECT", "category": "food", "note": "Common food." },
+
+    { "itemId": "leg", "labelSl": "NOGA", "expectedPath": "NovaRehab/icons/system/leg.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "pain_body", "note": "Pain body part." },
+    { "itemId": "head", "labelSl": "GLAVA", "expectedPath": "NovaRehab/icons/system/head.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "pain_body", "note": "Pain body part." },
+    { "itemId": "arm", "labelSl": "ROKA", "expectedPath": "NovaRehab/icons/system/arm.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "pain_body", "note": "Pain body part." },
+    { "itemId": "belly", "labelSl": "TREBUH", "expectedPath": "NovaRehab/icons/system/belly.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "pain_body", "note": "Pain body part." },
+    { "itemId": "back", "labelSl": "HRBET", "expectedPath": "NovaRehab/icons/system/back.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "pain_body", "note": "Pain body part." },
+    { "itemId": "throat", "labelSl": "GRLO", "expectedPath": "NovaRehab/icons/system/throat.png", "missing": true, "suggestedIconType": "AAC_SYMBOL", "category": "pain_body", "note": "Pain body part." },
+
+    { "itemId": "vending_drinks", "labelSl": "AVTOMAT PIJAČ", "expectedPath": "NovaRehab/icons/custom/real_world/vending_drinks.jpg", "missing": true, "suggestedIconType": "REAL_WORLD_PHOTO", "category": "real_world", "note": "Real-world vending scenario." },
+    { "itemId": "vending_coffee_tea", "labelSl": "AVTOMAT KAVA/ČAJ", "expectedPath": "NovaRehab/icons/custom/real_world/vending_coffee_tea.jpg", "missing": true, "suggestedIconType": "REAL_WORLD_PHOTO", "category": "real_world", "note": "Real-world coffee/tea vending scenario." },
+    { "itemId": "shop", "labelSl": "TRGOVINA", "expectedPath": "NovaRehab/icons/custom/real_world/shop.jpg", "missing": true, "suggestedIconType": "REAL_WORLD_PHOTO", "category": "real_world", "note": "Real-world scenario." },
+    { "itemId": "restaurant", "labelSl": "RESTAVRACIJA", "expectedPath": "NovaRehab/icons/custom/real_world/restaurant.jpg", "missing": true, "suggestedIconType": "REAL_WORLD_PHOTO", "category": "real_world", "note": "Real-world scenario." },
+    { "itemId": "transport", "labelSl": "PREVOZ", "expectedPath": "NovaRehab/icons/custom/real_world/transport.jpg", "missing": true, "suggestedIconType": "REAL_WORLD_PHOTO", "category": "real_world", "note": "Real-world scenario." }
+  ]
+}
