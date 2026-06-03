@@ -1,7 +1,6 @@
 package com.rehab2.aac
 
 import android.util.Log
-import com.rehab2.BuildConfig
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -126,9 +125,7 @@ object AacV2JsonParser {
     }
 
     private fun debugLog(message: String) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, message)
-        }
+        Log.d(TAG, message)
     }
 
     private const val TAG = "AacV2JsonParser"

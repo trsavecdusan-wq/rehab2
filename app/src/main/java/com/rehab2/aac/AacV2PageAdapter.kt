@@ -1,7 +1,6 @@
 package com.rehab2.aac
 
 import android.util.Log
-import com.rehab2.BuildConfig
 
 object AacV2PageAdapter {
     var lastWaterParsedModelChildrenCount: Int = -1
@@ -77,8 +76,6 @@ object AacV2PageAdapter {
     private const val WATER_NODE_ID = "water"
 
     private fun debugLog(message: String) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, message)
-        }
+        Log.d(TAG, message)
     }
 }

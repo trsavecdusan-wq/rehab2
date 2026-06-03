@@ -651,9 +651,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun debugLog(message: String) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, message)
-        }
+        Log.d(TAG, message)
     }
 
     private fun addWaterTraceDebugView() {
@@ -1406,9 +1404,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             fun debugLog(message: String) {
-                if (BuildConfig.DEBUG) {
-                    Log.d(IMAGE_LOG_TAG, message)
-                }
+                Log.d(IMAGE_LOG_TAG, message)
             }
         }
 
@@ -1518,9 +1514,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             private fun debugLog(message: String) {
-                if (BuildConfig.DEBUG) {
-                    Log.d("AacCommunicatorActivity", message)
-                }
+                Log.d("AacCommunicatorActivity", message)
             }
 
             private fun decodeTileBitmap(imageFile: File): android.graphics.Bitmap? {
