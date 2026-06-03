@@ -1386,16 +1386,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     return null
                 }
 
-                if (item.iconSource == com.rehab2.aac.IconSource.SYSTEM) {
-                    debugLog("AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
-                    return null
-                }
-
                 val resolved = AacStoragePaths.resolveIconFile(context, rawPath, item.iconSource)
                 val resolvedFile = resolved?.takeIf { it.exists() && it.isFile }
-                if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
+                if (
+                    item.iconSource == com.rehab2.aac.IconSource.SOCA ||
+                    item.iconSource == com.rehab2.aac.IconSource.SYSTEM
+                ) {
                     val state = if (resolvedFile != null) "resolved" else "missing"
-                    debugLog("AAC_IMAGE SOCA_$state item=${item.id} path=$rawPath")
+                    debugLog("AAC_IMAGE ${item.iconSource.name}_$state item=${item.id} path=$rawPath")
                 }
                 return resolvedFile ?: run {
                     debugLog("AAC_IMAGE IMAGE_MISSING item=${item.id}")
