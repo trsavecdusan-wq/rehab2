@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rehab2.aac.AacContentBootstrap
 import com.rehab2.aac.AacEditorStorage
+import com.rehab2.aac.AacImageGallery
 import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacStarterContentV1
@@ -118,11 +119,7 @@ class AacEditorActivity : AppCompatActivity() {
             .create()
 
         changeImage.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("TRENUTNA SLIKA")
-                .setMessage(item.imagePath.ifBlank { "Ni imagePath." })
-                .setPositiveButton("V REDU", null)
-                .show()
+            showImageSourceDialog(item, dialog)
         }
         editLabel.setOnClickListener {
             showTextEditDialog(
@@ -150,6 +147,150 @@ class AacEditorActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun showImageSourceDialog(item: AacItem, editDialog: AlertDialog) {
+        val sources = AacImageGallery.sources(this)
+        val labels = sources.map { source -> source.title }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("IZBERI VIR SLIKE")
+            .setItems(labels) { _, which ->
+                showImageGalleryDialog(item, editDialog, sources[which])
+            }
+            .setNegativeButton("PREKLI\u010cI", null)
+            .show()
+    }
+
+    private fun showImageGalleryDialog(
+        item: AacItem,
+        editDialog: AlertDialog,
+        source: AacImageGallery.Source
+    ) {
+        val entries = AacImageGallery.scan(source)
+        if (entries.isEmpty()) {
+            AlertDialog.Builder(this)
+                .setTitle("IZBERI SLIKO ZA: ${item.labelSl}")
+                .setMessage("V tej mapi \u0161e ni slik.")
+                .setPositiveButton("NAZAJ") { _, _ ->
+                    showImageSourceDialog(item, editDialog)
+                }
+                .setNegativeButton("PREKLI\u010cI", null)
+                .show()
+            return
+        }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF121417.toInt())
+            setPadding(12, 12, 12, 12)
+        }
+        val title = TextView(this).apply {
+            text = "IZBERI SLIKO ZA: ${item.labelSl}"
+            setTextColor(0xFFF4F7FA.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            gravity = Gravity.CENTER
+            setPadding(4, 0, 4, 12)
+        }
+        val gallery = RecyclerView(this).apply {
+            layoutManager = GridLayoutManager(this@AacEditorActivity, 4)
+            adapter = AacImageGalleryAdapter(entries) { entry ->
+                showImagePreviewDialog(item, editDialog, entry)
+            }
+            overScrollMode = View.OVER_SCROLL_NEVER
+        }
+        container.addView(title)
+        container.addView(
+            gallery,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.aac_editor_gallery_height)
+            )
+        )
+
+        AlertDialog.Builder(this)
+            .setView(container)
+            .setNegativeButton("PREKLI\u010cI", null)
+            .setPositiveButton("NAZAJ") { _, _ ->
+                showImageSourceDialog(item, editDialog)
+            }
+            .show()
+    }
+
+    private fun showImagePreviewDialog(
+        item: AacItem,
+        editDialog: AlertDialog,
+        entry: AacImageGallery.Entry
+    ) {
+        val decoded = BitmapFactory.decodeFile(entry.file.absolutePath)
+        if (!entry.file.isFile || decoded == null) {
+            Toast.makeText(this, "Slika ni berljiva.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF121417.toInt())
+            setPadding(18, 18, 18, 8)
+        }
+        val preview = ImageView(this).apply {
+            setImageBitmap(decoded)
+            setBackgroundColor(0xFF263746.toInt())
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            adjustViewBounds = true
+            setPadding(8, 8, 8, 8)
+        }
+        val details = TextView(this).apply {
+            text = buildString {
+                appendLine(entry.file.name)
+                appendLine(entry.imagePath)
+                append("Vir: ${entry.source.iconSource.name}")
+            }
+            setTextColor(0xFFF4F7FA.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setPadding(0, 14, 0, 0)
+        }
+        container.addView(
+            preview,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.aac_editor_preview_height)
+            )
+        )
+        container.addView(details)
+
+        AlertDialog.Builder(this)
+            .setTitle("PREDOGLED SLIKE")
+            .setView(container)
+            .setPositiveButton("UPORABI") { _, _ ->
+                applySelectedImage(item, editDialog, entry)
+            }
+            .setNegativeButton("PREKLI\u010cI", null)
+            .show()
+    }
+
+    private fun applySelectedImage(
+        item: AacItem,
+        editDialog: AlertDialog,
+        entry: AacImageGallery.Entry
+    ) {
+        if (!entry.file.isFile || BitmapFactory.decodeFile(entry.file.absolutePath) == null) {
+            Toast.makeText(this, "Slika ni ve\u010d na voljo.", Toast.LENGTH_LONG).show()
+            return
+        }
+        val saved = AacEditorStorage.updateImage(
+            context = this,
+            itemId = item.id,
+            iconSource = entry.source.iconSource,
+            imagePath = entry.imagePath
+        )
+        if (saved) {
+            Toast.makeText(this, "Slika shranjena.", Toast.LENGTH_SHORT).show()
+            editDialog.dismiss()
+            loadEditorPages()
+        } else {
+            Toast.makeText(this, "Shranjevanje slike ni uspelo.", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun showTextEditDialog(title: String, currentValue: String, onSave: (String) -> Unit) {
@@ -239,6 +380,73 @@ class AacEditorActivity : AppCompatActivity() {
                 }
 
                 itemView.setOnClickListener { onItemClick(item) }
+            }
+        }
+    }
+
+    private class AacImageGalleryAdapter(
+        private val entries: List<AacImageGallery.Entry>,
+        private val onEntryClick: (AacImageGallery.Entry) -> Unit
+    ) : RecyclerView.Adapter<AacImageGalleryAdapter.ViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val context = parent.context
+            val container = LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                setPadding(8, 8, 8, 8)
+                setBackgroundColor(0xFF263746.toInt())
+                isClickable = true
+                isFocusable = true
+            }
+            val image = ImageView(context).apply {
+                id = View.generateViewId()
+                setBackgroundColor(0xFF16202B.toInt())
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                adjustViewBounds = true
+                setPadding(4, 4, 4, 4)
+            }
+            val label = TextView(context).apply {
+                id = View.generateViewId()
+                gravity = Gravity.CENTER
+                setTextColor(0xFFF4F7FA.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                maxLines = 2
+                setPadding(2, 8, 2, 0)
+            }
+            container.addView(
+                image,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    context.resources.getDimensionPixelSize(R.dimen.aac_editor_gallery_thumb_size)
+                )
+            )
+            container.addView(label, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            return ViewHolder(container, image, label, onEntryClick)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.bind(entries[position])
+        }
+
+        override fun getItemCount(): Int = entries.size
+
+        class ViewHolder(
+            itemView: View,
+            private val image: ImageView,
+            private val label: TextView,
+            private val onEntryClick: (AacImageGallery.Entry) -> Unit
+        ) : RecyclerView.ViewHolder(itemView) {
+            fun bind(entry: AacImageGallery.Entry) {
+                label.text = entry.file.name
+                val bitmap = BitmapFactory.decodeFile(entry.file.absolutePath)
+                if (bitmap != null) {
+                    image.alpha = 1.0f
+                    image.setImageBitmap(bitmap)
+                } else {
+                    image.alpha = 0.0f
+                    image.setImageDrawable(null)
+                }
+                itemView.setOnClickListener { onEntryClick(entry) }
             }
         }
     }

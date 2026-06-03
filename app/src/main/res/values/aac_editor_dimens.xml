@@ -3,4 +3,7 @@
     <dimen name="aac_editor_page_button_width">132dp</dimen>
     <dimen name="aac_editor_page_button_height">56dp</dimen>
     <dimen name="aac_editor_page_button_gap">8dp</dimen>
+    <dimen name="aac_editor_gallery_height">520dp</dimen>
+    <dimen name="aac_editor_gallery_thumb_size">120dp</dimen>
+    <dimen name="aac_editor_preview_height">360dp</dimen>
 </resources>

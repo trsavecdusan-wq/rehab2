@@ -49,6 +49,14 @@ object AacEditorStorage {
         }
     }
 
+    fun updateImage(context: Context, itemId: String, iconSource: IconSource, imagePath: String): Boolean {
+        if (imagePath.isBlank()) return false
+        return updateItem(context, itemId) { item ->
+            item.put("iconSource", iconSource.name)
+            item.put("imagePath", imagePath.trim())
+        }
+    }
+
     private fun updateItem(context: Context, itemId: String, mutate: (JSONObject) -> Unit): Boolean {
         val itemsFile = AacStoragePaths.getAacItemsFile(context) ?: return false
 
