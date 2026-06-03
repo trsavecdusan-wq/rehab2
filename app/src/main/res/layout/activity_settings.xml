@@ -165,6 +165,18 @@
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/btnAacEditor"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#3E7C4A"
+            android:text="AAC EDITOR"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
             android:id="@+id/btnCreateSampleAacPack"
             android:layout_width="match_parent"
             android:layout_height="64dp"

@@ -272,6 +272,10 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, AacPackSettingsActivity::class.java))
         }
 
+        findViewById<Button>(R.id.btnAacEditor).setOnClickListener {
+            startActivity(Intent(this, AacEditorActivity::class.java))
+        }
+
         findViewById<Button>(R.id.btnAacSettings).setOnClickListener {
             startActivity(Intent(this, AacPackSettingsActivity::class.java))
         }
