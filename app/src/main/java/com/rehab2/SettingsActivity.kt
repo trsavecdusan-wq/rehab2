@@ -26,6 +26,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.rehab2.aac.AacAssistSettings
 import com.rehab2.aac.AiObservationSettings
+import com.rehab2.aac.AudioDuckingSettings
+import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacCommunicationContext
 import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
@@ -180,7 +182,11 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtKeywordMatcherResult: TextView
     private lateinit var txtAiObservationStatus: TextView
     private lateinit var editAiObservationInfo: EditText
+    private lateinit var txtAudioDuckingStatus: TextView
+    private lateinit var switchAudioDuckingEnabled: SwitchCompat
+    private lateinit var editAudioDuckingPercent: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
+    private var audioDuckingTestPlayer: AacAudioPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
     private var isBatteryReceiverRegistered = false
@@ -256,6 +262,9 @@ class SettingsActivity : AppCompatActivity() {
         txtKeywordMatcherResult = findViewById(R.id.txtKeywordMatcherResult)
         txtAiObservationStatus = findViewById(R.id.txtAiObservationStatus)
         editAiObservationInfo = findViewById(R.id.editAiObservationInfo)
+        txtAudioDuckingStatus = findViewById(R.id.txtAudioDuckingStatus)
+        switchAudioDuckingEnabled = findViewById(R.id.switchAudioDuckingEnabled)
+        editAudioDuckingPercent = findViewById(R.id.editAudioDuckingPercent)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -352,6 +361,12 @@ class SettingsActivity : AppCompatActivity() {
         editVendingCodes.setOnClickListener {
             showVendingCodePicker()
         }
+        editAudioDuckingPercent.setOnClickListener {
+            showAudioDuckingPercentPicker()
+        }
+        findViewById<Button>(R.id.btnTestAudioDucking).setOnClickListener {
+            testAudioDucking()
+        }
         findViewById<Button>(R.id.btnKeywordMatcherTest).setOnClickListener {
             runKeywordMatcherTest()
         }
@@ -428,7 +443,9 @@ class SettingsActivity : AppCompatActivity() {
         refreshAacAssistSection()
         refreshKeywordListenerSection()
         refreshAiObservationSection()
+        refreshAudioDuckingSection()
         bindAacAssistSwitchListeners()
+        bindAudioDuckingSwitchListener()
         applyKeepScreenOnWhileCharging()
     }
 
@@ -460,6 +477,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshAacAssistSection()
         refreshKeywordListenerSection()
         refreshAiObservationSection()
+        refreshAudioDuckingSection()
         applyKeepScreenOnWhileCharging()
         startGpsDiagnosticsRefresh()
     }
@@ -472,6 +490,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         releaseSpeechApiTestPlayer()
+        releaseAudioDuckingTestPlayer()
         super.onDestroy()
     }
 
@@ -664,6 +683,86 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
         )
+    }
+
+    private fun refreshAudioDuckingSection() {
+        val settings = AudioDuckingSettings.load(this)
+        val settingsPath = AudioDuckingSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
+        switchAudioDuckingEnabled.setOnCheckedChangeListener(null)
+        switchAudioDuckingEnabled.isChecked = settings.enabled
+        txtAudioDuckingStatus.text = if (settings.enabled && settings.duckingPercent > 0) {
+            "Zni\u017eanje radia: VKLOPLJENO (${settings.duckingPercent} %)"
+        } else {
+            "Zni\u017eanje radia: IZKLOPLJENO"
+        }
+        editAudioDuckingPercent.setText("${settings.duckingPercent} %\n$settingsPath")
+        bindAudioDuckingSwitchListener()
+    }
+
+    private fun bindAudioDuckingSwitchListener() {
+        switchAudioDuckingEnabled.setOnCheckedChangeListener { _, isChecked ->
+            val current = AudioDuckingSettings.load(this)
+            val saved = AudioDuckingSettings.save(
+                this,
+                current.copy(
+                    enabled = isChecked,
+                    lastUpdatedAt = System.currentTimeMillis()
+                )
+            )
+            if (!saved) {
+                Toast.makeText(this, "Nastavitve zni\u017eanja radia niso bile shranjene.", Toast.LENGTH_SHORT).show()
+            }
+            refreshAudioDuckingSection()
+        }
+    }
+
+    private fun showAudioDuckingPercentPicker() {
+        val options = intArrayOf(0, 25, 50, 70, 75, 90)
+        val current = AudioDuckingSettings.load(this).duckingPercent
+        val labels = options.map { percent ->
+            if (percent == 0) "0 % - radio se ne zni\u017ea" else "$percent %"
+        }.toTypedArray()
+        val selectedIndex = options.indexOf(current).takeIf { it >= 0 } ?: options.indexOf(AudioDuckingSettings.DEFAULT_DUCKING_PERCENT)
+        AlertDialog.Builder(this)
+            .setTitle("Stopnja zni\u017eanja radia")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val currentSettings = AudioDuckingSettings.load(this)
+                val saved = AudioDuckingSettings.save(
+                    this,
+                    currentSettings.copy(
+                        duckingPercent = options[which],
+                        lastUpdatedAt = System.currentTimeMillis()
+                    )
+                )
+                if (!saved) {
+                    Toast.makeText(this, "Nastavitve zni\u017eanja radia niso bile shranjene.", Toast.LENGTH_SHORT).show()
+                }
+                dialog.dismiss()
+                refreshAudioDuckingSection()
+            }
+            .show()
+    }
+
+    private fun testAudioDucking() {
+        releaseAudioDuckingTestPlayer()
+        audioDuckingTestPlayer = AacAudioPlayer(this).apply {
+            setSpeechListener(object : AacAudioPlayer.SpeechListener {
+                override fun onSpeechStarted() = Unit
+                override fun onSpeechCompleted() {
+                    releaseAudioDuckingTestPlayer()
+                }
+
+                override fun onSpeechCancelled() {
+                    releaseAudioDuckingTestPlayer()
+                }
+
+                override fun onSpeechError() {
+                    releaseAudioDuckingTestPlayer()
+                }
+            })
+            speakText("To je test govora med radiem.")
+        }
+        Toast.makeText(this, "Test govora. \u010ce radio igra, se za\u010dasno zni\u017ea.", Toast.LENGTH_SHORT).show()
     }
 
     private fun refreshAacAssistSection() {
@@ -1401,6 +1500,12 @@ class SettingsActivity : AppCompatActivity() {
     private fun releaseSpeechApiTestPlayer() {
         speechApiTestPlayer?.release()
         speechApiTestPlayer = null
+    }
+
+    private fun releaseAudioDuckingTestPlayer() {
+        audioDuckingTestPlayer?.setSpeechListener(null)
+        audioDuckingTestPlayer?.release()
+        audioDuckingTestPlayer = null
     }
 
     private fun updateModeButtonStyles(powerMode: String) {

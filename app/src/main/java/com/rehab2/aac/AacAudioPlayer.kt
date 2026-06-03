@@ -10,6 +10,7 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.widget.Toast
+import com.rehab2.radio.RadioDuckingCoordinator
 import java.io.File
 import java.util.Locale
 
@@ -359,6 +360,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
     private fun notifySpeechStarted() {
         isSpeechActive = true
+        runCatching { RadioDuckingCoordinator.duckForSpeech(context) }
         Log.d(TAG, "SPEECH_STARTED")
         postSpeechCallback { it.onSpeechStarted() }
     }
@@ -366,6 +368,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private fun notifySpeechCompleted() {
         if (!isSpeechActive) return
         isSpeechActive = false
+        runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         Log.d(TAG, "SPEECH_COMPLETED")
         postSpeechCallback { it.onSpeechCompleted() }
     }
@@ -373,12 +376,14 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private fun notifySpeechCancelled() {
         if (!isSpeechActive) return
         isSpeechActive = false
+        runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         Log.d(TAG, "SPEECH_CANCELLED")
         postSpeechCallback { it.onSpeechCancelled() }
     }
 
     private fun notifySpeechError() {
         isSpeechActive = false
+        runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         Log.d(TAG, "SPEECH_ERROR")
         postSpeechCallback { it.onSpeechError() }
     }

@@ -10,6 +10,8 @@ class RadioPlayerController(
     context: Context,
     private val onStatusChanged: (String) -> Unit
 ) {
+    private var volumeBeforeDucking: Float? = null
+
     private val player: ExoPlayer = ExoPlayer.Builder(context).build().apply {
         addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -35,6 +37,10 @@ class RadioPlayerController(
         })
     }
 
+    init {
+        RadioDuckingCoordinator.register(this)
+    }
+
     fun play(url: String) {
         onStatusChanged("Nalagam...")
         player.setMediaItem(MediaItem.fromUri(url))
@@ -43,14 +49,34 @@ class RadioPlayerController(
     }
 
     fun stop() {
+        restoreDucking()
         player.stop()
     }
 
     fun release() {
+        RadioDuckingCoordinator.unregister(this)
+        restoreDucking()
         player.release()
     }
 
     fun isPlaying(): Boolean {
         return player.isPlaying
+    }
+
+    fun applyDucking(duckingPercent: Int) {
+        if (!player.isPlaying) return
+        val normalizedPercent = duckingPercent.coerceIn(0, 100)
+        if (normalizedPercent <= 0) return
+        if (volumeBeforeDucking == null) {
+            volumeBeforeDucking = player.volume
+        }
+        val duckedVolume = (volumeBeforeDucking ?: player.volume) * (100 - normalizedPercent) / 100f
+        player.volume = duckedVolume.coerceIn(0f, 1f)
+    }
+
+    fun restoreDucking() {
+        val previousVolume = volumeBeforeDucking ?: return
+        player.volume = previousVolume.coerceIn(0f, 1f)
+        volumeBeforeDucking = null
     }
 }
