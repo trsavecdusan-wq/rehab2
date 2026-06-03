@@ -761,7 +761,7 @@ object AacSampleContentCreator {
     private fun buildRealWorldProfileJson(): JSONObject {
         return buildProfileJson(
             id = "real_world",
-            displayName = "REAL WORLD",
+            displayName = "RESNIČNI SVET",
             icon = "soca/real_world.png",
             context = AacCommunicationContext.REAL_WORLD_ASSISTANT,
             itemIds = listOf("no", "yes", "dont_understand", "thank_you", "sorry", "soca_water", "soca_wc", "soca_help", "soca_pain", "thirsty")

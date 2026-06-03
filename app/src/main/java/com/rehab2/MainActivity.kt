@@ -2365,8 +2365,8 @@ class MainActivity : AppCompatActivity() {
             mainAacItem("other", "DRUGO", "drugo", placements = mainAacPageOnePlacement(15)),
             mainAacItem(
                 "real_world",
-                "REAL WORLD",
-                "real world",
+                "RESNIČNI SVET",
+                "resnični svet",
                 opensSubicons = true,
                 children = listOf("vending_drinks", "vending_coffee_tea", "shop", "restaurant", "transport"),
                 questionByLanguage = mapOf("sl" to "Kje potrebuješ pomoč?"),
@@ -2670,7 +2670,7 @@ class MainActivity : AppCompatActivity() {
                 visibleUnderIds = listOf("please"),
                 questionByLanguage = mapOf("sl" to "Kako počasi?")
             ),
-            mainAacItem("stop", "STOP", "stop"),
+            mainAacItem("stop", "USTAVI", "ustavi"),
             mainAacItem(
                 "cannot",
                 "NE MOREM",

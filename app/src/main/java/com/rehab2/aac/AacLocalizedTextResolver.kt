@@ -35,6 +35,9 @@ object AacLocalizedTextResolver {
         selector: (AacLocalizedText) -> String?
     ): String? {
         val selectedCode = AacLanguageResolver.normalize(languageCode)
+        if (selectedCode == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            return localizedTexts[AacLanguageResolver.DEFAULT_LANGUAGE_CODE]?.let(selector).clean()
+        }
         return localizedTexts[selectedCode]?.let(selector).clean()
             ?: localizedTexts[AacLanguageResolver.DEFAULT_LANGUAGE_CODE]?.let(selector).clean()
             ?: localizedTexts.values.firstNotNullOfOrNull { selector(it).clean() }

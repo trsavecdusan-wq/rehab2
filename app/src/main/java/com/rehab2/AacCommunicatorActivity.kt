@@ -33,6 +33,7 @@ import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacPage
 import com.rehab2.aac.AacProfileStore
 import com.rehab2.aac.AacRepository
+import com.rehab2.aac.AacSentenceBuilder
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceStateManager
 import com.rehab2.aac.AacSpeechTimingSettings
@@ -327,6 +328,30 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
     }
 
+    private fun buildMissPersonTerminalSentence(item: AacItem): String? {
+        if (!item.id.startsWith("person_")) {
+            return null
+        }
+        val recentItems = recentSentenceAacItems()
+        if (recentItems.none { recentItem -> recentItem.id == "miss_someone" }) {
+            return null
+        }
+        return AacSentenceBuilder.buildSlovenianSentence(recentItems + item)
+            .trim()
+            .takeIf { it.isNotBlank() }
+    }
+
+    private fun resolveTreeFixChildItems(item: AacItem, existingChildren: List<AacItem>): List<AacItem> {
+        if (item.id != "miss_someone" || recentSentenceHasPersonTarget()) {
+            return existingChildren
+        }
+        return MISS_PERSON_TARGET_IDS.mapNotNull { personId -> currentV2ItemsById[personId] }
+    }
+
+    private fun recentSentenceHasPersonTarget(): Boolean {
+        return recentSentenceAacItems().any { recentItem -> recentItem.id.startsWith("person_") }
+    }
+
     private fun readAacLabelMode(): AacLabelMode {
         val prefs = getSharedPreferences(AacLabelMode.PREFS_FILE, MODE_PRIVATE)
         return AacLabelMode.fromPreference(
@@ -378,7 +403,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
             val clickedAt = System.currentTimeMillis()
             startSentenceCompositionTrackingIfNeeded(clickedAt)
-            val childItems = resolveGuidedChildItems(item, resolveV2ChildItems(item))
+            val missPersonSentence = buildMissPersonTerminalSentence(item)
+            val childItems = if (missPersonSentence != null) {
+                emptyList()
+            } else {
+                resolveTreeFixChildItems(item, resolveGuidedChildItems(item, resolveV2ChildItems(item)))
+            }
             if (item.id == WATER_NODE_ID) {
                 Log.d(TAG, "WATER clicked children=${childItems.size}")
                 if (childItems.isEmpty()) {
@@ -391,16 +421,20 @@ class AacCommunicatorActivity : AppCompatActivity() {
             if (handleVendingScenarioSelection(item)) {
                 return
             }
+            if (missPersonSentence != null) {
+                sentenceManager.removeLast()
+            }
+            val sentenceText = missPersonSentence ?: AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
             sentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
-                    text = AacLocalizedTextResolver.resolveSpeakText(item, languageCode),
+                    text = sentenceText,
                     role = item.sentenceRole
                 )
             )
             Log.d(TAG, "AAC_SENTENCE ITEM_ADDED count=${sentenceManager.getItems().size} item=${item.id}")
             updateSentenceBar()
-            val singleIconText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+            val singleIconText = sentenceText
             maybeShowVendingNumber(item)
 
             if (childItems.isNotEmpty()) {
@@ -1119,6 +1153,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
             return "Kaj želiš izbrati?"
         }
         if (isGuidedFollowUpAllowed()) {
+            if (item.id == "miss_someone" && !recentSentenceHasPersonTarget()) {
+                return "Koga pogrešaš?"
+            }
             item.followUpQuestion?.takeIf { it.isNotBlank() }?.let { return it }
             if (isDrinkFollowUpTrigger(item)) {
                 return "Kaj želiš piti?"
@@ -1559,5 +1596,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
         // Runtime fixes only the first grid-width items; remaining configured items flow normally.
         const val DEFAULT_PERSISTENT_TOP_ROW_COUNT = 5
         val DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "yes", "dont_understand", "thank_you", "sorry")
+        val MISS_PERSON_TARGET_IDS = listOf(
+            "person_dusan",
+            "person_zana",
+            "person_sergej",
+            "person_julija",
+            "person_oksana",
+            "person_inna",
+            "person_franc"
+        )
     }
 }

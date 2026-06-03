@@ -127,6 +127,8 @@ object AacSentenceBuilder {
         return when {
             items.hasId("tea") && items.hasId("yes") -> "Rada bi velik \u010daj."
             items.hasId("tea") && items.hasId("no") -> "Rada bi \u010daj."
+            items.hasId("tea_large") -> "Rada bi velik \u010daj."
+            items.hasId("tea_regular") -> "Rada bi \u010daj."
             items.hasId("coffee_plain") -> "Rada bi navadno kavo."
             items.hasId("coffee_white") -> "Rada bi belo kavo."
             items.hasId("coffee_cappuccino") -> "Rada bi cappuccino."
@@ -335,6 +337,8 @@ object AacSentenceBuilder {
 
     private val NEED_HELP_TARGETS = mapOf(
         "wc" to "WC",
+        "help_drinking" to "pitju",
+        "help_feeding" to "hranjenju",
         "dressing" to "oblačenju",
         "dressing_help" to "oblačenju",
         "washing_help" to "umivanju",
@@ -391,6 +395,8 @@ object AacSentenceBuilder {
 
     private val PLEASE_HELP_TARGETS = mapOf(
         "wc" to "WC",
+        "help_drinking" to "pitju",
+        "help_feeding" to "hranjenju",
         "dressing" to "oblačenju",
         "dressing_help" to "oblačenju",
         "washing_help" to "umivanju",

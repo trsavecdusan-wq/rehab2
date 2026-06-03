@@ -111,7 +111,7 @@ object AacGuidedPromptEngine {
         return when {
             rootId in DRINK_ROOT_IDS && selectedId == "tea" -> AacGuidedPrompt(
                 questionSl = "Velika skodelica?",
-                childIds = listOf("yes", "no")
+                childIds = listOf("tea_large", "tea_regular")
             )
             rootId in DRINK_ROOT_IDS && selectedId == "coffee" -> AacGuidedPrompt(
                 questionSl = "Kak\u0161na kava?",

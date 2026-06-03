@@ -33,7 +33,7 @@ object AacProfileStore {
         ),
         AacProfile(
             id = "real_world",
-            displayName = "REAL WORLD",
+            displayName = "RESNIČNI SVET",
             icon = null,
             context = AacCommunicationContext.REAL_WORLD_ASSISTANT,
             itemIds = listOf("thirsty", "drink", "help", "wc", "stop")
