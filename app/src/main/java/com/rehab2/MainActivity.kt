@@ -51,6 +51,7 @@ import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacContentBootstrap
 import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacGuidedPromptEngine
+import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacNaturalSentenceBuilder
@@ -64,12 +65,16 @@ import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.AacStoredTranslationCache
 import com.rehab2.aac.AacUsageStats
 import com.rehab2.aac.IconSource
+import com.rehab2.aac.StatusOrientationSettings
+import com.rehab2.aac.StatusOrientationSpeaker
+import com.rehab2.aac.WeatherClient
 import com.rehab2.radio.RadioPlayerController
 import com.rehab2.radio.SavedRadioStation
 import com.rehab2.radio.RadioStationStore
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
@@ -424,6 +429,9 @@ class MainActivity : AppCompatActivity() {
 
         txtStatusLanguageFlag.setOnClickListener {
             showLanguagePicker()
+        }
+        txtStatusDate.setOnClickListener {
+            speakStatusOrientation()
         }
         txtStatusSpeed.setOnLongClickListener {
             showAdminPinDialog()
@@ -3004,6 +3012,39 @@ class MainActivity : AppCompatActivity() {
         txtStatusYearTime.text = yearTimeFormat.format(now)
         txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
         txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
+    }
+
+    private fun speakStatusOrientation() {
+        val settings = StatusOrientationSettings.load(this)
+        val speechText = StatusOrientationSpeaker.buildBaseSpeechText(this)
+        if (speechText.isBlank()) {
+            Toast.makeText(this, "Statusni govor je izklopljen.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!settings.speakWeather || settings.weatherSourceUrl.isBlank()) {
+            aacAudioPlayer.speakText(speechText, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
+            return
+        }
+
+        val speechHandled = AtomicBoolean(false)
+        mainHandler.postDelayed({
+            if (speechHandled.compareAndSet(false, true)) {
+                aacAudioPlayer.speakText(
+                    "$speechText Vremena trenutno ne morem preveriti.",
+                    AacLanguageResolver.DEFAULT_LANGUAGE_CODE
+                )
+            }
+        }, 1800L)
+        Thread {
+            val weatherSentence = WeatherClient.fetchOrientationSentence(settings.weatherSourceUrl)
+                ?: "Vremena trenutno ne morem preveriti."
+            val fullSpeechText = "$speechText $weatherSentence"
+            runOnUiThread {
+                if (speechHandled.compareAndSet(false, true)) {
+                    aacAudioPlayer.speakText(fullSpeechText, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
+                }
+            }
+        }.start()
     }
 
     private fun shortDayLabel(now: Date): String {

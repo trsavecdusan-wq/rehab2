@@ -587,6 +587,148 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/txtStatusOrientationTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="STATUSNI GOVOR"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtStatusOrientationStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="Statusni govor: VKLOPLJEN"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchStatusOrientationEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Vklop statusnega govora"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchStatusOrientationGreeting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Povej pozdrav glede na uro"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchStatusOrientationDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Povej dan in datum"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchStatusOrientationTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Povej uro"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchStatusOrientationWeather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="Povej vreme"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editStatusWeatherSourceName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:hint="Izberi vremenski vir"
+            android:inputType="none"
+            android:maxLines="2"
+            android:minHeight="60dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editStatusWeatherSourceUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="URL vremenskega vira"
+            android:inputType="textUri"
+            android:maxLines="3"
+            android:minHeight="60dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnSaveStatusWeatherSource"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#2F80ED"
+            android:text="SHRANI VIR VREMENA"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editStatusOrientationInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:clickable="false"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:hint="Klik na datum v statusu pove orientacijski stavek."
+            android:inputType="none"
+            android:maxLines="8"
+            android:minHeight="112dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <TextView
             android:id="@+id/txtAacAssistTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

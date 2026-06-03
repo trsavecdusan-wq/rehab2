@@ -45,6 +45,8 @@ import com.rehab2.aac.AacSpeechCoordinator
 import com.rehab2.aac.AacSpeechTimingSettings
 import com.rehab2.aac.AacVendingScenario
 import com.rehab2.aac.OpenAiAacSpeechApiClient
+import com.rehab2.aac.StatusOrientationSettings
+import com.rehab2.aac.WeatherSource
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -185,6 +187,15 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtAudioDuckingStatus: TextView
     private lateinit var switchAudioDuckingEnabled: SwitchCompat
     private lateinit var editAudioDuckingPercent: EditText
+    private lateinit var txtStatusOrientationStatus: TextView
+    private lateinit var switchStatusOrientationEnabled: SwitchCompat
+    private lateinit var switchStatusOrientationGreeting: SwitchCompat
+    private lateinit var switchStatusOrientationDate: SwitchCompat
+    private lateinit var switchStatusOrientationTime: SwitchCompat
+    private lateinit var switchStatusOrientationWeather: SwitchCompat
+    private lateinit var editStatusWeatherSourceName: EditText
+    private lateinit var editStatusWeatherSourceUrl: EditText
+    private lateinit var editStatusOrientationInfo: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
     private var audioDuckingTestPlayer: AacAudioPlayer? = null
     private var latestBatteryPercent: Int? = null
@@ -265,6 +276,15 @@ class SettingsActivity : AppCompatActivity() {
         txtAudioDuckingStatus = findViewById(R.id.txtAudioDuckingStatus)
         switchAudioDuckingEnabled = findViewById(R.id.switchAudioDuckingEnabled)
         editAudioDuckingPercent = findViewById(R.id.editAudioDuckingPercent)
+        txtStatusOrientationStatus = findViewById(R.id.txtStatusOrientationStatus)
+        switchStatusOrientationEnabled = findViewById(R.id.switchStatusOrientationEnabled)
+        switchStatusOrientationGreeting = findViewById(R.id.switchStatusOrientationGreeting)
+        switchStatusOrientationDate = findViewById(R.id.switchStatusOrientationDate)
+        switchStatusOrientationTime = findViewById(R.id.switchStatusOrientationTime)
+        switchStatusOrientationWeather = findViewById(R.id.switchStatusOrientationWeather)
+        editStatusWeatherSourceName = findViewById(R.id.editStatusWeatherSourceName)
+        editStatusWeatherSourceUrl = findViewById(R.id.editStatusWeatherSourceUrl)
+        editStatusOrientationInfo = findViewById(R.id.editStatusOrientationInfo)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -367,6 +387,12 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnTestAudioDucking).setOnClickListener {
             testAudioDucking()
         }
+        editStatusWeatherSourceName.setOnClickListener {
+            showStatusWeatherSourcePicker()
+        }
+        findViewById<Button>(R.id.btnSaveStatusWeatherSource).setOnClickListener {
+            saveStatusWeatherSource()
+        }
         findViewById<Button>(R.id.btnKeywordMatcherTest).setOnClickListener {
             runKeywordMatcherTest()
         }
@@ -444,8 +470,10 @@ class SettingsActivity : AppCompatActivity() {
         refreshKeywordListenerSection()
         refreshAiObservationSection()
         refreshAudioDuckingSection()
+        refreshStatusOrientationSection()
         bindAacAssistSwitchListeners()
         bindAudioDuckingSwitchListener()
+        bindStatusOrientationSwitchListeners()
         applyKeepScreenOnWhileCharging()
     }
 
@@ -478,6 +506,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshKeywordListenerSection()
         refreshAiObservationSection()
         refreshAudioDuckingSection()
+        refreshStatusOrientationSection()
         applyKeepScreenOnWhileCharging()
         startGpsDiagnosticsRefresh()
     }
@@ -763,6 +792,130 @@ class SettingsActivity : AppCompatActivity() {
             speakText("To je test govora med radiem.")
         }
         Toast.makeText(this, "Test govora. \u010ce radio igra, se za\u010dasno zni\u017ea.", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun refreshStatusOrientationSection() {
+        val settings = StatusOrientationSettings.load(this)
+        val settingsPath = StatusOrientationSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
+        switchStatusOrientationEnabled.setOnCheckedChangeListener(null)
+        switchStatusOrientationGreeting.setOnCheckedChangeListener(null)
+        switchStatusOrientationDate.setOnCheckedChangeListener(null)
+        switchStatusOrientationTime.setOnCheckedChangeListener(null)
+        switchStatusOrientationWeather.setOnCheckedChangeListener(null)
+        switchStatusOrientationEnabled.isChecked = settings.enabled
+        switchStatusOrientationGreeting.isChecked = settings.speakGreeting
+        switchStatusOrientationDate.isChecked = settings.speakDate
+        switchStatusOrientationTime.isChecked = settings.speakTime
+        switchStatusOrientationWeather.isChecked = settings.speakWeather
+        switchStatusOrientationGreeting.isEnabled = settings.enabled
+        switchStatusOrientationDate.isEnabled = settings.enabled
+        switchStatusOrientationTime.isEnabled = settings.enabled
+        switchStatusOrientationWeather.isEnabled = settings.enabled && settings.weatherSourceUrl.isNotBlank()
+        editStatusWeatherSourceName.setText(settings.selectedWeatherSourceName.ifBlank { "Ni izbranega vira" })
+        editStatusWeatherSourceUrl.setText(settings.weatherSourceUrl)
+        txtStatusOrientationStatus.text = if (settings.enabled) {
+            "Statusni govor: VKLOPLJEN"
+        } else {
+            "Statusni govor: IZKLOPLJEN"
+        }
+        editStatusOrientationInfo.setText(
+            buildString {
+                appendLine("Klik na datum v statusu pove orientacijski stavek.")
+                appendLine("Pozdrav glede na uro: ${if (settings.speakGreeting) "DA" else "NE"}")
+                appendLine("Dan in datum: ${if (settings.speakDate) "DA" else "NE"}")
+                appendLine("Ura: ${if (settings.speakTime) "DA" else "NE"}")
+                appendLine("Vreme: ${if (settings.speakWeather) "VKLOPLJENO" else "IZKLOPLJENO"}")
+                appendLine("Internet: samo za izbrani vremenski vir")
+                appendLine("Lokacija: NE")
+                append("Lokalna datoteka: $settingsPath")
+            }
+        )
+        bindStatusOrientationSwitchListeners()
+    }
+
+    private fun bindStatusOrientationSwitchListeners() {
+        switchStatusOrientationEnabled.setOnCheckedChangeListener { _, isChecked ->
+            saveStatusOrientationSettings { current ->
+                current.copy(enabled = isChecked)
+            }
+        }
+        switchStatusOrientationGreeting.setOnCheckedChangeListener { _, isChecked ->
+            saveStatusOrientationSettings { current ->
+                current.copy(speakGreeting = isChecked)
+            }
+        }
+        switchStatusOrientationDate.setOnCheckedChangeListener { _, isChecked ->
+            saveStatusOrientationSettings { current ->
+                current.copy(speakDate = isChecked)
+            }
+        }
+        switchStatusOrientationTime.setOnCheckedChangeListener { _, isChecked ->
+            saveStatusOrientationSettings { current ->
+                current.copy(speakTime = isChecked)
+            }
+        }
+        switchStatusOrientationWeather.setOnCheckedChangeListener { _, isChecked ->
+            saveStatusOrientationSettings { current ->
+                current.copy(speakWeather = isChecked && current.weatherSourceUrl.isNotBlank())
+            }
+        }
+    }
+
+    private fun saveStatusOrientationSettings(update: (StatusOrientationSettings) -> StatusOrientationSettings) {
+        val current = StatusOrientationSettings.load(this)
+        val saved = StatusOrientationSettings.save(
+            this,
+            update(current).copy(
+                lastUpdatedAt = System.currentTimeMillis()
+            )
+        )
+        if (!saved) {
+            Toast.makeText(this, "Nastavitve statusnega govora niso bile shranjene.", Toast.LENGTH_SHORT).show()
+        }
+        refreshStatusOrientationSection()
+    }
+
+    private fun showStatusWeatherSourcePicker() {
+        val sources = WeatherSource.PREDEFINED
+        val labels = sources.map { source -> source.name }.toTypedArray()
+        val currentName = StatusOrientationSettings.load(this).selectedWeatherSourceName
+        val selectedIndex = sources.indexOfFirst { it.name == currentName }.coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle("Vir vremena")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val selected = sources[which]
+                StatusOrientationSettings.save(
+                    this,
+                    StatusOrientationSettings.load(this).copy(
+                        selectedWeatherSourceName = selected.name,
+                        weatherSourceUrl = selected.url,
+                        lastUpdatedAt = System.currentTimeMillis()
+                    )
+                )
+                dialog.dismiss()
+                refreshStatusOrientationSection()
+            }
+            .show()
+    }
+
+    private fun saveStatusWeatherSource() {
+        val sourceName = editStatusWeatherSourceName.text?.toString().orEmpty().trim()
+        val sourceUrl = editStatusWeatherSourceUrl.text?.toString().orEmpty().trim()
+        val saved = StatusOrientationSettings.save(
+            this,
+            StatusOrientationSettings.load(this).copy(
+                selectedWeatherSourceName = sourceName.ifBlank { "Ro\u010dni vir" },
+                weatherSourceUrl = sourceUrl,
+                speakWeather = sourceUrl.isNotBlank() && switchStatusOrientationWeather.isChecked,
+                lastUpdatedAt = System.currentTimeMillis()
+            )
+        )
+        if (!saved) {
+            Toast.makeText(this, "Vir vremena ni bil shranjen.", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Vir vremena shranjen.", Toast.LENGTH_SHORT).show()
+        }
+        refreshStatusOrientationSection()
     }
 
     private fun refreshAacAssistSection() {
