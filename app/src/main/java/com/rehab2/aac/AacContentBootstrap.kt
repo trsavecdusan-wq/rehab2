@@ -25,6 +25,57 @@ object AacContentBootstrap {
     private const val KEY_DEBUG_DOM_PROFILE_ID = "dom_profile_id"
     private const val KEY_DEBUG_ITEM_IDS_BEFORE = "item_ids_before"
     private const val KEY_DEBUG_ITEM_IDS_AFTER = "item_ids_after"
+    private const val SYSTEM_ICON_ASSET_DIR = "NovaRehab/icons/system"
+
+    private val BUNDLED_SYSTEM_ICON_FILES = listOf(
+        "come_to_me.png",
+        "dont_understand.png",
+        "help.png",
+        "home.png",
+        "hungry.png",
+        "miss_someone.png",
+        "need.png",
+        "no.png",
+        "other.png",
+        "pain.png",
+        "people.png",
+        "please.png",
+        "problem.png",
+        "real_world.png",
+        "repeat.png",
+        "rest.png",
+        "slower.png",
+        "sorry.png",
+        "thank_you.png",
+        "thirsty.png",
+        "tired.png",
+        "wait.png",
+        "wc.png",
+        "what.png",
+        "when.png",
+        "where.png",
+        "yes.png"
+    )
+
+    private val ROOT_SYSTEM_ICON_REPAIRS = mapOf(
+        "people" to "system/people.png",
+        "need" to "system/need.png",
+        "problem" to "system/problem.png",
+        "what_root" to "system/what.png",
+        "where_root" to "system/where.png",
+        "when_root" to "system/when.png",
+        "home" to "system/home.png",
+        "other" to "system/other.png",
+        "real_world" to "system/real_world.png"
+    )
+
+    private val OPTIONAL_ROOT_SYSTEM_ICON_REPAIRS = mapOf(
+        "feeling" to "system/feeling.png",
+        "care" to "system/care.png",
+        "health" to "system/health.png",
+        "cannot" to "system/cannot.png",
+        "cold_hot" to "system/cold_hot.png"
+    )
 
     data class Result(
         val itemCount: Int,
@@ -52,6 +103,7 @@ object AacContentBootstrap {
 
     fun ensurePatientStartupContent(context: Context, fallbackItems: List<AacItem>): Result {
         AacStoragePaths.ensureAacContentDirs(context)
+        val seededSystemIcons = seedBundledSystemIcons(context)
         val itemsFile = AacStoragePaths.getAacItemsFile(context)
         val rawItems = loadItemsJson(itemsFile, fallbackItems)
         val itemsArray = rawItems.itemsArray
@@ -59,6 +111,7 @@ object AacContentBootstrap {
         val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems + starterItems)
         val repairedStarterCategoryChildren = repairStarterCategoryChildren(itemsArray, starterItems)
         val repairedConversationTreeV3Metadata = repairConversationTreeV3Metadata(itemsArray, starterItems)
+        val repairedRootSystemIcons = repairRootSystemIconMetadata(context, itemsArray)
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
             return Result(
@@ -107,6 +160,7 @@ object AacContentBootstrap {
             mergedMissingSystemItems > 0 ||
             repairedStarterCategoryChildren > 0 ||
             repairedConversationTreeV3Metadata > 0 ||
+            repairedRootSystemIcons > 0 ||
             repairedFixedTopRowMetadata > 0 ||
             repairedDefaultPageV3Placements > 0 ||
             repairedNoUnderstandLabels > 0 ||
@@ -143,9 +197,83 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
+    }
+
+    private fun seedBundledSystemIcons(context: Context): Int {
+        val systemDir = AacStoragePaths.getIconsSystemDir(context) ?: return 0
+        if (!systemDir.exists() && !systemDir.mkdirs()) return 0
+
+        var seeded = 0
+        BUNDLED_SYSTEM_ICON_FILES.forEach { fileName ->
+            val targetFile = File(systemDir, fileName)
+            if (targetFile.exists() && targetFile.isFile && targetFile.length() > 0L) {
+                seeded++
+                return@forEach
+            }
+
+            val assetPath = "$SYSTEM_ICON_ASSET_DIR/$fileName"
+            try {
+                context.assets.open(assetPath).use { input ->
+                    targetFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                if (targetFile.exists() && targetFile.length() > 0L) {
+                    seeded++
+                }
+            } catch (error: Exception) {
+                Log.w(TAG, "AAC_BOOTSTRAP_SYSTEM_ICON_SEED_FAILED asset=$assetPath", error)
+            }
+        }
+        return seeded
+    }
+
+    private fun repairRootSystemIconMetadata(context: Context, itemsArray: JSONArray): Int {
+        val repairs = ROOT_SYSTEM_ICON_REPAIRS + OPTIONAL_ROOT_SYSTEM_ICON_REPAIRS.filterValues { imagePath ->
+            AacStoragePaths.resolveIconFile(context, imagePath, IconSource.SYSTEM)?.isFile == true
+        }
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+
+        var repaired = 0
+        repairs.forEach { (id, desiredImagePath) ->
+            val item = itemsById[id] ?: return@forEach
+            if (isUserProtected(item)) return@forEach
+            if (AacStoragePaths.resolveIconFile(context, desiredImagePath, IconSource.SYSTEM)?.isFile != true) {
+                return@forEach
+            }
+
+            val currentImagePath = item.optString("imagePath").trim()
+            val currentIconSource = item.optString("iconSource").trim().uppercase()
+            val hasProtectedExternalImage = currentImagePath.isNotBlank() &&
+                currentIconSource in setOf(
+                    IconSource.CUSTOM.name,
+                    IconSource.PATIENT.name,
+                    IconSource.SOCA.name,
+                    IconSource.ARASAAC.name
+                )
+            if (hasProtectedExternalImage) return@forEach
+
+            var itemRepaired = 0
+            if (currentImagePath.isBlank()) {
+                item.put("imagePath", desiredImagePath)
+                itemRepaired++
+            }
+            if (currentIconSource != IconSource.SYSTEM.name) {
+                item.put("iconSource", IconSource.SYSTEM.name)
+                itemRepaired++
+            }
+            if (itemRepaired > 0) {
+                repaired++
+            }
+        }
+        return repaired
     }
 
     private fun mergeMissingSystemItems(itemsArray: JSONArray, fallbackItems: List<AacItem>): Int {
