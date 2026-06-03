@@ -410,7 +410,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 resolveTreeFixChildItems(item, resolveGuidedChildItems(item, resolveV2ChildItems(item)))
             }
             if (item.id == WATER_NODE_ID) {
-                Log.d(TAG, "WATER clicked children=${childItems.size}")
+                debugLog("WATER clicked children=${childItems.size}")
                 if (childItems.isEmpty()) {
                     updateWaterTraceDebug("WATER CLICK CHILDREN=0")
                 } else {
@@ -628,7 +628,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun showDrinksCategoryRefreshLog(result: DrinksCategoryRefreshResult) {
         val existsText = if (result.exists) "yes" else "no"
         val message = "page=$DRINKS_CATEGORY_PAGE_ID runtime exists=$existsText size=${result.size}"
-        Log.d(TAG, "$message path=${result.path} rebuilt=${result.rebuilt}")
+        debugLog("$message path=${result.path} rebuilt=${result.rebuilt}")
     }
 
     private fun showDrinksCategoryWaterLog(page: AacPage) {
@@ -642,12 +642,18 @@ class AacCommunicatorActivity : AppCompatActivity() {
         } else {
             "WATER children=$waterChildrenCount - category data not ready"
         }
-        Log.d(TAG, "page=${page.pageId} $message")
+        debugLog("page=${page.pageId} $message")
     }
 
     private fun logWaterTrace(stage: String, item: AacItem?) {
         val children = item?.children.orEmpty()
-        Log.d(TAG, "TRACE category $stage children=${children.size} ids=$children")
+        debugLog("TRACE category $stage children=${children.size} ids=$children")
+    }
+
+    private fun debugLog(message: String) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, message)
+        }
     }
 
     private fun addWaterTraceDebugView() {
@@ -1378,12 +1384,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
             ): File? {
                 val rawPath = item.imagePath.trim()
                 if (rawPath.isEmpty()) {
-                    Log.d(IMAGE_LOG_TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
+                    debugLog("AAC_IMAGE IMAGE_MISSING item=${item.id}")
                     return null
                 }
 
                 if (item.iconSource == com.rehab2.aac.IconSource.SYSTEM) {
-                    Log.d(IMAGE_LOG_TAG, "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
+                    debugLog("AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
                     return null
                 }
 
@@ -1391,11 +1397,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 val resolvedFile = resolved?.takeIf { it.exists() && it.isFile }
                 if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
                     val state = if (resolvedFile != null) "resolved" else "missing"
-                    Log.d(IMAGE_LOG_TAG, "AAC_IMAGE SOCA_$state item=${item.id} path=$rawPath")
+                    debugLog("AAC_IMAGE SOCA_$state item=${item.id} path=$rawPath")
                 }
                 return resolvedFile ?: run {
-                    Log.d(IMAGE_LOG_TAG, "AAC_IMAGE IMAGE_MISSING item=${item.id}")
+                    debugLog("AAC_IMAGE IMAGE_MISSING item=${item.id}")
                     null
+                }
+            }
+
+            fun debugLog(message: String) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(IMAGE_LOG_TAG, message)
                 }
             }
         }
@@ -1439,16 +1451,16 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 tileColor = tileColorFor(item)
                 itemView.setBackgroundColor(tileColor)
                 if (item.id == "water") {
-                    Log.d("AacCommunicatorActivity", "TRACE water adapter bind children=${item.children.size} ids=${item.children}")
+                    debugLog("TRACE water adapter bind children=${item.children.size} ids=${item.children}")
                     onWaterBindTrace(item)
                 }
                 val resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode)
                 label.text = if (item.id in suggestionIds) "\u2B50 $resolvedLabel" else resolvedLabel
                 label.gravity = Gravity.CENTER
                 label.setTypeface(label.typeface, Typeface.BOLD)
-                applyLabelMode()
                 image.setImageBitmap(null)
                 bindImage(item)
+                applyLabelMode()
 
                 itemView.setOnClickListener {
                     showPressedFeedback()
@@ -1475,7 +1487,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             private fun bindImage(item: AacItem) {
                 val imageFile = resolveAacImageFile(context, item)
                 if (imageFile == null) {
-                    Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
+                    debugLog("AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
                     showMissingImageFallback()
                     return
                 }
@@ -1483,31 +1495,31 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 try {
                     val bitmap = decodeTileBitmap(imageFile)
                     if (bitmap != null) {
-                        Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOADED item=${item.id}")
+                        debugLog("AAC_IMAGE IMAGE_LOADED item=${item.id}")
                         image.alpha = 1.0f
                         image.setImageBitmap(bitmap)
                     } else {
-                        Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
-                        if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
-                            Log.d("AacCommunicatorActivity", "AAC_IMAGE SOCA_decode_failed item=${item.id} path=${item.imagePath}")
-                        }
-                        Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
-                        showMissingImageFallback()
+                        handleImageLoadFailure(item)
                     }
                 } catch (_: Exception) {
-                    Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
-                    if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
-                        Log.d("AacCommunicatorActivity", "AAC_IMAGE SOCA_decode_failed item=${item.id} path=${item.imagePath}")
-                    }
-                    Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
-                    showMissingImageFallback()
+                    handleImageLoadFailure(item)
                 } catch (_: OutOfMemoryError) {
-                    Log.d("AacCommunicatorActivity", "AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
-                    if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
-                        Log.d("AacCommunicatorActivity", "AAC_IMAGE SOCA_decode_failed item=${item.id} path=${item.imagePath}")
-                    }
-                    Log.d("AacCommunicatorActivity", "AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
-                    showMissingImageFallback()
+                    handleImageLoadFailure(item)
+                }
+            }
+
+            private fun handleImageLoadFailure(item: AacItem) {
+                debugLog("AAC_IMAGE IMAGE_LOAD_ERROR item=${item.id}")
+                if (item.iconSource == com.rehab2.aac.IconSource.SOCA) {
+                    debugLog("AAC_IMAGE SOCA_decode_failed item=${item.id} path=${item.imagePath}")
+                }
+                debugLog("AAC_IMAGE FALLBACK_TEXT_ICON item=${item.id}")
+                showMissingImageFallback()
+            }
+
+            private fun debugLog(message: String) {
+                if (BuildConfig.DEBUG) {
+                    Log.d("AacCommunicatorActivity", message)
                 }
             }
 

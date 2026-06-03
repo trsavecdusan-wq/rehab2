@@ -29,6 +29,7 @@ data class AacConversationNode(
     val id: String,
     val conceptId: String?,
     val title: String,
+    val titleUk: String?,
     val speakTextSl: String?,
     val speakTextUk: String?,
     val questionSl: String?,

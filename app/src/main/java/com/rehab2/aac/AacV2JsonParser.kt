@@ -1,6 +1,7 @@
 package com.rehab2.aac
 
 import android.util.Log
+import com.rehab2.BuildConfig
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -74,13 +75,14 @@ object AacV2JsonParser {
                 if (nodeId == WATER_NODE_ID) {
                     lastWaterJsonChildrenCount = children.size
                     lastWaterJsonChildrenIds = children
-                    Log.d(TAG, "TRACE water JSON children=${children.size} ids=$children")
+                    debugLog("TRACE water JSON children=${children.size} ids=$children")
                 }
                 add(
                     AacConversationNode(
                         id = nodeId,
                         conceptId = item.optNullableString("conceptId"),
                         title = item.optString("title"),
+                        titleUk = item.optNullableString("titleUk"),
                         speakTextSl = item.optNullableString("speakTextSl"),
                         speakTextUk = item.optNullableString("speakTextUk"),
                         questionSl = item.optNullableString("questionSl"),
@@ -121,6 +123,12 @@ object AacV2JsonParser {
 
         val value = optString(name).trim()
         return value.ifEmpty { null }
+    }
+
+    private fun debugLog(message: String) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, message)
+        }
     }
 
     private const val TAG = "AacV2JsonParser"

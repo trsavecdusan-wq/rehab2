@@ -1,6 +1,7 @@
 package com.rehab2.aac
 
 import android.util.Log
+import com.rehab2.BuildConfig
 
 object AacV2PageAdapter {
     var lastWaterParsedModelChildrenCount: Int = -1
@@ -33,7 +34,7 @@ object AacV2PageAdapter {
             if (node.id == WATER_NODE_ID) {
                 lastWaterParsedModelChildrenCount = node.children.size
                 lastWaterParsedModelChildrenIds = node.children
-                Log.d(TAG, "TRACE water parsed model children=${node.children.size} ids=${node.children}")
+                debugLog("TRACE water parsed model children=${node.children.size} ids=${node.children}")
             }
 
             val item = AacItem(
@@ -45,6 +46,7 @@ object AacV2PageAdapter {
                 targetPageId = "",
                 speakTextSl = node.speakTextSl,
                 speakTextUk = node.speakTextUk,
+                labelUk = node.titleUk,
                 conceptId = node.conceptId,
                 children = node.children,
                 sentenceRole = node.sentenceRole,
@@ -59,7 +61,7 @@ object AacV2PageAdapter {
             if (item.id == WATER_NODE_ID) {
                 lastWaterMappedItemChildrenCount = item.children.size
                 lastWaterMappedItemChildrenIds = item.children
-                Log.d(TAG, "TRACE water mapped AacItem children=${item.children.size} ids=${item.children}")
+                debugLog("TRACE water mapped AacItem children=${item.children.size} ids=${item.children}")
             }
             item
         }
@@ -73,4 +75,10 @@ object AacV2PageAdapter {
 
     private const val TAG = "AacV2PageAdapter"
     private const val WATER_NODE_ID = "water"
+
+    private fun debugLog(message: String) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, message)
+        }
+    }
 }
