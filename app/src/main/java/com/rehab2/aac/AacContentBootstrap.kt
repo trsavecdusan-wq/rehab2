@@ -26,6 +26,16 @@ object AacContentBootstrap {
     private const val KEY_DEBUG_ITEM_IDS_BEFORE = "item_ids_before"
     private const val KEY_DEBUG_ITEM_IDS_AFTER = "item_ids_after"
     private const val SYSTEM_ICON_ASSET_DIR = "NovaRehab/icons/system"
+    private val PNG_SIGNATURE = byteArrayOf(
+        0x89.toByte(),
+        0x50,
+        0x4E,
+        0x47,
+        0x0D,
+        0x0A,
+        0x1A,
+        0x0A
+    )
 
     private val BUNDLED_SYSTEM_ICON_FILES = listOf(
         "come_to_me.png",
@@ -67,6 +77,16 @@ object AacContentBootstrap {
         "home" to "system/home.png",
         "other" to "system/other.png",
         "real_world" to "system/real_world.png"
+    )
+
+    private val FIXED_ROW_SYSTEM_ICON_REPAIRS = mapOf(
+        "no" to "system/no.png",
+        "yes" to "system/yes.png"
+    )
+
+    private val CRITICAL_SYSTEM_ICON_FILES = setOf(
+        "no.png",
+        "yes.png"
     )
 
     private val OPTIONAL_ROOT_SYSTEM_ICON_REPAIRS = mapOf(
@@ -112,6 +132,7 @@ object AacContentBootstrap {
         val repairedStarterCategoryChildren = repairStarterCategoryChildren(itemsArray, starterItems)
         val repairedConversationTreeV3Metadata = repairConversationTreeV3Metadata(itemsArray, starterItems)
         val repairedRootSystemIcons = repairRootSystemIconMetadata(context, itemsArray)
+        val repairedFixedRowSystemIcons = repairFixedRowSystemIconMetadata(context, itemsArray)
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
             return Result(
@@ -161,6 +182,7 @@ object AacContentBootstrap {
             repairedStarterCategoryChildren > 0 ||
             repairedConversationTreeV3Metadata > 0 ||
             repairedRootSystemIcons > 0 ||
+            repairedFixedRowSystemIcons > 0 ||
             repairedFixedTopRowMetadata > 0 ||
             repairedDefaultPageV3Placements > 0 ||
             repairedNoUnderstandLabels > 0 ||
@@ -197,7 +219,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -209,17 +231,16 @@ object AacContentBootstrap {
         var seeded = 0
         BUNDLED_SYSTEM_ICON_FILES.forEach { fileName ->
             val targetFile = File(systemDir, fileName)
-            if (targetFile.exists() && targetFile.isFile && targetFile.length() > 0L) {
-                seeded++
-                return@forEach
-            }
-
             val assetPath = "$SYSTEM_ICON_ASSET_DIR/$fileName"
             try {
-                context.assets.open(assetPath).use { input ->
-                    targetFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
+                val assetBytes = context.assets.open(assetPath).use { input -> input.readBytes() }
+                if (isRuntimeSystemIconUsable(targetFile, fileName, assetBytes)) {
+                    seeded++
+                    return@forEach
+                }
+
+                targetFile.outputStream().use { output ->
+                    output.write(assetBytes)
                 }
                 if (targetFile.exists() && targetFile.length() > 0L) {
                     seeded++
@@ -229,6 +250,32 @@ object AacContentBootstrap {
             }
         }
         return seeded
+    }
+
+    private fun isRuntimeSystemIconUsable(file: File, fileName: String, assetBytes: ByteArray): Boolean {
+        if (!file.exists() || !file.isFile || file.length() <= 0L) return false
+        if (!hasPngHeader(file)) return false
+        if (fileName in CRITICAL_SYSTEM_ICON_FILES) {
+            return try {
+                file.readBytes().contentEquals(assetBytes)
+            } catch (_: Exception) {
+                false
+            }
+        }
+        return true
+    }
+
+    private fun hasPngHeader(file: File): Boolean {
+        return try {
+            if (file.length() < PNG_SIGNATURE.size) return false
+            file.inputStream().use { input ->
+                val header = ByteArray(PNG_SIGNATURE.size)
+                val read = input.read(header)
+                read == PNG_SIGNATURE.size && header.contentEquals(PNG_SIGNATURE)
+            }
+        } catch (_: Exception) {
+            false
+        }
     }
 
     private fun repairRootSystemIconMetadata(context: Context, itemsArray: JSONArray): Int {
@@ -266,6 +313,36 @@ object AacContentBootstrap {
                 itemRepaired++
             }
             if (currentIconSource != IconSource.SYSTEM.name) {
+                item.put("iconSource", IconSource.SYSTEM.name)
+                itemRepaired++
+            }
+            if (itemRepaired > 0) {
+                repaired++
+            }
+        }
+        return repaired
+    }
+
+    private fun repairFixedRowSystemIconMetadata(context: Context, itemsArray: JSONArray): Int {
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+
+        var repaired = 0
+        FIXED_ROW_SYSTEM_ICON_REPAIRS.forEach { (id, desiredImagePath) ->
+            val item = itemsById[id] ?: return@forEach
+            if (isUserProtected(item)) return@forEach
+            val resolvedFile = AacStoragePaths.resolveIconFile(context, desiredImagePath, IconSource.SYSTEM)
+            if (resolvedFile?.isFile != true || !hasPngHeader(resolvedFile)) return@forEach
+
+            var itemRepaired = 0
+            if (item.optString("imagePath").trim() != desiredImagePath) {
+                item.put("imagePath", desiredImagePath)
+                itemRepaired++
+            }
+            if (item.optString("iconSource").trim().uppercase() != IconSource.SYSTEM.name) {
                 item.put("iconSource", IconSource.SYSTEM.name)
                 itemRepaired++
             }
