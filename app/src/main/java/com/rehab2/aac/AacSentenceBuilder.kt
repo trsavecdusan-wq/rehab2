@@ -51,13 +51,21 @@ object AacSentenceBuilder {
                     else -> "Pogrešam ${person.accusative}."
                 }
             }
-            items.hasId("contact_call") -> "Prosim, pokliči ${person.accusative}."
+            items.hasId("person_see") -> "Rada bi videla ${person.accusative}."
+            items.hasId("person_come") -> "Rada bi, da pride ${person.nominative}."
+            items.hasId("contact_call") -> "Prosim, pokličite ${person.accusative}${personLaterSuffix(items)}."
+            items.hasId("contact_message") || items.hasId("message") -> "Rada bi poslala sporočilo ${person.dative}${personLaterSuffix(items)}."
+            items.hasId("i_want") || items.hasId("rada_bi") -> "Rada bi govorila z ${person.instrumental}."
             items.hasId("person_where_is") -> "Kje je ${person.nominative}?"
             items.hasId("come_to_me") -> "Naj pride ${person.nominative}."
             items.hasId("love_you") -> "Rada imam ${person.accusative}."
             items.hasId("person_tell") -> "Povej ${person.dative}."
             else -> ""
         }
+    }
+
+    private fun personLaterSuffix(items: List<AacItem>): String {
+        return if (items.hasId("later")) " kasneje" else ""
     }
 
     private fun buildNeedSentence(items: List<AacItem>): String {
@@ -258,7 +266,8 @@ object AacSentenceBuilder {
     private data class PersonTarget(
         val nominative: String,
         val accusative: String,
-        val dative: String
+        val dative: String,
+        val instrumental: String
     )
 
     private val WANT_KEYS = setOf(
@@ -294,6 +303,12 @@ object AacSentenceBuilder {
         "miss_someone",
         "miss_you",
         "contact_call",
+        "contact_message",
+        "message",
+        "i_want",
+        "rada_bi",
+        "person_see",
+        "person_come",
         "person_where_is",
         "come_to_me",
         "love_you",
@@ -301,20 +316,20 @@ object AacSentenceBuilder {
     )
 
     private val PERSON_TARGETS = mapOf(
-        "person_dusan" to PersonTarget("Dušan", "Dušana", "Dušanu"),
-        "dusan" to PersonTarget("Dušan", "Dušana", "Dušanu"),
-        "person_zana" to PersonTarget("Žana", "Žano", "Žani"),
-        "sister_zana" to PersonTarget("Žana", "Žano", "Žani"),
-        "person_sergej" to PersonTarget("Sergej", "Sergeja", "Sergeju"),
-        "grandfather_sergej" to PersonTarget("Sergej", "Sergeja", "Sergeju"),
-        "person_julija" to PersonTarget("Julija", "Julijo", "Juliji"),
-        "julija" to PersonTarget("Julija", "Julijo", "Juliji"),
-        "person_oksana" to PersonTarget("Oksana", "Oksano", "Oksani"),
-        "oksana" to PersonTarget("Oksana", "Oksano", "Oksani"),
-        "person_inna" to PersonTarget("Inna", "Inno", "Inni"),
-        "inna" to PersonTarget("Inna", "Inno", "Inni"),
-        "person_franc" to PersonTarget("Franc", "Franca", "Francu"),
-        "franc" to PersonTarget("Franc", "Franca", "Francu")
+        "person_dusan" to PersonTarget("Dušan", "Dušana", "Dušanu", "Dušanom"),
+        "dusan" to PersonTarget("Dušan", "Dušana", "Dušanu", "Dušanom"),
+        "person_zana" to PersonTarget("Žana", "Žano", "Žani", "Žano"),
+        "sister_zana" to PersonTarget("Žana", "Žano", "Žani", "Žano"),
+        "person_sergej" to PersonTarget("Sergej", "Sergeja", "Sergeju", "Sergejem"),
+        "grandfather_sergej" to PersonTarget("Sergej", "Sergeja", "Sergeju", "Sergejem"),
+        "person_julija" to PersonTarget("Julija", "Julijo", "Juliji", "Julijo"),
+        "julija" to PersonTarget("Julija", "Julijo", "Juliji", "Julijo"),
+        "person_oksana" to PersonTarget("Oksana", "Oksano", "Oksani", "Oksano"),
+        "oksana" to PersonTarget("Oksana", "Oksano", "Oksani", "Oksano"),
+        "person_inna" to PersonTarget("Inna", "Inno", "Inni", "Inno"),
+        "inna" to PersonTarget("Inna", "Inno", "Inni", "Inno"),
+        "person_franc" to PersonTarget("Franc", "Franca", "Francu", "Francem"),
+        "franc" to PersonTarget("Franc", "Franca", "Francu", "Francem")
     )
 
     private val MISS_INTENSITIES = mapOf(

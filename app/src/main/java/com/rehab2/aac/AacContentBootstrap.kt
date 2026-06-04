@@ -458,6 +458,8 @@ object AacContentBootstrap {
             "person_franc",
             "person_other",
             "miss_someone",
+            "contact_call",
+            "contact_message",
             "help",
             "repeat",
             "slower",
