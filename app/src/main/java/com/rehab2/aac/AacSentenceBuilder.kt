@@ -110,6 +110,9 @@ object AacSentenceBuilder {
     }
 
     private fun buildWantSentence(items: List<AacItem>): String {
+        if ((items.hasId("i_want") || items.hasId("rada_bi")) && items.hasId("later")) {
+            return "Rada bi kasneje."
+        }
         buildDrinkDetailSentence(items)?.let { return it }
         buildFoodDetailSentence(items)?.let { return it }
 
@@ -467,6 +470,16 @@ object AacSentenceBuilder {
         "when_therapy" to "Kdaj bo terapija?",
         "when_home" to "Kdaj gremo domov?",
         "when_eat" to "Kdaj jemo?",
+        "time_group" to "Izberite čas.",
+        "today" to "Danes.",
+        "tomorrow" to "Jutri.",
+        "yesterday" to "Včeraj.",
+        "now" to "Zdaj.",
+        "later" to "Kasneje.",
+        "morning" to "Zjutraj.",
+        "afternoon" to "Popoldne.",
+        "evening" to "Zvečer.",
+        "night" to "Ponoči.",
         "miss_little" to "Malo pogrešam.",
         "miss_very" to "Zelo pogrešam.",
         "repeat_question" to "Prosim, ponovi vprašanje.",

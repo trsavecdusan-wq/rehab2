@@ -225,6 +225,17 @@ class SettingsActivity : AppCompatActivity() {
             PersonPhotoAuditItem("person_oksana", "OKSANA", "person_oksana.jpg"),
             PersonPhotoAuditItem("person_sergej", "SERGEJ", "person_sergej.jpg")
         )
+        private val TIME_PACK_AUDIT_ITEMS = listOf(
+            "today" to "DANES",
+            "tomorrow" to "JUTRI",
+            "yesterday" to "VČERAJ",
+            "now" to "ZDAJ",
+            "later" to "KASNEJE",
+            "morning" to "ZJUTRAJ",
+            "afternoon" to "POPOLDNE",
+            "evening" to "ZVEČER",
+            "night" to "PONOČI"
+        )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
         private const val MAX_MISSING_ICONS_SHOWN = 15
@@ -1343,6 +1354,10 @@ class SettingsActivity : AppCompatActivity() {
             val peoplePhotoAudit = auditPeoplePhotoStatus()
             val emptySpeechItems = items.filter { explicitSlSpeechText(it).isBlank() }
             val missingCore = missingCoreAacLabels(items)
+            val itemIds = items.map { it.id.trim() }.toSet()
+            val missingTimeLabels = TIME_PACK_AUDIT_ITEMS
+                .filter { (itemId, _) -> itemId !in itemIds }
+                .map { (_, label) -> label }
             val coreWithoutSpeech = emptySpeechItems.filter { item ->
                 CORE_AAC_AUDIT_ITEMS.any { core ->
                     matchesCoreAacItem(item, core)
@@ -1357,6 +1372,7 @@ class SettingsActivity : AppCompatActivity() {
             if (coreIconVisualAudit.smallCount > 0) warnings += "nekaj osnovnih slik ikon je premajhnih"
             if (peoplePhotoAudit.missingFilenames.isNotEmpty()) warnings += "manjkajo fotografije oseb"
             if (missingCore.isNotEmpty()) warnings += "manjkajo osnovne ikone"
+            if (missingTimeLabels.isNotEmpty()) warnings += "manjkajo časovne ikone"
             if (coreWithoutSpeech.isNotEmpty()) warnings += "osnovne ikone nimajo govora"
             val overall = if (warnings.isEmpty()) "PRIPRAVLJENO ZA TEST" else "POTREBNA DOPOLNITEV"
             val activeProfile = AacProfileStore.getActiveAacProfile(this).displayName.ifBlank { "DOM" }
@@ -1403,6 +1419,11 @@ class SettingsActivity : AppCompatActivity() {
                 "",
                 "Manjkajoči družinski člani za kasnejši vnos: svak, nečak 1, nečak 2.",
                 "Dodajte jih šele, ko imate ime in fotografijo.",
+                statusLine(
+                    "ČAS",
+                    if (missingTimeLabels.isEmpty()) "DA" else "manjka: ${missingTimeLabels.joinToString(", ")}",
+                    missingTimeLabels.isEmpty()
+                ),
                 statusLine(
                     "Osnovne ikone",
                     if (missingCore.isEmpty()) "vse najdene" else "manjka: ${missingCore.joinToString(", ")}",
