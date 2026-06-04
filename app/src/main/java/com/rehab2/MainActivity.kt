@@ -1857,6 +1857,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
         val iconView = binding.icon ?: return
+        iconView.setTextColor(mainAacIconTextColorFor(item))
         val iconFile = AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
         if (iconFile?.isFile != true) {
             restoreMainAacFallbackIcon(binding, item)
@@ -1868,7 +1869,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val drawable = BitmapDrawable(resources, bitmap).apply {
-            val size = dp(mainAacIconBitmapSizeDp())
+            val size = dp(mainAacIconBitmapSizeDp(item))
             setBounds(0, 0, size, size)
         }
         iconView.text = ""
@@ -1877,8 +1878,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun mainAacTileBackgroundFor(item: AacItem?): GradientDrawable {
         val color = when (normalizeMainAacKey(item?.id.orEmpty())) {
-            "yes" -> 0xFF2E8B57.toInt()
-            "no" -> 0xFF9E2F2F.toInt()
             "help" -> 0xFF214A78.toInt()
             "stop", "stop_movement" -> 0xFF8B2E2E.toInt()
             else -> 0xFF34414D.toInt()
@@ -1889,7 +1888,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun mainAacIconBitmapSizeDp(): Int {
+    private fun mainAacIconBitmapSizeDp(item: AacItem? = null): Int {
+        if (isMainAacYesNoVisualItem(item)) {
+            return when (mainAacSelectedGridSize()) {
+                3 -> 96
+                4 -> 80
+                5 -> 64
+                else -> 44
+            }
+        }
         return when (mainAacSelectedGridSize()) {
             3 -> 76
             4 -> 62
@@ -1898,9 +1905,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun isMainAacYesNoVisualItem(item: AacItem?): Boolean {
+        val keys = listOfNotNull(
+            item?.id?.trim()?.lowercase(Locale.ROOT),
+            item?.conceptId?.trim()?.lowercase(Locale.ROOT)
+        )
+        return keys.any { key -> key == "yes" || key == "no" || key == "core.yes" || key == "core.no" }
+    }
+
+    private fun mainAacIconTextColorFor(item: AacItem?): Int {
+        val keys = listOfNotNull(
+            item?.id?.trim()?.lowercase(Locale.ROOT),
+            item?.conceptId?.trim()?.lowercase(Locale.ROOT)
+        )
+        return when {
+            keys.any { key -> key == "yes" || key == "core.yes" } -> 0xFF44D66E.toInt()
+            keys.any { key -> key == "no" || key == "core.no" } -> 0xFFFF4A4A.toInt()
+            else -> 0xFFF4F7FA.toInt()
+        }
+    }
+
     private fun restoreMainAacFallbackIcon(binding: MainAacTileBinding, item: AacItem?) {
         binding.icon?.apply {
             setCompoundDrawables(null, null, null, null)
+            setTextColor(mainAacIconTextColorFor(item))
             text = mainAacFallbackIconFor(item) ?: binding.fallbackIconText
         }
     }
@@ -1950,11 +1978,11 @@ class MainActivity : AppCompatActivity() {
                 "message" -> return "\uD83D\uDCE9"
                 "more" -> return "⋯"
                 "health" -> return "\uD83E\uDE7A"
-                "yes" -> return "✅"
+                "yes" -> return "✓"
                 "wc", "toilet", "soca_wc" -> return "\uD83D\uDEBD"
                 "good" -> return "\uD83D\uDE42"
                 "bad" -> return "\uD83D\uDE1F"
-                "no" -> return "❌"
+                "no" -> return "✕"
                 "dont_understand" -> return "❓"
                 "will" -> return "\uD83D\uDCAC"
                 "calm" -> return "\uD83C\uDF3F"
