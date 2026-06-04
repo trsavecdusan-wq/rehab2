@@ -146,6 +146,7 @@ class AacEditorActivity : AppCompatActivity() {
         val changeImage = dialogView.findViewById<Button>(R.id.btnAacEditorChangeImage)
         val pickGalleryImage = dialogView.findViewById<Button>(R.id.btnAacEditorPickGalleryImage)
         val capturePhoto = dialogView.findViewById<Button>(R.id.btnAacEditorCapturePhoto)
+        val removeImage = dialogView.findViewById<Button>(R.id.btnAacEditorRemoveImage)
         val copyIcon = dialogView.findViewById<Button>(R.id.btnAacEditorCopyIcon)
         val toggleHidden = dialogView.findViewById<Button>(R.id.btnAacEditorToggleHidden)
         val addChild = dialogView.findViewById<Button>(R.id.btnAacEditorAddChild)
@@ -165,7 +166,7 @@ class AacEditorActivity : AppCompatActivity() {
             itemId.text = "itemId: ${currentItem.id}"
             label.text = "labelSl: ${currentItem.labelSl}"
             speech.text = "speechTextSl: ${currentItem.resolvedSpeechText}"
-            imagePath.text = "imagePath: ${currentItem.imagePath.ifBlank { "ni nastavljen" }}"
+            imagePath.text = imageStatusText(currentItem)
             hiddenStatus.text = if (isHidden) "SKRITO: editor marker, runtime skrivanje pride kasneje." else ""
             toggleHidden.text = if (isHidden) "POKA\u017dI IKONO" else "SKRIJ IKONO"
             renderChildSection(
@@ -191,6 +192,9 @@ class AacEditorActivity : AppCompatActivity() {
         }
         capturePhoto.setOnClickListener {
             openCameraCapture(currentItem) { refreshDialogContent() }
+        }
+        removeImage.setOnClickListener {
+            removeImageFromItem(currentItem) { refreshDialogContent() }
         }
         copyIcon.setOnClickListener {
             showCopyIconDialog(currentItem) { refreshDialogContent() }
@@ -1126,6 +1130,22 @@ class AacEditorActivity : AppCompatActivity() {
         }
     }
 
+    private fun removeImageFromItem(item: AacItem, refresh: () -> Unit) {
+        val currentItem = AacEditorStorage.loadItems(this).firstOrNull { it.id == item.id } ?: item
+        if (currentItem.locked) {
+            Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val saved = AacEditorStorage.clearImage(this, currentItem.id)
+        if (saved) {
+            Toast.makeText(this, "Slika je odstranjena iz ikone.", Toast.LENGTH_SHORT).show()
+            refresh()
+            loadEditorPages()
+        } else {
+            Toast.makeText(this, "Slike ni bilo mogoče odstraniti.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun createCameraImageFile(itemId: String): File? {
         val customDir = AacStoragePaths.getIconsCustomDir(this) ?: return null
         if (!customDir.exists() && !customDir.mkdirs()) return null
@@ -1360,6 +1380,17 @@ class AacEditorActivity : AppCompatActivity() {
             return
         }
         imageView.setImageBitmap(BitmapFactory.decodeFile(imageFile.absolutePath))
+    }
+
+    private fun imageStatusText(item: AacItem): String {
+        val sourceLabel = item.iconSource.name
+        val imagePath = item.imagePath.trim()
+        if (imagePath.isEmpty()) {
+            return "Trenutna slika: ni izbrana"
+        }
+        val imageFile = resolveImageFile(item)
+        val fileStatus = if (imageFile != null) "datoteka najdena" else "datoteka manjka"
+        return "Trenutna slika: $sourceLabel\n$imagePath\n$fileStatus"
     }
 
     private fun resolveImageFile(item: AacItem): File? {

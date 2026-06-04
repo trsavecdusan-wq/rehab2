@@ -98,6 +98,13 @@ object AacEditorStorage {
         }
     }
 
+    fun clearImage(context: Context, itemId: String): Boolean {
+        return updateItem(context, itemId) { item ->
+            item.put("iconSource", IconSource.SYSTEM.name)
+            item.put("imagePath", "")
+        }
+    }
+
     fun updateChildren(context: Context, itemId: String, children: List<String>): Boolean {
         return updateItem(context, itemId) { item ->
             item.put("children", jsonArrayOf(children.distinct()))

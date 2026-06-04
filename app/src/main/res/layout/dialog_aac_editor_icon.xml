@@ -117,6 +117,27 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/txtAacEditorRemoveImageHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Odstranitev slike ne izbriše datoteke, samo odstrani povezavo iz te ikone."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnAacEditorRemoveImage"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#6A3840"
+            android:text="ODSTRANI SLIKO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <Button
             android:id="@+id/btnAacEditorCopyIcon"
             android:layout_width="match_parent"
