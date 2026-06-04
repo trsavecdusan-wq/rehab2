@@ -43,6 +43,30 @@
             android:textColor="#C9D3DD"
             android:textSize="18sp" />
 
+        <Button
+            android:id="@+id/btnSettingsModeTherapist"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#2F5F9E"
+            android:text="TERAPEVTSKI NAČIN"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsModeAdvanced"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="#3A3F45"
+            android:text="NAPREDNI NAČIN"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/sectionHub"
             android:layout_width="match_parent"

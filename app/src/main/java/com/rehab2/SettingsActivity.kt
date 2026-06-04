@@ -65,6 +65,11 @@ class SettingsActivity : AppCompatActivity() {
         ADVANCED
     }
 
+    private enum class SettingsDisplayMode {
+        THERAPIST,
+        ADVANCED
+    }
+
     companion object {
         private const val PREFS_FILE = "rehab2_prefs"
         private const val PREF_POWER_MODE = "power_mode"
@@ -84,6 +89,7 @@ class SettingsActivity : AppCompatActivity() {
         private const val PREF_DISTANCE_MONTH_METERS = "distance_month_meters"
         private const val PREF_DISTANCE_YEAR_METERS = "distance_year_meters"
         private const val DEFAULT_ADMIN_PIN = "0416"
+        private const val DEFAULT_ADVANCED_SETTINGS_PIN = "1964"
 
         private const val POWER_MODE_ALWAYS_ON = "ALWAYS_ON"
         private const val POWER_MODE_BATTERY_SAVER = "BATTERY_SAVER"
@@ -226,6 +232,7 @@ class SettingsActivity : AppCompatActivity() {
     private var speechApiTestPlayer: MediaPlayer? = null
     private var audioDuckingTestPlayer: AacAudioPlayer? = null
     private var speechLoudnessTestPlayer: AacAudioPlayer? = null
+    private var settingsDisplayMode = SettingsDisplayMode.THERAPIST
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
     private var isBatteryReceiverRegistered = false
@@ -333,6 +340,14 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 showSettingsHub()
             }
+        }
+
+        findViewById<Button>(R.id.btnSettingsModeTherapist).setOnClickListener {
+            setSettingsDisplayMode(SettingsDisplayMode.THERAPIST)
+        }
+
+        findViewById<Button>(R.id.btnSettingsModeAdvanced).setOnClickListener {
+            confirmAdvancedSettingsMode()
         }
 
         findViewById<Button>(R.id.btnSettingsHubPatient).setOnClickListener {
@@ -577,8 +592,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun showSettingsHub() {
         activeSettingsSection = null
-        val hubIds = setOf(
+        val hubIds = mutableSetOf(
             R.id.txtSettingsTitle,
+            R.id.btnSettingsModeTherapist,
+            R.id.btnSettingsModeAdvanced,
             R.id.sectionHub,
             R.id.btnSettingsHubPatient,
             R.id.btnSettingsHubCommunicator,
@@ -586,9 +603,11 @@ class SettingsActivity : AppCompatActivity() {
             R.id.btnSettingsHubSpeech,
             R.id.btnSettingsHubVideoMessages,
             R.id.btnSettingsHubOrientation,
-            R.id.btnSettingsHubBackup,
-            R.id.btnSettingsHubAdvanced
+            R.id.btnSettingsHubBackup
         )
+        if (settingsDisplayMode == SettingsDisplayMode.ADVANCED) {
+            hubIds += R.id.btnSettingsHubAdvanced
+        }
         settingsContentView()?.let { content ->
             for (index in 0 until content.childCount) {
                 val child = content.getChildAt(index)
@@ -596,10 +615,15 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
         findViewById<TextView>(R.id.txtSettingsSectionHelper).text = ""
+        updateSettingsModeButtons()
         scrollSettingsToTop()
     }
 
     private fun showSettingsSection(section: SettingsSection) {
+        if (section == SettingsSection.ADVANCED && settingsDisplayMode != SettingsDisplayMode.ADVANCED) {
+            showSettingsHub()
+            return
+        }
         activeSettingsSection = section
         val content = settingsContentView() ?: return
         for (index in 0 until content.childCount) {
@@ -609,6 +633,8 @@ class SettingsActivity : AppCompatActivity() {
         setSettingsChildVisible(R.id.txtSettingsTitle)
         setSettingsChildVisible(R.id.btnBackSettings)
         setSettingsChildVisible(R.id.txtSettingsSectionHelper)
+        setSettingsChildVisible(R.id.btnSettingsModeTherapist)
+        setSettingsChildVisible(R.id.btnSettingsModeAdvanced)
         findViewById<Button>(R.id.btnBackSettings).text = "NAZAJ NA NASTAVITVE"
         findViewById<TextView>(R.id.txtSettingsSectionHelper).text = when (section) {
             SettingsSection.PATIENT -> "Tukaj nastavite podatke pacientke."
@@ -643,7 +669,118 @@ class SettingsActivity : AppCompatActivity() {
                 setSettingsRangeVisible(content, R.id.sectionSystemSettings, R.id.btnResetGpsStatistics)
             }
         }
+        applyTherapistModeVisibility()
+        updateSettingsModeButtons()
         scrollSettingsToTop()
+    }
+
+    private fun setSettingsDisplayMode(mode: SettingsDisplayMode) {
+        settingsDisplayMode = mode
+        val section = activeSettingsSection
+        if (section == null || (section == SettingsSection.ADVANCED && mode != SettingsDisplayMode.ADVANCED)) {
+            showSettingsHub()
+        } else {
+            showSettingsSection(section)
+        }
+    }
+
+    private fun confirmAdvancedSettingsMode() {
+        val input = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            transformationMethod = PasswordTransformationMethod.getInstance()
+            hint = "PIN"
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("PIN ZA NAPREDNE NASTAVITVE")
+            .setMessage("Ta del je namenjen skrbniku ali razvijalcu.")
+            .setView(input)
+            .setPositiveButton("NADALJUJ") { _, _ ->
+                val enteredPin = input.text?.toString().orEmpty()
+                if (enteredPin == DEFAULT_ADVANCED_SETTINGS_PIN) {
+                    setSettingsDisplayMode(SettingsDisplayMode.ADVANCED)
+                } else {
+                    setSettingsDisplayMode(SettingsDisplayMode.THERAPIST)
+                    Toast.makeText(this, "Napačen PIN", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("PREKLIČI") { _, _ ->
+                setSettingsDisplayMode(SettingsDisplayMode.THERAPIST)
+            }
+            .show()
+    }
+
+    private fun updateSettingsModeButtons() {
+        val therapistSelected = settingsDisplayMode == SettingsDisplayMode.THERAPIST
+        findViewById<Button>(R.id.btnSettingsModeTherapist).backgroundTintList = ColorStateList.valueOf(
+            if (therapistSelected) 0xFF2F5F9E.toInt() else 0xFF3A3F45.toInt()
+        )
+        findViewById<Button>(R.id.btnSettingsModeAdvanced).backgroundTintList = ColorStateList.valueOf(
+            if (therapistSelected) 0xFF3A3F45.toInt() else 0xFF2F5F9E.toInt()
+        )
+    }
+
+    private fun applyTherapistModeVisibility() {
+        val speechHelper = findViewById<TextView>(R.id.helperSpeechApi)
+        if (settingsDisplayMode == SettingsDisplayMode.ADVANCED) {
+            speechHelper?.text = "Tukaj nastavite glas, hitrost in ključ za govor."
+            return
+        }
+
+        speechHelper?.text = "Tukaj nastavite glas in hitrost govora."
+        val hiddenIds = listOf(
+            R.id.txtSpeechApiStatus,
+            R.id.editSpeechApiKey,
+            R.id.editSpeechApiBaseUrl,
+            R.id.editSpeechApiModel,
+            R.id.btnImportSpeechApiKey,
+            R.id.txtStatusWeatherSourceUrlLabel,
+            R.id.editStatusWeatherSourceUrl,
+            R.id.btnSaveStatusWeatherSource,
+            R.id.sectionAdvancedSettings,
+            R.id.helperAdvancedTop,
+            R.id.subgroupAdvancedTools,
+            R.id.helperAdvancedTools,
+            R.id.btnRadioSettings,
+            R.id.btnAacPackSettings,
+            R.id.btnCreateSampleAacPack,
+            R.id.btnCheckAacFiles,
+            R.id.subgroupAdvancedAi,
+            R.id.helperAdvancedAi,
+            R.id.txtAacAssistTitle,
+            R.id.txtAacAssistStatus,
+            R.id.switchAacAssistShowSuggestions,
+            R.id.editAacAssistInfo,
+            R.id.txtKeywordListenerTitle,
+            R.id.txtKeywordListenerStatus,
+            R.id.editKeywordListenerInfo,
+            R.id.subgroupAdvancedTests,
+            R.id.helperAdvancedTests,
+            R.id.txtKeywordMatcherTitle,
+            R.id.editKeywordMatcherInput,
+            R.id.btnKeywordMatcherTest,
+            R.id.txtKeywordMatcherResult,
+            R.id.txtAiObservationTitle,
+            R.id.txtAiObservationStatus,
+            R.id.editAiObservationInfo,
+            R.id.sectionSystemSettings,
+            R.id.subgroupAdvancedSystem,
+            R.id.helperAdvancedSystem,
+            R.id.btnPowerModeOff,
+            R.id.btnPowerModeWarning,
+            R.id.btnPowerModeSleep,
+            R.id.btnKeepScreenOnWhileCharging,
+            R.id.btnAllowedUnplugMinus,
+            R.id.btnAllowedUnplugPlus,
+            R.id.btnCriticalBatteryMinus,
+            R.id.btnCriticalBatteryPlus,
+            R.id.btnWarningGraceMinus,
+            R.id.btnWarningGracePlus,
+            R.id.btnResetGpsStatistics
+        )
+        hiddenIds.forEach { id ->
+            findViewById<View>(id)?.visibility = View.GONE
+        }
     }
 
     private fun settingsContentView(): ViewGroup? {
