@@ -623,13 +623,13 @@ class SettingsActivity : AppCompatActivity() {
                 setSettingsRangeVisible(content, R.id.txtPatientProfileTitle, R.id.btnSavePatientProfile)
             }
             SettingsSection.COMMUNICATOR -> {
-                setSettingsRangeVisible(content, R.id.txtAacGridSizeStatus, R.id.switchSpeakDigitsSeparatelyEnabled)
-                setSettingsRangeVisible(content, R.id.txtVendingCodesTitle, R.id.editVendingCodes)
-                setSettingsRangeVisible(content, R.id.txtActiveAacProfileStatus, R.id.switchRealWorldHelpersEnabled)
+                setSettingsRangeVisible(content, R.id.subgroupCommunicatorGridSize, R.id.switchSpeakDigitsSeparatelyEnabled)
+                setSettingsRangeVisible(content, R.id.subgroupCommunicatorRealWorld, R.id.editVendingCodes)
+                setSettingsRangeVisible(content, R.id.subgroupCommunicatorProfile, R.id.switchRealWorldHelpersEnabled)
             }
             SettingsSection.SPEECH -> {
                 setSettingsRangeVisible(content, R.id.sectionSpeechApiSettings, R.id.switchClearSentenceAfterSentence)
-                setSettingsRangeVisible(content, R.id.txtAudioDuckingTitle, R.id.btnTestAacSpeechLoudness)
+                setSettingsRangeVisible(content, R.id.subgroupSpeechVolume, R.id.btnTestAacSpeechLoudness)
                 setSettingsChildVisible(R.id.btnSaveSpeechApiSettings)
                 setSettingsChildVisible(R.id.btnTestSpeechApi)
                 setSettingsChildVisible(R.id.btnImportSpeechApiKey)
@@ -639,7 +639,7 @@ class SettingsActivity : AppCompatActivity() {
             }
             SettingsSection.ADVANCED -> {
                 setSettingsRangeVisible(content, R.id.sectionAdvancedSettings, R.id.btnCheckAacFiles)
-                setSettingsRangeVisible(content, R.id.txtAacAssistTitle, R.id.editAiObservationInfo)
+                setSettingsRangeVisible(content, R.id.subgroupAdvancedAi, R.id.editAiObservationInfo)
                 setSettingsRangeVisible(content, R.id.sectionSystemSettings, R.id.btnResetGpsStatistics)
             }
         }

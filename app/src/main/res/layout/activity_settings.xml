@@ -257,6 +257,16 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/subgroupAdvancedTools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="ORODJA"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
         <Button
             android:id="@+id/btnRadioSettings"
             android:layout_width="match_parent"
@@ -325,6 +335,16 @@
             android:text="GOVOR / API"
             android:textColor="#F4F7FA"
             android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/subgroupSpeechApi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="GOVOR API"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -417,6 +437,17 @@
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/subgroupSpeechIconTiming"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="ČAS GOVORA IKON"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchSingleIconSpeech"
             android:layout_width="match_parent"
@@ -457,6 +488,17 @@
             android:text="Preskoči zadnjo ikono pri hitrem sestavljanju"
             android:textColor="#F4F7FA"
             android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/subgroupSpeechAutoSentence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="SAMODEJNI STAVEK"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.SwitchCompat
@@ -514,6 +556,17 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/subgroupCommunicatorGridSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="VELIKOST MREŽE"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/txtAacGridSizeStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -540,6 +593,17 @@
             android:textColor="#F4F7FA"
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/subgroupCommunicatorTopRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="STALNA ZGORNJA VRSTICA"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchPersistentTopRowEnabled"
@@ -581,6 +645,17 @@
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/subgroupCommunicatorGuided"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="VODENA VPRAŠANJA"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchGuidedFollowUpEnabled"
             android:layout_width="match_parent"
@@ -618,6 +693,17 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/subgroupCommunicatorRealWorld"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="REALNI SVET / POMOČNIKI"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/txtVendingCodesTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -644,6 +730,17 @@
             android:textColor="#F4F7FA"
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/subgroupSpeechVolume"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="GLASNOST GOVORA"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtAudioDuckingTitle"
@@ -692,6 +789,17 @@
             android:textColor="#F4F7FA"
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/subgroupSpeechTest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="TEST GOVORA"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnTestAudioDucking"
@@ -760,6 +868,17 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/subgroupOrientationWhat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="KAJ NAJ GOVORI"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/txtStatusOrientationStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -815,6 +934,17 @@
             android:text="Povej uro"
             android:textColor="#F4F7FA"
             android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/subgroupOrientationWeather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="VREME"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.SwitchCompat
@@ -883,6 +1013,17 @@
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/subgroupOrientationInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="INFORMACIJE"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/editStatusOrientationInfo"
             android:layout_width="match_parent"
@@ -919,6 +1060,17 @@
             android:text="Podatki o pacientu: lokalna shramba"
             android:textColor="#D6DDE4"
             android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/subgroupPatientBasic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="OSNOVNI PODATKI"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <EditText
@@ -1019,6 +1171,17 @@
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/subgroupPatientContacts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="KONTAKTI"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/editPatientCaregiverContact"
             android:layout_width="match_parent"
@@ -1047,6 +1210,17 @@
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/subgroupPatientDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="OPIS PACIENTKE"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/editPatientShortDescription"
             android:layout_width="match_parent"
@@ -1071,6 +1245,17 @@
             android:backgroundTint="#2F80ED"
             android:text="SHRANI PODATKE O PACIENTU"
             android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/subgroupAdvancedAi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="AI POMOČ"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -1162,6 +1347,17 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/subgroupAdvancedTests"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="TESTI"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/txtKeywordMatcherTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -1246,6 +1442,17 @@
             android:textColor="#F4F7FA"
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/subgroupCommunicatorProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="AKTIVNI PROFIL"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtActiveAacProfileStatus"
@@ -1359,6 +1566,16 @@
             android:text="NAPAJANJE"
             android:textColor="#F4F7FA"
             android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/subgroupAdvancedSystem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="SISTEM / BATERIJA / GPS"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
