@@ -187,7 +187,9 @@ object AacSentenceBuilder {
 
     private fun buildPainSentence(items: List<AacItem>): String {
         val target = items.firstNotNullOfOrNull { item -> PAIN_TARGETS[item.idKey()] }
-            ?: return ""
+        if (target == null) {
+            return if (items.hasId("pain")) "Boli me." else ""
+        }
         val intensity = items.firstNotNullOfOrNull { item -> PAIN_INTENSITIES[item.idKey()] }
         val timePrefix = items.firstNotNullOfOrNull { item -> PAIN_TIME_PREFIXES[item.idKey()] }
         if (timePrefix != null && intensity != null) {
@@ -199,6 +201,7 @@ object AacSentenceBuilder {
         return when (intensity) {
             "light" -> "Malo me boli $target."
             "medium" -> "Srednje močno me boli $target."
+            "strong" -> "Močno me boli $target."
             "very", "very_strong" -> "Zelo me boli $target."
             else -> "Boli me $target."
         }
@@ -208,6 +211,7 @@ object AacSentenceBuilder {
         return when (intensity) {
             "light" -> "malo"
             "medium" -> "srednje"
+            "strong" -> "močno"
             "very", "very_strong" -> "zelo"
             else -> ""
         }
@@ -636,6 +640,7 @@ object AacSentenceBuilder {
     private val PAIN_INTENSITIES = mapOf(
         "pain_light" to "light",
         "pain_medium" to "medium",
+        "pain_strong" to "strong",
         "pain_very" to "very",
         "pain_very_strong" to "very_strong"
     )
