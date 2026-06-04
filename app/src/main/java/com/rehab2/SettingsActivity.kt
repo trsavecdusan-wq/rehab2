@@ -612,10 +612,10 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnBackSettings).text = "NAZAJ NA NASTAVITVE"
         findViewById<TextView>(R.id.txtSettingsSectionHelper).text = when (section) {
             SettingsSection.PATIENT -> "Tukaj nastavite podatke pacientke."
-            SettingsSection.COMMUNICATOR -> "Tukaj nastavite komunikator in prikaz ikon."
-            SettingsSection.SPEECH -> "Tukaj nastavite govor in glasnost."
-            SettingsSection.ORIENTATION -> "Tukaj nastavite datum, uro in vreme."
-            SettingsSection.ADVANCED -> "Tukaj so diagnostika in napredna orodja."
+            SettingsSection.COMMUNICATOR -> "Tukaj nastavite, kako se prikazujejo in obnašajo komunikacijske ikone."
+            SettingsSection.SPEECH -> "Tukaj nastavite, kako glasno in hitro aplikacija govori."
+            SettingsSection.ORIENTATION -> "Tukaj nastavite, kaj aplikacija pove ob pritisku na datum."
+            SettingsSection.ADVANCED -> "Ta del je za skrbnika ali razvijalca."
         }
 
         when (section) {
@@ -802,14 +802,14 @@ class SettingsActivity : AppCompatActivity() {
     private fun refreshSpeechApiSection() {
         val config = AacSpeechApiConfig.read(this)
         txtSpeechApiStatus.text = if (config.apiKey.isBlank()) {
-            "API ključ: ni nastavljen"
+            "Ključ za govor: ni nastavljen"
         } else {
-            "API ključ: nastavljen (${maskApiKey(config.apiKey)})"
+            "Ključ za govor: nastavljen (${maskApiKey(config.apiKey)})"
         }
 
         editSpeechApiKey.setText("")
         editSpeechApiKey.hint = if (config.apiKey.isBlank()) {
-            "Prilepi OpenAI API ključ"
+            "Prilepi ključ za govor"
         } else {
             "Nov ključ ali pusti prazno"
         }
@@ -851,7 +851,7 @@ class SettingsActivity : AppCompatActivity() {
         switchPersistentTopRowEnabled.setOnCheckedChangeListener(null)
         switchPersistentTopRowEnabled.isChecked = enabled
         txtPersistentTopRowStatus.text = buildString {
-            append("Stalna prva vrstica: ")
+            append("Stalna zgornja vrstica: ")
             append(if (enabled) "VKLOP" else "IZKLOP")
             append("\nIkone: ")
             append(itemIds.joinToString(", ") { persistentTopRowLabel(it) })
@@ -885,7 +885,7 @@ class SettingsActivity : AppCompatActivity() {
         val realWorldHelpersEnabled = AacCommunicationContextPrefs.areRealWorldHelpersEnabled(this)
         txtActiveAacProfileStatus.text = "Aktivni AAC profil: ${activeProfile.displayName}"
         editActiveAacProfile.setText(activeProfile.displayName)
-        txtAacCommunicationContextStatus.text = "AAC kontekst: ${aacCommunicationContextLabel(contextMode)}"
+        txtAacCommunicationContextStatus.text = "Način komunikacije: ${aacCommunicationContextLabel(contextMode)}"
         editAacCommunicationContext.setText(aacCommunicationContextLabel(contextMode))
         switchRealWorldHelpersEnabled.setOnCheckedChangeListener(null)
         switchRealWorldHelpersEnabled.isChecked = realWorldHelpersEnabled
@@ -922,9 +922,9 @@ class SettingsActivity : AppCompatActivity() {
         switchAudioDuckingEnabled.setOnCheckedChangeListener(null)
         switchAudioDuckingEnabled.isChecked = settings.enabled
         txtAudioDuckingStatus.text = if (settings.enabled && settings.duckingPercent > 0) {
-            "Zni\u017eanje radia: VKLOPLJENO (${settings.duckingPercent} %)"
+            "Radio med govorom: utišan (${settings.duckingPercent} %)"
         } else {
-            "Zni\u017eanje radia: IZKLOPLJENO"
+            "Radio med govorom: ne utiša se"
         }
         editAudioDuckingPercent.setText("${settings.duckingPercent} %\n$settingsPath")
         bindAudioDuckingSwitchListener()
@@ -933,7 +933,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun refreshAacSpeechLoudnessSection() {
         val settings = AacSpeechLoudnessSettings.load(this)
         val settingsPath = AacSpeechLoudnessSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
-        txtAacSpeechLoudnessStatus.text = "Glasnost govora: ${settings.label()}"
+        txtAacSpeechLoudnessStatus.text = "Jakost AAC govora: ${settings.label()}"
         editAacSpeechLoudnessGain.setText("${settings.label()}\n$settingsPath")
     }
 
@@ -1009,7 +1009,7 @@ class SettingsActivity : AppCompatActivity() {
                 )
             )
             if (!saved) {
-                Toast.makeText(this, "Nastavitve zni\u017eanja radia niso bile shranjene.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Nastavitve radia med govorom niso bile shranjene.", Toast.LENGTH_SHORT).show()
             }
             refreshAudioDuckingSection()
         }
@@ -1019,7 +1019,7 @@ class SettingsActivity : AppCompatActivity() {
         val options = intArrayOf(0, 25, 50, 70, 75, 90)
         val current = AudioDuckingSettings.load(this).duckingPercent
         val labels = options.map { percent ->
-            if (percent == 0) "0 % - radio se ne zni\u017ea" else "$percent %"
+            if (percent == 0) "0 % - radio ostane enako glasen" else "$percent %"
         }.toTypedArray()
         val selectedIndex = options.indexOf(current).takeIf { it >= 0 } ?: options.indexOf(AudioDuckingSettings.DEFAULT_DUCKING_PERCENT)
         AlertDialog.Builder(this)
@@ -1034,7 +1034,7 @@ class SettingsActivity : AppCompatActivity() {
                     )
                 )
                 if (!saved) {
-                    Toast.makeText(this, "Nastavitve zni\u017eanja radia niso bile shranjene.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Nastavitve radia med govorom niso bile shranjene.", Toast.LENGTH_SHORT).show()
                 }
                 dialog.dismiss()
                 refreshAudioDuckingSection()
@@ -1052,7 +1052,7 @@ class SettingsActivity : AppCompatActivity() {
             .takeIf { it >= 0 }
             ?: gains.indexOfFirst { kotlin.math.abs(it - AacSpeechLoudnessSettings.DEFAULT_GAIN) < 0.001 }
         AlertDialog.Builder(this)
-            .setTitle("Glasnost govora")
+            .setTitle("Jakost AAC govora")
             .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
                 val saved = AacSpeechLoudnessSettings.save(
                     this,
@@ -1232,7 +1232,7 @@ class SettingsActivity : AppCompatActivity() {
         if (!saved) {
             Toast.makeText(this, "Vir vremena ni bil shranjen.", Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "URL vremena shranjen", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Vir vremena shranjen", Toast.LENGTH_SHORT).show()
         }
         refreshStatusOrientationSection()
     }
@@ -1349,8 +1349,8 @@ class SettingsActivity : AppCompatActivity() {
         val keyToSave = enteredKey.ifBlank { currentConfig.apiKey }
 
         if (keyToSave.isBlank()) {
-            txtSpeechApiStatus.text = "API ključ: ni nastavljen"
-            Toast.makeText(this, "Speech API ključ ni nastavljen.", Toast.LENGTH_SHORT).show()
+            txtSpeechApiStatus.text = "Ključ za govor: ni nastavljen"
+            Toast.makeText(this, "Ključ za govor ni nastavljen.", Toast.LENGTH_SHORT).show()
             return false
         }
 
@@ -1366,19 +1366,19 @@ class SettingsActivity : AppCompatActivity() {
         )
 
         if (!saved) {
-            Toast.makeText(this, "API nastavitev ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Nastavitev govora ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
             return false
         }
 
         refreshSpeechApiSection()
         if (showSavedToast) {
-            Toast.makeText(this, "API nastavitve shranjene.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Nastavitve govora so shranjene.", Toast.LENGTH_SHORT).show()
         }
         return true
     }
 
     private fun testSpeechApi() {
-        txtSpeechApiStatus.text = "TEST GOVORA API..."
+        txtSpeechApiStatus.text = "Preverjam govor..."
         Thread {
             val file = AacSpeechCoordinator(
                 speechCache = AacSpeechCache(this),
@@ -1392,11 +1392,11 @@ class SettingsActivity : AppCompatActivity() {
 
             runOnUiThread {
                 if (file != null && playSpeechApiTestFile(file.absolutePath)) {
-                    txtSpeechApiStatus.text = "GOVOR API DELUJE"
-                    Toast.makeText(this, "GOVOR API DELUJE", Toast.LENGTH_SHORT).show()
+                    txtSpeechApiStatus.text = "Govor deluje."
+                    Toast.makeText(this, "Govor deluje.", Toast.LENGTH_SHORT).show()
                 } else {
-                    txtSpeechApiStatus.text = "GOVOR API NE DELUJE"
-                    Toast.makeText(this, "GOVOR API NE DELUJE", Toast.LENGTH_SHORT).show()
+                    txtSpeechApiStatus.text = "Govor trenutno ne deluje."
+                    Toast.makeText(this, "Govor trenutno ne deluje.", Toast.LENGTH_SHORT).show()
                 }
             }
         }.start()
@@ -1450,7 +1450,7 @@ class SettingsActivity : AppCompatActivity() {
             .indexOf(currentCount)
             .coerceAtLeast(0)
         AlertDialog.Builder(this)
-            .setTitle("Stalna prva vrstica")
+            .setTitle("Stalna zgornja vrstica")
             .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
                 prefs.edit()
                     .putBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, true)
@@ -1710,13 +1710,13 @@ class SettingsActivity : AppCompatActivity() {
                 input.readBytes().toString(Charsets.UTF_8)
             }.orEmpty()
         } catch (_: Exception) {
-            Toast.makeText(this, "API datoteke ni bilo mogoče prebrati.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Datoteke s ključem za govor ni bilo mogoče prebrati.", Toast.LENGTH_SHORT).show()
             return
         }
 
         val importedKey = parseImportedApiKey(raw)
         if (importedKey.isBlank()) {
-            Toast.makeText(this, "API ključ ni bil najden.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Ključ za govor ni bil najden.", Toast.LENGTH_SHORT).show()
             return
         }
 
