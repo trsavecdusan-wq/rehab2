@@ -322,6 +322,18 @@
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/btnChangeAdminPin"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#3A3F45"
+            android:text="SPREMENI TERAPEVTSKI PIN"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
             android:id="@+id/btnRadioSettings"
             android:layout_width="match_parent"
             android:layout_height="64dp"

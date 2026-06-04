@@ -89,8 +89,10 @@ class SettingsActivity : AppCompatActivity() {
         private const val PREF_DISTANCE_WEEK_METERS = "distance_week_meters"
         private const val PREF_DISTANCE_MONTH_METERS = "distance_month_meters"
         private const val PREF_DISTANCE_YEAR_METERS = "distance_year_meters"
+        // Internal legacy name; visible UI calls this therapist PIN.
         private const val DEFAULT_ADMIN_PIN = "0416"
         private const val DEFAULT_ADVANCED_SETTINGS_PIN = "1964"
+        private const val DEFAULT_PROGRAMMER_PIN = "9981"
 
         private const val POWER_MODE_ALWAYS_ON = "ALWAYS_ON"
         private const val POWER_MODE_BATTERY_SAVER = "BATTERY_SAVER"
@@ -385,6 +387,10 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnChangeAdvancedSettingsPin).setOnClickListener {
             showChangeAdvancedSettingsPinDialog()
+        }
+
+        findViewById<Button>(R.id.btnChangeAdminPin).setOnClickListener {
+            showChangeAdminPinDialog()
         }
 
         findViewById<Button>(R.id.btnRadioSettings).setOnClickListener {
@@ -705,7 +711,7 @@ class SettingsActivity : AppCompatActivity() {
             .setView(input)
             .setPositiveButton("NADALJUJ") { _, _ ->
                 val enteredPin = input.text?.toString().orEmpty()
-                if (enteredPin == currentAdvancedSettingsPin()) {
+                if (enteredPin == currentAdvancedSettingsPin() || isProgrammerPin(enteredPin)) {
                     setSettingsDisplayMode(SettingsDisplayMode.ADVANCED)
                 } else {
                     setSettingsDisplayMode(SettingsDisplayMode.THERAPIST)
@@ -724,12 +730,18 @@ class SettingsActivity : AppCompatActivity() {
             .ifBlank { DEFAULT_ADVANCED_SETTINGS_PIN }
     }
 
+    private fun currentAdminPin(): String {
+        return prefs.getString(PREF_ADMIN_PIN, DEFAULT_ADMIN_PIN)
+            .orEmpty()
+            .ifBlank { DEFAULT_ADMIN_PIN }
+    }
+
     private fun showChangeAdvancedSettingsPinDialog() {
         showAdvancedPinInputDialog(
             title = "TRENUTNI PIN",
             message = "Vpišite trenutni PIN za napredni način."
         ) { currentPin ->
-            if (currentPin != currentAdvancedSettingsPin()) {
+            if (currentPin != currentAdvancedSettingsPin() && !isProgrammerPin(currentPin)) {
                 Toast.makeText(this, "Napačen trenutni PIN", Toast.LENGTH_SHORT).show()
                 return@showAdvancedPinInputDialog
             }
@@ -786,6 +798,50 @@ class SettingsActivity : AppCompatActivity() {
         return pin.length in 4..8 && pin.all { it.isDigit() }
     }
 
+    private fun showChangeAdminPinDialog() {
+        showAdvancedPinInputDialog(
+            title = "TRENUTNI TERAPEVTSKI PIN",
+            message = "Vpišite trenutni terapevtski PIN."
+        ) { currentPin ->
+            if (currentPin != currentAdminPin() && !isProgrammerPin(currentPin)) {
+                Toast.makeText(this, "Napačen trenutni terapevtski PIN", Toast.LENGTH_SHORT).show()
+                return@showAdvancedPinInputDialog
+            }
+            askNewAdminPin()
+        }
+    }
+
+    private fun askNewAdminPin() {
+        showAdvancedPinInputDialog(
+            title = "NOV TERAPEVTSKI PIN",
+            message = "Vpišite nov terapevtski PIN. Dovoljene so 4 do 8 številk."
+        ) { newPin ->
+            if (!isValidAdvancedSettingsPin(newPin)) {
+                Toast.makeText(this, "Terapevtski PIN mora imeti 4 do 8 številk", Toast.LENGTH_SHORT).show()
+                return@showAdvancedPinInputDialog
+            }
+            askRepeatAdminPin(newPin)
+        }
+    }
+
+    private fun askRepeatAdminPin(newPin: String) {
+        showAdvancedPinInputDialog(
+            title = "PONOVITE TERAPEVTSKI PIN",
+            message = "Še enkrat vpišite nov terapevtski PIN."
+        ) { repeatedPin ->
+            if (newPin != repeatedPin) {
+                Toast.makeText(this, "Terapevtski PIN se ne ujema", Toast.LENGTH_SHORT).show()
+                return@showAdvancedPinInputDialog
+            }
+            prefs.edit().putString(PREF_ADMIN_PIN, newPin).apply()
+            Toast.makeText(this, "Terapevtski PIN je shranjen", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun isProgrammerPin(pin: String): Boolean {
+        return pin == DEFAULT_PROGRAMMER_PIN
+    }
+
     private fun updateSettingsModeButtons() {
         val therapistSelected = settingsDisplayMode == SettingsDisplayMode.THERAPIST
         findViewById<Button>(R.id.btnSettingsModeTherapist).backgroundTintList = ColorStateList.valueOf(
@@ -818,6 +874,7 @@ class SettingsActivity : AppCompatActivity() {
             R.id.subgroupAdvancedTools,
             R.id.helperAdvancedTools,
             R.id.btnChangeAdvancedSettingsPin,
+            R.id.btnChangeAdminPin,
             R.id.btnRadioSettings,
             R.id.btnAacPackSettings,
             R.id.btnCreateSampleAacPack,
@@ -2352,8 +2409,8 @@ class SettingsActivity : AppCompatActivity() {
             .setView(input)
             .setPositiveButton(R.string.dialog_ok) { _, _ ->
                 val enteredPin = input.text?.toString().orEmpty()
-                val expectedPin = prefs.getString(PREF_ADMIN_PIN, DEFAULT_ADMIN_PIN).orEmpty().ifBlank { DEFAULT_ADMIN_PIN }
-                if (enteredPin == expectedPin) {
+                val expectedPin = currentAdminPin()
+                if (enteredPin == expectedPin || isProgrammerPin(enteredPin)) {
                     onSuccess()
                 } else {
                     Toast.makeText(this, getString(R.string.wrong_pin), Toast.LENGTH_SHORT).show()
