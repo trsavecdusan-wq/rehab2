@@ -1,12 +1,17 @@
 package com.rehab2
 
+import android.app.Activity
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -15,7 +20,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.rehab2.aac.AacContentBootstrap
 import com.rehab2.aac.AacEditorStorage
 import com.rehab2.aac.AacStarterContentV1
+import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.PatientProfileSettings
+import java.io.File
+import java.util.Locale
 
 class PatientSetupWizardActivity : AppCompatActivity() {
     private companion object {
@@ -24,6 +32,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         private const val PREF_AAC_PERSISTENT_TOP_ROW_COUNT = "aac_persistent_top_row_count"
         private const val DEFAULT_AAC_GRID_SIZE = 5
         private const val DEFAULT_TOP_ROW_COUNT = 5
+        private const val REQUEST_PICK_PATIENT_PHOTO = 4301
         private val GRID_OPTIONS = listOf(3, 4, 5)
     }
 
@@ -39,6 +48,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
     private var patientName = ""
     private var mainLanguage = ""
     private var gridSize = DEFAULT_AAC_GRID_SIZE
+    private var selectedPhotoFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +63,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         patientName = profile.firstName
         mainLanguage = profile.mainLanguage
         gridSize = prefs.getInt(PREF_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE).coerceIn(3, 5)
+        selectedPhotoFile = existingPatientPhotoFile()
     }
 
     private fun buildLayout() {
@@ -163,9 +174,26 @@ class PatientSetupWizardActivity : AppCompatActivity() {
 
     private fun renderPhotoStep() {
         helperView.text = "Fotografija pacientke"
-        content.addView(sectionText("V tej prvi verziji lahko ta korak varno preskočite. Izbor fotografije bo povezan z obstoječim sistemom slik v naslednji fazi."))
-        content.addView(choiceButton("IZBERI SLIKO - PRIPRAVLJENO ZA KASNEJE") {
-            Toast.makeText(this, "Izbor fotografije bo dodan v naslednji fazi.", Toast.LENGTH_SHORT).show()
+        content.addView(sectionText("Izberite fotografijo iz galerije ali ta korak preskočite."))
+        val currentPhoto = selectedPhotoFile?.takeIf { it.exists() && it.isFile && it.length() > 0L }
+        if (currentPhoto != null) {
+            BitmapFactory.decodeFile(currentPhoto.absolutePath)?.let { bitmap ->
+                content.addView(ImageView(this).apply {
+                    setImageBitmap(bitmap)
+                    adjustViewBounds = true
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setBackgroundColor(0xFF1E2329.toInt())
+                    setPadding(dp(8), dp(8), dp(8), dp(8))
+                }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(260)).apply {
+                    bottomMargin = dp(12)
+                })
+            }
+            content.addView(summaryText("Izbrana fotografija", currentPhoto.name))
+        } else {
+            content.addView(summaryText("Fotografija", "Ni izbrana."))
+        }
+        content.addView(choiceButton("IZBERI FOTOGRAFIJO") {
+            openPatientPhotoPicker()
         })
     }
 
@@ -175,7 +203,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         content.addView(summaryText("Ime pacientke", patientName.ifBlank { "Ni vpisano" }))
         content.addView(summaryText("Glavni jezik", mainLanguage.ifBlank { "slovenščina" }))
         content.addView(summaryText("Velikost mreže", "${gridSize}x$gridSize"))
-        content.addView(summaryText("Fotografija", "Preskočeno v tej verziji"))
+        content.addView(summaryText("Fotografija", selectedPhotoFile?.takeIf { it.exists() && it.length() > 0L }?.name ?: "Preskočeno"))
     }
 
     private fun handleNext() {
@@ -207,7 +235,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
             mainLanguage = mainLanguage.ifBlank { "slovenščina" }
         )
         val profileSaved = PatientProfileSettings.save(this, updatedProfile)
-        syncPatientProfileAacSpeech(updatedProfile)
+        val speechSynced = syncPatientProfileAacSpeech(updatedProfile)
         val normalizedTopRowCount = prefs.getInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, DEFAULT_TOP_ROW_COUNT)
             .coerceIn(3, gridSize)
         prefs.edit()
@@ -217,10 +245,75 @@ class PatientSetupWizardActivity : AppCompatActivity() {
 
         Toast.makeText(
             this,
-            if (profileSaved) "Pacientka je pripravljena za uporabo." else "Nekaterih podatkov ni bilo mogoče shraniti.",
+            when {
+                profileSaved && speechSynced -> "Pacientka je pripravljena za uporabo."
+                profileSaved -> "Podatki so shranjeni. Govor ikon bo morda treba preveriti."
+                else -> "Nekaterih podatkov ni bilo mogoče shraniti."
+            },
             Toast.LENGTH_LONG
         ).show()
         finish()
+    }
+
+    @Deprecated("Uses the platform picker without adding new storage or permissions.")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != REQUEST_PICK_PATIENT_PHOTO) return
+
+        val selectedUri = data?.data
+        if (resultCode == Activity.RESULT_OK && selectedUri != null && saveSelectedPatientPhoto(selectedUri)) {
+            Toast.makeText(this, "Fotografija je shranjena.", Toast.LENGTH_SHORT).show()
+            renderStep()
+        } else {
+            Toast.makeText(this, "Fotografije ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun openPatientPhotoPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+        }
+        try {
+            startActivityForResult(intent, REQUEST_PICK_PATIENT_PHOTO)
+        } catch (_: Exception) {
+            Toast.makeText(this, "Fotografije ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun saveSelectedPatientPhoto(uri: Uri): Boolean {
+        val patientDir = AacStoragePaths.getIconsPatientDir(this) ?: return false
+        return try {
+            if (!patientDir.exists() && !patientDir.mkdirs()) return false
+            val targetFile = File(patientDir, "patient_profile_photo.${photoExtension(uri)}")
+            contentResolver.openInputStream(uri)?.use { input ->
+                targetFile.outputStream().use { output -> input.copyTo(output) }
+            } ?: return false
+            if (!targetFile.exists() || targetFile.length() <= 0L) {
+                targetFile.delete()
+                return false
+            }
+            selectedPhotoFile = targetFile
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun photoExtension(uri: Uri): String {
+        return when (contentResolver.getType(uri)?.lowercase(Locale.ROOT)) {
+            "image/png" -> "png"
+            "image/webp" -> "webp"
+            "image/jpeg", "image/jpg" -> "jpg"
+            else -> "jpg"
+        }
+    }
+
+    private fun existingPatientPhotoFile(): File? {
+        val patientDir = AacStoragePaths.getIconsPatientDir(this) ?: return null
+        return listOf("patient_profile_photo.jpg", "patient_profile_photo.png", "patient_profile_photo.webp")
+            .map { File(patientDir, it) }
+            .firstOrNull { it.exists() && it.isFile && it.length() > 0L }
     }
 
     private fun syncPatientProfileAacSpeech(profile: PatientProfileSettings): Boolean {
