@@ -1439,11 +1439,24 @@ class AacCommunicatorActivity : AppCompatActivity() {
             private val image: ImageView = itemView.findViewById(R.id.imgAacTile)
             private val label: TextView = itemView.findViewById(R.id.txtAacTileLabel)
             private val context: android.content.Context = itemView.context
+            private val defaultImagePaddingPx: Int = (4 * context.resources.displayMetrics.density).toInt()
             private var tileColor: Int = TILE_DEFAULT_COLOR
 
             fun bind(item: AacItem) {
                 tileColor = tileColorFor(item)
                 itemView.setBackgroundColor(tileColor)
+                image.setBackgroundColor(TILE_DEFAULT_COLOR)
+                if (isYesNoVisualItem(item)) {
+                    image.setPadding(0, 0, 0, 0)
+                    image.alpha = 1.0f
+                } else {
+                    image.setPadding(
+                        defaultImagePaddingPx,
+                        defaultImagePaddingPx,
+                        defaultImagePaddingPx,
+                        defaultImagePaddingPx
+                    )
+                }
                 if (item.id == "water") {
                     debugLog("TRACE water adapter bind children=${item.children.size} ids=${item.children}")
                     onWaterBindTrace(item)
@@ -1471,11 +1484,24 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
             private fun tileColorFor(item: AacItem): Int {
                 return when {
+                    isYesNoVisualItem(item) -> TILE_DEFAULT_COLOR
                     item.actionType == "go_back" || item.actionType == "go_home" -> TILE_NAVIGATION_COLOR
                     item.actionType == "open_page" -> TILE_CATEGORY_COLOR
                     item.children.isNotEmpty() -> TILE_SUBCATEGORY_COLOR
                     else -> TILE_DEFAULT_COLOR
                 }
+            }
+
+            private fun isYesNoVisualItem(item: AacItem): Boolean {
+                val conceptId = item.conceptId?.trim().orEmpty()
+                return item.id == "no" ||
+                    item.id == "yes" ||
+                    item.id == "quick_no" ||
+                    item.id == "quick_yes" ||
+                    conceptId == "no" ||
+                    conceptId == "yes" ||
+                    conceptId == "core.no" ||
+                    conceptId == "core.yes"
             }
 
             private fun bindImage(item: AacItem) {
