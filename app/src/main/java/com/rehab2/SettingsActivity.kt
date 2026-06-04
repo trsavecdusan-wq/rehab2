@@ -91,8 +91,8 @@ class SettingsActivity : AppCompatActivity() {
         private const val PREF_DISTANCE_YEAR_METERS = "distance_year_meters"
         // Internal legacy name; visible UI calls this therapist PIN.
         private const val DEFAULT_ADMIN_PIN = "0416"
-        private const val DEFAULT_ADVANCED_SETTINGS_PIN = "1964"
-        private const val DEFAULT_PROGRAMMER_PIN = "9981"
+        private const val DEFAULT_ADVANCED_SETTINGS_PIN = "1604"
+        private const val DEFAULT_PROGRAMMER_PIN = "1964"
 
         private const val POWER_MODE_ALWAYS_ON = "ALWAYS_ON"
         private const val POWER_MODE_BATTERY_SAVER = "BATTERY_SAVER"

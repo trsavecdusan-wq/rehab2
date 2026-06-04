@@ -79,7 +79,11 @@ class PatientSetupWizardActivity : AppCompatActivity() {
             gravity = Gravity.CENTER
             setTypeface(typeface, android.graphics.Typeface.BOLD)
         }
-        root.addView(titleView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        val titleParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        root.addView(titleView, titleParams)
 
         helperView = TextView(this).apply {
             setTextColor(0xFFC8D0D8.toInt())
@@ -87,14 +91,19 @@ class PatientSetupWizardActivity : AppCompatActivity() {
             gravity = Gravity.CENTER
             setPadding(0, dp(16), 0, dp(20))
         }
-        root.addView(helperView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        val helperParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        root.addView(helperView, helperParams)
 
         val scrollView = ScrollView(this)
         content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
         }
         scrollView.addView(content)
-        root.addView(scrollView, LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
+        val scrollParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
+        root.addView(scrollView, scrollParams)
 
         val buttonRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -119,10 +128,21 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         nextButton = actionButton("NAPREJ", 0xFF2F5F9E.toInt()).apply {
             setOnClickListener { handleNext() }
         }
-        buttonRow.addView(backButton, LinearLayout.LayoutParams(0, dp(64), 1f).apply { marginEnd = dp(8) })
-        buttonRow.addView(skipButton, LinearLayout.LayoutParams(0, dp(64), 1f).apply { marginEnd = dp(8) })
-        buttonRow.addView(nextButton, LinearLayout.LayoutParams(0, dp(64), 1f))
-        root.addView(buttonRow, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        val backParams = LinearLayout.LayoutParams(0, dp(64), 1f).apply {
+            marginEnd = dp(8)
+        }
+        val skipParams = LinearLayout.LayoutParams(0, dp(64), 1f).apply {
+            marginEnd = dp(8)
+        }
+        val nextParams = LinearLayout.LayoutParams(0, dp(64), 1f)
+        buttonRow.addView(backButton, backParams)
+        buttonRow.addView(skipButton, skipParams)
+        buttonRow.addView(nextButton, nextParams)
+        val buttonRowParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        root.addView(buttonRow, buttonRowParams)
 
         setContentView(root)
     }
@@ -178,15 +198,20 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         val currentPhoto = selectedPhotoFile?.takeIf { it.exists() && it.isFile && it.length() > 0L }
         if (currentPhoto != null) {
             BitmapFactory.decodeFile(currentPhoto.absolutePath)?.let { bitmap ->
-                content.addView(ImageView(this).apply {
+                val previewView = ImageView(this).apply {
                     setImageBitmap(bitmap)
                     adjustViewBounds = true
                     scaleType = ImageView.ScaleType.CENTER_CROP
                     setBackgroundColor(0xFF1E2329.toInt())
                     setPadding(dp(8), dp(8), dp(8), dp(8))
-                }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(260)).apply {
+                }
+                val previewParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(260)
+                ).apply {
                     bottomMargin = dp(12)
-                })
+                }
+                content.addView(previewView, previewParams)
             }
             content.addView(summaryText("Izbrana fotografija", currentPhoto.name))
         } else {
