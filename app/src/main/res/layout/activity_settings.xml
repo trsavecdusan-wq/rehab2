@@ -730,6 +730,16 @@
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/txtStatusWeatherSourceUrlLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="URL VREMENA"
+            android:textColor="#F4F7FA"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/editStatusWeatherSourceUrl"
             android:layout_width="match_parent"
@@ -752,7 +762,7 @@
             android:layout_height="56dp"
             android:layout_marginBottom="8dp"
             android:backgroundTint="#2F80ED"
-            android:text="SHRANI VIR VREMENA"
+            android:text="SHRANI URL"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
 

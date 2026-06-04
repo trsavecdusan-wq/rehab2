@@ -1075,7 +1075,7 @@ class SettingsActivity : AppCompatActivity() {
         if (!saved) {
             Toast.makeText(this, "Vir vremena ni bil shranjen.", Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "Vir vremena shranjen.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "URL vremena shranjen", Toast.LENGTH_SHORT).show()
         }
         refreshStatusOrientationSection()
     }

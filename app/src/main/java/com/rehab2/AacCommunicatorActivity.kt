@@ -396,6 +396,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         if (isV2Item(item)) {
             val speechRequestId = nextSpeechRequestId("ITEM_SELECTED:${item.id}")
+            interruptActiveSpeechForNewInput()
             if (item.id == WATER_NODE_ID) {
                 waterClickItemChildrenCount = item.children.size
                 logWaterTrace("click item", item)
@@ -452,6 +453,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             return
         }
 
+        interruptActiveSpeechForNewInput()
         audioPlayer.playOrSpeak(item, languageCode)
     }
 
@@ -968,9 +970,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
             return
         }
         if (isSpeakingSentence) {
-            Log.d(TAG, "AAC_SPEECH SINGLE_ICON_CANCEL sentence_active requestId=$requestId")
-            isSpeakingSingleIcon = false
-            return
+            Log.d(TAG, "AAC_SPEECH SINGLE_ICON_INTERRUPT sentence_active requestId=$requestId")
+            interruptActiveSpeechForNewInput()
         }
         if (shouldSkipFastCompositionLastIcon()) {
             Log.d(TAG, "AAC_SPEECH FAST_COMPOSITION_SKIP_LAST_ICON requestId=$requestId text=$text")
@@ -1032,6 +1033,18 @@ class AacCommunicatorActivity : AppCompatActivity() {
         pendingVendingDigitsSpeech = null
         audioPlayer.stopCurrentSpeech()
         nextSpeechRequestId("CANCEL_ALL")
+    }
+
+    private fun interruptActiveSpeechForNewInput() {
+        if (!isSpeakingSentence && !isSpeakingSingleIcon) {
+            return
+        }
+        isSpeakingSentence = false
+        isSpeakingSingleIcon = false
+        pendingSpeechMode = null
+        activeSpeechMode = null
+        audioPlayer.interruptCurrentSpeechForNewInput()
+        Log.d(TAG, "AAC_SPEECH INTERRUPT_FOR_NEW_INPUT")
     }
 
     private fun resetSpeechState(reason: String) {

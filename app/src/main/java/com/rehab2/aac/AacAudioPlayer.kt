@@ -148,6 +148,13 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         nextSpeechRequestSerial()
     }
 
+    fun interruptCurrentSpeechForNewInput() {
+        pendingTextToSpeak = null
+        stopPlayback(notifyCancellation = false, restoreDuckingWhenSilent = true)
+        textToSpeech?.stop()
+        nextSpeechRequestSerial()
+    }
+
     private fun playGeneratedSpeechOrFallback(
         text: String,
         languageCode: String,
@@ -343,12 +350,19 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         speechListener = null
     }
 
-    private fun stopPlayback(notifyCancellation: Boolean = true) {
-        val shouldNotifyCancelled = notifyCancellation && (mediaPlayer != null || isSpeechActive)
+    private fun stopPlayback(
+        notifyCancellation: Boolean = true,
+        restoreDuckingWhenSilent: Boolean = false
+    ) {
+        val hadActiveSpeech = mediaPlayer != null || isSpeechActive
+        val shouldNotifyCancelled = notifyCancellation && hadActiveSpeech
         mediaPlayer?.stopSafely()
         releaseMediaPlayer()
         if (shouldNotifyCancelled) {
             notifySpeechCancelled()
+        } else if (restoreDuckingWhenSilent && hadActiveSpeech) {
+            isSpeechActive = false
+            runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         }
     }
 

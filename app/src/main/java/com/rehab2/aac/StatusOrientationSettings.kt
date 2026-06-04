@@ -16,6 +16,9 @@ data class StatusOrientationSettings(
 ) {
     companion object {
         private const val SETTINGS_FILE = "NovaRehab/data/status_orientation_settings.json"
+        const val DEFAULT_WEATHER_SOURCE_NAME = "Open-Meteo test"
+        const val DEFAULT_WEATHER_SOURCE_URL =
+            "https://api.open-meteo.com/v1/forecast?latitude=46.56&longitude=16.16&current=temperature_2m,weather_code"
 
         fun settingsFile(context: Context): File? {
             val externalFilesDir = context.getExternalFilesDir(null) ?: return null
@@ -23,15 +26,16 @@ data class StatusOrientationSettings(
         }
 
         fun load(context: Context): StatusOrientationSettings {
-            val file = settingsFile(context) ?: return StatusOrientationSettings()
+            val file = settingsFile(context) ?: return withDefaultWeatherSource(StatusOrientationSettings())
             if (!file.exists() || !file.isFile) {
-                save(context, StatusOrientationSettings())
-                return StatusOrientationSettings()
+                val defaults = withDefaultWeatherSource(StatusOrientationSettings())
+                save(context, defaults)
+                return defaults
             }
 
             return try {
                 val json = JSONObject(file.readText(Charsets.UTF_8))
-                StatusOrientationSettings(
+                val loaded = StatusOrientationSettings(
                     enabled = json.optBoolean("enabled", true),
                     speakGreeting = json.optBoolean("speakGreeting", true),
                     speakDate = json.optBoolean("speakDate", true),
@@ -41,8 +45,15 @@ data class StatusOrientationSettings(
                     selectedWeatherSourceName = json.optString("selectedWeatherSourceName", ""),
                     lastUpdatedAt = json.optLong("lastUpdatedAt", 0L)
                 )
+                val normalized = withDefaultWeatherSource(loaded)
+                if (normalized != loaded) {
+                    save(context, normalized)
+                }
+                normalized
             } catch (_: Exception) {
-                StatusOrientationSettings()
+                val defaults = withDefaultWeatherSource(StatusOrientationSettings())
+                save(context, defaults)
+                defaults
             }
         }
 
@@ -50,11 +61,7 @@ data class StatusOrientationSettings(
             val file = settingsFile(context) ?: return false
             return try {
                 file.parentFile?.let { parent -> if (!parent.exists()) parent.mkdirs() }
-                val safeSettings = settings.copy(
-                    speakWeather = settings.speakWeather && settings.weatherSourceUrl.isNotBlank(),
-                    weatherSourceUrl = settings.weatherSourceUrl.trim(),
-                    selectedWeatherSourceName = settings.selectedWeatherSourceName.trim()
-                )
+                val safeSettings = withDefaultWeatherSource(settings)
                 val json = JSONObject()
                     .put("enabled", safeSettings.enabled)
                     .put("speakGreeting", safeSettings.speakGreeting)
@@ -69,6 +76,23 @@ data class StatusOrientationSettings(
             } catch (_: Exception) {
                 false
             }
+        }
+
+        private fun withDefaultWeatherSource(settings: StatusOrientationSettings): StatusOrientationSettings {
+            val trimmedUrl = settings.weatherSourceUrl.trim()
+            val weatherSourceUrl = trimmedUrl.ifBlank { DEFAULT_WEATHER_SOURCE_URL }
+            val selectedWeatherSourceName = settings.selectedWeatherSourceName.trim().ifBlank {
+                if (weatherSourceUrl == DEFAULT_WEATHER_SOURCE_URL) {
+                    DEFAULT_WEATHER_SOURCE_NAME
+                } else {
+                    "Ročni vir"
+                }
+            }
+            return settings.copy(
+                speakWeather = settings.speakWeather && weatherSourceUrl.isNotBlank(),
+                weatherSourceUrl = weatherSourceUrl,
+                selectedWeatherSourceName = selectedWeatherSourceName
+            )
         }
     }
 }
