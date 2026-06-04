@@ -698,9 +698,20 @@
             android:id="@+id/btnAddMissingCoreAacIcons"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="8dp"
             android:backgroundTint="#6B4E16"
             android:text="DODAJ MANJKAJOČE OSNOVNE IKONE"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnShowCoreIconFilenames"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#4B5563"
+            android:text="PRIKAŽI IMENA DATOTEK"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />

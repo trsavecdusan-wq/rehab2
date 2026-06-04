@@ -69,6 +69,7 @@ private data class CoreAacAuditItem(
     val color: String,
     val emojiFallback: String,
     val speechTextSl: String,
+    val filename: String,
     val ids: Set<String>,
     val labels: Set<String>,
     val starterIds: Set<String> = ids
@@ -78,6 +79,12 @@ private data class ImageQualityAudit(
     val checkedImages: Int,
     val smallImages: Int,
     val largeImages: Int
+)
+
+private data class CoreIconVisualAudit(
+    val existingCount: Int,
+    val smallCount: Int,
+    val missingFilenames: List<String>
 )
 
 class SettingsActivity : AppCompatActivity() {
@@ -176,26 +183,26 @@ class SettingsActivity : AppCompatActivity() {
         private val AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS = arrayOf(3, 4, 5)
         private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "yes", "dont_understand", "thank_you", "sorry")
         private val CORE_AAC_AUDIT_ITEMS = listOf(
-            CoreAacAuditItem("da", "DA", "#4CAF50", "✅", "Da.", setOf("yes", "quick_yes", "da"), setOf("DA"), setOf("yes")),
-            CoreAacAuditItem("ne", "NE", "#F44336", "❌", "Ne.", setOf("no", "quick_no", "ne"), setOf("NE"), setOf("no")),
-            CoreAacAuditItem("ne_razumem", "NE RAZUMEM", "#FF9800", "😕", "Ne razumem.", setOf("dont_understand", "ne_razumem"), setOf("NE RAZUMEM")),
-            CoreAacAuditItem("hvala", "HVALA", "#9C27B0", "🙏", "Hvala.", setOf("thank_you", "hvala"), setOf("HVALA")),
-            CoreAacAuditItem("pomoc", "POMOČ", "#D32F2F", "🆘", "Prosim, pomagajte mi.", setOf("help", "pomoc"), setOf("POMOČ", "POMAGAJ MI")),
-            CoreAacAuditItem("zejna", "ŽEJNA SEM", "#2196F3", "💧", "Žejna sem.", setOf("thirsty", "zejna"), setOf("ŽEJNA SEM", "ŽEJNA")),
-            CoreAacAuditItem("lacna", "LAČNA SEM", "#FF5722", "🍽️", "Lačna sem.", setOf("hungry", "lacna"), setOf("LAČNA SEM", "LAČNA")),
-            CoreAacAuditItem("boli", "BOLI ME", "#E91E63", "🤕", "Boli me.", setOf("pain", "boli"), setOf("BOLI ME")),
-            CoreAacAuditItem("wc", "WC", "#3F51B5", "🚽", "Moram na stranišče.", setOf("wc"), setOf("WC")),
-            CoreAacAuditItem("utrujena", "UTRUJENA SEM", "#9E9E9E", "😴", "Utrujena sem.", setOf("tired", "utrujena"), setOf("UTRUJENA SEM", "UTRUJENA")),
-            CoreAacAuditItem("rada_bi", "RADA BI", "#FFC107", "❤️", "Rada bi.", setOf("i_want", "rada_bi"), setOf("RADA BI")),
-            CoreAacAuditItem("nocem", "NOČEM", "#B71C1C", "🚫", "Nočem.", setOf("dont_want", "nocem"), setOf("NOČEM")),
-            CoreAacAuditItem("druzina", "DRUŽINA", "#8BC34A", "👨‍👩‍👧", "Rada bi družino.", setOf("family_group", "druzina"), setOf("DRUŽINA")),
-            CoreAacAuditItem("poklici", "POKLIČI", "#00BCD4", "📞", "Prosim, pokličite.", setOf("call", "poklici"), setOf("POKLIČI")),
-            CoreAacAuditItem("sporocilo", "SPOROČILO", "#673AB7", "💬", "Rada bi poslati sporočilo.", setOf("message", "sporocilo"), setOf("SPOROČILO")),
-            CoreAacAuditItem("pijaca", "PIJAČA", "#03A9F4", "🥤", "Rada bi pijačo.", setOf("drink", "pijaca"), setOf("PIJAČA")),
-            CoreAacAuditItem("hrana", "HRANA", "#FF9800", "🍲", "Rada bi hrano.", setOf("food", "hrana"), setOf("HRANA")),
-            CoreAacAuditItem("pocutje", "POČUTJE", "#FFEB3B", "😐", "Rada bi povedati, kako se počutim.", setOf("feeling", "pocutje"), setOf("POČUTJE")),
-            CoreAacAuditItem("nega", "NEGA", "#B2DFDB", "🧴", "Potrebujem pomoč pri negi.", setOf("care", "nega"), setOf("NEGA")),
-            CoreAacAuditItem("zdravje", "ZDRAVJE", "#F44336", "🏥", "Potrebujem zdravstveno pomoč.", setOf("health", "zdravje"), setOf("ZDRAVJE"))
+            CoreAacAuditItem("da", "DA", "#4CAF50", "✅", "Da.", "core_yes.png", setOf("yes", "quick_yes", "da"), setOf("DA"), setOf("yes")),
+            CoreAacAuditItem("ne", "NE", "#F44336", "❌", "Ne.", "core_no.png", setOf("no", "quick_no", "ne"), setOf("NE"), setOf("no")),
+            CoreAacAuditItem("ne_razumem", "NE RAZUMEM", "#FF9800", "😕", "Ne razumem.", "core_dont_understand.png", setOf("dont_understand", "ne_razumem"), setOf("NE RAZUMEM")),
+            CoreAacAuditItem("hvala", "HVALA", "#9C27B0", "🙏", "Hvala.", "core_thank_you.png", setOf("thank_you", "hvala"), setOf("HVALA")),
+            CoreAacAuditItem("pomoc", "POMOČ", "#D32F2F", "🆘", "Prosim, pomagajte mi.", "core_help.png", setOf("help", "pomoc"), setOf("POMOČ", "POMAGAJ MI")),
+            CoreAacAuditItem("zejna", "ŽEJNA SEM", "#2196F3", "💧", "Žejna sem.", "core_thirsty.png", setOf("thirsty", "zejna"), setOf("ŽEJNA SEM", "ŽEJNA")),
+            CoreAacAuditItem("lacna", "LAČNA SEM", "#FF5722", "🍽️", "Lačna sem.", "core_hungry.png", setOf("hungry", "lacna"), setOf("LAČNA SEM", "LAČNA")),
+            CoreAacAuditItem("boli", "BOLI ME", "#E91E63", "🤕", "Boli me.", "core_pain.png", setOf("pain", "boli"), setOf("BOLI ME")),
+            CoreAacAuditItem("wc", "WC", "#3F51B5", "🚽", "Moram na stranišče.", "core_wc.png", setOf("wc"), setOf("WC")),
+            CoreAacAuditItem("utrujena", "UTRUJENA SEM", "#9E9E9E", "😴", "Utrujena sem.", "core_tired.png", setOf("tired", "utrujena"), setOf("UTRUJENA SEM", "UTRUJENA")),
+            CoreAacAuditItem("rada_bi", "RADA BI", "#FFC107", "❤️", "Rada bi.", "core_i_want.png", setOf("i_want", "rada_bi"), setOf("RADA BI")),
+            CoreAacAuditItem("nocem", "NOČEM", "#B71C1C", "🚫", "Nočem.", "core_dont_want.png", setOf("dont_want", "nocem"), setOf("NOČEM")),
+            CoreAacAuditItem("druzina", "DRUŽINA", "#8BC34A", "👨‍👩‍👧", "Rada bi družino.", "core_family.png", setOf("family_group", "druzina"), setOf("DRUŽINA")),
+            CoreAacAuditItem("poklici", "POKLIČI", "#00BCD4", "📞", "Prosim, pokličite.", "core_call.png", setOf("call", "poklici"), setOf("POKLIČI")),
+            CoreAacAuditItem("sporocilo", "SPOROČILO", "#673AB7", "💬", "Rada bi poslati sporočilo.", "core_message.png", setOf("message", "sporocilo"), setOf("SPOROČILO")),
+            CoreAacAuditItem("pijaca", "PIJAČA", "#03A9F4", "🥤", "Rada bi pijačo.", "core_drink.png", setOf("drink", "pijaca"), setOf("PIJAČA")),
+            CoreAacAuditItem("hrana", "HRANA", "#FF9800", "🍲", "Rada bi hrano.", "core_food.png", setOf("food", "hrana"), setOf("HRANA")),
+            CoreAacAuditItem("pocutje", "POČUTJE", "#FFEB3B", "😐", "Rada bi povedati, kako se počutim.", "core_feeling.png", setOf("feeling", "pocutje"), setOf("POČUTJE")),
+            CoreAacAuditItem("nega", "NEGA", "#B2DFDB", "🧴", "Potrebujem pomoč pri negi.", "core_care.png", setOf("care", "nega"), setOf("NEGA")),
+            CoreAacAuditItem("zdravje", "ZDRAVJE", "#F44336", "🏥", "Potrebujem zdravstveno pomoč.", "core_health.png", setOf("health", "zdravje"), setOf("ZDRAVJE"))
         )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
@@ -443,6 +450,10 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnAddMissingCoreAacIcons).setOnClickListener {
             confirmRepairMissingCoreAacIcons()
+        }
+
+        findViewById<Button>(R.id.btnShowCoreIconFilenames).setOnClickListener {
+            showCoreIconFilenamesDialog()
         }
 
         findViewById<Button>(R.id.btnChangeAdvancedSettingsPin).setOnClickListener {
@@ -1268,6 +1279,17 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun showCoreIconFilenamesDialog() {
+        val message = CORE_AAC_AUDIT_ITEMS.joinToString("\n") { core ->
+            "${core.label}: NovaRehab/icons/system/core/${core.filename}"
+        }
+        AlertDialog.Builder(this)
+            .setTitle("IMENA DATOTEK")
+            .setMessage(message)
+            .setPositiveButton("V REDU", null)
+            .show()
+    }
+
     private fun buildAacPatientAuditText(): String {
         return try {
             val items = AacEditorStorage.loadItems(this)
@@ -1286,6 +1308,7 @@ class SettingsActivity : AppCompatActivity() {
                 item.labelSl.trim().isBlank() && !hasUsableImage(item.imagePath, item.iconSource)
             }
             val imageQuality = auditImageQuality(items)
+            val coreIconVisualAudit = auditCoreIconVisualQuality()
             val emptySpeechItems = items.filter { explicitSlSpeechText(it).isBlank() }
             val missingCore = missingCoreAacLabels(items)
             val coreWithoutSpeech = emptySpeechItems.filter { item ->
@@ -1298,6 +1321,8 @@ class SettingsActivity : AppCompatActivity() {
             if (firstPageCount < minimumFirstPageCount) warnings += "prva stran ima premalo ikon"
             if (blankItems > 0) warnings += "nekaj ikon je praznih"
             if (imageQuality.smallImages > 0) warnings += "nekaj slik ikon je premajhnih"
+            if (coreIconVisualAudit.missingFilenames.isNotEmpty()) warnings += "manjkajo kakovostne osnovne slike ikon"
+            if (coreIconVisualAudit.smallCount > 0) warnings += "nekaj osnovnih slik ikon je premajhnih"
             if (missingCore.isNotEmpty()) warnings += "manjkajo osnovne ikone"
             if (coreWithoutSpeech.isNotEmpty()) warnings += "osnovne ikone nimajo govora"
             val overall = if (warnings.isEmpty()) "PRIPRAVLJENO ZA TEST" else "POTREBNA DOPOLNITEV"
@@ -1317,6 +1342,17 @@ class SettingsActivity : AppCompatActivity() {
                     imageQuality.smallImages == 0
                 ),
                 "Priporočeno: PNG 512x512 px, prozorno ozadje, brez teksta na ikoni.",
+                statusLine(
+                    "Osnovne slike ikon",
+                    "${coreIconVisualAudit.existingCount}/20 najdenih, ${coreIconVisualAudit.smallCount} premajhnih",
+                    coreIconVisualAudit.missingFilenames.isEmpty() && coreIconVisualAudit.smallCount == 0
+                ),
+                if (coreIconVisualAudit.missingFilenames.isEmpty()) {
+                    "Manjkajoče osnovne slike: nič."
+                } else {
+                    "Manjkajoče osnovne slike: ${coreIconVisualAudit.missingFilenames.joinToString(", ")}"
+                },
+                "Ikone kopirajte v NovaRehab/icons/system/core/ kot PNG 512x512.",
                 statusLine(
                     "Osnovne ikone",
                     if (missingCore.isEmpty()) "vse najdene" else "manjka: ${missingCore.joinToString(", ")}",
@@ -1373,6 +1409,34 @@ class SettingsActivity : AppCompatActivity() {
         )
     }
 
+    private fun auditCoreIconVisualQuality(): CoreIconVisualAudit {
+        var existingCount = 0
+        var smallCount = 0
+        val missingFilenames = mutableListOf<String>()
+        CORE_AAC_AUDIT_ITEMS.forEach { core ->
+            val file = AacStoragePaths.resolveIconFile(this, coreIconImagePath(core), IconSource.SYSTEM)
+            if (file?.exists() != true || !file.isFile || file.length() <= 0L) {
+                missingFilenames += core.filename
+                return@forEach
+            }
+            existingCount += 1
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+            }
+            BitmapFactory.decodeFile(file.absolutePath, options)
+            val width = options.outWidth
+            val height = options.outHeight
+            if (width <= 0 || height <= 0 || width < 256 || height < 256) {
+                smallCount += 1
+            }
+        }
+        return CoreIconVisualAudit(
+            existingCount = existingCount,
+            smallCount = smallCount,
+            missingFilenames = missingFilenames
+        )
+    }
+
     private fun missingCoreAacLabels(items: List<AacItem>): List<String> {
         return CORE_AAC_AUDIT_ITEMS
             .filterNot { core ->
@@ -1395,7 +1459,8 @@ class SettingsActivity : AppCompatActivity() {
                     AacEditorStorage.CoreRepairItem(
                         id = itemId,
                         labelSl = core.label,
-                        speechTextSl = core.speechTextSl
+                        speechTextSl = core.speechTextSl,
+                        imagePath = coreIconImagePath(core).takeIf(::coreIconFileExists).orEmpty()
                     )
                 }
             }
@@ -1411,6 +1476,15 @@ class SettingsActivity : AppCompatActivity() {
             .replace("\\p{Mn}+".toRegex(), "")
             .uppercase(Locale("sl", "SI"))
             .replace("\\s+".toRegex(), " ")
+    }
+
+    private fun coreIconImagePath(core: CoreAacAuditItem): String {
+        return "system/core/${core.filename}"
+    }
+
+    private fun coreIconFileExists(imagePath: String): Boolean {
+        val file = AacStoragePaths.resolveIconFile(this, imagePath, IconSource.SYSTEM)
+        return file?.exists() == true && file.isFile && file.length() > 0L
     }
 
     private fun refreshVendingCodesSection() {

@@ -32,7 +32,8 @@ object AacEditorStorage {
     data class CoreRepairItem(
         val id: String,
         val labelSl: String,
-        val speechTextSl: String
+        val speechTextSl: String,
+        val imagePath: String = ""
     )
 
     fun loadPages(context: Context): List<EditorPage> {
@@ -257,7 +258,14 @@ object AacEditorStorage {
 
     fun addMissingCoreStarterItems(context: Context, repairItems: Collection<CoreRepairItem>): Int {
         val requestedItems = repairItems
-            .map { it.copy(id = it.id.trim(), labelSl = it.labelSl.trim(), speechTextSl = it.speechTextSl.trim()) }
+            .map {
+                it.copy(
+                    id = it.id.trim(),
+                    labelSl = it.labelSl.trim(),
+                    speechTextSl = it.speechTextSl.trim(),
+                    imagePath = it.imagePath.trim()
+                )
+            }
             .filter { it.id.isNotBlank() && it.labelSl.isNotBlank() && it.speechTextSl.isNotBlank() }
             .distinctBy { it.id }
         if (requestedItems.isEmpty()) return 0
@@ -290,6 +298,12 @@ object AacEditorStorage {
                 itemJson.put("speakTextSl", repairItem.speechTextSl)
                 itemJson.put("speechText", repairItem.speechTextSl)
                 itemJson.put("speechTextByLanguage", JSONObject().put("sl", repairItem.speechTextSl))
+                if (repairItem.imagePath.isNotBlank()) {
+                    itemJson.put("iconSource", IconSource.SYSTEM.name)
+                    itemJson.put("imagePath", repairItem.imagePath)
+                } else {
+                    itemJson.put("imagePath", "")
+                }
 
                 val fixedTopRowPosition = itemJson.optInt("fixedTopRowPosition", 0)
                 if (fixedTopRowPosition in 1..5) {
