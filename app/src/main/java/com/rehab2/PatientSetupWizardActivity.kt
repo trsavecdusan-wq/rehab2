@@ -40,6 +40,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
     private lateinit var content: LinearLayout
     private lateinit var titleView: TextView
     private lateinit var helperView: TextView
+    private lateinit var cancelWizardButton: Button
     private lateinit var backButton: Button
     private lateinit var skipButton: Button
     private lateinit var nextButton: Button
@@ -96,6 +97,17 @@ class PatientSetupWizardActivity : AppCompatActivity() {
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
         root.addView(helperView, helperParams)
+
+        cancelWizardButton = actionButton("PREKINI NASTAVITEV", 0xFF8A3A3A.toInt()).apply {
+            setOnClickListener { finish() }
+        }
+        val cancelParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            dp(64)
+        ).apply {
+            bottomMargin = dp(16)
+        }
+        root.addView(cancelWizardButton, cancelParams)
 
         val scrollView = ScrollView(this)
         content = LinearLayout(this).apply {

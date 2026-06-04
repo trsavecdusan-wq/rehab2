@@ -34,6 +34,18 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/btnExitSettingsToMain"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="#8A3A3A"
+            android:text="NAZAJ NA GLAVNI ZASLON"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/txtSettingsSectionHelper"
             android:layout_width="match_parent"

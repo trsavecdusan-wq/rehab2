@@ -399,6 +399,14 @@ class SettingsActivity : AppCompatActivity() {
                 showSettingsHub()
             }
         }
+        findViewById<Button>(R.id.btnExitSettingsToMain).setOnClickListener {
+            startActivity(
+                Intent(this, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                }
+            )
+            finish()
+        }
 
         findViewById<Button>(R.id.btnSettingsModeTherapist).setOnClickListener {
             setSettingsDisplayMode(SettingsDisplayMode.THERAPIST)
@@ -680,6 +688,7 @@ class SettingsActivity : AppCompatActivity() {
         activeSettingsSection = null
         val hubIds = mutableSetOf(
             R.id.txtSettingsTitle,
+            R.id.btnExitSettingsToMain,
             R.id.btnSettingsModeTherapist,
             R.id.btnSettingsModeAdvanced,
             R.id.sectionHub,
@@ -718,6 +727,7 @@ class SettingsActivity : AppCompatActivity() {
 
         setSettingsChildVisible(R.id.txtSettingsTitle)
         setSettingsChildVisible(R.id.btnBackSettings)
+        setSettingsChildVisible(R.id.btnExitSettingsToMain)
         setSettingsChildVisible(R.id.txtSettingsSectionHelper)
         setSettingsChildVisible(R.id.btnSettingsModeTherapist)
         setSettingsChildVisible(R.id.btnSettingsModeAdvanced)

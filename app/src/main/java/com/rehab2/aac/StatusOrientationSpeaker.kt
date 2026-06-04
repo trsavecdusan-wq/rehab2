@@ -29,7 +29,7 @@ object StatusOrientationSpeaker {
         }
         if (settings.speakDate) {
             val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-            parts += "Danes je ${dayName(calendar)}, $dayOfMonth. ${monthName(calendar)}."
+            parts += "Danes je ${dayName(calendar)}, ${dayOfMonthOrdinalName(dayOfMonth)} ${monthName(calendar)}."
         }
         if (settings.speakTime) {
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -74,6 +74,43 @@ object StatusOrientationSpeaker {
             Calendar.OCTOBER -> "oktober"
             Calendar.NOVEMBER -> "november"
             else -> "december"
+        }
+    }
+
+    private fun dayOfMonthOrdinalName(dayOfMonth: Int): String {
+        return when (dayOfMonth) {
+            1 -> "prvi"
+            2 -> "drugi"
+            3 -> "tretji"
+            4 -> "\u010detrti"
+            5 -> "peti"
+            6 -> "\u0161esti"
+            7 -> "sedmi"
+            8 -> "osmi"
+            9 -> "deveti"
+            10 -> "deseti"
+            11 -> "enajsti"
+            12 -> "dvanajsti"
+            13 -> "trinajsti"
+            14 -> "\u0161tirinajsti"
+            15 -> "petnajsti"
+            16 -> "\u0161estnajsti"
+            17 -> "sedemnajsti"
+            18 -> "osemnajsti"
+            19 -> "devetnajsti"
+            20 -> "dvajseti"
+            21 -> "enaindvajseti"
+            22 -> "dvaindvajseti"
+            23 -> "triindvajseti"
+            24 -> "\u0161tiriindvajseti"
+            25 -> "petindvajseti"
+            26 -> "\u0161estindvajseti"
+            27 -> "sedemindvajseti"
+            28 -> "osemindvajseti"
+            29 -> "devetindvajseti"
+            30 -> "trideseti"
+            31 -> "enaintrideseti"
+            else -> dayOfMonth.toString()
         }
     }
 }
