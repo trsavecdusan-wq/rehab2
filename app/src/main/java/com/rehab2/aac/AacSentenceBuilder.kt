@@ -516,6 +516,14 @@ object AacSentenceBuilder {
         "shop" to "Prosim, pomagajte mi v trgovini.",
         "restaurant" to "Prosim, pomagajte mi v restavraciji.",
         "transport" to "Prosim, pomagajte mi pri prevozu.",
+        "place_group" to "Izberite kraj.",
+        "room" to "Rada bi v sobo.",
+        "terrace" to "Rada bi na teraso.",
+        "bathroom" to "Rada bi v kopalnico.",
+        "dining_room" to "Rada bi v jedilnico.",
+        "outside" to "Rada bi ven.",
+        "inside" to "Rada bi notri.",
+        "therapy" to "Rada bi na terapijo.",
         "good" to "Dobro sem.",
         "angry" to "Jezna sem.",
         "sad" to "\u017dalostna sem.",
@@ -555,7 +563,15 @@ object AacSentenceBuilder {
         "food_dinner" to "ve\u010derjo",
         "sweet" to "nekaj sladkega",
         "rest" to "počivati",
-        "wc" to "na WC"
+        "wc" to "na WC",
+        "room" to "v sobo",
+        "terrace" to "na teraso",
+        "bathroom" to "v kopalnico",
+        "dining_room" to "v jedilnico",
+        "home" to "domov",
+        "outside" to "ven",
+        "inside" to "notri",
+        "therapy" to "na terapijo"
     )
 
     private val FOOD_TARGETS = mapOf(

@@ -236,6 +236,17 @@ class SettingsActivity : AppCompatActivity() {
             "evening" to "ZVEČER",
             "night" to "PONOČI"
         )
+        private val PLACE_PACK_AUDIT_ITEMS = listOf(
+            "place_group" to "KRAJ",
+            "room" to "SOBA",
+            "terrace" to "TERASA",
+            "bathroom" to "KOPALNICA",
+            "dining_room" to "JEDILNICA",
+            "home" to "DOMOV",
+            "outside" to "ZUNAJ",
+            "inside" to "NOTRI",
+            "therapy" to "TERAPIJA"
+        )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
         private const val MAX_MISSING_ICONS_SHOWN = 15
@@ -1358,6 +1369,9 @@ class SettingsActivity : AppCompatActivity() {
             val missingTimeLabels = TIME_PACK_AUDIT_ITEMS
                 .filter { (itemId, _) -> itemId !in itemIds }
                 .map { (_, label) -> label }
+            val missingPlaceLabels = PLACE_PACK_AUDIT_ITEMS
+                .filter { (itemId, _) -> itemId !in itemIds }
+                .map { (_, label) -> label }
             val coreWithoutSpeech = emptySpeechItems.filter { item ->
                 CORE_AAC_AUDIT_ITEMS.any { core ->
                     matchesCoreAacItem(item, core)
@@ -1373,6 +1387,7 @@ class SettingsActivity : AppCompatActivity() {
             if (peoplePhotoAudit.missingFilenames.isNotEmpty()) warnings += "manjkajo fotografije oseb"
             if (missingCore.isNotEmpty()) warnings += "manjkajo osnovne ikone"
             if (missingTimeLabels.isNotEmpty()) warnings += "manjkajo časovne ikone"
+            if (missingPlaceLabels.isNotEmpty()) warnings += "manjkajo ikone za kraje"
             if (coreWithoutSpeech.isNotEmpty()) warnings += "osnovne ikone nimajo govora"
             val overall = if (warnings.isEmpty()) "PRIPRAVLJENO ZA TEST" else "POTREBNA DOPOLNITEV"
             val activeProfile = AacProfileStore.getActiveAacProfile(this).displayName.ifBlank { "DOM" }
@@ -1423,6 +1438,11 @@ class SettingsActivity : AppCompatActivity() {
                     "ČAS",
                     if (missingTimeLabels.isEmpty()) "DA" else "manjka: ${missingTimeLabels.joinToString(", ")}",
                     missingTimeLabels.isEmpty()
+                ),
+                statusLine(
+                    "KRAJ",
+                    if (missingPlaceLabels.isEmpty()) "DA" else "manjka: ${missingPlaceLabels.joinToString(", ")}",
+                    missingPlaceLabels.isEmpty()
                 ),
                 statusLine(
                     "Osnovne ikone",
