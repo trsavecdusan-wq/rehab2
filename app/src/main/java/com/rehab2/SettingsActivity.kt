@@ -256,6 +256,20 @@ class SettingsActivity : AppCompatActivity() {
             "visit" to "OBISK",
             "therapy" to "TERAPIJA"
         )
+        private val CARE_PACK_AUDIT_ITEMS = listOf(
+            "care" to "NEGA",
+            "washing_help" to "UMIVANJE",
+            "dressing_help" to "PREOBLAČENJE",
+            "bed" to "POSTELJA",
+            "wheelchair" to "VOZIČEK",
+            "blanket" to "ODEJA",
+            "pillow" to "BLAZINA",
+            "change_position" to "SPREMEMBA POLOŽAJA",
+            "turn_left" to "OBRNI LEVO",
+            "turn_right" to "OBRNI DESNO",
+            "sit_up" to "DVIGNI ME",
+            "lie_down" to "POLOŽI ME"
+        )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
         private const val MAX_MISSING_ICONS_SHOWN = 15
@@ -1384,6 +1398,9 @@ class SettingsActivity : AppCompatActivity() {
             val missingActivityLabels = ACTIVITY_PACK_AUDIT_ITEMS
                 .filter { (itemId, _) -> itemId !in itemIds }
                 .map { (_, label) -> label }
+            val missingCareLabels = CARE_PACK_AUDIT_ITEMS
+                .filter { (itemId, _) -> itemId !in itemIds }
+                .map { (_, label) -> label }
             val coreWithoutSpeech = emptySpeechItems.filter { item ->
                 CORE_AAC_AUDIT_ITEMS.any { core ->
                     matchesCoreAacItem(item, core)
@@ -1401,6 +1418,7 @@ class SettingsActivity : AppCompatActivity() {
             if (missingTimeLabels.isNotEmpty()) warnings += "manjkajo časovne ikone"
             if (missingPlaceLabels.isNotEmpty()) warnings += "manjkajo ikone za kraje"
             if (missingActivityLabels.isNotEmpty()) warnings += "manjkajo ikone za dejavnosti"
+            if (missingCareLabels.isNotEmpty()) warnings += "manjkajo ikone za nego"
             if (coreWithoutSpeech.isNotEmpty()) warnings += "osnovne ikone nimajo govora"
             val overall = if (warnings.isEmpty()) "PRIPRAVLJENO ZA TEST" else "POTREBNA DOPOLNITEV"
             val activeProfile = AacProfileStore.getActiveAacProfile(this).displayName.ifBlank { "DOM" }
@@ -1461,6 +1479,11 @@ class SettingsActivity : AppCompatActivity() {
                     "DEJAVNOSTI",
                     if (missingActivityLabels.isEmpty()) "DA" else "manjka: ${missingActivityLabels.joinToString(", ")}",
                     missingActivityLabels.isEmpty()
+                ),
+                statusLine(
+                    "NEGA",
+                    if (missingCareLabels.isEmpty()) "DA" else "manjka: ${missingCareLabels.joinToString(", ")}",
+                    missingCareLabels.isEmpty()
                 ),
                 statusLine(
                     "Osnovne ikone",

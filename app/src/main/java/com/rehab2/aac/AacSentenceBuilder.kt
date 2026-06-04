@@ -12,6 +12,7 @@ object AacSentenceBuilder {
         return when {
             items.anyIdIn(PERSON_ACTION_IDS) && items.hasPersonTarget() -> buildPeopleActionSentence(items)
             items.hasId("need") -> buildNeedSentence(items)
+            items.hasCareIntent() -> buildCareSentence(items)
             items.hasId("problem") -> buildProblemSentence(items)
             items.hasId("please") -> buildPleaseSentence(items)
             items.hasId("wc") -> buildWcSentence(items)
@@ -102,6 +103,7 @@ object AacSentenceBuilder {
             items.firstNotNullOfOrNull { item -> SLOWER_SENTENCES[item.idKey()] }?.let { return it }
         }
         if (items.hasId("turn_me")) {
+            items.firstNotNullOfOrNull { item -> TURN_SENTENCES[item.idKey()] }?.let { return it }
             val direction = items.firstNotNullOfOrNull { item -> TURN_DIRECTIONS[item.idKey()] }
             if (direction != null) return "Prosim, obrni me $direction."
         }
@@ -174,6 +176,11 @@ object AacSentenceBuilder {
             items.hasId("washing_help") -> "Potrebujem umivanje."
             else -> "Moram na WC."
         }
+    }
+
+    private fun buildCareSentence(items: List<AacItem>): String {
+        return items.firstNotNullOfOrNull { item -> CARE_SENTENCES[item.idKey()] }
+            ?: if (items.hasId("care")) "Potrebujem pomoč pri negi." else ""
     }
 
     private fun buildDontWantSentence(items: List<AacItem>): String {
@@ -249,6 +256,10 @@ object AacSentenceBuilder {
 
     private fun List<AacItem>.hasPersonTarget(): Boolean {
         return any { item -> item.idKey() in PERSON_TARGETS }
+    }
+
+    private fun List<AacItem>.hasCareIntent(): Boolean {
+        return any { item -> item.idKey() in CARE_ROOT_IDS || item.idKey() in CARE_SENTENCES }
     }
 
     private fun normalize(value: String): String {
@@ -447,6 +458,31 @@ object AacSentenceBuilder {
         "turn_side" to "na bok"
     )
 
+    private val CARE_ROOT_IDS = setOf("care", "care_group", "change_position")
+
+    private val CARE_SENTENCES = mapOf(
+        "care" to "Potrebujem pomoč pri negi.",
+        "care_group" to "Potrebujem pomoč pri negi.",
+        "washing_help" to "Potrebujem pomoč pri umivanju.",
+        "dressing_help" to "Potrebujem pomoč pri preoblačenju.",
+        "bed" to "Prosim, pomagajte mi v posteljo.",
+        "wheelchair" to "Prosim, pomagajte mi v voziček.",
+        "blanket" to "Potrebujem odejo.",
+        "pillow" to "Potrebujem blazino.",
+        "change_position" to "Prosim, pomagajte mi spremeniti položaj.",
+        "turn_left" to "Prosim, obrnite me na levo.",
+        "turn_right" to "Prosim, obrnite me na desno.",
+        "sit_up" to "Prosim, dvignite me.",
+        "lie_down" to "Prosim, položite me."
+    )
+
+    private val TURN_SENTENCES = mapOf(
+        "turn_left" to "Prosim, obrnite me na levo.",
+        "turn_right" to "Prosim, obrnite me na desno.",
+        "turn_back" to "Prosim, obrnite me na hrbet.",
+        "turn_side" to "Prosim, obrnite me na bok."
+    )
+
     private val SIMPLE_SENTENCES_BY_ID = mapOf(
         "cannot" to "Ne morem.",
         "cold" to "Mraz mi je.",
@@ -492,10 +528,10 @@ object AacSentenceBuilder {
         "repeat_slower" to "Prosim, ponovi počasneje.",
         "slower_little" to "Prosim, govori malo počasneje.",
         "slower_much" to "Prosim, govori zelo počasneje.",
-        "turn_left" to "Prosim, obrni me levo.",
-        "turn_right" to "Prosim, obrni me desno.",
-        "turn_back" to "Prosim, obrni me na hrbet.",
-        "turn_side" to "Prosim, obrni me na bok.",
+        "turn_left" to "Prosim, obrnite me na levo.",
+        "turn_right" to "Prosim, obrnite me na desno.",
+        "turn_back" to "Prosim, obrnite me na hrbet.",
+        "turn_side" to "Prosim, obrnite me na bok.",
         "cannot_speak" to "Ne morem govoriti.",
         "cannot_stand" to "Ne morem vstati.",
         "cannot_drink" to "Ne morem piti.",
@@ -505,6 +541,9 @@ object AacSentenceBuilder {
         "help_drinking" to "Potrebujem pomo\u010d pri pitju.",
         "help_feeding" to "Potrebujem pomo\u010d pri hranjenju.",
         "dressing" to "Potrebujem pomo\u010d pri obla\u010denju.",
+        "change_position" to "Prosim, pomagajte mi spremeniti položaj.",
+        "sit_up" to "Prosim, dvignite me.",
+        "lie_down" to "Prosim, položite me.",
         "tea_large" to "Rada bi velik \u010daj.",
         "tea_regular" to "Rada bi \u010daj.",
         "coffee_plain" to "Rada bi navadno kavo.",
