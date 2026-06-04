@@ -85,6 +85,7 @@ class SettingsActivity : AppCompatActivity() {
         private const val PREF_GPS_LAST_IGNORED_REASON = "gps_last_ignored_reason"
         private const val PREF_GPS_RESET_BASELINE_REQUESTED = "gps_reset_baseline_requested"
         private const val PREF_ADMIN_PIN = "admin_pin"
+        private const val PREF_ADVANCED_SETTINGS_PIN = "advanced_settings_pin"
         private const val PREF_DISTANCE_WEEK_METERS = "distance_week_meters"
         private const val PREF_DISTANCE_MONTH_METERS = "distance_month_meters"
         private const val PREF_DISTANCE_YEAR_METERS = "distance_year_meters"
@@ -380,6 +381,10 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnSettingsHubAdvanced).setOnClickListener {
             showSettingsSection(SettingsSection.ADVANCED)
+        }
+
+        findViewById<Button>(R.id.btnChangeAdvancedSettingsPin).setOnClickListener {
+            showChangeAdvancedSettingsPinDialog()
         }
 
         findViewById<Button>(R.id.btnRadioSettings).setOnClickListener {
@@ -700,7 +705,7 @@ class SettingsActivity : AppCompatActivity() {
             .setView(input)
             .setPositiveButton("NADALJUJ") { _, _ ->
                 val enteredPin = input.text?.toString().orEmpty()
-                if (enteredPin == DEFAULT_ADVANCED_SETTINGS_PIN) {
+                if (enteredPin == currentAdvancedSettingsPin()) {
                     setSettingsDisplayMode(SettingsDisplayMode.ADVANCED)
                 } else {
                     setSettingsDisplayMode(SettingsDisplayMode.THERAPIST)
@@ -711,6 +716,74 @@ class SettingsActivity : AppCompatActivity() {
                 setSettingsDisplayMode(SettingsDisplayMode.THERAPIST)
             }
             .show()
+    }
+
+    private fun currentAdvancedSettingsPin(): String {
+        return prefs.getString(PREF_ADVANCED_SETTINGS_PIN, DEFAULT_ADVANCED_SETTINGS_PIN)
+            .orEmpty()
+            .ifBlank { DEFAULT_ADVANCED_SETTINGS_PIN }
+    }
+
+    private fun showChangeAdvancedSettingsPinDialog() {
+        showAdvancedPinInputDialog(
+            title = "TRENUTNI PIN",
+            message = "Vpišite trenutni PIN za napredni način."
+        ) { currentPin ->
+            if (currentPin != currentAdvancedSettingsPin()) {
+                Toast.makeText(this, "Napačen trenutni PIN", Toast.LENGTH_SHORT).show()
+                return@showAdvancedPinInputDialog
+            }
+            askNewAdvancedSettingsPin()
+        }
+    }
+
+    private fun askNewAdvancedSettingsPin() {
+        showAdvancedPinInputDialog(
+            title = "NOV PIN",
+            message = "Vpišite nov PIN. Dovoljene so 4 do 8 številk."
+        ) { newPin ->
+            if (!isValidAdvancedSettingsPin(newPin)) {
+                Toast.makeText(this, "PIN mora imeti 4 do 8 številk", Toast.LENGTH_SHORT).show()
+                return@showAdvancedPinInputDialog
+            }
+            askRepeatAdvancedSettingsPin(newPin)
+        }
+    }
+
+    private fun askRepeatAdvancedSettingsPin(newPin: String) {
+        showAdvancedPinInputDialog(
+            title = "PONOVITE PIN",
+            message = "Še enkrat vpišite nov PIN."
+        ) { repeatedPin ->
+            if (newPin != repeatedPin) {
+                Toast.makeText(this, "PIN se ne ujema", Toast.LENGTH_SHORT).show()
+                return@showAdvancedPinInputDialog
+            }
+            prefs.edit().putString(PREF_ADVANCED_SETTINGS_PIN, newPin).apply()
+            Toast.makeText(this, "PIN za napredni način je shranjen", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showAdvancedPinInputDialog(title: String, message: String, onPinEntered: (String) -> Unit) {
+        val input = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            transformationMethod = PasswordTransformationMethod.getInstance()
+            hint = "PIN"
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setView(input)
+            .setPositiveButton("NADALJUJ") { _, _ ->
+                onPinEntered(input.text?.toString().orEmpty())
+            }
+            .setNegativeButton("PREKLIČI", null)
+            .show()
+    }
+
+    private fun isValidAdvancedSettingsPin(pin: String): Boolean {
+        return pin.length in 4..8 && pin.all { it.isDigit() }
     }
 
     private fun updateSettingsModeButtons() {
@@ -744,6 +817,7 @@ class SettingsActivity : AppCompatActivity() {
             R.id.helperAdvancedTop,
             R.id.subgroupAdvancedTools,
             R.id.helperAdvancedTools,
+            R.id.btnChangeAdvancedSettingsPin,
             R.id.btnRadioSettings,
             R.id.btnAacPackSettings,
             R.id.btnCreateSampleAacPack,
