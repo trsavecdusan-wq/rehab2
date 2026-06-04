@@ -17,6 +17,7 @@ import android.text.InputType
 import android.text.method.PasswordTransformationMethod
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ScrollView
@@ -56,6 +57,14 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 class SettingsActivity : AppCompatActivity() {
+    private enum class SettingsSection {
+        PATIENT,
+        COMMUNICATOR,
+        SPEECH,
+        ORIENTATION,
+        ADVANCED
+    }
+
     companion object {
         private const val PREFS_FILE = "rehab2_prefs"
         private const val PREF_POWER_MODE = "power_mode"
@@ -220,6 +229,7 @@ class SettingsActivity : AppCompatActivity() {
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
     private var isBatteryReceiverRegistered = false
+    private var activeSettingsSection: SettingsSection? = null
     private val gpsDiagnosticsRefreshHandler = Handler(Looper.getMainLooper())
     private val powerFeedbackHandler = Handler(Looper.getMainLooper())
     private val gpsDiagnosticsRefreshRunnable = object : Runnable {
@@ -318,15 +328,19 @@ class SettingsActivity : AppCompatActivity() {
         editPatientTherapistContact = findViewById(R.id.editPatientTherapistContact)
         editPatientShortDescription = findViewById(R.id.editPatientShortDescription)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
-            finish()
+            if (activeSettingsSection == null) {
+                finish()
+            } else {
+                showSettingsHub()
+            }
         }
 
         findViewById<Button>(R.id.btnSettingsHubPatient).setOnClickListener {
-            scrollToSettingsSection(R.id.txtPatientProfileTitle)
+            showSettingsSection(SettingsSection.PATIENT)
         }
 
         findViewById<Button>(R.id.btnSettingsHubCommunicator).setOnClickListener {
-            scrollToSettingsSection(R.id.txtAacGridSizeStatus)
+            showSettingsSection(SettingsSection.COMMUNICATOR)
         }
 
         findViewById<Button>(R.id.btnSettingsHubIcons).setOnClickListener {
@@ -334,7 +348,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnSettingsHubSpeech).setOnClickListener {
-            scrollToSettingsSection(R.id.sectionSpeechApiSettings)
+            showSettingsSection(SettingsSection.SPEECH)
         }
 
         findViewById<Button>(R.id.btnSettingsHubVideoMessages).setOnClickListener {
@@ -342,7 +356,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnSettingsHubOrientation).setOnClickListener {
-            scrollToSettingsSection(R.id.txtStatusOrientationTitle)
+            showSettingsSection(SettingsSection.ORIENTATION)
         }
 
         findViewById<Button>(R.id.btnSettingsHubBackup).setOnClickListener {
@@ -350,7 +364,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnSettingsHubAdvanced).setOnClickListener {
-            scrollToSettingsSection(R.id.sectionAdvancedSettings)
+            showSettingsSection(SettingsSection.ADVANCED)
         }
 
         findViewById<Button>(R.id.btnRadioSettings).setOnClickListener {
@@ -550,6 +564,117 @@ class SettingsActivity : AppCompatActivity() {
         bindAudioDuckingSwitchListener()
         bindStatusOrientationSwitchListeners()
         applyKeepScreenOnWhileCharging()
+        showSettingsHub()
+    }
+
+    override fun onBackPressed() {
+        if (activeSettingsSection != null) {
+            showSettingsHub()
+            return
+        }
+        super.onBackPressed()
+    }
+
+    private fun showSettingsHub() {
+        activeSettingsSection = null
+        val hubIds = setOf(
+            R.id.txtSettingsTitle,
+            R.id.sectionHub,
+            R.id.btnSettingsHubPatient,
+            R.id.btnSettingsHubCommunicator,
+            R.id.btnSettingsHubIcons,
+            R.id.btnSettingsHubSpeech,
+            R.id.btnSettingsHubVideoMessages,
+            R.id.btnSettingsHubOrientation,
+            R.id.btnSettingsHubBackup,
+            R.id.btnSettingsHubAdvanced
+        )
+        settingsContentView()?.let { content ->
+            for (index in 0 until content.childCount) {
+                val child = content.getChildAt(index)
+                child.visibility = if (child.id in hubIds) View.VISIBLE else View.GONE
+            }
+        }
+        findViewById<TextView>(R.id.txtSettingsSectionHelper).text = ""
+        scrollSettingsToTop()
+    }
+
+    private fun showSettingsSection(section: SettingsSection) {
+        activeSettingsSection = section
+        val content = settingsContentView() ?: return
+        for (index in 0 until content.childCount) {
+            content.getChildAt(index).visibility = View.GONE
+        }
+
+        setSettingsChildVisible(R.id.txtSettingsTitle)
+        setSettingsChildVisible(R.id.btnBackSettings)
+        setSettingsChildVisible(R.id.txtSettingsSectionHelper)
+        findViewById<Button>(R.id.btnBackSettings).text = "NAZAJ NA NASTAVITVE"
+        findViewById<TextView>(R.id.txtSettingsSectionHelper).text = when (section) {
+            SettingsSection.PATIENT -> "Tukaj nastavite podatke pacientke."
+            SettingsSection.COMMUNICATOR -> "Tukaj nastavite komunikator in prikaz ikon."
+            SettingsSection.SPEECH -> "Tukaj nastavite govor in glasnost."
+            SettingsSection.ORIENTATION -> "Tukaj nastavite datum, uro in vreme."
+            SettingsSection.ADVANCED -> "Tukaj so diagnostika in napredna orodja."
+        }
+
+        when (section) {
+            SettingsSection.PATIENT -> {
+                setSettingsRangeVisible(content, R.id.txtPatientProfileTitle, R.id.btnSavePatientProfile)
+            }
+            SettingsSection.COMMUNICATOR -> {
+                setSettingsRangeVisible(content, R.id.txtAacGridSizeStatus, R.id.switchSpeakDigitsSeparatelyEnabled)
+                setSettingsRangeVisible(content, R.id.txtVendingCodesTitle, R.id.editVendingCodes)
+                setSettingsRangeVisible(content, R.id.txtActiveAacProfileStatus, R.id.switchRealWorldHelpersEnabled)
+            }
+            SettingsSection.SPEECH -> {
+                setSettingsRangeVisible(content, R.id.sectionSpeechApiSettings, R.id.switchClearSentenceAfterSentence)
+                setSettingsRangeVisible(content, R.id.txtAudioDuckingTitle, R.id.btnTestAacSpeechLoudness)
+                setSettingsChildVisible(R.id.btnSaveSpeechApiSettings)
+                setSettingsChildVisible(R.id.btnTestSpeechApi)
+                setSettingsChildVisible(R.id.btnImportSpeechApiKey)
+            }
+            SettingsSection.ORIENTATION -> {
+                setSettingsRangeVisible(content, R.id.txtStatusOrientationTitle, R.id.editStatusOrientationInfo)
+            }
+            SettingsSection.ADVANCED -> {
+                setSettingsRangeVisible(content, R.id.sectionAdvancedSettings, R.id.btnCheckAacFiles)
+                setSettingsRangeVisible(content, R.id.txtAacAssistTitle, R.id.editAiObservationInfo)
+                setSettingsRangeVisible(content, R.id.sectionSystemSettings, R.id.btnResetGpsStatistics)
+            }
+        }
+        scrollSettingsToTop()
+    }
+
+    private fun settingsContentView(): ViewGroup? {
+        val scrollView = findViewById<ScrollView>(R.id.settingsScrollView)
+        return scrollView.getChildAt(0) as? ViewGroup
+    }
+
+    private fun setSettingsChildVisible(viewId: Int) {
+        findViewById<View>(viewId)?.visibility = View.VISIBLE
+    }
+
+    private fun setSettingsRangeVisible(content: ViewGroup, startId: Int, endId: Int) {
+        var isInRange = false
+        for (index in 0 until content.childCount) {
+            val child = content.getChildAt(index)
+            if (child.id == startId) {
+                isInRange = true
+            }
+            if (isInRange) {
+                child.visibility = View.VISIBLE
+            }
+            if (child.id == endId && isInRange) {
+                return
+            }
+        }
+    }
+
+    private fun scrollSettingsToTop() {
+        findViewById<ScrollView>(R.id.settingsScrollView).post {
+            findViewById<ScrollView>(R.id.settingsScrollView).smoothScrollTo(0, 0)
+        }
     }
 
     private fun scrollToSettingsSection(targetId: Int) {

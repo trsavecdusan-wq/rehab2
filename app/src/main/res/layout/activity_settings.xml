@@ -12,6 +12,7 @@
         android:padding="24dp">
 
         <TextView
+            android:id="@+id/txtSettingsTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
@@ -34,7 +35,16 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/sectionSettingsHub"
+            android:id="@+id/txtSettingsSectionHelper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:textColor="#C9D3DD"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/sectionHub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
