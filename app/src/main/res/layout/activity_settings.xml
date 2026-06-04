@@ -649,6 +649,52 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/subgroupCommunicatorAudit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="PREGLED KOMUNIKATORJA"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtAacPatientAuditStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="#1E2329"
+            android:lineSpacingExtra="3dp"
+            android:padding="18dp"
+            android:text="PREGLED KOMUNIKATORJA"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnRefreshAacPatientAudit"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#2F80ED"
+            android:text="OSVEŽI PREGLED"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnOpenAacEditorFromAudit"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#3E7C4A"
+            android:text="ODPRI AAC EDITOR"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/subgroupCommunicatorGridSize"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.BatteryManager
@@ -33,6 +34,7 @@ import com.rehab2.aac.AacCommunicationContext
 import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacGuidedFollowUpSettings
+import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacContentDiagnostics
 import com.rehab2.aac.AacContentBootstrap
 import com.rehab2.aac.AacEditorStorage
@@ -49,6 +51,7 @@ import com.rehab2.aac.AacSpeechCoordinator
 import com.rehab2.aac.AacSpeechLoudnessSettings
 import com.rehab2.aac.AacSpeechTimingSettings
 import com.rehab2.aac.AacVendingScenario
+import com.rehab2.aac.IconSource
 import com.rehab2.aac.OpenAiAacSpeechApiClient
 import com.rehab2.aac.PatientProfileSettings
 import com.rehab2.aac.StatusOrientationSettings
@@ -58,6 +61,18 @@ import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
+
+private data class CoreAacAuditItem(
+    val label: String,
+    val ids: Set<String>,
+    val labels: Set<String>
+)
+
+private data class ImageQualityAudit(
+    val checkedImages: Int,
+    val smallImages: Int,
+    val largeImages: Int
+)
 
 class SettingsActivity : AppCompatActivity() {
     private enum class SettingsSection {
@@ -154,6 +169,18 @@ class SettingsActivity : AppCompatActivity() {
         private const val DEFAULT_AAC_PERSISTENT_TOP_ROW_COUNT = 5
         private val AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS = arrayOf(3, 4, 5)
         private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "yes", "dont_understand", "thank_you", "sorry")
+        private val CORE_AAC_AUDIT_ITEMS = listOf(
+            CoreAacAuditItem("DA", setOf("yes", "quick_yes"), setOf("DA")),
+            CoreAacAuditItem("NE", setOf("no", "quick_no"), setOf("NE")),
+            CoreAacAuditItem("NE RAZUMEM", setOf("dont_understand"), setOf("NE RAZUMEM")),
+            CoreAacAuditItem("HVALA", setOf("thank_you"), setOf("HVALA")),
+            CoreAacAuditItem("POMOČ", setOf("help"), setOf("POMOČ", "POMAGAJ MI")),
+            CoreAacAuditItem("ŽEJNA SEM", setOf("thirsty"), setOf("ŽEJNA SEM", "ŽEJNA")),
+            CoreAacAuditItem("LAČNA SEM", setOf("hungry"), setOf("LAČNA SEM", "LAČNA")),
+            CoreAacAuditItem("BOLI ME", setOf("pain"), setOf("BOLI ME")),
+            CoreAacAuditItem("WC", setOf("wc"), setOf("WC")),
+            CoreAacAuditItem("UTRUJENA SEM", setOf("tired"), setOf("UTRUJENA SEM", "UTRUJENA"))
+        )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
         private const val MAX_MISSING_ICONS_SHOWN = 15
@@ -192,6 +219,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var switchPersistentTopRowEnabled: SwitchCompat
     private lateinit var txtPersistentTopRowStatus: TextView
     private lateinit var editPersistentTopRowCount: EditText
+    private lateinit var txtAacPatientAuditStatus: TextView
     private lateinit var switchGuidedFollowUpEnabled: SwitchCompat
     private lateinit var switchVendingNumberDisplayEnabled: SwitchCompat
     private lateinit var switchSpeakDigitsSeparatelyEnabled: SwitchCompat
@@ -297,6 +325,7 @@ class SettingsActivity : AppCompatActivity() {
         switchPersistentTopRowEnabled = findViewById(R.id.switchPersistentTopRowEnabled)
         txtPersistentTopRowStatus = findViewById(R.id.txtPersistentTopRowStatus)
         editPersistentTopRowCount = findViewById(R.id.editPersistentTopRowCount)
+        txtAacPatientAuditStatus = findViewById(R.id.txtAacPatientAuditStatus)
         switchGuidedFollowUpEnabled = findViewById(R.id.switchGuidedFollowUpEnabled)
         switchVendingNumberDisplayEnabled = findViewById(R.id.switchVendingNumberDisplayEnabled)
         switchSpeakDigitsSeparatelyEnabled = findViewById(R.id.switchSpeakDigitsSeparatelyEnabled)
@@ -386,6 +415,14 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnSettingsHubAdvanced).setOnClickListener {
             showSettingsSection(SettingsSection.ADVANCED)
+        }
+
+        findViewById<Button>(R.id.btnRefreshAacPatientAudit).setOnClickListener {
+            refreshAacPatientAuditPanel()
+        }
+
+        findViewById<Button>(R.id.btnOpenAacEditorFromAudit).setOnClickListener {
+            startActivity(Intent(this, AacEditorActivity::class.java))
         }
 
         findViewById<Button>(R.id.btnChangeAdvancedSettingsPin).setOnClickListener {
@@ -580,6 +617,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshGpsDiagnosticsSection()
         refreshSpeechApiSection()
         refreshSpeechTimingSection()
+        refreshAacPatientAuditPanel()
         refreshAacGridSizeSection()
         refreshPersistentTopRowSection()
         refreshGuidedFollowUpSection()
@@ -666,7 +704,7 @@ class SettingsActivity : AppCompatActivity() {
                 setSettingsRangeVisible(content, R.id.txtPatientProfileTitle, R.id.btnSavePatientProfile)
             }
             SettingsSection.COMMUNICATOR -> {
-                setSettingsRangeVisible(content, R.id.subgroupCommunicatorGridSize, R.id.switchSpeakDigitsSeparatelyEnabled)
+                setSettingsRangeVisible(content, R.id.subgroupCommunicatorAudit, R.id.switchSpeakDigitsSeparatelyEnabled)
                 setSettingsRangeVisible(content, R.id.subgroupCommunicatorRealWorld, R.id.editVendingCodes)
                 setSettingsRangeVisible(content, R.id.subgroupCommunicatorProfile, R.id.switchRealWorldHelpersEnabled)
             }
@@ -972,6 +1010,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshGpsDiagnosticsSection()
         refreshSpeechApiSection()
         refreshSpeechTimingSection()
+        refreshAacPatientAuditPanel()
         refreshAacGridSizeSection()
         refreshPersistentTopRowSection()
         refreshGuidedFollowUpSection()
@@ -1171,6 +1210,125 @@ class SettingsActivity : AppCompatActivity() {
         val gridSize = getAacGridSize()
         txtAacGridSizeStatus.text = "Velikost mreže komunikatorja: $gridSize x $gridSize"
         editAacGridSize.setText("$gridSize x $gridSize")
+    }
+
+    private fun refreshAacPatientAuditPanel() {
+        txtAacPatientAuditStatus.text = buildAacPatientAuditText()
+    }
+
+    private fun buildAacPatientAuditText(): String {
+        return try {
+            val items = AacEditorStorage.loadItems(this)
+            val gridSize = getAacGridSize()
+            val fixedItems = items
+                .filter { (it.fixedTopRowPosition ?: 0) in 1..5 }
+                .sortedBy { it.fixedTopRowPosition ?: Int.MAX_VALUE }
+            val firstPageItems = items
+                .filter { item -> item.placements.any { it.pageId == "page_1" && it.position5x5 in 1..25 } }
+                .filterNot { it.isHiddenUntilParent }
+                .sortedBy { item -> item.placements.firstOrNull { it.pageId == "page_1" }?.position5x5 ?: Int.MAX_VALUE }
+            val fixedCount = fixedItems.size
+            val firstPageCount = firstPageItems.size
+            val minimumFirstPageCount = if (gridSize == 5) 15 else (gridSize * gridSize - fixedCount).coerceAtLeast(0)
+            val blankItems = items.count { item ->
+                item.labelSl.trim().isBlank() && !hasUsableImage(item.imagePath, item.iconSource)
+            }
+            val imageQuality = auditImageQuality(items)
+            val emptySpeechItems = items.filter { explicitSlSpeechText(it).isBlank() }
+            val missingCore = missingCoreAacLabels(items)
+            val coreWithoutSpeech = emptySpeechItems.filter { item ->
+                CORE_AAC_AUDIT_ITEMS.any { core ->
+                    item.id in core.ids || item.labelSl.trim().uppercase(Locale("sl", "SI")) in core.labels
+                }
+            }
+            val warnings = mutableListOf<String>()
+            if (fixedCount < 3) warnings += "fiksna zgornja vrstica ima premalo ikon"
+            if (firstPageCount < minimumFirstPageCount) warnings += "prva stran ima premalo ikon"
+            if (blankItems > 0) warnings += "nekaj ikon je praznih"
+            if (imageQuality.smallImages > 0) warnings += "nekaj slik ikon je premajhnih"
+            if (missingCore.isNotEmpty()) warnings += "manjkajo osnovne ikone"
+            if (coreWithoutSpeech.isNotEmpty()) warnings += "osnovne ikone nimajo govora"
+            val overall = if (warnings.isEmpty()) "PRIPRAVLJENO ZA TEST" else "POTREBNA DOPOLNITEV"
+            val activeProfile = AacProfileStore.getActiveAacProfile(this).displayName.ifBlank { "DOM" }
+
+            listOf(
+                "PREGLED KOMUNIKATORJA",
+                "",
+                "Aktivni profil: $activeProfile",
+                "Velikost mreže: ${gridSize}x$gridSize",
+                statusLine("Fiksna zgornja vrstica", "$fixedCount ikon", fixedCount >= 3),
+                statusLine("Prva stran", "$firstPageCount ikon", firstPageCount >= minimumFirstPageCount),
+                statusLine("Prazne ikone", "$blankItems", blankItems == 0),
+                statusLine(
+                    "Ikone - kakovost slik",
+                    "${imageQuality.checkedImages} preverjenih, ${imageQuality.smallImages} manjših od 256x256, ${imageQuality.largeImages} vsaj 512x512",
+                    imageQuality.smallImages == 0
+                ),
+                "Priporočeno: PNG 512x512 px, prozorno ozadje, brez teksta na ikoni.",
+                statusLine(
+                    "Osnovne ikone",
+                    if (missingCore.isEmpty()) "vse najdene" else "manjka: ${missingCore.joinToString(", ")}",
+                    missingCore.isEmpty()
+                ),
+                statusLine("Govor", "${emptySpeechItems.size} ikon brez vpisanega govora", coreWithoutSpeech.isEmpty()),
+                "Fotografija: ${if (patientProfilePhotoExists()) "DA" else "NE"}",
+                "",
+                "Skupno stanje: $overall"
+            ).joinToString("\n")
+        } catch (_: Exception) {
+            "PREGLED KOMUNIKATORJA\n\nPOZOR: Pregleda trenutno ni mogoče pripraviti.\nSkupno stanje: POTREBNA DOPOLNITEV"
+        }
+    }
+
+    private fun statusLine(label: String, value: String, ok: Boolean): String {
+        return "${if (ok) "OK" else "POZOR"} - $label: $value"
+    }
+
+    private fun explicitSlSpeechText(item: AacItem): String {
+        return item.speechTextByLanguage["sl"]?.trim().orEmpty()
+            .ifBlank { item.speakTextSl?.trim().orEmpty() }
+            .ifBlank { item.speechText?.trim().orEmpty() }
+    }
+
+    private fun hasUsableImage(imagePath: String, iconSource: IconSource): Boolean {
+        val resolved = AacStoragePaths.resolveIconFile(this, imagePath, iconSource)
+        return resolved?.exists() == true && resolved.isFile && resolved.length() > 0L
+    }
+
+    private fun auditImageQuality(items: List<AacItem>): ImageQualityAudit {
+        var checkedImages = 0
+        var smallImages = 0
+        var largeImages = 0
+        items.forEach { item ->
+            val file = AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
+                ?.takeIf { it.exists() && it.isFile && it.length() > 0L }
+                ?: return@forEach
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+            }
+            BitmapFactory.decodeFile(file.absolutePath, options)
+            val width = options.outWidth
+            val height = options.outHeight
+            if (width <= 0 || height <= 0) return@forEach
+            checkedImages += 1
+            if (width < 256 || height < 256) smallImages += 1
+            if (width >= 512 && height >= 512) largeImages += 1
+        }
+        return ImageQualityAudit(
+            checkedImages = checkedImages,
+            smallImages = smallImages,
+            largeImages = largeImages
+        )
+    }
+
+    private fun missingCoreAacLabels(items: List<AacItem>): List<String> {
+        return CORE_AAC_AUDIT_ITEMS
+            .filterNot { core ->
+                items.any { item ->
+                    item.id in core.ids || item.labelSl.trim().uppercase(Locale("sl", "SI")) in core.labels
+                }
+            }
+            .map { it.label }
     }
 
     private fun refreshVendingCodesSection() {
