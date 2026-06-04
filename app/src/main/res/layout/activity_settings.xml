@@ -33,6 +33,113 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/sectionSettingsHub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:text="HITRI DOSTOP"
+            android:textColor="#F4F7FA"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsHubPatient"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#2F5F9E"
+            android:text="PACIENT"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsHubCommunicator"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#2F5F9E"
+            android:text="KOMUNIKATOR"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsHubIcons"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#2F5F9E"
+            android:text="IKONE IN SLIKE"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsHubSpeech"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#214A78"
+            android:text="GOVOR"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsHubVideoMessages"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#214A78"
+            android:text="VIDEO IN SPOROČILA"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsHubOrientation"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#214A78"
+            android:text="ORIENTACIJA"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsHubBackup"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#3A3F45"
+            android:text="VARNOSTNA KOPIJA"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSettingsHubAdvanced"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginBottom="28dp"
+            android:backgroundTint="#3A3F45"
+            android:text="NAPREDNO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
         <Button
             android:id="@+id/btnAacSettings"
             android:layout_width="match_parent"

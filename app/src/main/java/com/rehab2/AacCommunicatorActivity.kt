@@ -94,6 +94,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var singleIconSpeechOccurredInCurrentSentence = false
     private var sentenceCompositionStartedAt = 0L
     private var lastIconClickAt = 0L
+    private var lastSpeechEndedAt = 0L
     private var pendingVendingDigitsSpeech: String? = null
     private var currentPageId: String = "home"
     private var waterPageModelChildrenCount: Int = -1
@@ -110,6 +111,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         audioPlayer.setSpeechListener(object : AacAudioPlayer.SpeechListener {
             override fun onSpeechStarted() {
                 activeSpeechMode = pendingSpeechMode
+                Log.d(TAG, "AAC_INPUT speech_started inputLocked=false mode=$activeSpeechMode")
                 when (activeSpeechMode) {
                     SpeechMode.SENTENCE -> {
                         isSpeakingSentence = true
@@ -126,6 +128,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
             override fun onSpeechCompleted() {
                 val completedMode = activeSpeechMode
+                lastSpeechEndedAt = System.currentTimeMillis()
+                Log.d(TAG, "AAC_INPUT speech_completed inputLocked=false mode=$completedMode")
                 Log.d(TAG, "AAC_SPEECH SPEECH_COMPLETED mode=$completedMode")
                 resetSpeechState("completed")
                 if (completedMode == SpeechMode.SENTENCE) {
@@ -143,12 +147,16 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             override fun onSpeechCancelled() {
+                lastSpeechEndedAt = System.currentTimeMillis()
+                Log.d(TAG, "AAC_INPUT speech_cancelled inputLocked=false mode=$activeSpeechMode")
                 Log.d(TAG, "AAC_SPEECH SPEECH_CANCELLED mode=$activeSpeechMode")
                 pendingVendingDigitsSpeech = null
                 resetSpeechState("cancelled")
             }
 
             override fun onSpeechError() {
+                lastSpeechEndedAt = System.currentTimeMillis()
+                Log.d(TAG, "AAC_INPUT speech_error inputLocked=false mode=$activeSpeechMode")
                 Log.d(TAG, "AAC_SPEECH SPEECH_ERROR mode=$activeSpeechMode")
                 pendingVendingDigitsSpeech = null
                 resetSpeechState("error")
@@ -360,6 +368,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun handleItemClick(item: AacItem) {
+        Log.d(
+            TAG,
+            "AAC_INPUT handle_click item=${item.id} inputLocked=false " +
+                "isSpeakingSentence=$isSpeakingSentence isSpeakingSingleIcon=$isSpeakingSingleIcon"
+        )
         confirmGuidedTopSuggestionIfYesItem(item)?.let { suggestedItem ->
             handleItemClick(suggestedItem)
             return
@@ -932,8 +945,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
             pendingSingleIconSpeak = null
             startSingleIconSpeech(trimmed, requestId)
         }
+        val delayMs = effectiveSingleIconSpeakDelayMs()
+        Log.d(
+            TAG,
+            "AAC_INPUT single_icon_delay requestId=$requestId delayMs=$delayMs " +
+                "configured=${speechTimingSettings.singleIconSpeakDelayMs}"
+        )
         pendingSingleIconSpeak = pending
-        autoSpeakHandler.postDelayed(pending, speechTimingSettings.singleIconSpeakDelayMs)
+        autoSpeakHandler.postDelayed(pending, delayMs)
     }
 
     private fun scheduleAutoSpeakSentenceIfEnabled(requestId: Int) {
@@ -1043,8 +1062,19 @@ class AacCommunicatorActivity : AppCompatActivity() {
         isSpeakingSingleIcon = false
         pendingSpeechMode = null
         activeSpeechMode = null
+        lastSpeechEndedAt = System.currentTimeMillis()
         audioPlayer.interruptCurrentSpeechForNewInput()
         Log.d(TAG, "AAC_SPEECH INTERRUPT_FOR_NEW_INPUT")
+    }
+
+    private fun effectiveSingleIconSpeakDelayMs(): Long {
+        val configuredDelayMs = speechTimingSettings.singleIconSpeakDelayMs
+        val sinceSpeechEndedMs = System.currentTimeMillis() - lastSpeechEndedAt
+        return if (lastSpeechEndedAt > 0L && sinceSpeechEndedMs in 0..POST_SPEECH_FAST_RESPONSE_WINDOW_MS) {
+            configuredDelayMs.coerceAtMost(MAX_POST_SPEECH_SINGLE_ICON_DELAY_MS)
+        } else {
+            configuredDelayMs
+        }
     }
 
     private fun resetSpeechState(reason: String) {
@@ -1483,6 +1513,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 applyLabelMode()
 
                 itemView.setOnClickListener {
+                    debugLog("AAC_INPUT tile_tap_received item=${item.id}")
                     showPressedFeedback()
                     onItemClick(item)
                 }
@@ -1635,6 +1666,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
         const val PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = "aac_persistent_top_row_item_ids"
         const val MIN_PERSISTENT_TOP_ROW_COUNT = 3
         const val MAX_PERSISTENT_TOP_ROW_COUNT = 5
+        const val MAX_POST_SPEECH_SINGLE_ICON_DELAY_MS = 100L
+        const val POST_SPEECH_FAST_RESPONSE_WINDOW_MS = 1500L
         // Future therapist settings/content metadata may provide positions 1..5.
         // Runtime fixes only the first grid-width items; remaining configured items flow normally.
         const val DEFAULT_PERSISTENT_TOP_ROW_COUNT = 5

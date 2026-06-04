@@ -80,6 +80,7 @@ import kotlin.math.roundToLong
 
 class MainActivity : AppCompatActivity() {
     companion object {
+        private const val TAG = "MainActivity"
         private const val RADIO_TILE_BLUE = 0xFF2F5F9E.toInt()
         private const val RADIO_TILE_GREEN = 0xFF2E8B57.toInt()
         private const val RADIO_TILE_EMPTY = 0xFF3A3F45.toInt()
@@ -3045,11 +3046,15 @@ class MainActivity : AppCompatActivity() {
     private fun speakStatusOrientation() {
         val settings = StatusOrientationSettings.load(this)
         val speechText = StatusOrientationSpeaker.buildBaseSpeechText(this)
+        Log.d(TAG, "STATUS_ORIENTATION weatherEnabled=${settings.speakWeather}")
+        Log.d(TAG, "STATUS_ORIENTATION weatherUrl=${settings.weatherSourceUrl}")
         if (speechText.isBlank()) {
             Toast.makeText(this, "Statusni govor je izklopljen.", Toast.LENGTH_SHORT).show()
             return
         }
         if (!settings.speakWeather || settings.weatherSourceUrl.isBlank()) {
+            Log.d(TAG, "STATUS_ORIENTATION weatherFetchOk=false")
+            Log.d(TAG, "STATUS_ORIENTATION spokenText=$speechText")
             aacAudioPlayer.speakText(speechText, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
             return
         }
@@ -3057,16 +3062,19 @@ class MainActivity : AppCompatActivity() {
         val speechHandled = AtomicBoolean(false)
         mainHandler.postDelayed({
             if (speechHandled.compareAndSet(false, true)) {
+                Log.d(TAG, "STATUS_ORIENTATION weatherFetchOk=false")
+                Log.d(TAG, "STATUS_ORIENTATION spokenText=$speechText")
                 aacAudioPlayer.speakText(
-                    "$speechText Vremena trenutno ne morem preveriti.",
+                    speechText,
                     AacLanguageResolver.DEFAULT_LANGUAGE_CODE
                 )
             }
         }, 1800L)
         Thread {
             val weatherSentence = WeatherClient.fetchOrientationSentence(settings.weatherSourceUrl)
-                ?: "Vremena trenutno ne morem preveriti."
-            val fullSpeechText = "$speechText $weatherSentence"
+            val fullSpeechText = StatusOrientationSpeaker.buildSpeechText(this, weatherSentence = weatherSentence)
+            Log.d(TAG, "STATUS_ORIENTATION weatherFetchOk=${weatherSentence != null}")
+            Log.d(TAG, "STATUS_ORIENTATION spokenText=$fullSpeechText")
             runOnUiThread {
                 if (speechHandled.compareAndSet(false, true)) {
                     aacAudioPlayer.speakText(fullSpeechText, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)

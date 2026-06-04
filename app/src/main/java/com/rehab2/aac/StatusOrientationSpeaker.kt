@@ -28,7 +28,8 @@ object StatusOrientationSpeaker {
             parts += greeting(calendar)
         }
         if (settings.speakDate) {
-            parts += "Danes je ${dayName(calendar)}, ${calendar.get(Calendar.DAY_OF_MONTH)}. ${monthName(calendar)}."
+            val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+            parts += "Danes je ${dayName(calendar)}, $dayOfMonth. ${monthName(calendar)}."
         }
         if (settings.speakTime) {
             val hour = calendar.get(Calendar.HOUR_OF_DAY)

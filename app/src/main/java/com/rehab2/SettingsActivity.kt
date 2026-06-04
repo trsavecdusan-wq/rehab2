@@ -321,6 +321,38 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
+        findViewById<Button>(R.id.btnSettingsHubPatient).setOnClickListener {
+            scrollToSettingsSection(R.id.txtPatientProfileTitle)
+        }
+
+        findViewById<Button>(R.id.btnSettingsHubCommunicator).setOnClickListener {
+            scrollToSettingsSection(R.id.txtAacGridSizeStatus)
+        }
+
+        findViewById<Button>(R.id.btnSettingsHubIcons).setOnClickListener {
+            startActivity(Intent(this, AacEditorActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btnSettingsHubSpeech).setOnClickListener {
+            scrollToSettingsSection(R.id.sectionSpeechApiSettings)
+        }
+
+        findViewById<Button>(R.id.btnSettingsHubVideoMessages).setOnClickListener {
+            showModulePlaceholder("VIDEO IN SPOROČILA")
+        }
+
+        findViewById<Button>(R.id.btnSettingsHubOrientation).setOnClickListener {
+            scrollToSettingsSection(R.id.txtStatusOrientationTitle)
+        }
+
+        findViewById<Button>(R.id.btnSettingsHubBackup).setOnClickListener {
+            startActivity(Intent(this, BackupSettingsActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btnSettingsHubAdvanced).setOnClickListener {
+            scrollToSettingsSection(R.id.sectionAdvancedSettings)
+        }
+
         findViewById<Button>(R.id.btnRadioSettings).setOnClickListener {
             startActivity(Intent(this, RadioSettingsActivity::class.java))
         }
