@@ -87,6 +87,18 @@ private data class CoreIconVisualAudit(
     val missingFilenames: List<String>
 )
 
+private data class PersonPhotoAuditItem(
+    val itemId: String,
+    val label: String,
+    val filename: String
+)
+
+private data class PeoplePhotoAudit(
+    val existingCount: Int,
+    val missingFilenames: List<String>,
+    val lines: List<String>
+)
+
 class SettingsActivity : AppCompatActivity() {
     private enum class SettingsSection {
         PATIENT,
@@ -203,6 +215,15 @@ class SettingsActivity : AppCompatActivity() {
             CoreAacAuditItem("pocutje", "POČUTJE", "#FFEB3B", "😐", "Rada bi povedati, kako se počutim.", "core_feeling.png", setOf("feeling", "pocutje"), setOf("POČUTJE")),
             CoreAacAuditItem("nega", "NEGA", "#B2DFDB", "🧴", "Potrebujem pomoč pri negi.", "core_care.png", setOf("care", "nega"), setOf("NEGA")),
             CoreAacAuditItem("zdravje", "ZDRAVJE", "#F44336", "🏥", "Potrebujem zdravstveno pomoč.", "core_health.png", setOf("health", "zdravje"), setOf("ZDRAVJE"))
+        )
+        private val PEOPLE_PHOTO_AUDIT_ITEMS = listOf(
+            PersonPhotoAuditItem("person_dusan", "DUŠAN", "person_dusan.jpg"),
+            PersonPhotoAuditItem("person_zana", "ŽANA", "person_zana.jpg"),
+            PersonPhotoAuditItem("person_franc", "FRANC", "person_franc.jpg"),
+            PersonPhotoAuditItem("person_inna", "INNA", "person_inna.jpg"),
+            PersonPhotoAuditItem("person_julija", "JULIJA", "person_julija.jpg"),
+            PersonPhotoAuditItem("person_oksana", "OKSANA", "person_oksana.jpg"),
+            PersonPhotoAuditItem("person_sergej", "SERGEJ", "person_sergej.jpg")
         )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
@@ -1319,6 +1340,7 @@ class SettingsActivity : AppCompatActivity() {
             }
             val imageQuality = auditImageQuality(items)
             val coreIconVisualAudit = auditCoreIconVisualQuality()
+            val peoplePhotoAudit = auditPeoplePhotoStatus()
             val emptySpeechItems = items.filter { explicitSlSpeechText(it).isBlank() }
             val missingCore = missingCoreAacLabels(items)
             val coreWithoutSpeech = emptySpeechItems.filter { item ->
@@ -1333,6 +1355,7 @@ class SettingsActivity : AppCompatActivity() {
             if (imageQuality.smallImages > 0) warnings += "nekaj slik ikon je premajhnih"
             if (coreIconVisualAudit.missingFilenames.isNotEmpty()) warnings += "manjkajo kakovostne osnovne slike ikon"
             if (coreIconVisualAudit.smallCount > 0) warnings += "nekaj osnovnih slik ikon je premajhnih"
+            if (peoplePhotoAudit.missingFilenames.isNotEmpty()) warnings += "manjkajo fotografije oseb"
             if (missingCore.isNotEmpty()) warnings += "manjkajo osnovne ikone"
             if (coreWithoutSpeech.isNotEmpty()) warnings += "osnovne ikone nimajo govora"
             val overall = if (warnings.isEmpty()) "PRIPRAVLJENO ZA TEST" else "POTREBNA DOPOLNITEV"
@@ -1363,6 +1386,20 @@ class SettingsActivity : AppCompatActivity() {
                     "Manjkajoče osnovne slike: ${coreIconVisualAudit.missingFilenames.joinToString(", ")}"
                 },
                 "Ikone kopirajte v NovaRehab/icons/system/core/ kot PNG 512x512.",
+                "",
+                "PEOPLE PHOTO STATUS",
+                statusLine(
+                    "Fotografije oseb",
+                    "${peoplePhotoAudit.existingCount}/${PEOPLE_PHOTO_AUDIT_ITEMS.size} najdenih",
+                    peoplePhotoAudit.missingFilenames.isEmpty()
+                ),
+                if (peoplePhotoAudit.missingFilenames.isEmpty()) {
+                    "Manjkajoče fotografije oseb: nič."
+                } else {
+                    "Manjkajoče fotografije oseb: ${peoplePhotoAudit.missingFilenames.joinToString(", ")}"
+                },
+                "Pričakovana mapa: NovaRehab/icons/patient/",
+                peoplePhotoAudit.lines.joinToString("\n"),
                 statusLine(
                     "Osnovne ikone",
                     if (missingCore.isEmpty()) "vse najdene" else "manjka: ${missingCore.joinToString(", ")}",
@@ -1444,6 +1481,27 @@ class SettingsActivity : AppCompatActivity() {
             existingCount = existingCount,
             smallCount = smallCount,
             missingFilenames = missingFilenames
+        )
+    }
+
+    private fun auditPeoplePhotoStatus(): PeoplePhotoAudit {
+        val patientDir = AacStoragePaths.getIconsPatientDir(this)
+        var existingCount = 0
+        val missingFilenames = mutableListOf<String>()
+        val lines = PEOPLE_PHOTO_AUDIT_ITEMS.map { person ->
+            val file = patientDir?.let { File(it, person.filename) }
+            val exists = file?.exists() == true && file.isFile && file.length() > 0L
+            if (exists) {
+                existingCount += 1
+            } else {
+                missingFilenames += person.filename
+            }
+            "${person.label}: ${if (exists) "DA" else "NE"} (${person.filename})"
+        }
+        return PeoplePhotoAudit(
+            existingCount = existingCount,
+            missingFilenames = missingFilenames,
+            lines = lines
         )
     }
 

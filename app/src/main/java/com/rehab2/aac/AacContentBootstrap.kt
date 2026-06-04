@@ -84,6 +84,16 @@ object AacContentBootstrap {
         "yes" to "system/yes.png"
     )
 
+    private val PERSON_PHOTO_REPAIRS = mapOf(
+        "person_dusan" to "person_dusan.jpg",
+        "person_zana" to "person_zana.jpg",
+        "person_franc" to "person_franc.jpg",
+        "person_inna" to "person_inna.jpg",
+        "person_julija" to "person_julija.jpg",
+        "person_oksana" to "person_oksana.jpg",
+        "person_sergej" to "person_sergej.jpg"
+    )
+
     private val CRITICAL_SYSTEM_ICON_FILES = setOf(
         "no.png",
         "yes.png"
@@ -133,6 +143,7 @@ object AacContentBootstrap {
         val repairedConversationTreeV3Metadata = repairConversationTreeV3Metadata(itemsArray, starterItems)
         val repairedRootSystemIcons = repairRootSystemIconMetadata(context, itemsArray)
         val repairedFixedRowSystemIcons = repairFixedRowSystemIconMetadata(context, itemsArray)
+        val repairedPersonPhotoMetadata = repairPersonPhotoMetadata(context, itemsArray)
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
             return Result(
@@ -183,6 +194,7 @@ object AacContentBootstrap {
             repairedConversationTreeV3Metadata > 0 ||
             repairedRootSystemIcons > 0 ||
             repairedFixedRowSystemIcons > 0 ||
+            repairedPersonPhotoMetadata > 0 ||
             repairedFixedTopRowMetadata > 0 ||
             repairedDefaultPageV3Placements > 0 ||
             repairedNoUnderstandLabels > 0 ||
@@ -219,7 +231,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -344,6 +356,36 @@ object AacContentBootstrap {
             }
             if (item.optString("iconSource").trim().uppercase() != IconSource.SYSTEM.name) {
                 item.put("iconSource", IconSource.SYSTEM.name)
+                itemRepaired++
+            }
+            if (itemRepaired > 0) {
+                repaired++
+            }
+        }
+        return repaired
+    }
+
+    private fun repairPersonPhotoMetadata(context: Context, itemsArray: JSONArray): Int {
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+
+        var repaired = 0
+        PERSON_PHOTO_REPAIRS.forEach { (id, desiredImagePath) ->
+            val item = itemsById[id] ?: return@forEach
+            if (isUserProtected(item)) return@forEach
+            val resolvedFile = AacStoragePaths.resolveIconFile(context, desiredImagePath, IconSource.PATIENT)
+            if (resolvedFile?.isFile != true || resolvedFile.length() <= 0L) return@forEach
+
+            var itemRepaired = 0
+            if (item.optString("imagePath").trim() != desiredImagePath) {
+                item.put("imagePath", desiredImagePath)
+                itemRepaired++
+            }
+            if (item.optString("iconSource").trim().uppercase() != IconSource.PATIENT.name) {
+                item.put("iconSource", IconSource.PATIENT.name)
                 itemRepaired++
             }
             if (itemRepaired > 0) {
