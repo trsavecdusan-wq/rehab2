@@ -3,6 +3,7 @@ package com.rehab2.aac
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.audiofx.LoudnessEnhancer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,6 +14,7 @@ import android.widget.Toast
 import com.rehab2.radio.RadioDuckingCoordinator
 import java.io.File
 import java.util.Locale
+import kotlin.math.log10
 
 class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener {
     interface SpeechListener {
@@ -32,6 +34,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { }
     private var mediaPlayer: MediaPlayer? = null
+    private var loudnessEnhancer: LoudnessEnhancer? = null
     private var textToSpeech: TextToSpeech? = TextToSpeech(context, this)
     private var isTtsReady = false
     private var isTtsFailed = false
@@ -221,6 +224,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
                     mediaPlayer = null
                     return false
                 }
+                applySpeechLoudness(this)
                 start()
                 notifySpeechStarted()
             }
@@ -354,8 +358,35 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     }
 
     private fun releaseMediaPlayer() {
+        releaseLoudnessEnhancer()
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+
+    private fun applySpeechLoudness(player: MediaPlayer) {
+        releaseLoudnessEnhancer()
+        val gain = AacSpeechLoudnessSettings.load(context).gain
+        if (gain <= 1.0) return
+
+        runCatching {
+            val gainMb = (20.0 * log10(gain) * 100.0).toInt().coerceIn(0, MAX_LOUDNESS_GAIN_MB)
+            if (gainMb <= 0) return
+            loudnessEnhancer = LoudnessEnhancer(player.audioSessionId).apply {
+                setTargetGain(gainMb)
+                enabled = true
+            }
+        }.onFailure { error ->
+            Log.w(TAG, "SPEECH_LOUDNESS enhancer unavailable: ${error.javaClass.simpleName}")
+            releaseLoudnessEnhancer()
+        }
+    }
+
+    private fun releaseLoudnessEnhancer() {
+        runCatching {
+            loudnessEnhancer?.enabled = false
+            loudnessEnhancer?.release()
+        }
+        loudnessEnhancer = null
     }
 
     private fun notifySpeechStarted() {
@@ -406,5 +437,6 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private companion object {
         const val TAG = "AacAudioPlayer"
         const val MIN_AUDIO_DURATION_MS = 700
+        const val MAX_LOUDNESS_GAIN_MB = 300
     }
 }

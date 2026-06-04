@@ -587,6 +587,52 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/txtAacSpeechLoudnessTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="GLASNOST GOVORA"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtAacSpeechLoudnessStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="Glasnost govora: +20 %"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editAacSpeechLoudnessGain"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:hint="+20 %"
+            android:inputType="none"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnTestAacSpeechLoudness"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#2F80ED"
+            android:text="TEST GOVORA"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/txtStatusOrientationTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

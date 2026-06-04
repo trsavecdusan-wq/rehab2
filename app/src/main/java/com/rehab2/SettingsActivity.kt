@@ -45,6 +45,7 @@ import com.rehab2.aac.AacStarterContentV1
 import com.rehab2.aac.AacSpeechApiConfig
 import com.rehab2.aac.AacSpeechCache
 import com.rehab2.aac.AacSpeechCoordinator
+import com.rehab2.aac.AacSpeechLoudnessSettings
 import com.rehab2.aac.AacSpeechTimingSettings
 import com.rehab2.aac.AacVendingScenario
 import com.rehab2.aac.OpenAiAacSpeechApiClient
@@ -191,6 +192,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtAudioDuckingStatus: TextView
     private lateinit var switchAudioDuckingEnabled: SwitchCompat
     private lateinit var editAudioDuckingPercent: EditText
+    private lateinit var txtAacSpeechLoudnessStatus: TextView
+    private lateinit var editAacSpeechLoudnessGain: EditText
     private lateinit var txtStatusOrientationStatus: TextView
     private lateinit var switchStatusOrientationEnabled: SwitchCompat
     private lateinit var switchStatusOrientationGreeting: SwitchCompat
@@ -213,6 +216,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editPatientShortDescription: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
     private var audioDuckingTestPlayer: AacAudioPlayer? = null
+    private var speechLoudnessTestPlayer: AacAudioPlayer? = null
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
     private var isBatteryReceiverRegistered = false
@@ -291,6 +295,8 @@ class SettingsActivity : AppCompatActivity() {
         txtAudioDuckingStatus = findViewById(R.id.txtAudioDuckingStatus)
         switchAudioDuckingEnabled = findViewById(R.id.switchAudioDuckingEnabled)
         editAudioDuckingPercent = findViewById(R.id.editAudioDuckingPercent)
+        txtAacSpeechLoudnessStatus = findViewById(R.id.txtAacSpeechLoudnessStatus)
+        editAacSpeechLoudnessGain = findViewById(R.id.editAacSpeechLoudnessGain)
         txtStatusOrientationStatus = findViewById(R.id.txtStatusOrientationStatus)
         switchStatusOrientationEnabled = findViewById(R.id.switchStatusOrientationEnabled)
         switchStatusOrientationGreeting = findViewById(R.id.switchStatusOrientationGreeting)
@@ -410,6 +416,12 @@ class SettingsActivity : AppCompatActivity() {
         editAudioDuckingPercent.setOnClickListener {
             showAudioDuckingPercentPicker()
         }
+        editAacSpeechLoudnessGain.setOnClickListener {
+            showAacSpeechLoudnessPicker()
+        }
+        findViewById<Button>(R.id.btnTestAacSpeechLoudness).setOnClickListener {
+            testAacSpeechLoudness()
+        }
         findViewById<Button>(R.id.btnTestAudioDucking).setOnClickListener {
             testAudioDucking()
         }
@@ -499,6 +511,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshKeywordListenerSection()
         refreshAiObservationSection()
         refreshAudioDuckingSection()
+        refreshAacSpeechLoudnessSection()
         refreshStatusOrientationSection()
         refreshPatientProfileSection()
         bindAacAssistSwitchListeners()
@@ -551,6 +564,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onDestroy() {
         releaseSpeechApiTestPlayer()
         releaseAudioDuckingTestPlayer()
+        releaseSpeechLoudnessTestPlayer()
         super.onDestroy()
     }
 
@@ -759,6 +773,13 @@ class SettingsActivity : AppCompatActivity() {
         bindAudioDuckingSwitchListener()
     }
 
+    private fun refreshAacSpeechLoudnessSection() {
+        val settings = AacSpeechLoudnessSettings.load(this)
+        val settingsPath = AacSpeechLoudnessSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
+        txtAacSpeechLoudnessStatus.text = "Glasnost govora: ${settings.label()}"
+        editAacSpeechLoudnessGain.setText("${settings.label()}\n$settingsPath")
+    }
+
     private fun refreshPatientProfileSection() {
         val profile = PatientProfileSettings.load(this)
         val settingsPath = AacStoragePaths.getPatientProfileFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
@@ -862,6 +883,55 @@ class SettingsActivity : AppCompatActivity() {
                 refreshAudioDuckingSection()
             }
             .show()
+    }
+
+    private fun showAacSpeechLoudnessPicker() {
+        val gains = AacSpeechLoudnessSettings.ALLOWED_GAINS
+        val current = AacSpeechLoudnessSettings.load(this).gain
+        val labels = gains.map { gain ->
+            AacSpeechLoudnessSettings(gain = gain).label()
+        }.toTypedArray()
+        val selectedIndex = gains.indexOfFirst { kotlin.math.abs(it - current) < 0.001 }
+            .takeIf { it >= 0 }
+            ?: gains.indexOf(AacSpeechLoudnessSettings.DEFAULT_GAIN)
+        AlertDialog.Builder(this)
+            .setTitle("Glasnost govora")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val saved = AacSpeechLoudnessSettings.save(
+                    this,
+                    AacSpeechLoudnessSettings(
+                        gain = gains[which],
+                        lastUpdatedAt = System.currentTimeMillis()
+                    )
+                )
+                if (!saved) {
+                    Toast.makeText(this, "Nastavitve glasnosti govora niso bile shranjene.", Toast.LENGTH_SHORT).show()
+                }
+                dialog.dismiss()
+                refreshAacSpeechLoudnessSection()
+            }
+            .show()
+    }
+
+    private fun testAacSpeechLoudness() {
+        releaseSpeechLoudnessTestPlayer()
+        speechLoudnessTestPlayer = AacAudioPlayer(this).apply {
+            setSpeechListener(object : AacAudioPlayer.SpeechListener {
+                override fun onSpeechStarted() = Unit
+                override fun onSpeechCompleted() {
+                    releaseSpeechLoudnessTestPlayer()
+                }
+
+                override fun onSpeechCancelled() {
+                    releaseSpeechLoudnessTestPlayer()
+                }
+
+                override fun onSpeechError() {
+                    releaseSpeechLoudnessTestPlayer()
+                }
+            })
+            speakText("To je test glasnosti govora.")
+        }
     }
 
     private fun testAudioDucking() {
@@ -1751,6 +1821,12 @@ class SettingsActivity : AppCompatActivity() {
         audioDuckingTestPlayer?.setSpeechListener(null)
         audioDuckingTestPlayer?.release()
         audioDuckingTestPlayer = null
+    }
+
+    private fun releaseSpeechLoudnessTestPlayer() {
+        speechLoudnessTestPlayer?.setSpeechListener(null)
+        speechLoudnessTestPlayer?.release()
+        speechLoudnessTestPlayer = null
     }
 
     private fun updateModeButtonStyles(powerMode: String) {
