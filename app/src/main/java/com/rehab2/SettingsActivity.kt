@@ -1400,6 +1400,9 @@ class SettingsActivity : AppCompatActivity() {
                 },
                 "Pričakovana mapa: NovaRehab/icons/patient/",
                 peoplePhotoAudit.lines.joinToString("\n"),
+                "",
+                "Manjkajoči družinski člani za kasnejši vnos: svak, nečak 1, nečak 2.",
+                "Dodajte jih šele, ko imate ime in fotografijo.",
                 statusLine(
                     "Osnovne ikone",
                     if (missingCore.isEmpty()) "vse najdene" else "manjka: ${missingCore.joinToString(", ")}",
