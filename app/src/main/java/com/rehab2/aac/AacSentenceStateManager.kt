@@ -58,16 +58,16 @@ class AacSentenceStateManager {
 
     private fun getDrinkSpeakText(upperSet: Set<String>): String? {
         return when {
-            upperSet.contains("MRZLA VODA") -> "Želim piti mrzlo vodo."
-            upperSet.contains("TOPLA VODA") -> "Želim piti toplo vodo."
-            upperSet.contains("VODA Z MEHURČKI") -> "Želim piti vodo z mehurčki."
-            upperSet.contains("VODA BREZ MEHURČKOV") -> "Želim piti vodo brez mehurčkov."
-            upperSet.contains("VODA") -> "Želim piti vodo."
-            upperSet.contains("ČAJ") -> "Želim piti čaj."
-            upperSet.contains("SOK") -> "Želim piti sok."
-            upperSet.contains("KAVA") -> "Želim piti kavo."
-            upperSet.contains("MLEKO") -> "Želim piti mleko."
-            upperSet.contains("LIMONADA") -> "Želim piti limonado."
+            upperSet.contains("MRZLA VODA") -> "Rada bi mrzlo vodo."
+            upperSet.contains("TOPLA VODA") -> "Rada bi toplo vodo."
+            upperSet.contains("VODA Z MEHURČKI") -> "Rada bi vodo z mehurčki."
+            upperSet.contains("VODA BREZ MEHURČKOV") -> "Rada bi vodo brez mehurčkov."
+            upperSet.contains("VODA") -> "Rada bi vodo."
+            upperSet.contains("ČAJ") -> "Rada bi čaj."
+            upperSet.contains("SOK") -> "Rada bi sok."
+            upperSet.contains("KAVA") -> "Rada bi kavo."
+            upperSet.contains("MLEKO") -> "Rada bi mleko."
+            upperSet.contains("LIMONADA") -> "Rada bi limonado."
             else -> null
         }
     }

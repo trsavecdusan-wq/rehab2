@@ -452,8 +452,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
             maybeShowVendingNumber(item)
 
             if (childItems.isNotEmpty()) {
-                speakSingleIconIfEnabled(singleIconText, speechRequestId)
-                scheduleAutoSpeakSentenceIfEnabled(speechRequestId)
+                if (item.id != WATER_NODE_ID) {
+                    speakSingleIconIfEnabled(singleIconText, speechRequestId)
+                }
+                scheduleAutoSpeakSentenceIfEnabled(speechRequestId, allowSingleItem = item.id == WATER_NODE_ID)
                 setPromptText(resolveFollowUpQuestion(item))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
@@ -955,7 +957,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         autoSpeakHandler.postDelayed(pending, delayMs)
     }
 
-    private fun scheduleAutoSpeakSentenceIfEnabled(requestId: Int) {
+    private fun scheduleAutoSpeakSentenceIfEnabled(requestId: Int, allowSingleItem: Boolean = false) {
         cancelPendingAutoSpeakSentence()
         if (!speechTimingSettings.autoSpeakSentenceEnabled) {
             return
@@ -967,7 +969,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             return
         }
         // A single tile already has its own speech path; auto-sentence is reserved for composed phrases.
-        if (itemCount <= 1 && speechTimingSettings.speakSingleIconEnabled) {
+        if (itemCount <= 1 && speechTimingSettings.speakSingleIconEnabled && !allowSingleItem) {
             Log.d(TAG, "AAC_SENTENCE AUTO_SKIP_SINGLE_ITEM_DUPLICATE requestId=$requestId")
             return
         }
