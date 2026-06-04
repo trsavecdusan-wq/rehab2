@@ -687,9 +687,20 @@
             android:id="@+id/btnOpenAacEditorFromAudit"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="8dp"
             android:backgroundTint="#3E7C4A"
             android:text="ODPRI AAC EDITOR"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAddMissingCoreAacIcons"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#6B4E16"
+            android:text="DODAJ MANJKAJOČE OSNOVNE IKONE"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />

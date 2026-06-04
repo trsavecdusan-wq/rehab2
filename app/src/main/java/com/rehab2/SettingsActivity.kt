@@ -58,14 +58,20 @@ import com.rehab2.aac.StatusOrientationSettings
 import com.rehab2.aac.WeatherSource
 import java.io.File
 import java.text.DateFormat
+import java.text.Normalizer
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
 
 private data class CoreAacAuditItem(
+    val key: String,
     val label: String,
+    val color: String,
+    val emojiFallback: String,
+    val speechTextSl: String,
     val ids: Set<String>,
-    val labels: Set<String>
+    val labels: Set<String>,
+    val starterIds: Set<String> = ids
 )
 
 private data class ImageQualityAudit(
@@ -170,16 +176,26 @@ class SettingsActivity : AppCompatActivity() {
         private val AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS = arrayOf(3, 4, 5)
         private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "yes", "dont_understand", "thank_you", "sorry")
         private val CORE_AAC_AUDIT_ITEMS = listOf(
-            CoreAacAuditItem("DA", setOf("yes", "quick_yes"), setOf("DA")),
-            CoreAacAuditItem("NE", setOf("no", "quick_no"), setOf("NE")),
-            CoreAacAuditItem("NE RAZUMEM", setOf("dont_understand"), setOf("NE RAZUMEM")),
-            CoreAacAuditItem("HVALA", setOf("thank_you"), setOf("HVALA")),
-            CoreAacAuditItem("POMOČ", setOf("help"), setOf("POMOČ", "POMAGAJ MI")),
-            CoreAacAuditItem("ŽEJNA SEM", setOf("thirsty"), setOf("ŽEJNA SEM", "ŽEJNA")),
-            CoreAacAuditItem("LAČNA SEM", setOf("hungry"), setOf("LAČNA SEM", "LAČNA")),
-            CoreAacAuditItem("BOLI ME", setOf("pain"), setOf("BOLI ME")),
-            CoreAacAuditItem("WC", setOf("wc"), setOf("WC")),
-            CoreAacAuditItem("UTRUJENA SEM", setOf("tired"), setOf("UTRUJENA SEM", "UTRUJENA"))
+            CoreAacAuditItem("da", "DA", "#4CAF50", "✅", "Da.", setOf("yes", "quick_yes", "da"), setOf("DA"), setOf("yes")),
+            CoreAacAuditItem("ne", "NE", "#F44336", "❌", "Ne.", setOf("no", "quick_no", "ne"), setOf("NE"), setOf("no")),
+            CoreAacAuditItem("ne_razumem", "NE RAZUMEM", "#FF9800", "😕", "Ne razumem.", setOf("dont_understand", "ne_razumem"), setOf("NE RAZUMEM")),
+            CoreAacAuditItem("hvala", "HVALA", "#9C27B0", "🙏", "Hvala.", setOf("thank_you", "hvala"), setOf("HVALA")),
+            CoreAacAuditItem("pomoc", "POMOČ", "#D32F2F", "🆘", "Prosim, pomagajte mi.", setOf("help", "pomoc"), setOf("POMOČ", "POMAGAJ MI")),
+            CoreAacAuditItem("zejna", "ŽEJNA SEM", "#2196F3", "💧", "Žejna sem.", setOf("thirsty", "zejna"), setOf("ŽEJNA SEM", "ŽEJNA")),
+            CoreAacAuditItem("lacna", "LAČNA SEM", "#FF5722", "🍽️", "Lačna sem.", setOf("hungry", "lacna"), setOf("LAČNA SEM", "LAČNA")),
+            CoreAacAuditItem("boli", "BOLI ME", "#E91E63", "🤕", "Boli me.", setOf("pain", "boli"), setOf("BOLI ME")),
+            CoreAacAuditItem("wc", "WC", "#3F51B5", "🚽", "Moram na stranišče.", setOf("wc"), setOf("WC")),
+            CoreAacAuditItem("utrujena", "UTRUJENA SEM", "#9E9E9E", "😴", "Utrujena sem.", setOf("tired", "utrujena"), setOf("UTRUJENA SEM", "UTRUJENA")),
+            CoreAacAuditItem("rada_bi", "RADA BI", "#FFC107", "❤️", "Rada bi.", setOf("i_want", "rada_bi"), setOf("RADA BI")),
+            CoreAacAuditItem("nocem", "NOČEM", "#B71C1C", "🚫", "Nočem.", setOf("dont_want", "nocem"), setOf("NOČEM")),
+            CoreAacAuditItem("druzina", "DRUŽINA", "#8BC34A", "👨‍👩‍👧", "Rada bi družino.", setOf("family_group", "druzina"), setOf("DRUŽINA")),
+            CoreAacAuditItem("poklici", "POKLIČI", "#00BCD4", "📞", "Prosim, pokličite.", setOf("call", "poklici"), setOf("POKLIČI")),
+            CoreAacAuditItem("sporocilo", "SPOROČILO", "#673AB7", "💬", "Rada bi poslati sporočilo.", setOf("message", "sporocilo"), setOf("SPOROČILO")),
+            CoreAacAuditItem("pijaca", "PIJAČA", "#03A9F4", "🥤", "Rada bi pijačo.", setOf("drink", "pijaca"), setOf("PIJAČA")),
+            CoreAacAuditItem("hrana", "HRANA", "#FF9800", "🍲", "Rada bi hrano.", setOf("food", "hrana"), setOf("HRANA")),
+            CoreAacAuditItem("pocutje", "POČUTJE", "#FFEB3B", "😐", "Rada bi povedati, kako se počutim.", setOf("feeling", "pocutje"), setOf("POČUTJE")),
+            CoreAacAuditItem("nega", "NEGA", "#B2DFDB", "🧴", "Potrebujem pomoč pri negi.", setOf("care", "nega"), setOf("NEGA")),
+            CoreAacAuditItem("zdravje", "ZDRAVJE", "#F44336", "🏥", "Potrebujem zdravstveno pomoč.", setOf("health", "zdravje"), setOf("ZDRAVJE"))
         )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
@@ -423,6 +439,10 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnOpenAacEditorFromAudit).setOnClickListener {
             startActivity(Intent(this, AacEditorActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btnAddMissingCoreAacIcons).setOnClickListener {
+            confirmRepairMissingCoreAacIcons()
         }
 
         findViewById<Button>(R.id.btnChangeAdvancedSettingsPin).setOnClickListener {
@@ -1216,6 +1236,38 @@ class SettingsActivity : AppCompatActivity() {
         txtAacPatientAuditStatus.text = buildAacPatientAuditText()
     }
 
+    private fun confirmRepairMissingCoreAacIcons() {
+        AlertDialog.Builder(this)
+            .setTitle("DODAJ OSNOVNE IKONE")
+            .setMessage("Aplikacija bo dodala samo manjkajoče osnovne ikone. Obstoječih ikon ne bo izbrisala ali prepisala.")
+            .setPositiveButton("DODAJ") { _, _ -> repairMissingCoreAacIcons() }
+            .setNegativeButton("PREKLIČI", null)
+            .show()
+    }
+
+    private fun repairMissingCoreAacIcons() {
+        try {
+            val currentItems = AacEditorStorage.loadItems(this)
+            val missingCoreItems = missingCoreAacRepairItems(currentItems)
+            if (missingCoreItems.isEmpty()) {
+                Toast.makeText(this, "Osnovne ikone so že pripravljene.", Toast.LENGTH_SHORT).show()
+                refreshAacPatientAuditPanel()
+                return
+            }
+
+            val addedCount = AacEditorStorage.addMissingCoreStarterItems(this, missingCoreItems)
+            if (addedCount > 0) {
+                Toast.makeText(this, "Manjkajoče osnovne ikone so dodane.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Osnovnih ikon ni bilo mogoče dodati.", Toast.LENGTH_SHORT).show()
+            }
+            refreshAacPatientAuditPanel()
+        } catch (_: Exception) {
+            Toast.makeText(this, "Osnovnih ikon ni bilo mogoče dodati.", Toast.LENGTH_SHORT).show()
+            refreshAacPatientAuditPanel()
+        }
+    }
+
     private fun buildAacPatientAuditText(): String {
         return try {
             val items = AacEditorStorage.loadItems(this)
@@ -1238,7 +1290,7 @@ class SettingsActivity : AppCompatActivity() {
             val missingCore = missingCoreAacLabels(items)
             val coreWithoutSpeech = emptySpeechItems.filter { item ->
                 CORE_AAC_AUDIT_ITEMS.any { core ->
-                    item.id in core.ids || item.labelSl.trim().uppercase(Locale("sl", "SI")) in core.labels
+                    matchesCoreAacItem(item, core)
                 }
             }
             val warnings = mutableListOf<String>()
@@ -1325,10 +1377,40 @@ class SettingsActivity : AppCompatActivity() {
         return CORE_AAC_AUDIT_ITEMS
             .filterNot { core ->
                 items.any { item ->
-                    item.id in core.ids || item.labelSl.trim().uppercase(Locale("sl", "SI")) in core.labels
+                    matchesCoreAacItem(item, core)
                 }
             }
             .map { it.label }
+    }
+
+    private fun missingCoreAacRepairItems(items: List<AacItem>): List<AacEditorStorage.CoreRepairItem> {
+        return CORE_AAC_AUDIT_ITEMS
+            .filterNot { core ->
+                items.any { item ->
+                    matchesCoreAacItem(item, core)
+                }
+            }
+            .flatMap { core ->
+                core.starterIds.map { itemId ->
+                    AacEditorStorage.CoreRepairItem(
+                        id = itemId,
+                        labelSl = core.label,
+                        speechTextSl = core.speechTextSl
+                    )
+                }
+            }
+            .distinctBy { it.id }
+    }
+
+    private fun matchesCoreAacItem(item: AacItem, core: CoreAacAuditItem): Boolean {
+        return item.id.trim() in core.ids || normalizedCoreLabel(item.labelSl) in core.labels.map(::normalizedCoreLabel)
+    }
+
+    private fun normalizedCoreLabel(value: String): String {
+        return Normalizer.normalize(value.trim(), Normalizer.Form.NFD)
+            .replace("\\p{Mn}+".toRegex(), "")
+            .uppercase(Locale("sl", "SI"))
+            .replace("\\s+".toRegex(), " ")
     }
 
     private fun refreshVendingCodesSection() {

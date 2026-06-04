@@ -29,6 +29,12 @@ object AacEditorStorage {
         val imagePath: String
     )
 
+    data class CoreRepairItem(
+        val id: String,
+        val labelSl: String,
+        val speechTextSl: String
+    )
+
     fun loadPages(context: Context): List<EditorPage> {
         val items = loadItems(context)
         val pages = items
@@ -249,6 +255,67 @@ object AacEditorStorage {
         }
     }
 
+    fun addMissingCoreStarterItems(context: Context, repairItems: Collection<CoreRepairItem>): Int {
+        val requestedItems = repairItems
+            .map { it.copy(id = it.id.trim(), labelSl = it.labelSl.trim(), speechTextSl = it.speechTextSl.trim()) }
+            .filter { it.id.isNotBlank() && it.labelSl.isNotBlank() && it.speechTextSl.isNotBlank() }
+            .distinctBy { it.id }
+        if (requestedItems.isEmpty()) return 0
+
+        val itemsFile = AacStoragePaths.getAacItemsFile(context) ?: return 0
+        return try {
+            val storedJson = readStoredItemsJson(itemsFile)
+            val itemsArray = storedJson.itemsArray
+            val items = itemObjects(itemsArray)
+            val existingIds = items
+                .map { it.optString("id").trim() }
+                .toSet()
+            val occupiedFixedPositions = items
+                .mapNotNull { item ->
+                    item.optInt("fixedTopRowPosition", 0)
+                        .takeIf { it in 1..5 }
+                }
+                .toMutableSet()
+            val occupiedPageOnePositions = occupiedPageOnePositions(itemsArray).toMutableSet()
+            val starterItemsById = AacStarterContentV1.items()
+                .filter { starterItem -> requestedItems.any { it.id == starterItem.id } }
+                .associateBy { it.id }
+            var addedCount = 0
+
+            requestedItems.forEach { repairItem ->
+                if (repairItem.id in existingIds) return@forEach
+                val starterItem = starterItemsById[repairItem.id] ?: return@forEach
+                val itemJson = starterItemJson(starterItem)
+                itemJson.put("labelSl", repairItem.labelSl)
+                itemJson.put("speakTextSl", repairItem.speechTextSl)
+                itemJson.put("speechText", repairItem.speechTextSl)
+                itemJson.put("speechTextByLanguage", JSONObject().put("sl", repairItem.speechTextSl))
+
+                val fixedTopRowPosition = itemJson.optInt("fixedTopRowPosition", 0)
+                if (fixedTopRowPosition in 1..5) {
+                    if (fixedTopRowPosition in occupiedFixedPositions) {
+                        itemJson.remove("fixedTopRowPosition")
+                    } else {
+                        occupiedFixedPositions += fixedTopRowPosition
+                    }
+                }
+                if (itemJson.optInt("fixedTopRowPosition", 0) !in 1..5) {
+                    placeOnFirstPageIfSpaceExists(itemJson, occupiedPageOnePositions)
+                }
+
+                itemsArray.put(itemJson)
+                addedCount += 1
+            }
+
+            if (addedCount <= 0) return 0
+            itemsFile.parentFile?.let { parent -> if (!parent.exists()) parent.mkdirs() }
+            itemsFile.writeText(storedJson.toJsonText(), Charsets.UTF_8)
+            addedCount
+        } catch (_: Exception) {
+            0
+        }
+    }
+
     private fun updateItem(context: Context, itemId: String, mutate: (JSONObject) -> Unit): Boolean {
         val itemsFile = AacStoragePaths.getAacItemsFile(context) ?: return false
 
@@ -303,44 +370,47 @@ object AacEditorStorage {
     private fun starterItemsJson(): JSONArray {
         return JSONArray().apply {
             AacStarterContentV1.items().forEach { item ->
-                put(JSONObject()
-                    .put("id", item.id)
-                    .put("labelSl", item.labelSl)
-                    .put("imagePath", item.imagePath)
-                    .put("audioSl", item.audioSl)
-                    .put("actionType", item.actionType)
-                    .put("targetPageId", item.targetPageId)
-                    .put("speakTextSl", item.speakTextSl ?: item.resolvedSpeechText)
-                    .put("speechText", item.speechText ?: item.resolvedSpeechText)
-                    .put("iconSource", item.iconSource.name)
-                    .put("isRootItem", item.isRootItem)
-                    .put("isHiddenUntilParent", item.isHiddenUntilParent)
-                    .put("addsToSentence", item.addsToSentence)
-                    .put("speaksImmediately", item.speaksImmediately)
-                    .put("opensSubicons", item.opensSubicons)
-                    .put("priority", item.priority)
-                    .also { json ->
-                        item.categoryId?.let { json.put("categoryId", it) }
-                        item.conceptId?.let { json.put("conceptId", it) }
-                        item.parentId?.let { json.put("parentId", it) }
-                        item.fixedTopRowPosition?.let { json.put("fixedTopRowPosition", it) }
-                        if (item.children.isNotEmpty()) json.put("children", jsonArrayOf(item.children))
-                        if (item.visibleUnderIds.isNotEmpty()) json.put("visibleUnderIds", jsonArrayOf(item.visibleUnderIds))
-                        if (item.questionByLanguage.isNotEmpty()) json.put("questionByLanguage", JSONObject(item.questionByLanguage))
-                        if (item.placements.isNotEmpty()) {
-                            json.put("placements", JSONArray().apply {
-                                item.placements.forEach { placement ->
-                                    put(JSONObject()
-                                        .put("pageId", placement.pageId)
-                                        .put("position5x5", placement.position5x5)
-                                    )
-                                }
-                            })
-                        }
-                    }
-                )
+                put(starterItemJson(item))
             }
         }
+    }
+
+    private fun starterItemJson(item: AacItem): JSONObject {
+        return JSONObject()
+            .put("id", item.id)
+            .put("labelSl", item.labelSl)
+            .put("imagePath", item.imagePath)
+            .put("audioSl", item.audioSl)
+            .put("actionType", item.actionType)
+            .put("targetPageId", item.targetPageId)
+            .put("speakTextSl", item.speakTextSl ?: item.resolvedSpeechText)
+            .put("speechText", item.speechText ?: item.resolvedSpeechText)
+            .put("iconSource", item.iconSource.name)
+            .put("isRootItem", item.isRootItem)
+            .put("isHiddenUntilParent", item.isHiddenUntilParent)
+            .put("addsToSentence", item.addsToSentence)
+            .put("speaksImmediately", item.speaksImmediately)
+            .put("opensSubicons", item.opensSubicons)
+            .put("priority", item.priority)
+            .also { json ->
+                item.categoryId?.let { json.put("categoryId", it) }
+                item.conceptId?.let { json.put("conceptId", it) }
+                item.parentId?.let { json.put("parentId", it) }
+                item.fixedTopRowPosition?.let { json.put("fixedTopRowPosition", it) }
+                if (item.children.isNotEmpty()) json.put("children", jsonArrayOf(item.children))
+                if (item.visibleUnderIds.isNotEmpty()) json.put("visibleUnderIds", jsonArrayOf(item.visibleUnderIds))
+                if (item.questionByLanguage.isNotEmpty()) json.put("questionByLanguage", JSONObject(item.questionByLanguage))
+                if (item.placements.isNotEmpty()) {
+                    json.put("placements", JSONArray().apply {
+                        item.placements.forEach { placement ->
+                            put(JSONObject()
+                                .put("pageId", placement.pageId)
+                                .put("position5x5", placement.position5x5)
+                            )
+                        }
+                    })
+                }
+            }
     }
 
     private fun jsonArrayOf(values: List<String>): JSONArray {
@@ -364,6 +434,57 @@ object AacEditorStorage {
                 array.optString(index).trim().takeIf { it.isNotBlank() }?.let(::add)
             }
         }
+    }
+
+    private fun occupiedPageOnePositions(itemsArray: JSONArray): Set<Int> {
+        return itemObjects(itemsArray).flatMap { item ->
+            val placements = item.optJSONArray("placements") ?: return@flatMap emptyList()
+            buildList {
+                for (index in 0 until placements.length()) {
+                    val placement = placements.optJSONObject(index) ?: continue
+                    if (placement.optString("pageId").trim() == "page_1") {
+                        val position = placement.optInt("position5x5", 0)
+                        if (position in 1..25) add(position)
+                    }
+                }
+            }
+        }.toSet()
+    }
+
+    private fun placeOnFirstPageIfSpaceExists(item: JSONObject, occupiedPositions: MutableSet<Int>) {
+        val currentPlacements = item.optJSONArray("placements")
+        val nextPlacements = JSONArray()
+        var hasSafePageOnePlacement = false
+        if (currentPlacements != null) {
+            for (index in 0 until currentPlacements.length()) {
+                val placement = currentPlacements.optJSONObject(index) ?: continue
+                if (placement.optString("pageId").trim() != "page_1") {
+                    nextPlacements.put(placement)
+                    continue
+                }
+                val position = placement.optInt("position5x5", 0)
+                if (position in 1..25 && position !in occupiedPositions && !hasSafePageOnePlacement) {
+                    nextPlacements.put(placement)
+                    occupiedPositions += position
+                    hasSafePageOnePlacement = true
+                }
+            }
+        }
+        if (!hasSafePageOnePlacement) {
+            firstOpenPageOnePosition(occupiedPositions)?.let { position ->
+                nextPlacements.put(JSONObject().put("pageId", "page_1").put("position5x5", position))
+                occupiedPositions += position
+            }
+        }
+        if (nextPlacements.length() > 0) {
+            item.put("placements", nextPlacements)
+        } else {
+            item.remove("placements")
+        }
+    }
+
+    private fun firstOpenPageOnePosition(occupiedPositions: Set<Int>): Int? {
+        return (1..25).firstOrNull { it !in occupiedPositions }
     }
 
     private data class StoredItemsJson(
