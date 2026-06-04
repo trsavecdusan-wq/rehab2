@@ -258,6 +258,15 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/helperAdvancedTop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Ta del je za skrbnika ali razvijalca. Če niste prepričani, nastavitev ne spreminjajte."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <TextView
             android:id="@+id/subgroupAdvancedTools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -266,6 +275,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperAdvancedTools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Orodja uporabljajte samo pri preverjanju ali popravilu."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/btnRadioSettings"
@@ -346,6 +364,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperSpeechApi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Tukaj nastavite glas, hitrost in ključ za govor."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/txtSpeechApiStatus"
@@ -448,6 +475,15 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/helperSpeechIconTiming"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Daljši zamik pomaga, če pacientka izbira več ikon zapored."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchSingleIconSpeech"
             android:layout_width="match_parent"
@@ -500,6 +536,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperSpeechAutoSentence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Aplikacija lahko po kratkem premoru sama pove sestavljen stavek."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchAutoSentenceSpeech"
@@ -567,6 +612,15 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/helperCommunicatorGridSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Večja mreža pokaže več ikon. Manjša mreža je lažja za uporabo."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <TextView
             android:id="@+id/txtAacGridSizeStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -604,6 +658,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperCommunicatorTopRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Te ikone ostanejo vedno zgoraj, da jih pacientka hitro najde."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchPersistentTopRowEnabled"
@@ -656,6 +719,15 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/helperCommunicatorGuided"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Aplikacija lahko po izbiri ikone ponudi naslednje smiselno vprašanje."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchGuidedFollowUpEnabled"
             android:layout_width="match_parent"
@@ -704,6 +776,15 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/helperCommunicatorRealWorld"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Pomočniki pomagajo pri opravilih, kot so pijača, hrana ali avtomat."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <TextView
             android:id="@+id/txtVendingCodesTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -741,6 +822,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperSpeechVolume"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Povečajte samo toliko, da je govor jasen in ne poka."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/txtAudioDuckingTitle"
@@ -800,6 +890,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperSpeechTest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Po spremembi vedno pritisnite test govora."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/btnTestAudioDucking"
@@ -879,6 +978,15 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/helperOrientationWhat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Izberite, ali naj aplikacija pove pozdrav, datum, uro in vreme."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <TextView
             android:id="@+id/txtStatusOrientationStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -946,6 +1054,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperOrientationWeather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Vreme deluje samo, ko ima tablica internet."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchStatusOrientationWeather"
@@ -1024,6 +1141,15 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/helperOrientationInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="To polje je namenjeno opombam za statusni govor."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
         <EditText
             android:id="@+id/editStatusOrientationInfo"
             android:layout_width="match_parent"
@@ -1072,6 +1198,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperPatientBasic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Vpišite osnovne podatke pacientke. Ti podatki pomagajo pri osebnem govoru in poročilih."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <EditText
             android:id="@+id/editPatientFirstName"
@@ -1182,6 +1317,15 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/helperPatientContacts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Vpišite osebe, ki pomagajo pacientki."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
         <EditText
             android:id="@+id/editPatientCaregiverContact"
             android:layout_width="match_parent"
@@ -1221,6 +1365,15 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/helperPatientDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Kratek opis naj pove, kaj pacientka zmore in pri čem potrebuje pomoč."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
         <EditText
             android:id="@+id/editPatientShortDescription"
             android:layout_width="match_parent"
@@ -1257,6 +1410,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperAdvancedAi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="AI lahko pomaga s predlogi, odločitev pa ostane pri terapevtu."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/txtAacAssistTitle"
@@ -1358,6 +1520,15 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/helperAdvancedTests"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Testi so namenjeni preverjanju delovanja."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <TextView
             android:id="@+id/txtKeywordMatcherTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -1453,6 +1624,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperCommunicatorProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Profil določa, kateri nabor ikon je trenutno uporabljen."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/txtActiveAacProfileStatus"
@@ -1577,6 +1757,15 @@
             android:textColor="#F4F7FA"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperAdvancedSystem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Te nastavitve vplivajo na delovanje tablice in naj jih spreminja skrbnik."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <TextView
             android:layout_width="match_parent"
