@@ -247,6 +247,15 @@ class SettingsActivity : AppCompatActivity() {
             "inside" to "NOTRI",
             "therapy" to "TERAPIJA"
         )
+        private val ACTIVITY_PACK_AUDIT_ITEMS = listOf(
+            "activity_group" to "KAJ BI DELALA?",
+            "rest" to "POČITEK",
+            "music" to "GLASBA",
+            "tv" to "TELEVIZIJA",
+            "walk" to "SPREHOD",
+            "visit" to "OBISK",
+            "therapy" to "TERAPIJA"
+        )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
         private const val MAX_MISSING_ICONS_SHOWN = 15
@@ -1372,6 +1381,9 @@ class SettingsActivity : AppCompatActivity() {
             val missingPlaceLabels = PLACE_PACK_AUDIT_ITEMS
                 .filter { (itemId, _) -> itemId !in itemIds }
                 .map { (_, label) -> label }
+            val missingActivityLabels = ACTIVITY_PACK_AUDIT_ITEMS
+                .filter { (itemId, _) -> itemId !in itemIds }
+                .map { (_, label) -> label }
             val coreWithoutSpeech = emptySpeechItems.filter { item ->
                 CORE_AAC_AUDIT_ITEMS.any { core ->
                     matchesCoreAacItem(item, core)
@@ -1388,6 +1400,7 @@ class SettingsActivity : AppCompatActivity() {
             if (missingCore.isNotEmpty()) warnings += "manjkajo osnovne ikone"
             if (missingTimeLabels.isNotEmpty()) warnings += "manjkajo časovne ikone"
             if (missingPlaceLabels.isNotEmpty()) warnings += "manjkajo ikone za kraje"
+            if (missingActivityLabels.isNotEmpty()) warnings += "manjkajo ikone za dejavnosti"
             if (coreWithoutSpeech.isNotEmpty()) warnings += "osnovne ikone nimajo govora"
             val overall = if (warnings.isEmpty()) "PRIPRAVLJENO ZA TEST" else "POTREBNA DOPOLNITEV"
             val activeProfile = AacProfileStore.getActiveAacProfile(this).displayName.ifBlank { "DOM" }
@@ -1443,6 +1456,11 @@ class SettingsActivity : AppCompatActivity() {
                     "KRAJ",
                     if (missingPlaceLabels.isEmpty()) "DA" else "manjka: ${missingPlaceLabels.joinToString(", ")}",
                     missingPlaceLabels.isEmpty()
+                ),
+                statusLine(
+                    "DEJAVNOSTI",
+                    if (missingActivityLabels.isEmpty()) "DA" else "manjka: ${missingActivityLabels.joinToString(", ")}",
+                    missingActivityLabels.isEmpty()
                 ),
                 statusLine(
                     "Osnovne ikone",
