@@ -893,7 +893,7 @@ class SettingsActivity : AppCompatActivity() {
         }.toTypedArray()
         val selectedIndex = gains.indexOfFirst { kotlin.math.abs(it - current) < 0.001 }
             .takeIf { it >= 0 }
-            ?: gains.indexOf(AacSpeechLoudnessSettings.DEFAULT_GAIN)
+            ?: gains.indexOfFirst { kotlin.math.abs(it - AacSpeechLoudnessSettings.DEFAULT_GAIN) < 0.001 }
         AlertDialog.Builder(this)
             .setTitle("Glasnost govora")
             .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
