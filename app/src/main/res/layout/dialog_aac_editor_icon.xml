@@ -75,6 +75,27 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/txtAacEditorGalleryHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Izberite fotografijo ali sliko iz tablice. Aplikacija jo bo shranila za to ikono."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnAacEditorPickGalleryImage"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#2F5F9E"
+            android:text="IZBERI SLIKO IZ GALERIJE"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <Button
             android:id="@+id/btnAacEditorCopyIcon"
             android:layout_width="match_parent"

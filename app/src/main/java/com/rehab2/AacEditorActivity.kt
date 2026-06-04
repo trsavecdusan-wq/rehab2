@@ -1,7 +1,10 @@
 package com.rehab2
 
 import android.app.AlertDialog
+import android.app.Activity
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
@@ -17,6 +20,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,7 +35,9 @@ import com.rehab2.aac.AacStarterContentV1
 import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.IconSource
 import java.io.File
+import java.io.FileOutputStream
 import java.text.Normalizer
+import java.util.Locale
 
 class AacEditorActivity : AppCompatActivity() {
     private lateinit var pageButtons: LinearLayout
@@ -39,9 +46,15 @@ class AacEditorActivity : AppCompatActivity() {
     private var pages: List<AacEditorStorage.EditorPage> = emptyList()
     private var selectedPageIndex = 0
     private val adapter = AacEditorAdapter(::showEditIconDialog)
+    private lateinit var galleryImagePicker: ActivityResultLauncher<Intent>
+    private var pendingGalleryItemId: String? = null
+    private var pendingGalleryRefresh: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        galleryImagePicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            handleGalleryImageResult(result.resultCode, result.data?.data)
+        }
         setContentView(R.layout.activity_aac_editor)
 
         pageButtons = findViewById(R.id.aacEditorPageButtons)
@@ -123,6 +136,7 @@ class AacEditorActivity : AppCompatActivity() {
         val hiddenStatus = dialogView.findViewById<TextView>(R.id.txtAacEditorHiddenStatus)
         val childList = dialogView.findViewById<LinearLayout>(R.id.aacEditorChildrenList)
         val changeImage = dialogView.findViewById<Button>(R.id.btnAacEditorChangeImage)
+        val pickGalleryImage = dialogView.findViewById<Button>(R.id.btnAacEditorPickGalleryImage)
         val copyIcon = dialogView.findViewById<Button>(R.id.btnAacEditorCopyIcon)
         val toggleHidden = dialogView.findViewById<Button>(R.id.btnAacEditorToggleHidden)
         val addChild = dialogView.findViewById<Button>(R.id.btnAacEditorAddChild)
@@ -162,6 +176,9 @@ class AacEditorActivity : AppCompatActivity() {
 
         changeImage.setOnClickListener {
             showImageSourceDialog(currentItem, dialog)
+        }
+        pickGalleryImage.setOnClickListener {
+            openGalleryImagePicker(currentItem) { refreshDialogContent() }
         }
         copyIcon.setOnClickListener {
             showCopyIconDialog(currentItem) { refreshDialogContent() }
@@ -968,6 +985,115 @@ class AacEditorActivity : AppCompatActivity() {
             }
             .setNegativeButton("PREKLI\u010cI", null)
             .show()
+    }
+
+    private fun openGalleryImagePicker(item: AacItem, refresh: () -> Unit) {
+        val currentItem = AacEditorStorage.loadItems(this).firstOrNull { it.id == item.id } ?: item
+        if (currentItem.locked) {
+            Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        pendingGalleryItemId = currentItem.id
+        pendingGalleryRefresh = refresh
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            galleryImagePicker.launch(intent)
+        } catch (_: Exception) {
+            pendingGalleryItemId = null
+            pendingGalleryRefresh = null
+            Toast.makeText(this, "Slike ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun handleGalleryImageResult(resultCode: Int, uri: Uri?) {
+        val itemId = pendingGalleryItemId
+        val refresh = pendingGalleryRefresh
+        pendingGalleryItemId = null
+        pendingGalleryRefresh = null
+        if (resultCode != Activity.RESULT_OK || uri == null || itemId.isNullOrBlank()) {
+            return
+        }
+
+        val currentItem = AacEditorStorage.loadItems(this).firstOrNull { it.id == itemId }
+        if (currentItem?.locked == true) {
+            Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val savedImagePath = copyGalleryImageToCustomIcons(uri, itemId)
+        if (savedImagePath.isNullOrBlank()) {
+            Toast.makeText(this, "Slike ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val saved = AacEditorStorage.updateImage(
+            context = this,
+            itemId = itemId,
+            iconSource = IconSource.CUSTOM,
+            imagePath = savedImagePath
+        )
+        if (saved) {
+            Toast.makeText(this, "Slika je shranjena.", Toast.LENGTH_SHORT).show()
+            refresh?.invoke()
+            loadEditorPages()
+        } else {
+            Toast.makeText(this, "Slike ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun copyGalleryImageToCustomIcons(uri: Uri, itemId: String): String? {
+        val customDir = AacStoragePaths.getIconsCustomDir(this) ?: return null
+        if (!customDir.exists() && !customDir.mkdirs()) return null
+        val extension = galleryImageExtension(uri)
+        val safeItemId = safeImageItemId(itemId).ifBlank { "aac_icon" }
+        val targetFile = uniqueCustomImageFile(customDir, "custom_$safeItemId", extension)
+        return try {
+            contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(targetFile).use { output ->
+                    input.copyTo(output)
+                }
+            } ?: return null
+            if (!targetFile.exists() || targetFile.length() <= 0L) {
+                targetFile.delete()
+                return null
+            }
+            targetFile.name
+        } catch (_: Exception) {
+            targetFile.delete()
+            null
+        }
+    }
+
+    private fun galleryImageExtension(uri: Uri): String {
+        val mimeType = contentResolver.getType(uri)?.lowercase(Locale.ROOT).orEmpty()
+        val lastPath = uri.lastPathSegment?.lowercase(Locale.ROOT).orEmpty()
+        return when {
+            mimeType.contains("png") || lastPath.endsWith(".png") -> "png"
+            mimeType.contains("webp") || lastPath.endsWith(".webp") -> "webp"
+            else -> "jpg"
+        }
+    }
+
+    private fun uniqueCustomImageFile(directory: File, baseName: String, extension: String): File {
+        var candidate = File(directory, "$baseName.$extension")
+        var index = 2
+        while (candidate.exists()) {
+            candidate = File(directory, "${baseName}_$index.$extension")
+            index += 1
+        }
+        return candidate
+    }
+
+    private fun safeImageItemId(itemId: String): String {
+        return Normalizer.normalize(itemId.trim().lowercase(Locale.ROOT), Normalizer.Form.NFD)
+            .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
+            .replace(Regex("[^a-z0-9_]+"), "_")
+            .replace(Regex("_+"), "_")
+            .trim('_')
     }
 
     private fun showImageGalleryDialog(
