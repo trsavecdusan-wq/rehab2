@@ -94,6 +94,22 @@ object AacContentBootstrap {
         "person_sergej" to "person_sergej.jpg"
     )
 
+    private val PEOPLE_GROUP_CHILD_REPAIRS = mapOf(
+        "family_group" to listOf("person_zana", "person_sergej", "miss_you", "love_you", "contact_call"),
+        "friends_group" to listOf(
+            "person_dusan",
+            "person_franc",
+            "person_inna",
+            "person_julija",
+            "person_oksana",
+            "contact_message",
+            "contact_call",
+            "miss_you",
+            "when_come",
+            "come_to_me"
+        )
+    )
+
     private val CRITICAL_SYSTEM_ICON_FILES = setOf(
         "no.png",
         "yes.png"
@@ -140,6 +156,7 @@ object AacContentBootstrap {
         val starterItems = AacStarterContentV1.items()
         val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems + starterItems)
         val repairedStarterCategoryChildren = repairStarterCategoryChildren(itemsArray, starterItems)
+        val repairedPeopleGroupChildren = repairPeopleGroupChildren(itemsArray)
         val repairedConversationTreeV3Metadata = repairConversationTreeV3Metadata(itemsArray, starterItems)
         val repairedRootSystemIcons = repairRootSystemIconMetadata(context, itemsArray)
         val repairedFixedRowSystemIcons = repairFixedRowSystemIconMetadata(context, itemsArray)
@@ -191,6 +208,7 @@ object AacContentBootstrap {
             addedPlacements > 0 ||
             mergedMissingSystemItems > 0 ||
             repairedStarterCategoryChildren > 0 ||
+            repairedPeopleGroupChildren > 0 ||
             repairedConversationTreeV3Metadata > 0 ||
             repairedRootSystemIcons > 0 ||
             repairedFixedRowSystemIcons > 0 ||
@@ -231,7 +249,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren peopleGroupChildrenRepaired=$repairedPeopleGroupChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -437,6 +455,25 @@ object AacContentBootstrap {
                     item.put("children", children)
                 }
             }
+        return repaired
+    }
+
+    private fun repairPeopleGroupChildren(itemsArray: JSONArray): Int {
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+
+        var repaired = 0
+        PEOPLE_GROUP_CHILD_REPAIRS.forEach { (id, desiredChildren) ->
+            val item = itemsById[id] ?: return@forEach
+            if (isUserProtected(item)) return@forEach
+            val existingChildren = stringList(item.optJSONArray("children"))
+            if (existingChildren == desiredChildren) return@forEach
+            item.put("children", jsonArrayOf(desiredChildren))
+            repaired++
+        }
         return repaired
     }
 
