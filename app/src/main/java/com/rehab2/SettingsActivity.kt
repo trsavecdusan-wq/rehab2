@@ -495,6 +495,9 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSavePatientProfile).setOnClickListener {
             savePatientProfileSettings()
         }
+        findViewById<Button>(R.id.btnPatientSetupWizard).setOnClickListener {
+            startActivity(Intent(this, PatientSetupWizardActivity::class.java))
+        }
         findViewById<Button>(R.id.btnKeywordMatcherTest).setOnClickListener {
             runKeywordMatcherTest()
         }

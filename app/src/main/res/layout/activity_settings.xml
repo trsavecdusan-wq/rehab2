@@ -1232,6 +1232,18 @@
             android:textColor="#C8D0D8"
             android:textSize="15sp" />
 
+        <Button
+            android:id="@+id/btnPatientSetupWizard"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#2F5F9E"
+            android:text="ZAČETNA NASTAVITEV PACIENTKE"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/editPatientFirstName"
             android:layout_width="match_parent"

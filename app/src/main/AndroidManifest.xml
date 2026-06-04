@@ -26,6 +26,7 @@
         <activity android:name=".BackupSettingsActivity" />
         <activity android:name=".AacEditorActivity" />
         <activity android:name=".AacPackSettingsActivity" />
+        <activity android:name=".PatientSetupWizardActivity" />
         <activity android:name=".LocalMusicActivity" />
         <activity android:name=".RadioStationEditActivity" />
         <activity android:name=".RadioPreviewActivity" />
