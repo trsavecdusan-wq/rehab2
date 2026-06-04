@@ -1230,10 +1230,13 @@
             android:id="@+id/txtPatientProfileStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            android:text="Podatki o pacientu: lokalna shramba"
-            android:textColor="#D6DDE4"
-            android:textSize="15sp"
+            android:layout_marginBottom="18dp"
+            android:background="#1E2329"
+            android:lineSpacingExtra="3dp"
+            android:padding="18dp"
+            android:text="PACIENTKA"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView

@@ -53,6 +53,9 @@ import com.rehab2.aac.OpenAiAacSpeechApiClient
 import com.rehab2.aac.PatientProfileSettings
 import com.rehab2.aac.StatusOrientationSettings
 import com.rehab2.aac.WeatherSource
+import java.io.File
+import java.text.DateFormat
+import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -1210,8 +1213,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun refreshPatientProfileSection() {
         val profile = PatientProfileSettings.load(this)
-        val settingsPath = AacStoragePaths.getPatientProfileFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
-        txtPatientProfileStatus.text = "Podatki o pacientu: lokalna shramba\n$settingsPath"
+        txtPatientProfileStatus.text = buildPatientSummaryText(profile)
         editPatientFirstName.setText(profile.firstName)
         editPatientLastName.setText(profile.lastName)
         editPatientAge.setText(profile.age)
@@ -1222,6 +1224,48 @@ class SettingsActivity : AppCompatActivity() {
         editPatientCaregiverContact.setText(profile.caregiverContact)
         editPatientTherapistContact.setText(profile.therapistContact)
         editPatientShortDescription.setText(profile.shortDescription)
+    }
+
+    private fun buildPatientSummaryText(profile: PatientProfileSettings): String {
+        val patientName = listOf(profile.firstName, profile.lastName)
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .joinToString(" ")
+            .ifBlank { "Ni vpisano" }
+        val language = profile.mainLanguage.trim().ifBlank { "Ni nastavljen" }
+        val gridSize = getAacGridSize()
+        val photoStatus = if (patientProfilePhotoExists()) "DA" else "NE"
+        val activeProfile = AacProfileStore.getActiveAacProfile(this).displayName.ifBlank { "DOM" }
+        val lastUpdated = patientProfileLastUpdatedLabel()
+
+        return listOf(
+            "PACIENTKA",
+            patientName,
+            "",
+            "Jezik: $language",
+            "Mreža: ${gridSize}x$gridSize",
+            "Fotografija: $photoStatus",
+            "AAC profil: $activeProfile",
+            "Zadnja sprememba: $lastUpdated"
+        ).joinToString("\n")
+    }
+
+    private fun patientProfilePhotoExists(): Boolean {
+        val patientDir = AacStoragePaths.getIconsPatientDir(this) ?: return false
+        return patientProfilePhotoFiles(patientDir).any { it.exists() && it.isFile && it.length() > 0L }
+    }
+
+    private fun patientProfileLastUpdatedLabel(): String {
+        val profileFile = AacStoragePaths.getPatientProfileFile(this)
+            ?.takeIf { it.exists() && it.isFile && it.lastModified() > 0L }
+            ?: return "Ni podatka"
+        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale("sl", "SI"))
+            .format(Date(profileFile.lastModified()))
+    }
+
+    private fun patientProfilePhotoFiles(patientDir: File): List<File> {
+        return listOf("patient_profile_photo.jpg", "patient_profile_photo.png", "patient_profile_photo.webp")
+            .map { File(patientDir, it) }
     }
 
     private fun savePatientProfileSettings() {
