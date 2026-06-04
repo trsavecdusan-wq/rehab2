@@ -452,10 +452,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
             maybeShowVendingNumber(item)
 
             if (childItems.isNotEmpty()) {
-                if (item.id != WATER_NODE_ID) {
+                val allowParentAutoSentence = shouldAllowParentAutoSentence(item)
+                if (!(allowParentAutoSentence && speechTimingSettings.autoSpeakSentenceEnabled)) {
                     speakSingleIconIfEnabled(singleIconText, speechRequestId)
                 }
-                scheduleAutoSpeakSentenceIfEnabled(speechRequestId, allowSingleItem = item.id == WATER_NODE_ID)
+                scheduleAutoSpeakSentenceIfEnabled(speechRequestId, allowSingleItem = allowParentAutoSentence)
                 setPromptText(resolveFollowUpQuestion(item))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
@@ -964,7 +965,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
 
         val itemCount = sentenceManager.getItems().size
-        val sentence = sentenceManager.getSpeakText(languageCode).trim()
+        val sentence = getCurrentSentenceSpeakText()
         if (sentence.isEmpty()) {
             return
         }
@@ -1085,6 +1086,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
         pendingSpeechMode = null
         activeSpeechMode = null
         Log.d(TAG, "AAC_SPEECH STATE_RESET reason=$reason")
+    }
+
+    private fun shouldAllowParentAutoSentence(item: AacItem): Boolean {
+        return item.children.isNotEmpty() || item.opensSubicons
     }
 
     private fun resolveV2ChildItems(item: AacItem): List<AacItem> {
@@ -1375,11 +1380,21 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun speakCurrentSentence() {
-        val text = sentenceManager.getSpeakText(languageCode)
+        val text = getCurrentSentenceSpeakText()
         if (text.isNotBlank()) {
             val requestId = nextSpeechRequestId("MANUAL_SENTENCE")
             startSentenceSpeech(text, requestId)
         }
+    }
+
+    private fun getCurrentSentenceSpeakText(): String {
+        if (AacLanguageResolver.normalize(languageCode) == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            val builtSentence = AacSentenceBuilder.buildSlovenianSentence(recentSentenceAacItems()).trim()
+            if (builtSentence.isNotBlank()) {
+                return builtSentence
+            }
+        }
+        return sentenceManager.getSpeakText(languageCode).trim()
     }
 
     private fun nextSpeechRequestId(reason: String): Int {

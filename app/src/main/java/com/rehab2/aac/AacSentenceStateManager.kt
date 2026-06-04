@@ -50,7 +50,9 @@ class AacSentenceStateManager {
     }
 
     private fun buildSimpleSentence(normalizedTexts: List<String>): String {
-        val raw = normalizedTexts.joinToString(" ") { it.lowercase() }
+        val raw = normalizedTexts.joinToString(" ") { text ->
+            text.trim().trimEnd('.', '!', '?').lowercase()
+        }
         return raw.replaceFirstChar { char ->
             if (char.isLowerCase()) char.titlecase() else char.toString()
         } + "."
