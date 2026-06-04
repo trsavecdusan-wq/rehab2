@@ -366,7 +366,10 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private fun applySpeechLoudness(player: MediaPlayer) {
         releaseLoudnessEnhancer()
         val gain = AacSpeechLoudnessSettings.load(context).gain
-        if (gain <= 1.0) return
+        if (gain <= 1.0) {
+            Log.d(TAG, "SPEECH_LOUDNESS disabled gain=$gain")
+            return
+        }
 
         runCatching {
             val gainMb = (20.0 * log10(gain) * 100.0).toInt().coerceIn(0, MAX_LOUDNESS_GAIN_MB)
@@ -375,6 +378,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
                 setTargetGain(gainMb)
                 enabled = true
             }
+            Log.d(TAG, "SPEECH_LOUDNESS applied gain=$gain targetGainMb=$gainMb")
         }.onFailure { error ->
             Log.w(TAG, "SPEECH_LOUDNESS enhancer unavailable: ${error.javaClass.simpleName}")
             releaseLoudnessEnhancer()
@@ -437,6 +441,6 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private companion object {
         const val TAG = "AacAudioPlayer"
         const val MIN_AUDIO_DURATION_MS = 700
-        const val MAX_LOUDNESS_GAIN_MB = 300
+        const val MAX_LOUDNESS_GAIN_MB = 400
     }
 }
