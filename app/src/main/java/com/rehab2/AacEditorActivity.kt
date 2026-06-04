@@ -23,6 +23,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rehab2.aac.AacContentBootstrap
@@ -47,13 +48,20 @@ class AacEditorActivity : AppCompatActivity() {
     private var selectedPageIndex = 0
     private val adapter = AacEditorAdapter(::showEditIconDialog)
     private lateinit var galleryImagePicker: ActivityResultLauncher<Intent>
+    private lateinit var cameraCaptureLauncher: ActivityResultLauncher<Uri>
     private var pendingGalleryItemId: String? = null
     private var pendingGalleryRefresh: (() -> Unit)? = null
+    private var pendingCameraItemId: String? = null
+    private var pendingCameraFile: File? = null
+    private var pendingCameraRefresh: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         galleryImagePicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             handleGalleryImageResult(result.resultCode, result.data?.data)
+        }
+        cameraCaptureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            handleCameraCaptureResult(success)
         }
         setContentView(R.layout.activity_aac_editor)
 
@@ -137,6 +145,7 @@ class AacEditorActivity : AppCompatActivity() {
         val childList = dialogView.findViewById<LinearLayout>(R.id.aacEditorChildrenList)
         val changeImage = dialogView.findViewById<Button>(R.id.btnAacEditorChangeImage)
         val pickGalleryImage = dialogView.findViewById<Button>(R.id.btnAacEditorPickGalleryImage)
+        val capturePhoto = dialogView.findViewById<Button>(R.id.btnAacEditorCapturePhoto)
         val copyIcon = dialogView.findViewById<Button>(R.id.btnAacEditorCopyIcon)
         val toggleHidden = dialogView.findViewById<Button>(R.id.btnAacEditorToggleHidden)
         val addChild = dialogView.findViewById<Button>(R.id.btnAacEditorAddChild)
@@ -179,6 +188,9 @@ class AacEditorActivity : AppCompatActivity() {
         }
         pickGalleryImage.setOnClickListener {
             openGalleryImagePicker(currentItem) { refreshDialogContent() }
+        }
+        capturePhoto.setOnClickListener {
+            openCameraCapture(currentItem) { refreshDialogContent() }
         }
         copyIcon.setOnClickListener {
             showCopyIconDialog(currentItem) { refreshDialogContent() }
@@ -1043,6 +1055,91 @@ class AacEditorActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Slike ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun openCameraCapture(item: AacItem, refresh: () -> Unit) {
+        val currentItem = AacEditorStorage.loadItems(this).firstOrNull { it.id == item.id } ?: item
+        if (currentItem.locked) {
+            Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val targetFile = createCameraImageFile(currentItem.id)
+        if (targetFile == null) {
+            Toast.makeText(this, "Fotografije ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val outputUri = try {
+            FileProvider.getUriForFile(this, "$packageName.fileprovider", targetFile)
+        } catch (_: Exception) {
+            targetFile.delete()
+            Toast.makeText(this, "Fotografije ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        pendingCameraItemId = currentItem.id
+        pendingCameraFile = targetFile
+        pendingCameraRefresh = refresh
+        try {
+            cameraCaptureLauncher.launch(outputUri)
+        } catch (_: Exception) {
+            clearPendingCameraCapture(deleteFile = true)
+            Toast.makeText(this, "Fotografije ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun handleCameraCaptureResult(success: Boolean) {
+        val itemId = pendingCameraItemId
+        val targetFile = pendingCameraFile
+        val refresh = pendingCameraRefresh
+        pendingCameraItemId = null
+        pendingCameraFile = null
+        pendingCameraRefresh = null
+
+        if (!success || itemId.isNullOrBlank() || targetFile == null || !targetFile.exists() || targetFile.length() <= 0L) {
+            targetFile?.delete()
+            Toast.makeText(this, "Fotografije ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val currentItem = AacEditorStorage.loadItems(this).firstOrNull { it.id == itemId }
+        if (currentItem?.locked == true) {
+            targetFile.delete()
+            Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val saved = AacEditorStorage.updateImage(
+            context = this,
+            itemId = itemId,
+            iconSource = IconSource.CUSTOM,
+            imagePath = targetFile.name
+        )
+        if (saved) {
+            Toast.makeText(this, "Fotografija je shranjena.", Toast.LENGTH_SHORT).show()
+            refresh?.invoke()
+            loadEditorPages()
+        } else {
+            targetFile.delete()
+            Toast.makeText(this, "Fotografije ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun createCameraImageFile(itemId: String): File? {
+        val customDir = AacStoragePaths.getIconsCustomDir(this) ?: return null
+        if (!customDir.exists() && !customDir.mkdirs()) return null
+        val safeItemId = safeImageItemId(itemId).ifBlank { "aac_icon" }
+        return uniqueCustomImageFile(customDir, "custom_${safeItemId}_camera", "jpg")
+    }
+
+    private fun clearPendingCameraCapture(deleteFile: Boolean) {
+        if (deleteFile) {
+            pendingCameraFile?.delete()
+        }
+        pendingCameraItemId = null
+        pendingCameraFile = null
+        pendingCameraRefresh = null
     }
 
     private fun copyGalleryImageToCustomIcons(uri: Uri, itemId: String): String? {

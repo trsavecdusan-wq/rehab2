@@ -96,6 +96,27 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/txtAacEditorCameraHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Fotografirajte predmet ali osebo in aplikacija bo sliko shranila za to ikono."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnAacEditorCapturePhoto"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#2F7A54"
+            android:text="FOTOGRAFIRAJ"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <Button
             android:id="@+id/btnAacEditorCopyIcon"
             android:layout_width="match_parent"
