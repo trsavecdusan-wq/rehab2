@@ -729,6 +729,178 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/txtPatientProfileTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="PODATKI O PACIENTU"
+            android:textColor="#D6DDE4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtPatientProfileStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="Podatki o pacientu: lokalna shramba"
+            android:textColor="#D6DDE4"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editPatientFirstName"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="Ime"
+            android:inputType="textPersonName"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientLastName"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="Priimek"
+            android:inputType="textPersonName"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientAge"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="Starost"
+            android:inputType="number"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientBirthDate"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="Datum rojstva"
+            android:inputType="text"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientHomeTown"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="Kraj bivanja"
+            android:inputType="textCapWords"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientCountry"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="Dr\u017eava"
+            android:inputType="textCapWords"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientMainLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="Glavni jezik"
+            android:inputType="textCapSentences"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientCaregiverContact"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="Skrbnik / kontakt"
+            android:inputType="textCapSentences"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientTherapistContact"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="center_vertical"
+            android:hint="Terapevt / kontakt"
+            android:inputType="textCapSentences"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editPatientShortDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:gravity="top"
+            android:hint="Kratek opis"
+            android:inputType="textMultiLine|textCapSentences"
+            android:maxLines="5"
+            android:minHeight="96dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnSavePatientProfile"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#2F80ED"
+            android:text="SHRANI PODATKE O PACIENTU"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/txtAacAssistTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

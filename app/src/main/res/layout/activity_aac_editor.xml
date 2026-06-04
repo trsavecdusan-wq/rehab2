@@ -22,9 +22,21 @@
         android:id="@+id/btnAacEditorBack"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="8dp"
         android:backgroundTint="#2F5F9E"
         android:text="NAZAJ"
+        android:textAllCaps="false"
+        android:textColor="#F4F7FA"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btnAacEditorAudit"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#34414D"
+        android:text="PREVERI KOMUNIKATOR"
         android:textAllCaps="false"
         android:textColor="#F4F7FA"
         android:textSize="20sp"

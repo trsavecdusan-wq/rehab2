@@ -46,6 +46,23 @@
             android:textColor="#F4F7FA"
             android:textSize="18sp" />
 
+        <TextView
+            android:id="@+id/txtAacEditorImagePath"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="#DCE6EF"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtAacEditorHiddenStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="#F2C94C"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
         <Button
             android:id="@+id/btnAacEditorChangeImage"
             android:layout_width="match_parent"
@@ -53,6 +70,71 @@
             android:layout_marginTop="18dp"
             android:backgroundTint="#34414D"
             android:text="MENJAJ SLIKO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAacEditorCopyIcon"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#34414D"
+            android:text="KOPIRAJ IKONO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAacEditorToggleHidden"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#8A5A2B"
+            android:text="SKRIJ IKONO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtAacEditorChildrenTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="PODIKONE"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/aacEditorChildrenList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical" />
+
+        <Button
+            android:id="@+id/btnAacEditorAddChild"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#2E8B57"
+            android:text="DODAJ OBSTOJEČO IKONO"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAacEditorAddNewChild"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#2E8B57"
+            android:text="DODAJ NOVO PODIKONO"
             android:textAllCaps="false"
             android:textColor="#F4F7FA"
             android:textSize="18sp"

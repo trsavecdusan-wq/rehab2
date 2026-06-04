@@ -11,8 +11,26 @@ object AacEditorStorage {
         val items: List<AacItem>
     )
 
+    data class NewIcon(
+        val id: String,
+        val parentId: String,
+        val labelSl: String,
+        val speechTextSl: String,
+        val iconSource: IconSource,
+        val imagePath: String
+    )
+
+    data class CopyIcon(
+        val sourceId: String,
+        val newId: String,
+        val labelSl: String,
+        val speechTextSl: String,
+        val iconSource: IconSource,
+        val imagePath: String
+    )
+
     fun loadPages(context: Context): List<EditorPage> {
-        val items = AacLocalJsonLoader.loadItems(context, AacStarterContentV1.items())
+        val items = loadItems(context)
         val pages = items
             .flatMap { item -> item.placements.map { placement -> placement.pageId } }
             .filter { it.isNotBlank() }
@@ -27,6 +45,22 @@ object AacEditorStorage {
                     .filter { item -> item.placements.any { it.pageId == pageId } }
                     .sortedBy { item -> item.placements.firstOrNull { it.pageId == pageId }?.position5x5 ?: Int.MAX_VALUE }
             )
+        }
+    }
+
+    fun loadItems(context: Context): List<AacItem> {
+        return AacLocalJsonLoader.loadItems(context, AacStarterContentV1.items())
+    }
+
+    fun hiddenItemIds(context: Context): Set<String> {
+        val itemsFile = AacStoragePaths.getAacItemsFile(context) ?: return emptySet()
+        return try {
+            itemObjects(readStoredItemsJson(itemsFile).itemsArray)
+                .filter { it.optBoolean("hidden", false) }
+                .mapNotNull { it.optString("id").trim().takeIf(String::isNotBlank) }
+                .toSet()
+        } catch (_: Exception) {
+            emptySet()
         }
     }
 
@@ -54,6 +88,164 @@ object AacEditorStorage {
         return updateItem(context, itemId) { item ->
             item.put("iconSource", iconSource.name)
             item.put("imagePath", imagePath.trim())
+        }
+    }
+
+    fun updateChildren(context: Context, itemId: String, children: List<String>): Boolean {
+        return updateItem(context, itemId) { item ->
+            item.put("children", jsonArrayOf(children.distinct()))
+        }
+    }
+
+    fun addNewChildIcon(context: Context, newIcon: NewIcon): Boolean {
+        val itemId = newIcon.id.trim()
+        val parentId = newIcon.parentId.trim()
+        val labelSl = newIcon.labelSl.trim()
+        val speechTextSl = newIcon.speechTextSl.trim()
+        if (itemId.isBlank() || parentId.isBlank() || labelSl.isBlank() || speechTextSl.isBlank()) return false
+
+        val itemsFile = AacStoragePaths.getAacItemsFile(context) ?: return false
+        return try {
+            val storedJson = readStoredItemsJson(itemsFile)
+            val itemsArray = storedJson.itemsArray
+            val items = itemObjects(itemsArray)
+            if (items.any { it.optString("id").trim() == itemId }) return false
+            val parent = items.firstOrNull { it.optString("id").trim() == parentId } ?: return false
+            val parentChildren = stringList(parent.optJSONArray("children"))
+            if (itemId in parentChildren) return false
+
+            val newItem = JSONObject()
+                .put("id", itemId)
+                .put("labelSl", labelSl)
+                .put("speakTextSl", speechTextSl)
+                .put("speechText", speechTextSl)
+                .put("speechTextByLanguage", JSONObject().put("sl", speechTextSl))
+                .put("actionType", "speak")
+                .put("iconSource", newIcon.iconSource.name)
+                .put("imagePath", newIcon.imagePath.trim())
+                .put("isRootItem", false)
+                .put("isHiddenUntilParent", false)
+                .put("parentId", parentId)
+                .put("visibleUnderIds", jsonArrayOf(listOf(parentId)))
+                .put("children", JSONArray())
+                .put("addsToSentence", true)
+                .put("speaksImmediately", true)
+                .put("opensSubicons", false)
+                .put("meaningId", "custom.$itemId")
+                .put("meaningType", "CUSTOM")
+                .put("meaningGroup", "custom")
+                .put("semanticTags", jsonArrayOf(listOf(labelSl.lowercase(), itemId)))
+                .put("searchKeywordsByLanguage", JSONObject().put("sl", jsonArrayOf(listOf(labelSl.lowercase(), itemId))))
+                .put("userEdited", true)
+
+            parent.put("children", jsonArrayOf(parentChildren + itemId))
+            parent.put("userEdited", true)
+            itemsArray.put(newItem)
+
+            itemsFile.parentFile?.let { parentDir -> if (!parentDir.exists()) parentDir.mkdirs() }
+            itemsFile.writeText(storedJson.toJsonText(), Charsets.UTF_8)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    fun copyIconAsSibling(context: Context, copyIcon: CopyIcon): Boolean {
+        val sourceId = copyIcon.sourceId.trim()
+        val itemId = copyIcon.newId.trim()
+        val labelSl = copyIcon.labelSl.trim()
+        val speechTextSl = copyIcon.speechTextSl.trim()
+        if (sourceId.isBlank() || itemId.isBlank() || labelSl.isBlank() || speechTextSl.isBlank()) return false
+
+        val itemsFile = AacStoragePaths.getAacItemsFile(context) ?: return false
+        return try {
+            val storedJson = readStoredItemsJson(itemsFile)
+            val itemsArray = storedJson.itemsArray
+            val items = itemObjects(itemsArray)
+            if (items.any { it.optString("id").trim() == itemId }) return false
+            val source = items.firstOrNull { it.optString("id").trim() == sourceId } ?: return false
+            val parent = items.firstOrNull { item -> sourceId in stringList(item.optJSONArray("children")) } ?: return false
+            val parentChildren = stringList(parent.optJSONArray("children"))
+            if (itemId in parentChildren) return false
+
+            val newItem = JSONObject(source.toString())
+            newItem.put("id", itemId)
+            newItem.put("labelSl", labelSl)
+            newItem.put("speakTextSl", speechTextSl)
+            newItem.put("speechText", speechTextSl)
+            newItem.put("speechTextByLanguage", JSONObject().put("sl", speechTextSl))
+            newItem.put("iconSource", copyIcon.iconSource.name)
+            newItem.put("imagePath", copyIcon.imagePath.trim())
+            newItem.put("children", JSONArray())
+            newItem.put("visibleUnderIds", jsonArrayOf(listOf(parent.optString("id").trim())))
+            newItem.put("isRootItem", false)
+            newItem.put("opensSubicons", false)
+            newItem.put("speaksImmediately", true)
+            newItem.put("actionType", "speak")
+            newItem.put("targetPageId", "")
+            newItem.put("parentId", parent.optString("id").trim())
+            newItem.put("userEdited", true)
+            newItem.remove("placements")
+            newItem.remove("fixedTopRowPosition")
+            newItem.remove("hidden")
+
+            parent.put("children", jsonArrayOf(parentChildren + itemId))
+            parent.put("userEdited", true)
+            itemsArray.put(newItem)
+
+            itemsFile.parentFile?.let { parentDir -> if (!parentDir.exists()) parentDir.mkdirs() }
+            itemsFile.writeText(storedJson.toJsonText(), Charsets.UTF_8)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    fun setHidden(context: Context, itemId: String, hidden: Boolean): Boolean {
+        val protectedIds = setOf(
+            "no",
+            "yes",
+            "dont_understand",
+            "thank_you",
+            "sorry",
+            "people",
+            "need",
+            "problem",
+            "thirsty",
+            "hungry",
+            "pain",
+            "wc"
+        )
+        val normalizedId = itemId.trim()
+        if (hidden && normalizedId in protectedIds) return false
+
+        val items = loadItems(context)
+        val item = items.firstOrNull { it.id == normalizedId } ?: return false
+        if (hidden && item.placements.isNotEmpty()) {
+            val pageIds = item.placements.map { it.pageId }.toSet()
+            pageIds.forEach { pageId ->
+                val visibleOnPage = items
+                    .filter { candidate -> candidate.id != normalizedId && candidate.placements.any { it.pageId == pageId } }
+                    .filterNot { candidate -> candidate.id in hiddenItemIds(context) }
+                if (visibleOnPage.isEmpty()) return false
+            }
+        }
+
+        return updateItem(context, normalizedId) { json ->
+            json.put("hidden", hidden)
+        }
+    }
+
+    fun rawItemsForAudit(context: Context): JSONArray {
+        val itemsFile = AacStoragePaths.getAacItemsFile(context)
+        return try {
+            if (itemsFile != null) {
+                readStoredItemsJson(itemsFile).itemsArray
+            } else {
+                starterItemsJson()
+            }
+        } catch (_: Exception) {
+            starterItemsJson()
         }
     }
 
@@ -154,6 +346,23 @@ object AacEditorStorage {
     private fun jsonArrayOf(values: List<String>): JSONArray {
         return JSONArray().apply {
             values.forEach { value -> put(value) }
+        }
+    }
+
+    private fun itemObjects(itemsArray: JSONArray): List<JSONObject> {
+        return buildList {
+            for (index in 0 until itemsArray.length()) {
+                itemsArray.optJSONObject(index)?.let(::add)
+            }
+        }
+    }
+
+    private fun stringList(array: JSONArray?): List<String> {
+        if (array == null) return emptyList()
+        return buildList {
+            for (index in 0 until array.length()) {
+                array.optString(index).trim().takeIf { it.isNotBlank() }?.let(::add)
+            }
         }
     }
 

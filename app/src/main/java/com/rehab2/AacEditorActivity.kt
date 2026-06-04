@@ -3,7 +3,9 @@ package com.rehab2
 import android.app.AlertDialog
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -19,13 +21,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rehab2.aac.AacContentBootstrap
+import com.rehab2.aac.AacEditorAudit
 import com.rehab2.aac.AacEditorStorage
 import com.rehab2.aac.AacImageGallery
 import com.rehab2.aac.AacItem
 import com.rehab2.aac.AacLocalizedTextResolver
 import com.rehab2.aac.AacStarterContentV1
 import com.rehab2.aac.AacStoragePaths
+import com.rehab2.aac.IconSource
 import java.io.File
+import java.text.Normalizer
 
 class AacEditorActivity : AppCompatActivity() {
     private lateinit var pageButtons: LinearLayout
@@ -46,6 +51,7 @@ class AacEditorActivity : AppCompatActivity() {
         recycler.adapter = adapter
 
         findViewById<Button>(R.id.btnAacEditorBack).setOnClickListener { finish() }
+        findViewById<Button>(R.id.btnAacEditorAudit).setOnClickListener { showCommunicatorAuditDialog() }
 
         loadEditorPages()
     }
@@ -94,7 +100,17 @@ class AacEditorActivity : AppCompatActivity() {
     private fun showPage(index: Int) {
         val page = pages.getOrNull(index) ?: return
         pageTitle.text = page.title
-        adapter.submitItems(page.items)
+        adapter.submitItems(page.items, AacEditorStorage.hiddenItemIds(this))
+    }
+
+    private fun showCommunicatorAuditDialog() {
+        val problems = AacEditorAudit.run(this)
+        val message = AacEditorAudit.format(problems)
+        AlertDialog.Builder(this)
+            .setTitle("PREVERI KOMUNIKATOR (${problems.size})")
+            .setMessage(message.take(12000))
+            .setPositiveButton("ZAPRI", null)
+            .show()
     }
 
     private fun showEditIconDialog(item: AacItem) {
@@ -103,31 +119,69 @@ class AacEditorActivity : AppCompatActivity() {
         val itemId = dialogView.findViewById<TextView>(R.id.txtAacEditorItemId)
         val label = dialogView.findViewById<TextView>(R.id.txtAacEditorLabel)
         val speech = dialogView.findViewById<TextView>(R.id.txtAacEditorSpeech)
+        val imagePath = dialogView.findViewById<TextView>(R.id.txtAacEditorImagePath)
+        val hiddenStatus = dialogView.findViewById<TextView>(R.id.txtAacEditorHiddenStatus)
+        val childList = dialogView.findViewById<LinearLayout>(R.id.aacEditorChildrenList)
         val changeImage = dialogView.findViewById<Button>(R.id.btnAacEditorChangeImage)
+        val copyIcon = dialogView.findViewById<Button>(R.id.btnAacEditorCopyIcon)
+        val toggleHidden = dialogView.findViewById<Button>(R.id.btnAacEditorToggleHidden)
+        val addChild = dialogView.findViewById<Button>(R.id.btnAacEditorAddChild)
+        val addNewChild = dialogView.findViewById<Button>(R.id.btnAacEditorAddNewChild)
         val editLabel = dialogView.findViewById<Button>(R.id.btnAacEditorEditLabel)
         val editSpeech = dialogView.findViewById<Button>(R.id.btnAacEditorEditSpeech)
 
-        bindPreview(preview, item)
-        itemId.text = "itemId: ${item.id}"
-        label.text = "labelSl: ${item.labelSl}"
-        speech.text = "speechTextSl: ${item.resolvedSpeechText}"
+        var currentItem = item
+        lateinit var dialog: AlertDialog
 
-        val dialog = AlertDialog.Builder(this)
+        fun refreshDialogContent() {
+            currentItem = AacEditorStorage.loadItems(this).firstOrNull { it.id == item.id } ?: currentItem
+            val allItems = AacEditorStorage.loadItems(this)
+            val hiddenIds = AacEditorStorage.hiddenItemIds(this)
+            val isHidden = currentItem.id in hiddenIds
+            bindPreview(preview, currentItem)
+            itemId.text = "itemId: ${currentItem.id}"
+            label.text = "labelSl: ${currentItem.labelSl}"
+            speech.text = "speechTextSl: ${currentItem.resolvedSpeechText}"
+            imagePath.text = "imagePath: ${currentItem.imagePath.ifBlank { "ni nastavljen" }}"
+            hiddenStatus.text = if (isHidden) "SKRITO: editor marker, runtime skrivanje pride kasneje." else ""
+            toggleHidden.text = if (isHidden) "POKA\u017dI IKONO" else "SKRIJ IKONO"
+            renderChildSection(
+                parent = currentItem,
+                allItems = allItems,
+                childList = childList,
+                editDialog = dialog,
+                refresh = { refreshDialogContent() }
+            )
+        }
+
+        dialog = AlertDialog.Builder(this)
             .setTitle("UREDI IKONO")
             .setView(dialogView)
             .setNegativeButton("ZAPRI", null)
             .create()
 
         changeImage.setOnClickListener {
-            showImageSourceDialog(item, dialog)
+            showImageSourceDialog(currentItem, dialog)
+        }
+        copyIcon.setOnClickListener {
+            showCopyIconDialog(currentItem) { refreshDialogContent() }
+        }
+        toggleHidden.setOnClickListener {
+            toggleHiddenMarker(currentItem) { refreshDialogContent() }
+        }
+        addChild.setOnClickListener {
+            showAddChildDialog(currentItem) { refreshDialogContent() }
+        }
+        addNewChild.setOnClickListener {
+            showAddNewChildIconDialog(currentItem) { refreshDialogContent() }
         }
         editLabel.setOnClickListener {
             showTextEditDialog(
                 title = "UREDI TEKST",
-                currentValue = item.labelSl,
+                currentValue = currentItem.labelSl,
                 onSave = { value ->
                     saveTextChange(
-                        saved = AacEditorStorage.updateLabelSl(this, item.id, value),
+                        saved = AacEditorStorage.updateLabelSl(this, currentItem.id, value),
                         dialog = dialog
                     )
                 }
@@ -136,17 +190,772 @@ class AacEditorActivity : AppCompatActivity() {
         editSpeech.setOnClickListener {
             showTextEditDialog(
                 title = "UREDI GOVOR",
-                currentValue = item.resolvedSpeechText,
+                currentValue = currentItem.resolvedSpeechText,
                 onSave = { value ->
                     saveTextChange(
-                        saved = AacEditorStorage.updateSpeechTextSl(this, item.id, value),
+                        saved = AacEditorStorage.updateSpeechTextSl(this, currentItem.id, value),
                         dialog = dialog
                     )
                 }
             )
         }
 
+        refreshDialogContent()
         dialog.show()
+    }
+
+    private fun renderChildSection(
+        parent: AacItem,
+        allItems: List<AacItem>,
+        childList: LinearLayout,
+        editDialog: AlertDialog,
+        refresh: () -> Unit
+    ) {
+        childList.removeAllViews()
+        val itemsById = allItems.associateBy { it.id }
+        if (parent.children.isEmpty()) {
+            childList.addView(TextView(this).apply {
+                text = "Ni podikon."
+                setTextColor(0xFFDCE6EF.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                setPadding(8, 8, 8, 8)
+            })
+            return
+        }
+
+        parent.children.forEachIndexed { index, childId ->
+            val child = itemsById[childId]
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(10, 10, 10, 10)
+                setBackgroundColor(0xFF1E2329.toInt())
+            }
+            row.addView(TextView(this).apply {
+                text = "${index + 1}. ${child?.labelSl ?: childId} ($childId)"
+                setTextColor(0xFFF4F7FA.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+            })
+            val buttons = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+                setPadding(0, 8, 0, 0)
+            }
+            buttons.addView(buildChildActionButton("GOR") {
+                if (index > 0) {
+                    updateChildren(parent, parent.children.toMutableList().also {
+                        val moved = it.removeAt(index)
+                        it.add(index - 1, moved)
+                    }, refresh)
+                }
+            })
+            buttons.addView(buildChildActionButton("DOL") {
+                if (index < parent.children.lastIndex) {
+                    updateChildren(parent, parent.children.toMutableList().also {
+                        val moved = it.removeAt(index)
+                        it.add(index + 1, moved)
+                    }, refresh)
+                }
+            })
+            buttons.addView(buildChildActionButton("ODSTRANI") {
+                confirmRemoveChild(parent, childId, child?.labelSl ?: childId, editDialog, refresh)
+            })
+            row.addView(buttons)
+            childList.addView(
+                row,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = 8
+                }
+            )
+        }
+    }
+
+    private fun buildChildActionButton(textValue: String, onClick: () -> Unit): Button {
+        return Button(this).apply {
+            text = textValue
+            isAllCaps = false
+            setTextColor(0xFFF4F7FA.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF34414D.toInt())
+            setOnClickListener { onClick() }
+            layoutParams = LinearLayout.LayoutParams(0, 52, 1f).apply {
+                marginEnd = 6
+            }
+        }
+    }
+
+    private fun confirmRemoveChild(
+        parent: AacItem,
+        childId: String,
+        childLabel: String,
+        editDialog: AlertDialog,
+        refresh: () -> Unit
+    ) {
+        AlertDialog.Builder(this)
+            .setTitle("ODSTRANI PODIKONO")
+            .setMessage("Odstranim povezavo, ikona ne bo izbrisana.\n\n$childLabel")
+            .setPositiveButton("ODSTRANI") { _, _ ->
+                updateChildren(parent, parent.children.filterNot { it == childId }, refresh)
+            }
+            .setNegativeButton("PREKLI\u010cI", null)
+            .show()
+    }
+
+    private fun updateChildren(parent: AacItem, nextChildren: List<String>, refresh: () -> Unit) {
+        val saved = AacEditorStorage.updateChildren(this, parent.id, nextChildren)
+        if (saved) {
+            Toast.makeText(this, "Podikone shranjene.", Toast.LENGTH_SHORT).show()
+            loadEditorPages()
+            refresh()
+        } else {
+            Toast.makeText(this, "Shranjevanje podikon ni uspelo.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun showAddChildDialog(parent: AacItem, refresh: () -> Unit) {
+        val allItems = AacEditorStorage.loadItems(this)
+        lateinit var pickerDialog: AlertDialog
+        val adapter = AacItemPickerAdapter(emptyList()) { child ->
+            addChildIfAllowed(parent, child, refresh)
+            pickerDialog.dismiss()
+        }
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF121417.toInt())
+            setPadding(14, 14, 14, 8)
+        }
+        val title = TextView(this).apply {
+            text = "DODAJ PODIKONO ZA: ${parent.labelSl}"
+            setTextColor(0xFFF4F7FA.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            gravity = Gravity.CENTER
+            setPadding(4, 0, 4, 12)
+        }
+        val search = EditText(this).apply {
+            hint = "Išči po labelSl ali itemId"
+            inputType = InputType.TYPE_CLASS_TEXT
+            setSingleLine(true)
+            setTextColor(0xFFF4F7FA.toInt())
+            setHintTextColor(0xFF9EA8B2.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setPadding(16, 10, 16, 10)
+            setBackgroundColor(0xFF1E2329.toInt())
+        }
+        val list = RecyclerView(this).apply {
+            layoutManager = GridLayoutManager(this@AacEditorActivity, 4)
+            this.adapter = adapter
+            overScrollMode = View.OVER_SCROLL_NEVER
+        }
+
+        fun applyFilter(query: String) {
+            val normalized = query.trim().lowercase()
+            val filtered = allItems
+                .filter { candidate ->
+                    candidate.id != parent.id &&
+                        candidate.id !in parent.children &&
+                        !wouldCreateSimpleCycle(parent, candidate) &&
+                        (
+                            normalized.isBlank() ||
+                                candidate.labelSl.lowercase().contains(normalized) ||
+                                candidate.id.lowercase().contains(normalized)
+                            )
+                }
+                .sortedWith(compareBy({ it.labelSl.lowercase() }, { it.id }))
+            adapter.submitItems(filtered)
+        }
+
+        search.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                applyFilter(s?.toString().orEmpty())
+            }
+
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+
+        container.addView(title)
+        container.addView(
+            search,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                bottomMargin = 12
+            }
+        )
+        container.addView(
+            list,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.aac_editor_child_picker_height)
+            )
+        )
+        applyFilter("")
+
+        pickerDialog = AlertDialog.Builder(this)
+            .setView(container)
+            .setNegativeButton("PREKLI\u010cI", null)
+            .create()
+        pickerDialog.show()
+    }
+
+    private fun addChildIfAllowed(parent: AacItem, child: AacItem, refresh: () -> Unit) {
+        when {
+            child.id == parent.id -> {
+                Toast.makeText(this, "Ikona ne more biti sama sebi podikona.", Toast.LENGTH_LONG).show()
+            }
+            child.id in parent.children -> {
+                Toast.makeText(this, "Ta podikona je \u017ee dodana.", Toast.LENGTH_LONG).show()
+            }
+            wouldCreateSimpleCycle(parent, child) -> {
+                Toast.makeText(this, "Ta povezava bi ustvarila cikel.", Toast.LENGTH_LONG).show()
+            }
+            else -> {
+                updateChildren(parent, parent.children + child.id, refresh)
+            }
+        }
+    }
+
+    private fun wouldCreateSimpleCycle(parent: AacItem, child: AacItem): Boolean {
+        return parent.id in child.children
+    }
+
+    private fun showCopyIconDialog(item: AacItem, refresh: () -> Unit) {
+        val allItems = AacEditorStorage.loadItems(this)
+        val parent = allItems.firstOrNull { item.id in it.children }
+        if (parent == null) {
+            Toast.makeText(this, "Root/page ikone ne kopiram, ker bi to spremenilo postavitev strani.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val existingIds = allItems.map { it.id }.toSet()
+        var selectedImagePath = item.imagePath
+        var selectedImageFile = resolveImageFile(item)
+        var selectedIconSource = item.iconSource
+        if (selectedImagePath.isNotBlank() && selectedImageFile?.isFile != true) {
+            selectedImagePath = ""
+            selectedImageFile = null
+        }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF121417.toInt())
+            setPadding(18, 18, 18, 8)
+        }
+        val labelInput = buildNewIconInput("Napis pod ikono / labelSl").apply { setText(item.labelSl) }
+        val speechInput = buildNewIconInput("Govor / speechTextSl").apply { setText(item.resolvedSpeechText) }
+        val itemIdInput = buildNewIconInput("itemId").apply { setText(suggestCopyItemId(item.id, existingIds)) }
+        val imageInfo = TextView(this).apply {
+            text = if (selectedImagePath.isBlank()) {
+                "Slika: ni izbrana\nIkona bo prikazana samo kot tekst."
+            } else {
+                "Slika: $selectedImagePath\nVir: ${selectedIconSource.name}"
+            }
+            setTextColor(0xFFDCE6EF.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setPadding(0, 8, 0, 8)
+        }
+        val chooseImage = Button(this).apply {
+            text = "IZBERI SLIKO"
+            isAllCaps = false
+            setTextColor(0xFFF4F7FA.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF34414D.toInt())
+            setOnClickListener {
+                showImageSourceDialogForNewIcon { entry ->
+                    selectedImagePath = entry.imagePath
+                    selectedImageFile = entry.file
+                    selectedIconSource = entry.source.iconSource
+                    imageInfo.text = "Slika: $selectedImagePath\nVir: ${selectedIconSource.name}"
+                }
+            }
+        }
+
+        container.addView(labelInput, newIconInputParams())
+        container.addView(speechInput, newIconInputParams())
+        container.addView(itemIdInput, newIconInputParams())
+        container.addView(imageInfo)
+        container.addView(chooseImage, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 58))
+
+        lateinit var dialog: AlertDialog
+        dialog = AlertDialog.Builder(this)
+            .setTitle("KOPIRAJ IKONO")
+            .setView(container)
+            .setPositiveButton("SHRANI", null)
+            .setNegativeButton("PREKLI\u010cI", null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                saveCopiedIcon(
+                    source = item,
+                    labelSl = labelInput.text?.toString().orEmpty(),
+                    speechTextSl = speechInput.text?.toString().orEmpty(),
+                    itemId = itemIdInput.text?.toString().orEmpty(),
+                    iconSource = selectedIconSource,
+                    imagePath = selectedImagePath,
+                    imageFile = selectedImageFile,
+                    existingIds = existingIds,
+                    dialog = dialog,
+                    refresh = refresh
+                )
+            }
+        }
+        dialog.show()
+    }
+
+    private fun saveCopiedIcon(
+        source: AacItem,
+        labelSl: String,
+        speechTextSl: String,
+        itemId: String,
+        iconSource: IconSource,
+        imagePath: String,
+        imageFile: File?,
+        existingIds: Set<String>,
+        dialog: AlertDialog,
+        refresh: () -> Unit
+    ) {
+        val normalizedLabel = labelSl.trim()
+        val normalizedSpeech = speechTextSl.trim()
+        val normalizedId = normalizeItemId(itemId)
+        when {
+            normalizedLabel.isBlank() -> {
+                Toast.makeText(this, "Napis pod ikono ne sme biti prazen.", Toast.LENGTH_LONG).show()
+                return
+            }
+            normalizedSpeech.isBlank() -> {
+                Toast.makeText(this, "Govor ne sme biti prazen.", Toast.LENGTH_LONG).show()
+                return
+            }
+            normalizedId.isBlank() || normalizedId in existingIds || normalizedId == source.id -> {
+                Toast.makeText(this, "itemId mora biti unikaten.", Toast.LENGTH_LONG).show()
+                return
+            }
+            imagePath.isBlank() -> {
+                AlertDialog.Builder(this)
+                    .setTitle("BREZ SLIKE")
+                    .setMessage("Ikona bo prikazana samo kot tekst.")
+                    .setPositiveButton("SHRANI") { _, _ ->
+                        persistCopiedIcon(source, normalizedId, normalizedLabel, normalizedSpeech, iconSource, imagePath, dialog, refresh)
+                    }
+                    .setNegativeButton("PREKLI\u010cI", null)
+                    .show()
+            }
+            imageFile == null || !imageFile.isFile || BitmapFactory.decodeFile(imageFile.absolutePath) == null -> {
+                Toast.makeText(this, "Izbrana slika ni ve\u010d berljiva.", Toast.LENGTH_LONG).show()
+            }
+            else -> {
+                persistCopiedIcon(source, normalizedId, normalizedLabel, normalizedSpeech, iconSource, imagePath, dialog, refresh)
+            }
+        }
+    }
+
+    private fun persistCopiedIcon(
+        source: AacItem,
+        itemId: String,
+        labelSl: String,
+        speechTextSl: String,
+        iconSource: IconSource,
+        imagePath: String,
+        dialog: AlertDialog,
+        refresh: () -> Unit
+    ) {
+        val saved = AacEditorStorage.copyIconAsSibling(
+            this,
+            AacEditorStorage.CopyIcon(
+                sourceId = source.id,
+                newId = itemId,
+                labelSl = labelSl,
+                speechTextSl = speechTextSl,
+                iconSource = iconSource,
+                imagePath = imagePath
+            )
+        )
+        if (saved) {
+            Toast.makeText(this, "Ikona je kopirana.", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+            loadEditorPages()
+            refresh()
+        } else {
+            Toast.makeText(this, "Kopiranje ni uspelo.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun toggleHiddenMarker(item: AacItem, refresh: () -> Unit) {
+        val hidden = item.id in AacEditorStorage.hiddenItemIds(this)
+        val saved = AacEditorStorage.setHidden(this, item.id, !hidden)
+        if (saved) {
+            Toast.makeText(
+                this,
+                if (hidden) "Ikona je ozna\u010dena kot prikazana." else "Ikona je ozna\u010dena kot skrita v editorju.",
+                Toast.LENGTH_SHORT
+            ).show()
+            loadEditorPages()
+            refresh()
+        } else {
+            Toast.makeText(this, "Te ikone ni dovoljeno skriti ali pokazati.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun showAddNewChildIconDialog(parent: AacItem, refresh: () -> Unit) {
+        val allItems = AacEditorStorage.loadItems(this)
+        val existingIds = allItems.map { it.id }.toSet()
+        var selectedImagePath = ""
+        var selectedImageFile: File? = null
+        var selectedIconSource = IconSource.CUSTOM
+        var itemIdManuallyEdited = false
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF121417.toInt())
+            setPadding(18, 18, 18, 8)
+        }
+        val labelInput = buildNewIconInput("Napis pod ikono / labelSl")
+        val speechInput = buildNewIconInput("Govor / speechTextSl")
+        val itemIdInput = buildNewIconInput("itemId predlog")
+        val imageInfo = TextView(this).apply {
+            text = "Slika: ni izbrana\nIkona bo prikazana samo kot tekst."
+            setTextColor(0xFFDCE6EF.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setPadding(0, 8, 0, 8)
+        }
+        val chooseImage = Button(this).apply {
+            text = "IZBERI SLIKO"
+            isAllCaps = false
+            setTextColor(0xFFF4F7FA.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF34414D.toInt())
+        }
+
+        labelInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!itemIdManuallyEdited) {
+                    itemIdInput.setText(suggestNewItemId(s?.toString().orEmpty(), existingIds))
+                    itemIdInput.setSelection(itemIdInput.text?.length ?: 0)
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+        itemIdInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) itemIdManuallyEdited = true
+        }
+        chooseImage.setOnClickListener {
+            showImageSourceDialogForNewIcon { entry ->
+                selectedImagePath = entry.imagePath
+                selectedImageFile = entry.file
+                selectedIconSource = entry.source.iconSource
+                imageInfo.text = "Slika: $selectedImagePath\nVir: ${selectedIconSource.name}"
+            }
+        }
+
+        container.addView(labelInput, newIconInputParams())
+        container.addView(speechInput, newIconInputParams())
+        container.addView(itemIdInput, newIconInputParams())
+        container.addView(imageInfo)
+        container.addView(
+            chooseImage,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                58
+            ).apply { bottomMargin = 8 }
+        )
+
+        lateinit var dialog: AlertDialog
+        dialog = AlertDialog.Builder(this)
+            .setTitle("NOVA IKONA ZA: ${parent.labelSl}")
+            .setView(container)
+            .setPositiveButton("SHRANI", null)
+            .setNegativeButton("PREKLI\u010cI", null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                saveNewChildIcon(
+                    parent = parent,
+                    labelSl = labelInput.text?.toString().orEmpty(),
+                    speechTextSl = speechInput.text?.toString().orEmpty(),
+                    itemId = itemIdInput.text?.toString().orEmpty(),
+                    iconSource = selectedIconSource,
+                    imagePath = selectedImagePath,
+                    imageFile = selectedImageFile,
+                    existingIds = existingIds,
+                    dialog = dialog,
+                    refresh = refresh
+                )
+            }
+        }
+        dialog.show()
+    }
+
+    private fun buildNewIconInput(hintText: String): EditText {
+        return EditText(this).apply {
+            hint = hintText
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+            setSingleLine(false)
+            minLines = 1
+            setTextColor(0xFFF4F7FA.toInt())
+            setHintTextColor(0xFF9EA8B2.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setPadding(16, 12, 16, 12)
+            setBackgroundColor(0xFF1E2329.toInt())
+        }
+    }
+
+    private fun newIconInputParams(): LinearLayout.LayoutParams {
+        return LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            bottomMargin = 10
+        }
+    }
+
+    private fun saveNewChildIcon(
+        parent: AacItem,
+        labelSl: String,
+        speechTextSl: String,
+        itemId: String,
+        iconSource: IconSource,
+        imagePath: String,
+        imageFile: File?,
+        existingIds: Set<String>,
+        dialog: AlertDialog,
+        refresh: () -> Unit
+    ) {
+        val normalizedLabel = labelSl.trim()
+        val normalizedSpeech = speechTextSl.trim()
+        val normalizedId = normalizeItemId(itemId)
+        when {
+            normalizedLabel.isBlank() -> {
+                Toast.makeText(this, "Napis pod ikono ne sme biti prazen.", Toast.LENGTH_LONG).show()
+                return
+            }
+            normalizedSpeech.isBlank() -> {
+                Toast.makeText(this, "Govor ne sme biti prazen.", Toast.LENGTH_LONG).show()
+                return
+            }
+            normalizedId.isBlank() -> {
+                Toast.makeText(this, "itemId ne sme biti prazen.", Toast.LENGTH_LONG).show()
+                return
+            }
+            normalizedId in existingIds -> {
+                Toast.makeText(this, "itemId \u017ee obstaja.", Toast.LENGTH_LONG).show()
+                return
+            }
+            normalizedId == parent.id || normalizedId in parent.children -> {
+                Toast.makeText(this, "Ta povezava ni dovoljena.", Toast.LENGTH_LONG).show()
+                return
+            }
+            imagePath.isBlank() -> {
+                AlertDialog.Builder(this)
+                    .setTitle("BREZ SLIKE")
+                    .setMessage("Ikona bo prikazana samo kot tekst.")
+                    .setPositiveButton("SHRANI") { _, _ ->
+                        persistNewChildIcon(parent, normalizedId, normalizedLabel, normalizedSpeech, iconSource, imagePath, dialog, refresh)
+                    }
+                    .setNegativeButton("PREKLI\u010cI", null)
+                    .show()
+            }
+            imageFile == null || !imageFile.isFile || BitmapFactory.decodeFile(imageFile.absolutePath) == null -> {
+                Toast.makeText(this, "Izbrana slika ni ve\u010d berljiva.", Toast.LENGTH_LONG).show()
+            }
+            else -> {
+                persistNewChildIcon(parent, normalizedId, normalizedLabel, normalizedSpeech, iconSource, imagePath, dialog, refresh)
+            }
+        }
+    }
+
+    private fun persistNewChildIcon(
+        parent: AacItem,
+        itemId: String,
+        labelSl: String,
+        speechTextSl: String,
+        iconSource: IconSource,
+        imagePath: String,
+        dialog: AlertDialog,
+        refresh: () -> Unit
+    ) {
+        val saved = AacEditorStorage.addNewChildIcon(
+            this,
+            AacEditorStorage.NewIcon(
+                id = itemId,
+                parentId = parent.id,
+                labelSl = labelSl,
+                speechTextSl = speechTextSl,
+                iconSource = iconSource,
+                imagePath = imagePath
+            )
+        )
+        if (saved) {
+            Toast.makeText(this, "Nova podikona je shranjena.", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+            loadEditorPages()
+            refresh()
+        } else {
+            Toast.makeText(this, "Shranjevanje nove ikone ni uspelo.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun suggestNewItemId(labelSl: String, existingIds: Set<String>): String {
+        val base = normalizeItemId("custom_${slugify(labelSl)}").ifBlank { "custom_icon" }
+        if (base !in existingIds) return base
+        for (index in 2..999) {
+            val candidate = "${base}_$index"
+            if (candidate !in existingIds) return candidate
+        }
+        return ""
+    }
+
+    private fun suggestCopyItemId(sourceId: String, existingIds: Set<String>): String {
+        val base = normalizeItemId("${sourceId}_copy").ifBlank { "custom_icon_copy" }
+        if (base !in existingIds) return base
+        for (index in 2..999) {
+            val candidate = "${base}_$index"
+            if (candidate !in existingIds) return candidate
+        }
+        return ""
+    }
+
+    private fun normalizeItemId(value: String): String {
+        return slugify(value).trim('_')
+    }
+
+    private fun slugify(value: String): String {
+        val ascii = Normalizer.normalize(value.trim().lowercase(), Normalizer.Form.NFD)
+            .replace("\\p{Mn}+".toRegex(), "")
+        return ascii
+            .replace("[^a-z0-9]+".toRegex(), "_")
+            .replace("_+".toRegex(), "_")
+            .trim('_')
+    }
+
+    private fun showImageSourceDialogForNewIcon(onSelected: (AacImageGallery.Entry) -> Unit) {
+        val sources = AacImageGallery.sources(this)
+        val labels = sources.map { source -> source.title }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("IZBERI VIR SLIKE")
+            .setItems(labels) { _, which ->
+                showImageGalleryDialogForNewIcon(sources[which], onSelected)
+            }
+            .setNegativeButton("PREKLI\u010cI", null)
+            .show()
+    }
+
+    private fun showImageGalleryDialogForNewIcon(
+        source: AacImageGallery.Source,
+        onSelected: (AacImageGallery.Entry) -> Unit
+    ) {
+        val entries = AacImageGallery.scan(source)
+        if (entries.isEmpty()) {
+            AlertDialog.Builder(this)
+                .setTitle("IZBERI SLIKO")
+                .setMessage("V tej mapi \u0161e ni slik.")
+                .setPositiveButton("NAZAJ") { _, _ ->
+                    showImageSourceDialogForNewIcon(onSelected)
+                }
+                .setNegativeButton("PREKLI\u010cI", null)
+                .show()
+            return
+        }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF121417.toInt())
+            setPadding(12, 12, 12, 12)
+        }
+        val title = TextView(this).apply {
+            text = "IZBERI SLIKO"
+            setTextColor(0xFFF4F7FA.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            gravity = Gravity.CENTER
+            setPadding(4, 0, 4, 12)
+        }
+        lateinit var galleryDialog: AlertDialog
+        val gallery = RecyclerView(this).apply {
+            layoutManager = GridLayoutManager(this@AacEditorActivity, 4)
+            adapter = AacImageGalleryAdapter(entries) { entry ->
+                showImagePreviewDialogForNewIcon(entry) {
+                    onSelected(entry)
+                    galleryDialog.dismiss()
+                }
+            }
+            overScrollMode = View.OVER_SCROLL_NEVER
+        }
+        container.addView(title)
+        container.addView(
+            gallery,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.aac_editor_gallery_height)
+            )
+        )
+
+        galleryDialog = AlertDialog.Builder(this)
+            .setView(container)
+            .setNegativeButton("PREKLI\u010cI", null)
+            .setPositiveButton("NAZAJ") { _, _ ->
+                showImageSourceDialogForNewIcon(onSelected)
+            }
+            .create()
+        galleryDialog.show()
+    }
+
+    private fun showImagePreviewDialogForNewIcon(
+        entry: AacImageGallery.Entry,
+        onUse: () -> Unit
+    ) {
+        val decoded = BitmapFactory.decodeFile(entry.file.absolutePath)
+        if (!entry.file.isFile || decoded == null) {
+            Toast.makeText(this, "Slika ni berljiva.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF121417.toInt())
+            setPadding(18, 18, 18, 8)
+        }
+        val preview = ImageView(this).apply {
+            setImageBitmap(decoded)
+            setBackgroundColor(0xFF263746.toInt())
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            adjustViewBounds = true
+            setPadding(8, 8, 8, 8)
+        }
+        val details = TextView(this).apply {
+            text = buildString {
+                appendLine(entry.file.name)
+                appendLine(entry.imagePath)
+                append("Vir: ${entry.source.iconSource.name}")
+            }
+            setTextColor(0xFFF4F7FA.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setPadding(0, 14, 0, 0)
+        }
+        container.addView(
+            preview,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.aac_editor_preview_height)
+            )
+        )
+        container.addView(details)
+
+        AlertDialog.Builder(this)
+            .setTitle("PREDOGLED SLIKE")
+            .setView(container)
+            .setPositiveButton("UPORABI") { _, _ -> onUse() }
+            .setNegativeButton("PREKLI\u010cI", null)
+            .show()
     }
 
     private fun showImageSourceDialog(item: AacItem, editDialog: AlertDialog) {
@@ -339,9 +1148,11 @@ class AacEditorActivity : AppCompatActivity() {
         private val onItemClick: (AacItem) -> Unit
     ) : RecyclerView.Adapter<AacEditorAdapter.ViewHolder>() {
         private var items: List<AacItem> = emptyList()
+        private var hiddenIds: Set<String> = emptySet()
 
-        fun submitItems(nextItems: List<AacItem>) {
+        fun submitItems(nextItems: List<AacItem>, nextHiddenIds: Set<String> = emptySet()) {
             items = nextItems
+            hiddenIds = nextHiddenIds
             notifyDataSetChanged()
         }
 
@@ -351,7 +1162,7 @@ class AacEditorActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(items[position])
+            holder.bind(items[position], items[position].id in hiddenIds)
         }
 
         override fun getItemCount(): Int = items.size
@@ -363,9 +1174,10 @@ class AacEditorActivity : AppCompatActivity() {
             private val image: ImageView = itemView.findViewById(R.id.imgAacTile)
             private val label: TextView = itemView.findViewById(R.id.txtAacTileLabel)
 
-            fun bind(item: AacItem) {
+            fun bind(item: AacItem, hidden: Boolean) {
                 itemView.setBackgroundColor(0xFF263746.toInt())
-                label.text = AacLocalizedTextResolver.resolveLabel(item, "sl")
+                val resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, "sl")
+                label.text = if (hidden) "$resolvedLabel\nSKRITO" else resolvedLabel
                 label.gravity = Gravity.CENTER
                 label.visibility = View.VISIBLE
                 image.setImageDrawable(null)
@@ -447,6 +1259,78 @@ class AacEditorActivity : AppCompatActivity() {
                     image.setImageDrawable(null)
                 }
                 itemView.setOnClickListener { onEntryClick(entry) }
+            }
+        }
+    }
+
+    private class AacItemPickerAdapter(
+        private var items: List<AacItem>,
+        private val onItemClick: (AacItem) -> Unit
+    ) : RecyclerView.Adapter<AacItemPickerAdapter.ViewHolder>() {
+        fun submitItems(nextItems: List<AacItem>) {
+            items = nextItems
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val context = parent.context
+            val container = LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                setPadding(8, 8, 8, 8)
+                setBackgroundColor(0xFF263746.toInt())
+                isClickable = true
+                isFocusable = true
+            }
+            val image = ImageView(context).apply {
+                setBackgroundColor(0xFF16202B.toInt())
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                adjustViewBounds = true
+                setPadding(4, 4, 4, 4)
+            }
+            val label = TextView(context).apply {
+                gravity = Gravity.CENTER
+                setTextColor(0xFFF4F7FA.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                maxLines = 2
+                setPadding(2, 8, 2, 0)
+            }
+            container.addView(
+                image,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    context.resources.getDimensionPixelSize(R.dimen.aac_editor_gallery_thumb_size)
+                )
+            )
+            container.addView(label, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            return ViewHolder(container, image, label, onItemClick)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.bind(items[position])
+        }
+
+        override fun getItemCount(): Int = items.size
+
+        class ViewHolder(
+            itemView: View,
+            private val image: ImageView,
+            private val label: TextView,
+            private val onItemClick: (AacItem) -> Unit
+        ) : RecyclerView.ViewHolder(itemView) {
+            fun bind(item: AacItem) {
+                label.text = "${item.labelSl}\n${item.id}"
+                val imageFile = AacStoragePaths.resolveIconFile(itemView.context, item.imagePath, item.iconSource)
+                    ?.takeIf { it.exists() && it.isFile }
+                val bitmap = imageFile?.let { BitmapFactory.decodeFile(it.absolutePath) }
+                if (bitmap != null) {
+                    image.alpha = 1.0f
+                    image.setImageBitmap(bitmap)
+                } else {
+                    image.alpha = 0.0f
+                    image.setImageDrawable(null)
+                }
+                itemView.setOnClickListener { onItemClick(item) }
             }
         }
     }

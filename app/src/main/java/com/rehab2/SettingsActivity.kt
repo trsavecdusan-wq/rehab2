@@ -33,11 +33,14 @@ import com.rehab2.aac.AacCommunicationContextPrefs
 import com.rehab2.aac.AacLanguageResolver
 import com.rehab2.aac.AacGuidedFollowUpSettings
 import com.rehab2.aac.AacContentDiagnostics
+import com.rehab2.aac.AacContentBootstrap
+import com.rehab2.aac.AacEditorStorage
 import com.rehab2.aac.AacKeywordMatcher
 import com.rehab2.aac.AacKeywordListenerSettings
 import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacProfileStore
 import com.rehab2.aac.AacSampleContentCreator
+import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.AacStarterContentV1
 import com.rehab2.aac.AacSpeechApiConfig
 import com.rehab2.aac.AacSpeechCache
@@ -45,6 +48,7 @@ import com.rehab2.aac.AacSpeechCoordinator
 import com.rehab2.aac.AacSpeechTimingSettings
 import com.rehab2.aac.AacVendingScenario
 import com.rehab2.aac.OpenAiAacSpeechApiClient
+import com.rehab2.aac.PatientProfileSettings
 import com.rehab2.aac.StatusOrientationSettings
 import com.rehab2.aac.WeatherSource
 import java.util.Locale
@@ -196,6 +200,17 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editStatusWeatherSourceName: EditText
     private lateinit var editStatusWeatherSourceUrl: EditText
     private lateinit var editStatusOrientationInfo: EditText
+    private lateinit var txtPatientProfileStatus: TextView
+    private lateinit var editPatientFirstName: EditText
+    private lateinit var editPatientLastName: EditText
+    private lateinit var editPatientAge: EditText
+    private lateinit var editPatientBirthDate: EditText
+    private lateinit var editPatientHomeTown: EditText
+    private lateinit var editPatientCountry: EditText
+    private lateinit var editPatientMainLanguage: EditText
+    private lateinit var editPatientCaregiverContact: EditText
+    private lateinit var editPatientTherapistContact: EditText
+    private lateinit var editPatientShortDescription: EditText
     private var speechApiTestPlayer: MediaPlayer? = null
     private var audioDuckingTestPlayer: AacAudioPlayer? = null
     private var latestBatteryPercent: Int? = null
@@ -285,6 +300,17 @@ class SettingsActivity : AppCompatActivity() {
         editStatusWeatherSourceName = findViewById(R.id.editStatusWeatherSourceName)
         editStatusWeatherSourceUrl = findViewById(R.id.editStatusWeatherSourceUrl)
         editStatusOrientationInfo = findViewById(R.id.editStatusOrientationInfo)
+        txtPatientProfileStatus = findViewById(R.id.txtPatientProfileStatus)
+        editPatientFirstName = findViewById(R.id.editPatientFirstName)
+        editPatientLastName = findViewById(R.id.editPatientLastName)
+        editPatientAge = findViewById(R.id.editPatientAge)
+        editPatientBirthDate = findViewById(R.id.editPatientBirthDate)
+        editPatientHomeTown = findViewById(R.id.editPatientHomeTown)
+        editPatientCountry = findViewById(R.id.editPatientCountry)
+        editPatientMainLanguage = findViewById(R.id.editPatientMainLanguage)
+        editPatientCaregiverContact = findViewById(R.id.editPatientCaregiverContact)
+        editPatientTherapistContact = findViewById(R.id.editPatientTherapistContact)
+        editPatientShortDescription = findViewById(R.id.editPatientShortDescription)
         findViewById<Button>(R.id.btnBackSettings).setOnClickListener {
             finish()
         }
@@ -393,6 +419,9 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSaveStatusWeatherSource).setOnClickListener {
             saveStatusWeatherSource()
         }
+        findViewById<Button>(R.id.btnSavePatientProfile).setOnClickListener {
+            savePatientProfileSettings()
+        }
         findViewById<Button>(R.id.btnKeywordMatcherTest).setOnClickListener {
             runKeywordMatcherTest()
         }
@@ -471,6 +500,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshAiObservationSection()
         refreshAudioDuckingSection()
         refreshStatusOrientationSection()
+        refreshPatientProfileSection()
         bindAacAssistSwitchListeners()
         bindAudioDuckingSwitchListener()
         bindStatusOrientationSwitchListeners()
@@ -507,6 +537,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshAiObservationSection()
         refreshAudioDuckingSection()
         refreshStatusOrientationSection()
+        refreshPatientProfileSection()
         applyKeepScreenOnWhileCharging()
         startGpsDiagnosticsRefresh()
     }
@@ -726,6 +757,67 @@ class SettingsActivity : AppCompatActivity() {
         }
         editAudioDuckingPercent.setText("${settings.duckingPercent} %\n$settingsPath")
         bindAudioDuckingSwitchListener()
+    }
+
+    private fun refreshPatientProfileSection() {
+        val profile = PatientProfileSettings.load(this)
+        val settingsPath = AacStoragePaths.getPatientProfileFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
+        txtPatientProfileStatus.text = "Podatki o pacientu: lokalna shramba\n$settingsPath"
+        editPatientFirstName.setText(profile.firstName)
+        editPatientLastName.setText(profile.lastName)
+        editPatientAge.setText(profile.age)
+        editPatientBirthDate.setText(profile.birthDate)
+        editPatientHomeTown.setText(profile.homeTown)
+        editPatientCountry.setText(profile.country)
+        editPatientMainLanguage.setText(profile.mainLanguage)
+        editPatientCaregiverContact.setText(profile.caregiverContact)
+        editPatientTherapistContact.setText(profile.therapistContact)
+        editPatientShortDescription.setText(profile.shortDescription)
+    }
+
+    private fun savePatientProfileSettings() {
+        val profile = PatientProfileSettings(
+            firstName = editPatientFirstName.text?.toString().orEmpty(),
+            lastName = editPatientLastName.text?.toString().orEmpty(),
+            age = editPatientAge.text?.toString().orEmpty(),
+            birthDate = editPatientBirthDate.text?.toString().orEmpty(),
+            homeTown = editPatientHomeTown.text?.toString().orEmpty(),
+            country = editPatientCountry.text?.toString().orEmpty(),
+            mainLanguage = editPatientMainLanguage.text?.toString().orEmpty(),
+            caregiverContact = editPatientCaregiverContact.text?.toString().orEmpty(),
+            therapistContact = editPatientTherapistContact.text?.toString().orEmpty(),
+            shortDescription = editPatientShortDescription.text?.toString().orEmpty()
+        )
+        val saved = PatientProfileSettings.save(this, profile)
+        val synced = if (saved) syncPatientProfileAacSpeech(profile) else false
+        Toast.makeText(
+            this,
+            when {
+                saved && synced -> "Podatki o pacientu so shranjeni."
+                saved -> "Podatki so shranjeni. AAC odgovori bodo osve\u017eeni ob naslednjem zagonu."
+                else -> "Podatkov o pacientu ni bilo mogo\u010de shraniti."
+            },
+            Toast.LENGTH_SHORT
+        ).show()
+        refreshPatientProfileSection()
+    }
+
+    private fun syncPatientProfileAacSpeech(profile: PatientProfileSettings): Boolean {
+        return try {
+            AacContentBootstrap.ensurePatientStartupContent(this, AacStarterContentV1.items())
+            val linked = ensurePatientProfileAacLink()
+            profile.speechByItemId().map { (itemId, speechText) ->
+                AacEditorStorage.updateSpeechTextSl(this, itemId, speechText)
+            }.all { it } && linked
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun ensurePatientProfileAacLink(): Boolean {
+        val people = AacEditorStorage.loadItems(this).firstOrNull { it.id == "people" } ?: return false
+        if ("about_me" in people.children) return true
+        return AacEditorStorage.updateChildren(this, "people", people.children + "about_me")
     }
 
     private fun bindAudioDuckingSwitchListener() {
