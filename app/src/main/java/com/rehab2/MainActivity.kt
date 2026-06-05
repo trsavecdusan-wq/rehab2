@@ -3482,19 +3482,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun formatSpeedKmh(speedKmh: Float, hasSpeedData: Boolean): String {
         if (!hasSpeedData) {
-            return "Hitrost: ni podatka"
+            return "0"
         }
         if (speedKmh < 0.05f) {
-            return "Hitrost: 0 km/h"
+            return "0"
         }
-        val roundedToOneDecimal = (speedKmh * 10f).roundToInt() / 10f
-        val wholePart = roundedToOneDecimal.roundToInt().toFloat()
-        val speedText = if (kotlin.math.abs(roundedToOneDecimal - wholePart) < 0.05f) {
-            wholePart.toInt().toString()
-        } else {
-            String.format(Locale.US, "%.1f", roundedToOneDecimal)
-        }
-        return "Hitrost: $speedText km/h"
+        return speedKmh.roundToInt().coerceAtLeast(0).toString()
     }
 
     private fun readTodayDistanceMeters(): Long {
@@ -3507,7 +3500,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             String.format(Locale.US, "%.2f km", distanceMeters / 1000f)
         }
-        return "Pot danes: $distanceText"
+        return "Pot:\n$distanceText"
     }
 
     private fun gpsSignalForAccuracy(location: Location): String {
