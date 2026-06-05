@@ -1383,14 +1383,24 @@ class AacEditorActivity : AppCompatActivity() {
     }
 
     private fun imageStatusText(item: AacItem): String {
-        val sourceLabel = item.iconSource.name
+        val sourceLabel = imageSourceDisplayName(item.iconSource)
         val imagePath = item.imagePath.trim()
         if (imagePath.isEmpty()) {
             return "Trenutna slika: ni izbrana"
         }
         val imageFile = resolveImageFile(item)
         val fileStatus = if (imageFile != null) "datoteka najdena" else "datoteka manjka"
-        return "Trenutna slika: $sourceLabel\n$imagePath\n$fileStatus"
+        return "Trenutni vir: $sourceLabel\n$imagePath\n$fileStatus"
+    }
+
+    private fun imageSourceDisplayName(iconSource: IconSource): String {
+        return when (iconSource) {
+            IconSource.SYSTEM -> "SISTEMSKE IKONE (SYSTEM)"
+            IconSource.CUSTOM -> "MOJE SLIKE (CUSTOM)"
+            IconSource.PATIENT -> "OSEBE / PACIENT (PATIENT)"
+            IconSource.SOCA -> "SOČA (SOCA)"
+            IconSource.ARASAAC -> "ARASAAC"
+        }
     }
 
     private fun resolveImageFile(item: AacItem): File? {

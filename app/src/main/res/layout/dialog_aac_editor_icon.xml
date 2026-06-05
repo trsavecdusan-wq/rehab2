@@ -76,6 +76,26 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/txtAacEditorImageSourceHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Najprej izberite vir slike. Za osebne fotografije uporabite OSEBE / PACIENT. Za svoje slike uporabite MOJE SLIKE."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/txtAacEditorImageSourceChoices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#1B2530"
+            android:padding="12dp"
+            android:text="SISTEMSKE IKONE — bundled/default app icons&#10;MOJE SLIKE — NovaRehab/icons/custom/&#10;OSEBE / PACIENT — NovaRehab/icons/patient/&#10;SOČA — NovaRehab/icons/soca/&#10;ARASAAC — NovaRehab/icons/arasaac/"
+            android:textColor="#F4F7FA"
+            android:textSize="15sp" />
+
+        <TextView
             android:id="@+id/txtAacEditorGalleryHelp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
