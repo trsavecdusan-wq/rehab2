@@ -128,13 +128,100 @@ class AacEditorActivity : AppCompatActivity() {
 
     private fun showCommunicatorAuditDialog() {
         val problems = AacEditorAudit.run(this)
-        val message = AacEditorAudit.format(problems)
+        val message = buildString {
+            append(AacEditorAudit.format(problems))
+            appendLine()
+            appendLine()
+            append(buildImageCleanupAuditText())
+        }
         AlertDialog.Builder(this)
             .setTitle("PREVERI KOMUNIKATOR (${problems.size})")
             .setMessage(message.take(12000))
             .setPositiveButton("ZAPRI", null)
             .show()
     }
+
+    private fun buildImageCleanupAuditText(): String {
+        val usedImages = AacEditorStorage.loadItems(this)
+            .filter { item -> item.imagePath.isNotBlank() }
+            .map { item -> imageUsageKey(item.iconSource, item.imagePath) }
+            .toSet()
+        val sources = AacImageGallery.sources(this)
+            .filter { source ->
+                source.iconSource == IconSource.CUSTOM ||
+                    source.iconSource == IconSource.PATIENT ||
+                    source.iconSource == IconSource.SOCA ||
+                    source.iconSource == IconSource.ARASAAC
+            }
+
+        val rows = sources.map { source ->
+            val entries = AacImageGallery.scan(source)
+            val usedEntries = entries.filter { entry -> imageUsageKey(entry.source.iconSource, entry.imagePath) in usedImages }
+            val unusedEntries = entries.filterNot { entry -> imageUsageKey(entry.source.iconSource, entry.imagePath) in usedImages }
+            ImageCleanupRow(
+                title = imageCleanupSourceTitle(source.iconSource),
+                total = entries.size,
+                used = usedEntries.size,
+                unused = unusedEntries.size,
+                firstUnused = unusedEntries.take(20).map { entry -> entry.file.name }
+            )
+        }
+
+        return buildString {
+            appendLine("PREGLED SLIK")
+            appendLine("Neuporabljene slike niso izbrisane. To je samo pregled.")
+            appendLine()
+            rows.forEach { row ->
+                appendLine(row.title)
+                appendLine("Skupaj: ${row.total}")
+                appendLine("Uporabljene: ${row.used}")
+                appendLine("Neuporabljene: ${row.unused}")
+                if (row.firstUnused.isNotEmpty()) {
+                    appendLine("Prvih neuporabljenih:")
+                    row.firstUnused.forEach { fileName -> appendLine("- $fileName") }
+                }
+                appendLine()
+            }
+            if (rows.none { it.unused > 0 }) {
+                append("Ni neuporabljenih slik.")
+            }
+        }.trim()
+    }
+
+    private fun imageUsageKey(iconSource: IconSource, imagePath: String): String {
+        val normalizedPath = normalizedImageUsagePath(iconSource, imagePath)
+        return "${iconSource.name}:$normalizedPath"
+    }
+
+    private fun normalizedImageUsagePath(iconSource: IconSource, imagePath: String): String {
+        val normalizedPath = imagePath.trim().replace('\\', '/').removePrefix("/")
+        val sourcePrefix = when (iconSource) {
+            IconSource.CUSTOM -> "custom/"
+            IconSource.PATIENT -> "patient/"
+            IconSource.SOCA -> "soca/"
+            IconSource.ARASAAC -> "arasaac/"
+            IconSource.SYSTEM -> "system/"
+        }
+        return normalizedPath.removePrefix(sourcePrefix).lowercase(Locale.ROOT)
+    }
+
+    private fun imageCleanupSourceTitle(iconSource: IconSource): String {
+        return when (iconSource) {
+            IconSource.CUSTOM -> "MOJE SLIKE"
+            IconSource.PATIENT -> "OSEBE / PACIENT"
+            IconSource.SOCA -> "SOČA"
+            IconSource.ARASAAC -> "ARASAAC"
+            IconSource.SYSTEM -> "SISTEMSKE IKONE"
+        }
+    }
+
+    private data class ImageCleanupRow(
+        val title: String,
+        val total: Int,
+        val used: Int,
+        val unused: Int,
+        val firstUnused: List<String>
+    )
 
     private fun showEditIconDialog(item: AacItem) {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_aac_editor_icon, null)
