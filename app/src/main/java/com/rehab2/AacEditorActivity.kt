@@ -1129,16 +1129,38 @@ class AacEditorActivity : AppCompatActivity() {
         refreshEditor: () -> Unit,
         refreshBrowser: () -> Unit
     ) {
-        val actions = arrayOf("UPORABI SLIKO", "PREIMENUJ SLIKO")
+        val actions = arrayOf("UPORABI SLIKO", "PREIMENUJ SLIKO", "KJE SE UPORABLJA")
         AlertDialog.Builder(this)
             .setTitle(entry.file.name)
             .setItems(actions) { _, which ->
                 when (which) {
                     0 -> applySimpleSelectedImage(item, entry, refreshEditor)
                     1 -> showRenameImageDialog(item, entry, refreshEditor, refreshBrowser)
+                    2 -> showImageUsedByDialog(entry)
                 }
             }
             .setNegativeButton("PREKLIČI", null)
+            .show()
+    }
+
+    private fun showImageUsedByDialog(entry: AacImageGallery.Entry) {
+        val usedByItems = imageUsedByItems(entry)
+        val message = if (usedByItems.isEmpty()) {
+            "Ta slika ni vezana na nobeno ikono."
+        } else {
+            buildString {
+                appendLine("To sliko uporabljajo:")
+                appendLine()
+                usedByItems.forEach { item ->
+                    val label = item.labelSl.trim().ifBlank { item.id }
+                    appendLine(label)
+                }
+            }.trim()
+        }
+        AlertDialog.Builder(this)
+            .setTitle("KJE SE UPORABLJA")
+            .setMessage(message)
+            .setPositiveButton("ZAPRI", null)
             .show()
     }
 
@@ -1258,7 +1280,11 @@ class AacEditorActivity : AppCompatActivity() {
     }
 
     private fun isImageUsedByAacItem(entry: AacImageGallery.Entry): Boolean {
-        return AacEditorStorage.loadItems(this).any { item ->
+        return imageUsedByItems(entry).isNotEmpty()
+    }
+
+    private fun imageUsedByItems(entry: AacImageGallery.Entry): List<AacItem> {
+        return AacEditorStorage.loadItems(this).filter { item ->
             item.iconSource == entry.source.iconSource && item.imagePath == entry.imagePath
         }
     }
