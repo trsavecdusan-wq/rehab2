@@ -109,6 +109,7 @@ class MainActivity : AppCompatActivity() {
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
+        private const val STATUS_WEATHER_REFRESH_INTERVAL_MS = 15 * 60 * 1000L
         private const val PREF_DISTANCE_TODAY_METERS = "distance_today_meters"
         private const val PREF_DISTANCE_TOTAL_METERS = "distance_total_meters"
         private const val PREF_DISTANCE_DAY_STAMP = "distance_day_stamp"
@@ -244,6 +245,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var txtStatusDay: TextView
     private lateinit var txtStatusDate: TextView
     private lateinit var txtStatusYearTime: TextView
+    private lateinit var txtStatusWeather: TextView
     private lateinit var txtStatusSpeed: TextView
     private lateinit var txtStatusTodayDistance: TextView
     private lateinit var powerOverlay: View
@@ -254,6 +256,9 @@ class MainActivity : AppCompatActivity() {
     private var currentRadioPage = 1
     private var radioTouchStartX = 0f
     private var currentSpeedKmh = 0f
+    @Volatile private var currentStatusWeatherText: String? = null
+    @Volatile private var isStatusWeatherFetchRunning = false
+    private var lastStatusWeatherFetchAtMs = 0L
     private var hasCurrentSpeedData = false
     private var previousTrackedLocation: Location? = null
     private var locationPermissionRequestShown = false
@@ -386,6 +391,7 @@ class MainActivity : AppCompatActivity() {
         txtStatusDay = findViewById(R.id.txtStatusDay)
         txtStatusDate = findViewById(R.id.txtStatusDate)
         txtStatusYearTime = findViewById(R.id.txtStatusYearTime)
+        txtStatusWeather = findViewById(R.id.txtStatusWeather)
         txtStatusSpeed = findViewById(R.id.txtStatusSpeed)
         txtStatusTodayDistance = findViewById(R.id.txtStatusTodayDistance)
         powerOverlay = findViewById(R.id.powerOverlay)
@@ -3086,8 +3092,45 @@ class MainActivity : AppCompatActivity() {
         txtStatusDay.text = dayFormat.format(now).replaceFirstChar { it.titlecase(Locale.getDefault()) }
         txtStatusDate.text = dateFormat.format(now)
         txtStatusYearTime.text = yearTimeFormat.format(now)
+        refreshCompactStatusWeather()
         txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh, hasCurrentSpeedData)
         txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
+    }
+
+    private fun refreshCompactStatusWeather() {
+        val settings = StatusOrientationSettings.load(this)
+        if (!settings.speakWeather || settings.weatherSourceUrl.isBlank()) {
+            currentStatusWeatherText = null
+            txtStatusWeather.visibility = View.GONE
+            txtStatusWeather.text = ""
+            return
+        }
+        val weatherText = currentStatusWeatherText
+        if (weatherText.isNullOrBlank()) {
+            txtStatusWeather.visibility = View.GONE
+            txtStatusWeather.text = ""
+        } else {
+            txtStatusWeather.text = weatherText
+            txtStatusWeather.visibility = View.VISIBLE
+        }
+        maybeFetchCompactStatusWeather(settings)
+    }
+
+    private fun maybeFetchCompactStatusWeather(settings: StatusOrientationSettings) {
+        val nowMs = System.currentTimeMillis()
+        if (isStatusWeatherFetchRunning || nowMs - lastStatusWeatherFetchAtMs < STATUS_WEATHER_REFRESH_INTERVAL_MS) {
+            return
+        }
+        isStatusWeatherFetchRunning = true
+        lastStatusWeatherFetchAtMs = nowMs
+        Thread {
+            val compactWeather = WeatherClient.fetchCompactStatus(settings.weatherSourceUrl)
+            runOnUiThread {
+                currentStatusWeatherText = compactWeather
+                isStatusWeatherFetchRunning = false
+                refreshCompactStatusWeather()
+            }
+        }.start()
     }
 
     private fun speakStatusOrientation() {

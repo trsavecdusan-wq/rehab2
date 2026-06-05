@@ -44,6 +44,33 @@ object WeatherClient {
         }
     }
 
+    fun fetchCompactStatus(sourceUrl: String): String? {
+        if (sourceUrl.isBlank()) {
+            return null
+        }
+
+        var connection: HttpURLConnection? = null
+        return try {
+            connection = (URL(sourceUrl).openConnection() as? HttpURLConnection)?.apply {
+                connectTimeout = TIMEOUT_MS
+                readTimeout = TIMEOUT_MS
+                requestMethod = "GET"
+                useCaches = false
+            }
+            val activeConnection = connection ?: return null
+            if (activeConnection.responseCode !in 200..299) {
+                return null
+            }
+
+            val body = activeConnection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+            parseOpenMeteoCompact(body)
+        } catch (_: Exception) {
+            null
+        } finally {
+            connection?.disconnect()
+        }
+    }
+
     private fun parseOpenMeteo(body: String): String? {
         val root = JSONObject(body)
         val current = root.optJSONObject("current")
@@ -92,6 +119,38 @@ object WeatherClient {
             71, 73, 75 -> "sneg"
             95 -> "je nevihta"
             else -> ""
+        }
+    }
+
+    private fun parseOpenMeteoCompact(body: String): String? {
+        val root = JSONObject(body)
+        val current = root.optJSONObject("current")
+            ?: root.optJSONObject("current_weather")
+            ?: return null
+        val temperature = when {
+            current.has("temperature_2m") -> current.optDouble("temperature_2m")
+            current.has("temperature") -> current.optDouble("temperature")
+            else -> Double.NaN
+        }
+        if (temperature.isNaN()) {
+            return null
+        }
+        val weatherCode = when {
+            current.has("weather_code") -> current.optInt("weather_code")
+            current.has("weathercode") -> current.optInt("weathercode")
+            else -> null
+        }
+        return "${weatherIcon(weatherCode)} ${temperature.roundToInt()}\u00b0"
+    }
+
+    private fun weatherIcon(code: Int?): String {
+        return when (code) {
+            0 -> "\u2600"
+            1, 2, 3 -> "\u2601"
+            45, 48 -> "\ud83c\udf2b"
+            51, 53, 55, 61, 63, 65, 95 -> "\ud83c\udf27"
+            71, 73, 75 -> "\u2744"
+            else -> "\u2601"
         }
     }
 
