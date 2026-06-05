@@ -133,6 +133,9 @@ class AacEditorActivity : AppCompatActivity() {
             appendLine()
             appendLine()
             append(buildImageCleanupAuditText())
+            appendLine()
+            appendLine()
+            append(buildImageWorkflowTestText())
         }
         AlertDialog.Builder(this)
             .setTitle("PREVERI KOMUNIKATOR (${problems.size})")
@@ -186,6 +189,27 @@ class AacEditorActivity : AppCompatActivity() {
                 append("Ni neuporabljenih slik.")
             }
         }.trim()
+    }
+
+    private fun buildImageWorkflowTestText(): String {
+        return """
+            TEST SLIK V EDITORJU
+
+            1. Izberi sliko iz galerije.
+            2. Fotografiraj novo sliko.
+            3. Izberi sliko iz MOJE SLIKE.
+            4. Izberi sliko iz OSEBE / PACIENT.
+            5. Preimenuj sliko.
+            6. Preveri “KJE SE UPORABLJA”.
+            7. Odstrani povezavo slike iz ikone.
+            8. Odpri komunikator in preveri, ali se slika vidi.
+
+            Pričakovane mape:
+            - NovaRehab/icons/custom/
+            - NovaRehab/icons/patient/
+            - NovaRehab/icons/soca/
+            - NovaRehab/icons/arasaac/
+        """.trimIndent()
     }
 
     private fun imageUsageKey(iconSource: IconSource, imagePath: String): String {
