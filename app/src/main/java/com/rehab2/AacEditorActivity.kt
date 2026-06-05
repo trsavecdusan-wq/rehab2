@@ -1309,9 +1309,15 @@ class AacEditorActivity : AppCompatActivity() {
             Toast.makeText(this, "V tej mapi ni slik.", Toast.LENGTH_SHORT).show()
             return
         }
+        confirmImageReplacementIfNeeded(currentItem) {
+            applySelectedImageNow(currentItem, entry, refresh)
+        }
+    }
+
+    private fun applySelectedImageNow(item: AacItem, entry: AacImageGallery.Entry, refresh: () -> Unit) {
         val saved = AacEditorStorage.updateImage(
             context = this,
-            itemId = currentItem.id,
+            itemId = item.id,
             iconSource = entry.source.iconSource,
             imagePath = entry.imagePath
         )
@@ -1340,7 +1346,13 @@ class AacEditorActivity : AppCompatActivity() {
             Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
             return
         }
-        pendingGalleryItemId = currentItem.id
+        confirmImageReplacementIfNeeded(currentItem) {
+            openGalleryImagePickerNow(currentItem, refresh)
+        }
+    }
+
+    private fun openGalleryImagePickerNow(item: AacItem, refresh: () -> Unit) {
+        pendingGalleryItemId = item.id
         pendingGalleryRefresh = refresh
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -1398,8 +1410,13 @@ class AacEditorActivity : AppCompatActivity() {
             Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
             return
         }
+        confirmImageReplacementIfNeeded(currentItem) {
+            openCameraCaptureNow(currentItem, refresh)
+        }
+    }
 
-        val targetFile = createCameraImageFile(currentItem.id)
+    private fun openCameraCaptureNow(item: AacItem, refresh: () -> Unit) {
+        val targetFile = createCameraImageFile(item.id)
         if (targetFile == null) {
             Toast.makeText(this, "Fotografije ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
             return
@@ -1413,7 +1430,7 @@ class AacEditorActivity : AppCompatActivity() {
             return
         }
 
-        pendingCameraItemId = currentItem.id
+        pendingCameraItemId = item.id
         pendingCameraFile = targetFile
         pendingCameraRefresh = refresh
         try {
@@ -1422,6 +1439,19 @@ class AacEditorActivity : AppCompatActivity() {
             clearPendingCameraCapture(deleteFile = true)
             Toast.makeText(this, "Fotografije ni bilo mogoče shraniti.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun confirmImageReplacementIfNeeded(item: AacItem, onConfirmed: () -> Unit) {
+        if (item.imagePath.isBlank()) {
+            onConfirmed()
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("ZAMENJAVA SLIKE")
+            .setMessage("Zamenjali boste sliko samo za to ikono. Druge ikone, ki uporabljajo staro sliko, se ne bodo spremenile.")
+            .setPositiveButton("ZAMENJAJ") { _, _ -> onConfirmed() }
+            .setNegativeButton("PREKLIČI", null)
+            .show()
     }
 
     private fun handleCameraCaptureResult(success: Boolean) {
