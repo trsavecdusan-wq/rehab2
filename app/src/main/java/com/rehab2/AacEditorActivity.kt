@@ -140,6 +140,9 @@ class AacEditorActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("PREVERI KOMUNIKATOR (${problems.size})")
             .setMessage(message.take(12000))
+            .setNeutralButton("PONASTAVI TEST") { _, _ ->
+                Toast.makeText(this, "Test je ponastavljen.", Toast.LENGTH_SHORT).show()
+            }
             .setPositiveButton("ZAPRI", null)
             .show()
     }
@@ -203,6 +206,16 @@ class AacEditorActivity : AppCompatActivity() {
             6. Preveri “KJE SE UPORABLJA”.
             7. Odstrani povezavo slike iz ikone.
             8. Odpri komunikator in preveri, ali se slika vidi.
+
+            Rezultati:
+            1. Galerija: NI PREVERJENO
+            2. Kamera: NI PREVERJENO
+            3. Moje slike: NI PREVERJENO
+            4. Osebe/Pacient: NI PREVERJENO
+            5. Preimenovanje: NI PREVERJENO
+            6. Kje se uporablja: NI PREVERJENO
+            7. Odstrani sliko: NI PREVERJENO
+            8. Slika vidna v komunikatorju: NI PREVERJENO
 
             Pričakovane mape:
             - NovaRehab/icons/custom/
