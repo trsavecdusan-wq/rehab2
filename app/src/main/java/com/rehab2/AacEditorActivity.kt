@@ -144,6 +144,10 @@ class AacEditorActivity : AppCompatActivity() {
         val hiddenStatus = dialogView.findViewById<TextView>(R.id.txtAacEditorHiddenStatus)
         val childList = dialogView.findViewById<LinearLayout>(R.id.aacEditorChildrenList)
         val changeImage = dialogView.findViewById<Button>(R.id.btnAacEditorChangeImage)
+        val pickCustomFolder = dialogView.findViewById<Button>(R.id.btnAacEditorPickCustomFolder)
+        val pickPatientFolder = dialogView.findViewById<Button>(R.id.btnAacEditorPickPatientFolder)
+        val pickSocaFolder = dialogView.findViewById<Button>(R.id.btnAacEditorPickSocaFolder)
+        val pickArasaacFolder = dialogView.findViewById<Button>(R.id.btnAacEditorPickArasaacFolder)
         val pickGalleryImage = dialogView.findViewById<Button>(R.id.btnAacEditorPickGalleryImage)
         val capturePhoto = dialogView.findViewById<Button>(R.id.btnAacEditorCapturePhoto)
         val removeImage = dialogView.findViewById<Button>(R.id.btnAacEditorRemoveImage)
@@ -186,6 +190,18 @@ class AacEditorActivity : AppCompatActivity() {
 
         changeImage.setOnClickListener {
             showImageSourceDialog(currentItem, dialog)
+        }
+        pickCustomFolder.setOnClickListener {
+            showSimpleImageSourceBrowser(currentItem, IconSource.CUSTOM) { refreshDialogContent() }
+        }
+        pickPatientFolder.setOnClickListener {
+            showSimpleImageSourceBrowser(currentItem, IconSource.PATIENT) { refreshDialogContent() }
+        }
+        pickSocaFolder.setOnClickListener {
+            showSimpleImageSourceBrowser(currentItem, IconSource.SOCA) { refreshDialogContent() }
+        }
+        pickArasaacFolder.setOnClickListener {
+            showSimpleImageSourceBrowser(currentItem, IconSource.ARASAAC) { refreshDialogContent() }
         }
         pickGalleryImage.setOnClickListener {
             openGalleryImagePicker(currentItem) { refreshDialogContent() }
@@ -1001,6 +1017,73 @@ class AacEditorActivity : AppCompatActivity() {
             }
             .setNegativeButton("PREKLI\u010cI", null)
             .show()
+    }
+
+    private fun showSimpleImageSourceBrowser(item: AacItem, iconSource: IconSource, refresh: () -> Unit) {
+        val currentItem = AacEditorStorage.loadItems(this).firstOrNull { it.id == item.id } ?: item
+        if (currentItem.locked) {
+            Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val source = AacImageGallery.sources(this).firstOrNull { it.iconSource == iconSource }
+        if (source == null) {
+            Toast.makeText(this, "V tej mapi ni slik.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val entries = AacImageGallery.scan(source)
+            .filter { entry -> !entry.file.name.startsWith(".") && entry.file.isFile }
+            .sortedBy { entry -> entry.file.name.lowercase(Locale.ROOT) }
+
+        if (entries.isEmpty()) {
+            Toast.makeText(this, "V tej mapi ni slik.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val labels = entries.map { entry -> entry.file.name }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle(simpleImageSourceTitle(iconSource))
+            .setItems(labels) { _, which ->
+                applySimpleSelectedImage(currentItem, entries[which], refresh)
+            }
+            .setNegativeButton("PREKLIČI", null)
+            .show()
+    }
+
+    private fun applySimpleSelectedImage(item: AacItem, entry: AacImageGallery.Entry, refresh: () -> Unit) {
+        val currentItem = AacEditorStorage.loadItems(this).firstOrNull { it.id == item.id } ?: item
+        if (currentItem.locked) {
+            Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!entry.file.isFile) {
+            Toast.makeText(this, "V tej mapi ni slik.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val saved = AacEditorStorage.updateImage(
+            context = this,
+            itemId = currentItem.id,
+            iconSource = entry.source.iconSource,
+            imagePath = entry.imagePath
+        )
+        if (saved) {
+            Toast.makeText(this, "Slika je shranjena.", Toast.LENGTH_SHORT).show()
+            refresh()
+            loadEditorPages()
+        } else {
+            Toast.makeText(this, "Shranjevanje slike ni uspelo.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun simpleImageSourceTitle(iconSource: IconSource): String {
+        return when (iconSource) {
+            IconSource.CUSTOM -> "IZBERI IZ MOJIH SLIK"
+            IconSource.PATIENT -> "IZBERI IZ OSEB"
+            IconSource.SOCA -> "IZBERI IZ SOČA"
+            IconSource.ARASAAC -> "IZBERI IZ ARASAAC"
+            IconSource.SYSTEM -> "SISTEMSKE IKONE"
+        }
     }
 
     private fun openGalleryImagePicker(item: AacItem, refresh: () -> Unit) {

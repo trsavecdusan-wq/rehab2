@@ -96,6 +96,63 @@
             android:textSize="15sp" />
 
         <TextView
+            android:id="@+id/txtAacEditorLocalBrowserHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Izberite že shranjeno sliko iz ene od map."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnAacEditorPickCustomFolder"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#34414D"
+            android:text="IZBERI IZ MOJIH SLIK"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAacEditorPickPatientFolder"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#34414D"
+            android:text="IZBERI IZ OSEB"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAacEditorPickSocaFolder"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#34414D"
+            android:text="IZBERI IZ SOČA"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAacEditorPickArasaacFolder"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#34414D"
+            android:text="IZBERI IZ ARASAAC"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/txtAacEditorGalleryHelp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
