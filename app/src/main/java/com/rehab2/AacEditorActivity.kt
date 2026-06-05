@@ -17,7 +17,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -1032,23 +1034,243 @@ class AacEditorActivity : AppCompatActivity() {
             return
         }
 
-        val entries = AacImageGallery.scan(source)
-            .filter { entry -> !entry.file.name.startsWith(".") && entry.file.isFile }
-            .sortedBy { entry -> entry.file.name.lowercase(Locale.ROOT) }
+        var entries = simpleImageEntries(source)
 
         if (entries.isEmpty()) {
             Toast.makeText(this, "V tej mapi ni slik.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val labels = entries.map { entry -> entry.file.name }.toTypedArray()
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24, 16, 24, 8)
+        }
+        val searchInput = EditText(this).apply {
+            hint = "IŠČI SLIKO"
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            setSingleLine(true)
+        }
+        val emptyStatus = TextView(this).apply {
+            text = ""
+            setTextColor(0xFF9AA6B2.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setPadding(0, 10, 0, 8)
+        }
+        val listView = ListView(this)
+        val filteredEntries = entries.toMutableList()
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            filteredEntries.map { entry -> entry.file.name }.toMutableList()
+        )
+        listView.adapter = adapter
+
+        fun applyFilter(query: String) {
+            val normalizedQuery = query.trim().lowercase(Locale.ROOT)
+            filteredEntries.clear()
+            filteredEntries.addAll(
+                if (normalizedQuery.isBlank()) {
+                    entries
+                } else {
+                    entries.filter { entry -> entry.file.name.lowercase(Locale.ROOT).contains(normalizedQuery) }
+                }
+            )
+            adapter.clear()
+            adapter.addAll(filteredEntries.map { entry -> entry.file.name })
+            adapter.notifyDataSetChanged()
+            emptyStatus.text = if (filteredEntries.isEmpty()) "Ni najdenih slik." else ""
+        }
+
+        fun refreshEntries() {
+            entries = simpleImageEntries(source)
+            applyFilter(searchInput.text?.toString().orEmpty())
+        }
+
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                applyFilter(s?.toString().orEmpty())
+            }
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+        listView.setOnItemClickListener { _, _, position, _ ->
+            filteredEntries.getOrNull(position)?.let { entry ->
+                showSimpleImageEntryActions(currentItem, entry, refresh, ::refreshEntries)
+            }
+        }
+
+        container.addView(searchInput)
+        container.addView(emptyStatus)
+        container.addView(
+            listView,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.aac_editor_gallery_height)
+            )
+        )
+
         AlertDialog.Builder(this)
             .setTitle(simpleImageSourceTitle(iconSource))
-            .setItems(labels) { _, which ->
-                applySimpleSelectedImage(currentItem, entries[which], refresh)
+            .setView(container)
+            .setNegativeButton("PREKLIČI", null)
+            .show()
+    }
+
+    private fun simpleImageEntries(source: AacImageGallery.Source): List<AacImageGallery.Entry> {
+        return AacImageGallery.scan(source)
+            .filter { entry -> !entry.file.name.startsWith(".") && entry.file.isFile }
+            .sortedBy { entry -> entry.file.name.lowercase(Locale.ROOT) }
+    }
+
+    private fun showSimpleImageEntryActions(
+        item: AacItem,
+        entry: AacImageGallery.Entry,
+        refreshEditor: () -> Unit,
+        refreshBrowser: () -> Unit
+    ) {
+        val actions = arrayOf("UPORABI SLIKO", "PREIMENUJ SLIKO")
+        AlertDialog.Builder(this)
+            .setTitle(entry.file.name)
+            .setItems(actions) { _, which ->
+                when (which) {
+                    0 -> applySimpleSelectedImage(item, entry, refreshEditor)
+                    1 -> showRenameImageDialog(item, entry, refreshEditor, refreshBrowser)
+                }
             }
             .setNegativeButton("PREKLIČI", null)
             .show()
+    }
+
+    private fun showRenameImageDialog(
+        item: AacItem,
+        entry: AacImageGallery.Entry,
+        refreshEditor: () -> Unit,
+        refreshBrowser: () -> Unit
+    ) {
+        if (!canRenameImageSource(entry.source.iconSource)) {
+            Toast.makeText(this, "Tega vira ni mogoče preimenovati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val parentDir = entry.file.parentFile
+        if (parentDir == null || !parentDir.isDirectory || !entry.file.canWrite()) {
+            Toast.makeText(this, "Tega vira ni mogoče preimenovati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24, 12, 24, 0)
+        }
+        val help = TextView(this).apply {
+            text = buildString {
+                append("Vpišite jasno ime slike, na primer: zana, voda, kava, vozicek.")
+                if (isImageUsedByAacItem(entry)) {
+                    append("\n\nTa slika je morda že uporabljena. Po preimenovanju jo bo treba ponovno izbrati.")
+                }
+            }
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setPadding(0, 0, 0, 12)
+        }
+        val input = EditText(this).apply {
+            setText(entry.file.nameWithoutExtension)
+            setSelectAllOnFocus(true)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            setSingleLine(true)
+        }
+        container.addView(help)
+        container.addView(input)
+
+        AlertDialog.Builder(this)
+            .setTitle("PREIMENUJ SLIKO")
+            .setView(container)
+            .setPositiveButton("SHRANI") { _, _ ->
+                renameImageFile(item, entry, input.text?.toString().orEmpty(), refreshEditor, refreshBrowser)
+            }
+            .setNegativeButton("PREKLIČI", null)
+            .show()
+    }
+
+    private fun renameImageFile(
+        item: AacItem,
+        entry: AacImageGallery.Entry,
+        requestedName: String,
+        refreshEditor: () -> Unit,
+        refreshBrowser: () -> Unit
+    ) {
+        val parentDir = entry.file.parentFile
+        if (parentDir == null || !parentDir.isDirectory) {
+            Toast.makeText(this, "Tega vira ni mogoče preimenovati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val safeBaseName = safeLibraryImageBaseName(requestedName)
+        if (safeBaseName.isBlank()) {
+            Toast.makeText(this, "Vpišite jasno ime slike.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val extension = entry.file.extension.lowercase(Locale.ROOT).ifBlank { "jpg" }
+        val targetFile = File(parentDir, "$safeBaseName.$extension")
+        if (targetFile.exists() && !targetFile.equals(entry.file)) {
+            Toast.makeText(this, "Datoteka s tem imenom že obstaja.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (targetFile.equals(entry.file)) {
+            Toast.makeText(this, "Slika je preimenovana.", Toast.LENGTH_SHORT).show()
+            refreshBrowser()
+            return
+        }
+        if (entry.file.renameTo(targetFile)) {
+            val currentItem = AacEditorStorage.loadItems(this).firstOrNull { it.id == item.id } ?: item
+            if (currentItem.iconSource == entry.source.iconSource && currentItem.imagePath == entry.imagePath) {
+                val nextImagePath = renamedImagePath(entry.imagePath, targetFile.name)
+                val updated = AacEditorStorage.updateImage(
+                    context = this,
+                    itemId = currentItem.id,
+                    iconSource = currentItem.iconSource,
+                    imagePath = nextImagePath
+                )
+                if (updated) {
+                    Toast.makeText(this, "Slika je preimenovana in posodobljena na ikoni.", Toast.LENGTH_SHORT).show()
+                    refreshEditor()
+                    refreshBrowser()
+                    loadEditorPages()
+                } else {
+                    targetFile.renameTo(entry.file)
+                    Toast.makeText(this, "Slike ni bilo mogoče preimenovati.", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "Slika je preimenovana.", Toast.LENGTH_SHORT).show()
+                refreshBrowser()
+            }
+        } else {
+            Toast.makeText(this, "Slike ni bilo mogoče preimenovati.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun renamedImagePath(oldImagePath: String, newFileName: String): String {
+        val normalizedPath = oldImagePath.replace('\\', '/')
+        val parentPath = normalizedPath.substringBeforeLast('/', missingDelimiterValue = "")
+        return if (parentPath.isBlank()) newFileName else "$parentPath/$newFileName"
+    }
+
+    private fun canRenameImageSource(iconSource: IconSource): Boolean {
+        return iconSource == IconSource.CUSTOM || iconSource == IconSource.PATIENT
+    }
+
+    private fun isImageUsedByAacItem(entry: AacImageGallery.Entry): Boolean {
+        return AacEditorStorage.loadItems(this).any { item ->
+            item.iconSource == entry.source.iconSource && item.imagePath == entry.imagePath
+        }
+    }
+
+    private fun safeLibraryImageBaseName(rawName: String): String {
+        val withoutExtension = rawName.trim().substringBeforeLast('.', rawName.trim())
+        return Normalizer.normalize(withoutExtension.lowercase(Locale.ROOT), Normalizer.Form.NFD)
+            .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
+            .replace(Regex("\\s+"), "_")
+            .replace(Regex("[^a-z0-9_-]+"), "_")
+            .replace(Regex("_+"), "_")
+            .trim('_', '-')
     }
 
     private fun applySimpleSelectedImage(item: AacItem, entry: AacImageGallery.Entry, refresh: () -> Unit) {
