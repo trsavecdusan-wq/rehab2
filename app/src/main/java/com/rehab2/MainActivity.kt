@@ -119,6 +119,8 @@ class MainActivity : AppCompatActivity() {
         private const val PREF_GPS_LAST_SIGNAL = "gps_last_signal"
         private const val PREF_GPS_LAST_IGNORED_REASON = "gps_last_ignored_reason"
         private const val PREF_GPS_RESET_BASELINE_REQUESTED = "gps_reset_baseline_requested"
+        private const val PREF_LOCATION_PERMISSION_REQUESTED = "location_permission_requested"
+        private const val REQUEST_LOCATION_PERMISSION_CODE = 600
         private const val MAX_REASONABLE_DISTANCE_METERS = 250f
         private const val MAX_REASONABLE_ACCURACY_METERS = 30f
         private const val MIN_REASONABLE_DISTANCE_METERS = 3f
@@ -252,7 +254,9 @@ class MainActivity : AppCompatActivity() {
     private var currentRadioPage = 1
     private var radioTouchStartX = 0f
     private var currentSpeedKmh = 0f
+    private var hasCurrentSpeedData = false
     private var previousTrackedLocation: Location? = null
+    private var locationPermissionRequestShown = false
     private var isPowerConnected = true
     private var powerDisconnectedAtMs = 0L
     private var powerWarningShownAtMs = 0L
@@ -324,8 +328,10 @@ class MainActivity : AppCompatActivity() {
     private val speedLocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             currentSpeedKmh = resolveSpeedKmh(previousTrackedLocation, location)
+            hasCurrentSpeedData = hasUsableSpeedLocation(location)
             trackDistance(location)
-            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
+            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh, hasCurrentSpeedData)
+            txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
         }
     }
     private val powerReceiver = object : BroadcastReceiver() {
@@ -2956,8 +2962,11 @@ class MainActivity : AppCompatActivity() {
     private fun startSpeedUpdates() {
         if (!hasLocationPermission()) {
             previousTrackedLocation = null
+            hasCurrentSpeedData = false
             currentSpeedKmh = 0f
-            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
+            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh, hasCurrentSpeedData)
+            txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
+            requestLocationPermissionIfNeeded()
             return
         }
 
@@ -2971,8 +2980,10 @@ class MainActivity : AppCompatActivity() {
         }
         if (!anyProviderEnabled) {
             previousTrackedLocation = null
+            hasCurrentSpeedData = false
             currentSpeedKmh = 0f
-            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
+            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh, hasCurrentSpeedData)
+            txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
             return
         }
 
@@ -2996,7 +3007,9 @@ class MainActivity : AppCompatActivity() {
 
         currentSpeedKmh = 0f
         previousTrackedLocation = lastLocation
-        txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
+        hasCurrentSpeedData = lastLocation?.let(::hasUsableSpeedLocation) == true
+        txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh, hasCurrentSpeedData)
+        txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
     }
 
     private fun stopSpeedUpdates() {
@@ -3005,6 +3018,40 @@ class MainActivity : AppCompatActivity() {
             locationManager.removeUpdates(speedLocationListener)
         } catch (_: SecurityException) {
         } catch (_: IllegalArgumentException) {
+        }
+    }
+
+    private fun requestLocationPermissionIfNeeded() {
+        if (locationPermissionRequestShown ||
+            prefs.getBoolean(PREF_LOCATION_PERMISSION_REQUESTED, false) ||
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+        ) {
+            return
+        }
+        locationPermissionRequestShown = true
+        prefs.edit().putBoolean(PREF_LOCATION_PERMISSION_REQUESTED, true).apply()
+        requestPermissions(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            REQUEST_LOCATION_PERMISSION_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_LOCATION_PERMISSION_CODE && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
+            startSpeedUpdates()
+        } else if (requestCode == REQUEST_LOCATION_PERMISSION_CODE) {
+            hasCurrentSpeedData = false
+            currentSpeedKmh = 0f
+            txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh, hasCurrentSpeedData)
+            txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
         }
     }
 
@@ -3039,7 +3086,7 @@ class MainActivity : AppCompatActivity() {
         txtStatusDay.text = dayFormat.format(now).replaceFirstChar { it.titlecase(Locale.getDefault()) }
         txtStatusDate.text = dateFormat.format(now)
         txtStatusYearTime.text = yearTimeFormat.format(now)
-        txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh)
+        txtStatusSpeed.text = formatSpeedKmh(currentSpeedKmh, hasCurrentSpeedData)
         txtStatusTodayDistance.text = formatTodayDistance(readTodayDistanceMeters())
     }
 
@@ -3429,17 +3476,25 @@ class MainActivity : AppCompatActivity() {
         return (distanceMeters / elapsedSeconds) * 3.6f
     }
 
-    private fun formatSpeedKmh(speedKmh: Float): String {
+    private fun hasUsableSpeedLocation(location: Location): Boolean {
+        return location.hasAccuracy() && location.accuracy <= MAX_REASONABLE_ACCURACY_METERS
+    }
+
+    private fun formatSpeedKmh(speedKmh: Float, hasSpeedData: Boolean): String {
+        if (!hasSpeedData) {
+            return "Hitrost: ni podatka"
+        }
         if (speedKmh < 0.05f) {
-            return "0"
+            return "Hitrost: 0 km/h"
         }
         val roundedToOneDecimal = (speedKmh * 10f).roundToInt() / 10f
         val wholePart = roundedToOneDecimal.roundToInt().toFloat()
-        return if (kotlin.math.abs(roundedToOneDecimal - wholePart) < 0.05f) {
+        val speedText = if (kotlin.math.abs(roundedToOneDecimal - wholePart) < 0.05f) {
             wholePart.toInt().toString()
         } else {
             String.format(Locale.US, "%.1f", roundedToOneDecimal)
         }
+        return "Hitrost: $speedText km/h"
     }
 
     private fun readTodayDistanceMeters(): Long {
@@ -3447,11 +3502,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun formatTodayDistance(distanceMeters: Long): String {
-        return if (distanceMeters < 1000L) {
+        val distanceText = if (distanceMeters < 1000L) {
             "${distanceMeters} m"
         } else {
             String.format(Locale.US, "%.2f km", distanceMeters / 1000f)
         }
+        return "Pot danes: $distanceText"
     }
 
     private fun gpsSignalForAccuracy(location: Location): String {

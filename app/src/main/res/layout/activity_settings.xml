@@ -2189,11 +2189,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="8dp"
             android:text="STATISTIKA GPS"
             android:textColor="#F4F7FA"
             android:textSize="24sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtGpsPermissionHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Za prikaz hitrosti in poti mora biti dovoljena lokacija."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
 
         <TextView
             android:layout_width="match_parent"
