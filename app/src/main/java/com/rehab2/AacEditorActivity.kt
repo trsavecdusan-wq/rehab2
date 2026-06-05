@@ -56,6 +56,16 @@ class AacEditorActivity : AppCompatActivity() {
     private var pendingCameraItemId: String? = null
     private var pendingCameraFile: File? = null
     private var pendingCameraRefresh: (() -> Unit)? = null
+    private val imageWorkflowTestItems = listOf(
+        "gallery" to "Galerija",
+        "camera" to "Kamera",
+        "custom" to "Moje slike",
+        "patient" to "Osebe/Pacient",
+        "rename" to "Preimenovanje",
+        "used_by" to "Kje se uporablja",
+        "remove" to "Odstrani sliko",
+        "communicator_visible" to "Slika vidna v komunikatorju"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,8 +151,11 @@ class AacEditorActivity : AppCompatActivity() {
             .setTitle("PREVERI KOMUNIKATOR (${problems.size})")
             .setMessage(message.take(12000))
             .setNeutralButton("PONASTAVI TEST") { _, _ ->
+                resetImageWorkflowTestResults()
                 Toast.makeText(this, "Test je ponastavljen.", Toast.LENGTH_SHORT).show()
+                showCommunicatorAuditDialog()
             }
+            .setNegativeButton("OZNAČI TEST") { _, _ -> showImageWorkflowTestPicker() }
             .setPositiveButton("ZAPRI", null)
             .show()
     }
@@ -208,14 +221,7 @@ class AacEditorActivity : AppCompatActivity() {
             8. Odpri komunikator in preveri, ali se slika vidi.
 
             Rezultati:
-            1. Galerija: NI PREVERJENO
-            2. Kamera: NI PREVERJENO
-            3. Moje slike: NI PREVERJENO
-            4. Osebe/Pacient: NI PREVERJENO
-            5. Preimenovanje: NI PREVERJENO
-            6. Kje se uporablja: NI PREVERJENO
-            7. Odstrani sliko: NI PREVERJENO
-            8. Slika vidna v komunikatorju: NI PREVERJENO
+            ${imageWorkflowTestResultsText()}
 
             Pričakovane mape:
             - NovaRehab/icons/custom/
@@ -223,6 +229,66 @@ class AacEditorActivity : AppCompatActivity() {
             - NovaRehab/icons/soca/
             - NovaRehab/icons/arasaac/
         """.trimIndent()
+    }
+
+    private fun imageWorkflowTestResultsText(): String {
+        return imageWorkflowTestItems.mapIndexed { index, item ->
+            "${index + 1}. ${item.second}: ${imageWorkflowTestStatus(item.first)}"
+        }.joinToString("\n")
+    }
+
+    private fun showImageWorkflowTestPicker() {
+        val labels = imageWorkflowTestItems.map { item ->
+            "${item.second}: ${imageWorkflowTestStatus(item.first)}"
+        }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("OZNAČI TEST")
+            .setItems(labels) { _, which ->
+                imageWorkflowTestItems.getOrNull(which)?.let { item ->
+                    showImageWorkflowStatusPicker(item.first, item.second)
+                }
+            }
+            .setNegativeButton("PREKLIČI", null)
+            .show()
+    }
+
+    private fun showImageWorkflowStatusPicker(itemKey: String, itemLabel: String) {
+        val statuses = arrayOf("NI PREVERJENO", "DELA", "NE DELA")
+        AlertDialog.Builder(this)
+            .setTitle(itemLabel)
+            .setItems(statuses) { _, which ->
+                val selectedStatus = statuses.getOrElse(which) { "NI PREVERJENO" }
+                imageWorkflowPrefs()
+                    .edit()
+                    .putString(imageWorkflowTestPreferenceKey(itemKey), selectedStatus)
+                    .apply()
+                Toast.makeText(this, "Status je shranjen.", Toast.LENGTH_SHORT).show()
+                showCommunicatorAuditDialog()
+            }
+            .setNegativeButton("PREKLIČI", null)
+            .show()
+    }
+
+    private fun imageWorkflowTestStatus(itemKey: String): String {
+        val saved = imageWorkflowPrefs().getString(imageWorkflowTestPreferenceKey(itemKey), null)
+        return when (saved) {
+            "DELA", "NE DELA" -> saved
+            else -> "NI PREVERJENO"
+        }
+    }
+
+    private fun resetImageWorkflowTestResults() {
+        val editor = imageWorkflowPrefs().edit()
+        imageWorkflowTestItems.forEach { item ->
+            editor.putString(imageWorkflowTestPreferenceKey(item.first), "NI PREVERJENO")
+        }
+        editor.apply()
+    }
+
+    private fun imageWorkflowPrefs() = getSharedPreferences("aac_editor_image_workflow_test", MODE_PRIVATE)
+
+    private fun imageWorkflowTestPreferenceKey(itemKey: String): String {
+        return "aac_editor_image_test_$itemKey"
     }
 
     private fun imageUsageKey(iconSource: IconSource, imagePath: String): String {
