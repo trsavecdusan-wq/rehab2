@@ -50,6 +50,7 @@ import com.rehab2.aac.AacSpeechCache
 import com.rehab2.aac.AacSpeechCoordinator
 import com.rehab2.aac.AacSpeechLoudnessSettings
 import com.rehab2.aac.AacSpeechTimingSettings
+import com.rehab2.aac.AacUsageStats
 import com.rehab2.aac.AacVendingScenario
 import com.rehab2.aac.IconSource
 import com.rehab2.aac.OpenAiAacSpeechApiClient
