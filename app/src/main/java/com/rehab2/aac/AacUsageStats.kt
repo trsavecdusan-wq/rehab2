@@ -7,6 +7,9 @@ import java.io.File
 
 object AacUsageStats {
     private const val USAGE_STATS_FILE = "NovaRehab/data/aac_usage_stats.json"
+    private const val PREFS_FILE = "rehab2_prefs"
+    const val PREF_CORRECTION_BACK_COUNT = "aac_correction_back_count"
+    const val PREF_CORRECTION_LAST_AT = "aac_correction_last_at"
     private const val MIN_TOP_SUGGESTION_USE_COUNT = 5
 
     data class Entry(
@@ -76,6 +79,21 @@ object AacUsageStats {
     fun load(context: Context): Map<String, Entry> {
         val file = usageStatsFile(context) ?: return emptyMap()
         return loadEntries(file)
+    }
+
+    fun recordBackCorrection(context: Context, now: Long = System.currentTimeMillis()) {
+        val prefs = context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
+        val currentCount = prefs.getLong(PREF_CORRECTION_BACK_COUNT, 0L).coerceAtLeast(0L)
+        prefs.edit()
+            .putLong(PREF_CORRECTION_BACK_COUNT, currentCount + 1L)
+            .putLong(PREF_CORRECTION_LAST_AT, now)
+            .apply()
+    }
+
+    fun backCorrectionCount(context: Context): Long {
+        return context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
+            .getLong(PREF_CORRECTION_BACK_COUNT, 0L)
+            .coerceAtLeast(0L)
     }
 
     private fun usageStatsFile(context: Context): File? {

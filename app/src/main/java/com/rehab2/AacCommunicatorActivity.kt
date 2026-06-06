@@ -52,6 +52,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
         SENTENCE
     }
 
+    private data class DeferredSingleIconSpeech(
+        val text: String,
+        val requestId: Int,
+        val delayMs: Long
+    )
+
     private lateinit var repository: AacRepository
     private val pageHistory = ArrayDeque<String>()
     private val sentenceManager = AacSentenceStateManager()
@@ -63,6 +69,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var audioPlayer: AacAudioPlayer
     private val autoSpeakHandler = Handler(Looper.getMainLooper())
     private var pendingSingleIconSpeak: Runnable? = null
+    private var deferredSingleIconSpeech: DeferredSingleIconSpeech? = null
     private var pendingAutoSpeakSentence: Runnable? = null
     private var isSpeakingSentence = false
     private var isSpeakingSingleIcon = false
@@ -143,6 +150,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
                         returnToRootMenuAfterSentence()
                     }
                     speakPendingVendingDigitsIfNeeded()
+                } else if (completedMode == SpeechMode.SINGLE_ICON) {
+                    scheduleDeferredSingleIconSpeechAfterCurrent()
                 }
             }
 
@@ -155,11 +164,15 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             override fun onSpeechError() {
+                val errorMode = activeSpeechMode
                 lastSpeechEndedAt = System.currentTimeMillis()
-                Log.d(TAG, "AAC_INPUT speech_error inputLocked=false mode=$activeSpeechMode")
-                Log.d(TAG, "AAC_SPEECH SPEECH_ERROR mode=$activeSpeechMode")
+                Log.d(TAG, "AAC_INPUT speech_error inputLocked=false mode=$errorMode")
+                Log.d(TAG, "AAC_SPEECH SPEECH_ERROR mode=$errorMode")
                 pendingVendingDigitsSpeech = null
                 resetSpeechState("error")
+                if (errorMode == SpeechMode.SINGLE_ICON) {
+                    scheduleDeferredSingleIconSpeechAfterCurrent()
+                }
             }
         })
 
@@ -205,6 +218,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
         btnBackNav.setOnClickListener {
             cancelPendingSpeech()
+            recordBackCorrection()
             goBack()
         }
         setupQuickAccessRow()
@@ -385,6 +399,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         if (isGuidedBackNoItem(item)) {
             cancelPendingSpeech()
+            recordBackCorrection()
             goBack()
             return
         }
@@ -402,12 +417,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
             "go_back" -> {
                 cancelPendingSpeech()
+                recordBackCorrection()
                 goBack()
                 return
             }
         }
 
         if (isV2Item(item)) {
+            val isSubIconTap = isInSubIconMenu()
             val speechRequestId = nextSpeechRequestId("ITEM_SELECTED:${item.id}")
             interruptActiveSpeechForNewInput()
             if (item.id == WATER_NODE_ID) {
@@ -454,7 +471,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             if (childItems.isNotEmpty()) {
                 val allowParentAutoSentence = shouldAllowParentAutoSentence(item)
                 if (!(allowParentAutoSentence && speechTimingSettings.autoSpeakSentenceEnabled)) {
-                    speakSingleIconIfEnabled(singleIconText, speechRequestId)
+                    speakSingleIconIfEnabled(singleIconText, speechRequestId, isSubIconTap)
                 }
                 scheduleAutoSpeakSentenceIfEnabled(speechRequestId, allowSingleItem = allowParentAutoSentence)
                 setPromptText(resolveFollowUpQuestion(item))
@@ -464,7 +481,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             } else {
                 clearPromptText()
             }
-            speakSingleIconIfEnabled(singleIconText, speechRequestId)
+            speakSingleIconIfEnabled(singleIconText, speechRequestId, isSubIconTap)
             scheduleAutoSpeakSentenceIfEnabled(speechRequestId)
             return
         }
@@ -749,6 +766,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
         showPage(page)
     }
 
+    private fun recordBackCorrection() {
+        AacUsageStats.recordBackCorrection(this)
+        Log.d(TAG, "AAC_CORRECTION BACK count=${AacUsageStats.backCorrectionCount(this)}")
+    }
+
     private fun clearV2State() {
         cancelPendingSpeech()
         sentenceManager.clear()
@@ -926,8 +948,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
         btnClearSentence.isEnabled = hasSentence
     }
 
-    private fun speakSingleIconIfEnabled(text: String, requestId: Int) {
-        cancelPendingSingleIconSpeak()
+    private fun speakSingleIconIfEnabled(text: String, requestId: Int, isSubIconTap: Boolean) {
+        cancelPendingSingleIconRunnable()
         if (!speechTimingSettings.speakSingleIconEnabled) {
             return
         }
@@ -937,25 +959,49 @@ class AacCommunicatorActivity : AppCompatActivity() {
             return
         }
 
-        if (!speechTimingSettings.delayedSingleIconSpeakEnabled ||
-            speechTimingSettings.singleIconSpeakDelayMs <= 0L
-        ) {
+        val delayMs = if (speechTimingSettings.delayedSingleIconSpeakEnabled) {
+            selectedIconSpeakDelayMs(isSubIconTap)
+        } else {
+            0L
+        }
+
+        if (isSpeakingSingleIcon) {
+            deferredSingleIconSpeech = DeferredSingleIconSpeech(trimmed, requestId, delayMs)
+            Log.d(TAG, "AAC_SPEECH SINGLE_ICON_DEFERRED_UNTIL_CURRENT_END requestId=$requestId delayMs=$delayMs")
+            return
+        }
+
+        if (delayMs <= 0L) {
             startSingleIconSpeech(trimmed, requestId)
             return
         }
 
+        scheduleSingleIconSpeech(trimmed, requestId, delayMs)
+    }
+
+    private fun scheduleSingleIconSpeech(text: String, requestId: Int, delayMs: Long) {
         val pending = Runnable {
             pendingSingleIconSpeak = null
-            startSingleIconSpeech(trimmed, requestId)
+            startSingleIconSpeech(text, requestId)
         }
-        val delayMs = effectiveSingleIconSpeakDelayMs()
         Log.d(
             TAG,
-            "AAC_INPUT single_icon_delay requestId=$requestId delayMs=$delayMs " +
-                "configured=${speechTimingSettings.singleIconSpeakDelayMs}"
+            "AAC_INPUT single_icon_delay requestId=$requestId delayMs=$delayMs"
         )
         pendingSingleIconSpeak = pending
         autoSpeakHandler.postDelayed(pending, delayMs)
+    }
+
+    private fun scheduleDeferredSingleIconSpeechAfterCurrent() {
+        val deferred = deferredSingleIconSpeech ?: return
+        deferredSingleIconSpeech = null
+        val delayMs = effectiveSingleIconSpeakDelayMs(deferred.delayMs)
+        Log.d(TAG, "AAC_SPEECH SINGLE_ICON_DEFERRED_SCHEDULED requestId=${deferred.requestId} delayMs=$delayMs")
+        if (delayMs <= 0L) {
+            startSingleIconSpeech(deferred.text, deferred.requestId)
+        } else {
+            scheduleSingleIconSpeech(deferred.text, deferred.requestId, delayMs)
+        }
     }
 
     private fun scheduleAutoSpeakSentenceIfEnabled(requestId: Int, allowSingleItem: Boolean = false) {
@@ -1037,12 +1083,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun cancelPendingSingleIconSpeak() {
+        cancelPendingSingleIconRunnable()
+        deferredSingleIconSpeech = null
+        isSpeakingSingleIcon = false
+    }
+
+    private fun cancelPendingSingleIconRunnable() {
         pendingSingleIconSpeak?.let { pending ->
             autoSpeakHandler.removeCallbacks(pending)
             Log.d(TAG, "AAC_SPEECH SINGLE_ICON_CANCEL pending requestId=$lastSpeechRequestId")
         }
         pendingSingleIconSpeak = null
-        isSpeakingSingleIcon = false
     }
 
     private fun cancelPendingSpeech() {
@@ -1058,6 +1109,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun interruptActiveSpeechForNewInput() {
+        if (isSpeakingSingleIcon && !isSpeakingSentence) {
+            Log.d(TAG, "AAC_SPEECH KEEP_CURRENT_SINGLE_ICON_FOR_NEW_INPUT")
+            return
+        }
         if (!isSpeakingSentence && !isSpeakingSingleIcon) {
             return
         }
@@ -1070,14 +1125,25 @@ class AacCommunicatorActivity : AppCompatActivity() {
         Log.d(TAG, "AAC_SPEECH INTERRUPT_FOR_NEW_INPUT")
     }
 
-    private fun effectiveSingleIconSpeakDelayMs(): Long {
-        val configuredDelayMs = speechTimingSettings.singleIconSpeakDelayMs
+    private fun effectiveSingleIconSpeakDelayMs(configuredDelayMs: Long): Long {
         val sinceSpeechEndedMs = System.currentTimeMillis() - lastSpeechEndedAt
         return if (lastSpeechEndedAt > 0L && sinceSpeechEndedMs in 0..POST_SPEECH_FAST_RESPONSE_WINDOW_MS) {
             configuredDelayMs.coerceAtMost(MAX_POST_SPEECH_SINGLE_ICON_DELAY_MS)
         } else {
             configuredDelayMs
         }
+    }
+
+    private fun selectedIconSpeakDelayMs(isSubIconTap: Boolean): Long {
+        return if (isSubIconTap) {
+            speechTimingSettings.subIconSpeakDelayMs
+        } else {
+            speechTimingSettings.mainIconSpeakDelayMs
+        }
+    }
+
+    private fun isInSubIconMenu(): Boolean {
+        return currentV2VisibleHistory.isNotEmpty()
     }
 
     private fun resetSpeechState(reason: String) {

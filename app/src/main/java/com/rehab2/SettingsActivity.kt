@@ -167,8 +167,19 @@ class SettingsActivity : AppCompatActivity() {
             "Normalno (0.88)" to 0.88,
             "Hitro (1.10)" to 1.10
         )
-        private val SINGLE_ICON_DELAY_OPTIONS = arrayOf(
+        private val MAIN_ICON_DELAY_OPTIONS = arrayOf(
             "0 ms" to 0L,
+            "100 ms" to 100L,
+            "200 ms" to 200L,
+            "300 ms" to 300L,
+            "500 ms" to 500L,
+            "700 ms" to 700L,
+            "1000 ms" to 1000L
+        )
+        private val SUB_ICON_DELAY_OPTIONS = arrayOf(
+            "0 ms" to 0L,
+            "100 ms" to 100L,
+            "200 ms" to 200L,
             "300 ms" to 300L,
             "500 ms" to 500L,
             "700 ms" to 700L,
@@ -298,6 +309,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editSpeechApiSpeed: EditText
     private lateinit var switchSingleIconSpeech: SwitchCompat
     private lateinit var editSingleIconDelay: EditText
+    private lateinit var editSubIconDelay: EditText
     private lateinit var switchFastCompositionSkipLastIcon: SwitchCompat
     private lateinit var switchAutoSentenceSpeech: SwitchCompat
     private lateinit var editAutoSentenceDelay: EditText
@@ -404,6 +416,7 @@ class SettingsActivity : AppCompatActivity() {
         editSpeechApiSpeed = findViewById(R.id.editSpeechApiSpeed)
         switchSingleIconSpeech = findViewById(R.id.switchSingleIconSpeech)
         editSingleIconDelay = findViewById(R.id.editSingleIconDelay)
+        editSubIconDelay = findViewById(R.id.editSubIconDelay)
         switchFastCompositionSkipLastIcon = findViewById(R.id.switchFastCompositionSkipLastIcon)
         switchAutoSentenceSpeech = findViewById(R.id.switchAutoSentenceSpeech)
         editAutoSentenceDelay = findViewById(R.id.editAutoSentenceDelay)
@@ -610,7 +623,10 @@ class SettingsActivity : AppCompatActivity() {
             showSpeechSpeedPicker()
         }
         editSingleIconDelay.setOnClickListener {
-            showSingleIconDelayPicker()
+            showMainIconDelayPicker()
+        }
+        editSubIconDelay.setOnClickListener {
+            showSubIconDelayPicker()
         }
         editAutoSentenceDelay.setOnClickListener {
             showAutoSentenceDelayPicker()
@@ -1251,7 +1267,8 @@ class SettingsActivity : AppCompatActivity() {
         switchAutoSentenceSpeech.isChecked = settings.autoSpeakSentenceEnabled
         switchReturnToRootAfterSentence.isChecked = settings.returnToRootAfterSentenceEnabled
         switchClearSentenceAfterSentence.isChecked = settings.clearSentenceAfterSentenceEnabled
-        editSingleIconDelay.setText("${settings.singleIconSpeakDelayMs} ms")
+        editSingleIconDelay.setText("${settings.mainIconSpeakDelayMs} ms")
+        editSubIconDelay.setText("${settings.subIconSpeakDelayMs} ms")
         editAutoSentenceDelay.setText(
             if (settings.autoSpeakSentenceEnabled) {
                 "${settings.autoSpeakSentenceDelayMs} ms"
@@ -1260,6 +1277,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         )
         editSingleIconDelay.isEnabled = settings.speakSingleIconEnabled
+        editSubIconDelay.isEnabled = settings.speakSingleIconEnabled
         editAutoSentenceDelay.isEnabled = settings.autoSpeakSentenceEnabled
         bindSpeechTimingSwitchListeners()
     }
@@ -1386,6 +1404,7 @@ class SettingsActivity : AppCompatActivity() {
             val imageQuality = auditImageQuality(items)
             val coreIconVisualAudit = auditCoreIconVisualQuality()
             val peoplePhotoAudit = auditPeoplePhotoStatus()
+            val backCorrections = AacUsageStats.backCorrectionCount(this)
             val emptySpeechItems = items.filter { explicitSlSpeechText(it).isBlank() }
             val missingCore = missingCoreAacLabels(items)
             val itemIds = items.map { it.id.trim() }.toSet()
@@ -1491,6 +1510,7 @@ class SettingsActivity : AppCompatActivity() {
                     missingCore.isEmpty()
                 ),
                 statusLine("Govor", "${emptySpeechItems.size} ikon brez vpisanega govora", coreWithoutSpeech.isEmpty()),
+                "Popravki z NAZAJ: $backCorrections",
                 "Fotografija: ${if (patientProfilePhotoExists()) "DA" else "NE"}",
                 "",
                 "Skupno stanje: $overall"
@@ -2285,17 +2305,36 @@ class SettingsActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showSingleIconDelayPicker() {
+    private fun showMainIconDelayPicker() {
         val settings = AacSpeechTimingSettings.read(this)
-        val labels = SINGLE_ICON_DELAY_OPTIONS.map { it.first }.toTypedArray()
-        val selectedIndex = SINGLE_ICON_DELAY_OPTIONS
-            .indexOfFirst { it.second == settings.singleIconSpeakDelayMs }
-            .coerceAtLeast(3)
+        val labels = MAIN_ICON_DELAY_OPTIONS.map { it.first }.toTypedArray()
+        val selectedIndex = MAIN_ICON_DELAY_OPTIONS
+            .indexOfFirst { it.second == settings.mainIconSpeakDelayMs }
         AlertDialog.Builder(this)
-            .setTitle("Zamik govora ikone")
+            .setTitle("Pavza glavnih ikon")
             .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
-                val delayMs = SINGLE_ICON_DELAY_OPTIONS[which].second
+                val delayMs = MAIN_ICON_DELAY_OPTIONS[which].second
                 prefs.edit()
+                    .putLong(AacSpeechTimingSettings.PREF_MAIN_ICON_SPEAK_DELAY_MS, delayMs)
+                    .apply()
+                refreshSpeechTimingSection()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun showSubIconDelayPicker() {
+        val settings = AacSpeechTimingSettings.read(this)
+        val labels = SUB_ICON_DELAY_OPTIONS.map { it.first }.toTypedArray()
+        val selectedIndex = SUB_ICON_DELAY_OPTIONS
+            .indexOfFirst { it.second == settings.subIconSpeakDelayMs }
+            .coerceAtLeast(5)
+        AlertDialog.Builder(this)
+            .setTitle("Pavza podikon")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val delayMs = SUB_ICON_DELAY_OPTIONS[which].second
+                prefs.edit()
+                    .putLong(AacSpeechTimingSettings.PREF_SUB_ICON_SPEAK_DELAY_MS, delayMs)
                     .putLong(AacSpeechTimingSettings.PREF_SINGLE_ICON_SPEAK_DELAY_MS, delayMs)
                     .apply()
                 refreshSpeechTimingSection()
