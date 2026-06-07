@@ -1398,6 +1398,22 @@
             android:textSize="16sp" />
 
         <EditText
+            android:id="@+id/editPatientGender"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:hint="Spol"
+            android:inputType="none"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <EditText
             android:id="@+id/editPatientAge"
             android:layout_width="match_parent"
             android:layout_height="60dp"

@@ -357,6 +357,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtPatientProfileStatus: TextView
     private lateinit var editPatientFirstName: EditText
     private lateinit var editPatientLastName: EditText
+    private lateinit var editPatientGender: EditText
     private lateinit var editPatientAge: EditText
     private lateinit var editPatientBirthDate: EditText
     private lateinit var editPatientHomeTown: EditText
@@ -464,6 +465,7 @@ class SettingsActivity : AppCompatActivity() {
         txtPatientProfileStatus = findViewById(R.id.txtPatientProfileStatus)
         editPatientFirstName = findViewById(R.id.editPatientFirstName)
         editPatientLastName = findViewById(R.id.editPatientLastName)
+        editPatientGender = findViewById(R.id.editPatientGender)
         editPatientAge = findViewById(R.id.editPatientAge)
         editPatientBirthDate = findViewById(R.id.editPatientBirthDate)
         editPatientHomeTown = findViewById(R.id.editPatientHomeTown)
@@ -628,6 +630,9 @@ class SettingsActivity : AppCompatActivity() {
         }
         editSubIconDelay.setOnClickListener {
             showSubIconDelayPicker()
+        }
+        editPatientGender.setOnClickListener {
+            showPatientGenderPicker()
         }
         editAutoSentenceDelay.setOnClickListener {
             showAutoSentenceDelayPicker()
@@ -1704,6 +1709,7 @@ class SettingsActivity : AppCompatActivity() {
         txtPatientProfileStatus.text = buildPatientSummaryText(profile)
         editPatientFirstName.setText(profile.firstName)
         editPatientLastName.setText(profile.lastName)
+        editPatientGender.setText(PatientProfileSettings.genderDisplayLabel(profile.gender))
         editPatientAge.setText(profile.age)
         editPatientBirthDate.setText(profile.birthDate)
         editPatientHomeTown.setText(profile.homeTown)
@@ -1721,6 +1727,7 @@ class SettingsActivity : AppCompatActivity() {
             .joinToString(" ")
             .ifBlank { "Ni vpisano" }
         val language = profile.mainLanguage.trim().ifBlank { "Ni nastavljen" }
+        val gender = PatientProfileSettings.genderDisplayLabel(profile.gender)
         val gridSize = getAacGridSize()
         val photoStatus = if (patientProfilePhotoExists()) "DA" else "NE"
         val activeProfile = AacProfileStore.getActiveAacProfile(this).displayName.ifBlank { "DOM" }
@@ -1731,6 +1738,7 @@ class SettingsActivity : AppCompatActivity() {
             patientName,
             "",
             "Jezik: $language",
+            "Spol: $gender",
             "Mreža: ${gridSize}x$gridSize",
             "Fotografija: $photoStatus",
             "AAC profil: $activeProfile",
@@ -1760,6 +1768,7 @@ class SettingsActivity : AppCompatActivity() {
         val profile = PatientProfileSettings(
             firstName = editPatientFirstName.text?.toString().orEmpty(),
             lastName = editPatientLastName.text?.toString().orEmpty(),
+            gender = PatientProfileSettings.genderFromDisplayLabel(editPatientGender.text?.toString().orEmpty()),
             age = editPatientAge.text?.toString().orEmpty(),
             birthDate = editPatientBirthDate.text?.toString().orEmpty(),
             homeTown = editPatientHomeTown.text?.toString().orEmpty(),
@@ -2339,6 +2348,19 @@ class SettingsActivity : AppCompatActivity() {
                     .putLong(AacSpeechTimingSettings.PREF_SINGLE_ICON_SPEAK_DELAY_MS, delayMs)
                     .apply()
                 refreshSpeechTimingSection()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun showPatientGenderPicker() {
+        val options = arrayOf("\u017denska", "Mo\u0161ki")
+        val currentGender = PatientProfileSettings.genderFromDisplayLabel(editPatientGender.text?.toString().orEmpty())
+        val selectedIndex = if (currentGender == PatientProfileSettings.GENDER_MALE) 1 else 0
+        AlertDialog.Builder(this)
+            .setTitle("Spol pacientke")
+            .setSingleChoiceItems(options, selectedIndex) { dialog, which ->
+                editPatientGender.setText(options[which])
                 dialog.dismiss()
             }
             .show()

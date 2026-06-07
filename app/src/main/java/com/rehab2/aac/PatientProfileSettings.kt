@@ -6,6 +6,7 @@ import org.json.JSONObject
 data class PatientProfileSettings(
     val firstName: String = "",
     val lastName: String = "",
+    val gender: String = GENDER_FEMALE,
     val age: String = "",
     val birthDate: String = "",
     val homeTown: String = "",
@@ -17,6 +18,8 @@ data class PatientProfileSettings(
 ) {
     companion object {
         const val EMPTY_FIELD_SENTENCE = "Ta podatek \u0161e ni vpisan."
+        const val GENDER_FEMALE = "FEMALE"
+        const val GENDER_MALE = "MALE"
 
         fun load(context: Context): PatientProfileSettings {
             val file = AacStoragePaths.getPatientProfileFile(context) ?: return PatientProfileSettings()
@@ -30,6 +33,7 @@ data class PatientProfileSettings(
                 PatientProfileSettings(
                     firstName = json.optString("firstName", ""),
                     lastName = json.optString("lastName", ""),
+                    gender = normalizeGender(json.optString("gender", GENDER_FEMALE)),
                     age = json.optString("age", ""),
                     birthDate = json.optString("birthDate", ""),
                     homeTown = json.optString("homeTown", ""),
@@ -52,6 +56,7 @@ data class PatientProfileSettings(
                 val json = JSONObject()
                     .put("firstName", normalized.firstName)
                     .put("lastName", normalized.lastName)
+                    .put("gender", normalized.gender)
                     .put("age", normalized.age)
                     .put("birthDate", normalized.birthDate)
                     .put("homeTown", normalized.homeTown)
@@ -69,6 +74,30 @@ data class PatientProfileSettings(
 
         fun speechForItem(context: Context, itemId: String): String {
             return load(context).speechForItem(itemId)
+        }
+
+        fun genderDisplayLabel(gender: String): String {
+            return when (normalizeGender(gender)) {
+                GENDER_MALE -> "Mo\u0161ki"
+                else -> "\u017denska"
+            }
+        }
+
+        fun genderFromDisplayLabel(label: String): String {
+            val value = label.trim().uppercase()
+            return if (value == GENDER_MALE || value.contains("MO\u0160")) {
+                GENDER_MALE
+            } else {
+                GENDER_FEMALE
+            }
+        }
+
+        fun normalizeGender(gender: String): String {
+            return when (gender.trim().uppercase()) {
+                GENDER_MALE -> GENDER_MALE
+                GENDER_FEMALE -> GENDER_FEMALE
+                else -> GENDER_FEMALE
+            }
         }
     }
 
@@ -98,6 +127,7 @@ data class PatientProfileSettings(
         return copy(
             firstName = firstName.trim(),
             lastName = lastName.trim(),
+            gender = normalizeGender(gender),
             age = age.trim(),
             birthDate = birthDate.trim(),
             homeTown = homeTown.trim(),

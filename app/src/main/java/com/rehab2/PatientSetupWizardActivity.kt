@@ -47,6 +47,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
 
     private var step = 0
     private var patientName = ""
+    private var patientGender = PatientProfileSettings.GENDER_FEMALE
     private var mainLanguage = ""
     private var gridSize = DEFAULT_AAC_GRID_SIZE
     private var selectedPhotoFile: File? = null
@@ -62,6 +63,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
     private fun loadExistingValues() {
         val profile = PatientProfileSettings.load(this)
         patientName = profile.firstName
+        patientGender = PatientProfileSettings.normalizeGender(profile.gender)
         mainLanguage = profile.mainLanguage
         gridSize = prefs.getInt(PREF_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE).coerceIn(3, 5)
         selectedPhotoFile = existingPatientPhotoFile()
@@ -177,6 +179,14 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         helperView.text = "Ime pacientke"
         content.addView(sectionText("Vpišite ime, ki ga bo aplikacija uporabljala v osebnih odgovorih."))
         content.addView(editText("Ime pacientke", patientName) { patientName = it })
+        content.addView(choiceButton("\u017dENSKA", selected = patientGender == PatientProfileSettings.GENDER_FEMALE) {
+            patientGender = PatientProfileSettings.GENDER_FEMALE
+            renderStep()
+        })
+        content.addView(choiceButton("MO\u0160KI", selected = patientGender == PatientProfileSettings.GENDER_MALE) {
+            patientGender = PatientProfileSettings.GENDER_MALE
+            renderStep()
+        })
     }
 
     private fun renderLanguageStep() {
@@ -238,6 +248,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         helperView.text = "Potrditev"
         content.addView(sectionText("Preverite podatke in pritisnite KONČAJ."))
         content.addView(summaryText("Ime pacientke", patientName.ifBlank { "Ni vpisano" }))
+        content.addView(summaryText("Spol", PatientProfileSettings.genderDisplayLabel(patientGender)))
         content.addView(summaryText("Glavni jezik", mainLanguage.ifBlank { "slovenščina" }))
         content.addView(summaryText("Velikost mreže", "${gridSize}x$gridSize"))
         content.addView(summaryText("Fotografija", selectedPhotoFile?.takeIf { it.exists() && it.length() > 0L }?.name ?: "Preskočeno"))
@@ -269,6 +280,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         val currentProfile = PatientProfileSettings.load(this)
         val updatedProfile = currentProfile.copy(
             firstName = patientName,
+            gender = patientGender,
             mainLanguage = mainLanguage.ifBlank { "slovenščina" }
         )
         val profileSaved = PatientProfileSettings.save(this, updatedProfile)
