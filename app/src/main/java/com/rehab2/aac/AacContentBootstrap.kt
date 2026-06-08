@@ -605,8 +605,8 @@ object AacContentBootstrap {
     private fun repairFixedTopRowMetadata(itemsArray: JSONArray): Int {
         val desiredPositions = mapOf(
             "no" to 1,
-            "yes" to 2,
-            "dont_understand" to 3,
+            "dont_understand" to 2,
+            "yes" to 3,
             "thank_you" to 4,
             "sorry" to 5
         )
@@ -647,9 +647,9 @@ object AacContentBootstrap {
             "what_root" to 11,
             "where_root" to 12,
             "when_root" to 13,
-            "home" to 14,
+            "i_want" to 14,
             "other" to 15,
-            "real_world" to 16,
+            "place_group" to 16,
             "feeling" to 17,
             "care" to 18,
             "health" to 19,
@@ -670,7 +670,6 @@ object AacContentBootstrap {
             "what_do",
             "where_go",
             "when_come",
-            "i_want",
             "dont_want",
             "drink",
             "food"
