@@ -331,6 +331,38 @@ class SettingsActivity : AppCompatActivity() {
             "go_outside_with_wheelchair" to "VEN Z VOZIČKOM",
             "go_inside" to "NAZAJ NOTRI"
         )
+        private const val AAC_FIRST_PAGE_FIXED_ROW_SNAPSHOT = "NE | NE RAZUMEM | DA | HVALA | OPROSTI"
+        private val AAC_FIRST_PAGE_VISIBLE_SNAPSHOT = listOf(
+            6 to ("LJUDJE" to "people"),
+            7 to ("POTREBUJEM" to "need"),
+            8 to ("TEŽAVA" to "problem"),
+            9 to ("ŽEJNA SEM" to "thirsty"),
+            10 to ("LAČNA SEM" to "hungry"),
+            11 to ("BOLI ME" to "pain"),
+            12 to ("WC" to "wc"),
+            13 to ("UTRUJENA" to "tired"),
+            14 to ("POČITEK" to "rest"),
+            15 to ("PROSIM" to "please"),
+            16 to ("KAJ?" to "what_root"),
+            17 to ("KJE?" to "where_root"),
+            18 to ("KDAJ?" to "when_root"),
+            19 to ("RADA BI" to "i_want"),
+            20 to ("DRUGO" to "other"),
+            21 to ("KRAJ" to "place_group"),
+            22 to ("POČUTJE" to "feeling"),
+            23 to ("NEGA" to "care"),
+            24 to ("ZDRAVJE" to "health"),
+            25 to ("PONOVI" to "repeat")
+        )
+        private val AAC_FIRST_PAGE_TEST_PATHS = listOf(
+            "CIGARETA: RADA BI -> CIGARETA",
+            "BALKON: KRAJ -> BALKON",
+            "DVORIŠČE: KRAJ -> DVORIŠČE",
+            "WC",
+            "BOLI ME -> NOGA -> LEVA",
+            "BOLI ME -> NOGA -> LEVA -> MOČNO -> OD VČERAJ",
+            "LJUDJE -> ŽANA"
+        )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
         private const val MAX_MISSING_ICONS_SHOWN = 15
@@ -1540,7 +1572,14 @@ class SettingsActivity : AppCompatActivity() {
                 "Aktivni profil: $activeProfile",
                 "Velikost mreže: ${gridSize}x$gridSize",
                 statusLine("Fiksna zgornja vrstica", "$fixedCount ikon", fixedCount >= 3),
+                "Trenutna fiksna zgornja vrstica: $AAC_FIRST_PAGE_FIXED_ROW_SNAPSHOT",
                 statusLine("Prva stran", "$firstPageCount ikon", firstPageCount >= minimumFirstPageCount),
+                "Prva stran, položaji 6-25:",
+                AAC_FIRST_PAGE_VISIBLE_SNAPSHOT.joinToString("\n") { (position, item) ->
+                    "$position. ${item.first} [${item.second}]"
+                },
+                "Testne poti za tablico:",
+                AAC_FIRST_PAGE_TEST_PATHS.joinToString("\n") { path -> "NI PREVERJENO - $path" },
                 statusLine("Prazne ikone", "$blankItems", blankItems == 0),
                 statusLine(
                     "Ikone - kakovost slik",
