@@ -212,7 +212,7 @@ class SettingsActivity : AppCompatActivity() {
         private const val PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = "aac_persistent_top_row_item_ids"
         private const val DEFAULT_AAC_PERSISTENT_TOP_ROW_COUNT = 5
         private val AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS = arrayOf(3, 4, 5)
-        private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "yes", "dont_understand", "thank_you", "sorry")
+        private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "dont_understand", "yes", "thank_you", "sorry")
         private val CORE_AAC_AUDIT_ITEMS = listOf(
             CoreAacAuditItem("da", "DA", "#4CAF50", "✅", "Da.", "core_yes.png", setOf("yes", "quick_yes", "da"), setOf("DA"), setOf("yes")),
             CoreAacAuditItem("ne", "NE", "#F44336", "❌", "Ne.", "core_no.png", setOf("no", "quick_no", "ne"), setOf("NE"), setOf("no")),
@@ -320,6 +320,16 @@ class SettingsActivity : AppCompatActivity() {
             "hat" to "KAPA",
             "scarf" to "ŠAL",
             "gloves" to "ROKAVICE"
+        )
+        private val OUTDOOR_SMOKING_PACK_AUDIT_ITEMS = listOf(
+            "cigarette" to "CIGARETA",
+            "smoking" to "KADITI",
+            "lighter" to "VŽIGALNIK",
+            "ashtray" to "PEPELNIK",
+            "balcony" to "BALKON",
+            "courtyard" to "DVORIŠČE",
+            "go_outside_with_wheelchair" to "VEN Z VOZIČKOM",
+            "go_inside" to "NAZAJ NOTRI"
         )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
@@ -1493,6 +1503,9 @@ class SettingsActivity : AppCompatActivity() {
             val missingClothingLabels = CLOTHING_PACK_AUDIT_ITEMS
                 .filter { (itemId, _) -> itemId !in itemIds }
                 .map { (_, label) -> label }
+            val missingOutdoorSmokingLabels = OUTDOOR_SMOKING_PACK_AUDIT_ITEMS
+                .filter { (itemId, _) -> itemId !in itemIds }
+                .map { (_, label) -> label }
             val coreWithoutSpeech = emptySpeechItems.filter { item ->
                 CORE_AAC_AUDIT_ITEMS.any { core ->
                     matchesCoreAacItem(item, core)
@@ -1512,6 +1525,7 @@ class SettingsActivity : AppCompatActivity() {
             if (missingActivityLabels.isNotEmpty()) warnings += "manjkajo ikone za dejavnosti"
             if (missingCareLabels.isNotEmpty()) warnings += "manjkajo ikone za nego"
             if (missingClothingLabels.isNotEmpty()) warnings += "manjkajo ikone za oblačila"
+            if (missingOutdoorSmokingLabels.isNotEmpty()) warnings += "manjkajo ikone za zunaj/cigareto"
             if (!painSideOk) warnings += "manjkajo ikone za stran bolečine"
             if (!painTimeOk) warnings += "manjkajo ikone za čas bolečine"
             if (missingAboutMeLabels.isNotEmpty()) warnings += "manjkajo ikone O MENI"
@@ -1586,6 +1600,11 @@ class SettingsActivity : AppCompatActivity() {
                     "OBLAČILA",
                     if (missingClothingLabels.isEmpty()) "DA" else "manjka: ${missingClothingLabels.joinToString(", ")}",
                     missingClothingLabels.isEmpty()
+                ),
+                statusLine(
+                    "ZUNAJ / CIGARETA",
+                    if (missingOutdoorSmokingLabels.isEmpty()) "DA" else "manjka: ${missingOutdoorSmokingLabels.joinToString(", ")}",
+                    missingOutdoorSmokingLabels.isEmpty()
                 ),
                 "BOLEČINA: stran telesa ${if (painSideOk) "DA" else "NE"}",
                 "BOLEČINA: čas ${if (painTimeOk) "DA" else "NE"}",
