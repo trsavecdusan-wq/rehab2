@@ -509,6 +509,8 @@ object AacContentBootstrap {
             "turn_me",
             "cannot",
             "cold_hot",
+            "care",
+            "clothing",
             "uncomfortable",
             "thirsty",
             "drink",

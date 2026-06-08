@@ -297,6 +297,7 @@ class SettingsActivity : AppCompatActivity() {
             "care" to "NEGA",
             "washing_help" to "UMIVANJE",
             "dressing_help" to "PREOBLAČENJE",
+            "clothing" to "OBLAČILA",
             "bed" to "POSTELJA",
             "wheelchair" to "VOZIČEK",
             "blanket" to "ODEJA",
@@ -306,6 +307,19 @@ class SettingsActivity : AppCompatActivity() {
             "turn_right" to "OBRNI DESNO",
             "sit_up" to "DVIGNI ME",
             "lie_down" to "POLOŽI ME"
+        )
+        private val CLOTHING_PACK_AUDIT_ITEMS = listOf(
+            "clothing" to "OBLAČILA",
+            "shirt" to "MAJICA",
+            "pants" to "HLAČE",
+            "socks" to "NOGAVICE",
+            "shoes" to "ČEVLJI",
+            "jacket" to "JAKNA",
+            "pajamas" to "PIŽAMA",
+            "underwear" to "SPODNJE PERILO",
+            "hat" to "KAPA",
+            "scarf" to "ŠAL",
+            "gloves" to "ROKAVICE"
         )
 
         // Faza 1: najvec manjkajocih ikon, prikazanih v diagnostiki; ostalo se sesteje.
@@ -1476,6 +1490,9 @@ class SettingsActivity : AppCompatActivity() {
             val missingCareLabels = CARE_PACK_AUDIT_ITEMS
                 .filter { (itemId, _) -> itemId !in itemIds }
                 .map { (_, label) -> label }
+            val missingClothingLabels = CLOTHING_PACK_AUDIT_ITEMS
+                .filter { (itemId, _) -> itemId !in itemIds }
+                .map { (_, label) -> label }
             val coreWithoutSpeech = emptySpeechItems.filter { item ->
                 CORE_AAC_AUDIT_ITEMS.any { core ->
                     matchesCoreAacItem(item, core)
@@ -1494,6 +1511,7 @@ class SettingsActivity : AppCompatActivity() {
             if (missingPlaceLabels.isNotEmpty()) warnings += "manjkajo ikone za kraje"
             if (missingActivityLabels.isNotEmpty()) warnings += "manjkajo ikone za dejavnosti"
             if (missingCareLabels.isNotEmpty()) warnings += "manjkajo ikone za nego"
+            if (missingClothingLabels.isNotEmpty()) warnings += "manjkajo ikone za oblačila"
             if (!painSideOk) warnings += "manjkajo ikone za stran bolečine"
             if (!painTimeOk) warnings += "manjkajo ikone za čas bolečine"
             if (missingAboutMeLabels.isNotEmpty()) warnings += "manjkajo ikone O MENI"
@@ -1563,6 +1581,11 @@ class SettingsActivity : AppCompatActivity() {
                     "NEGA",
                     if (missingCareLabels.isEmpty()) "DA" else "manjka: ${missingCareLabels.joinToString(", ")}",
                     missingCareLabels.isEmpty()
+                ),
+                statusLine(
+                    "OBLAČILA",
+                    if (missingClothingLabels.isEmpty()) "DA" else "manjka: ${missingClothingLabels.joinToString(", ")}",
+                    missingClothingLabels.isEmpty()
                 ),
                 "BOLEČINA: stran telesa ${if (painSideOk) "DA" else "NE"}",
                 "BOLEČINA: čas ${if (painTimeOk) "DA" else "NE"}",
