@@ -71,6 +71,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private var pendingSingleIconSpeak: Runnable? = null
     private var deferredSingleIconSpeech: DeferredSingleIconSpeech? = null
     private var pendingAutoSpeakSentence: Runnable? = null
+    private var pendingPartialAutoReturn: Runnable? = null
+    private var pendingSentenceKeepsFollowUpOpen = false
+    private var activeSentenceKeepsFollowUpOpen = false
     private var isSpeakingSentence = false
     private var isSpeakingSingleIcon = false
     private var lastSpeechRequestId = 0
@@ -138,9 +141,15 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 lastSpeechEndedAt = System.currentTimeMillis()
                 Log.d(TAG, "AAC_INPUT speech_completed inputLocked=false mode=$completedMode")
                 Log.d(TAG, "AAC_SPEECH SPEECH_COMPLETED mode=$completedMode")
+                val keepFollowUpOpen = activeSentenceKeepsFollowUpOpen
                 resetSpeechState("completed")
                 if (completedMode == SpeechMode.SENTENCE) {
                     resetSentenceCompositionTracking()
+                    if (keepFollowUpOpen) {
+                        schedulePartialAutoReturnIfNeeded()
+                        speakPendingVendingDigitsIfNeeded()
+                        return
+                    }
                     if (speechTimingSettings.clearSentenceAfterSentenceEnabled) {
                         Log.d(TAG, "AAC_SENTENCE CLEAR_AFTER_SENTENCE_COMPLETED")
                         sentenceManager.clear()
@@ -279,9 +288,15 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         cancelPendingSpeech()
+        cancelPendingPartialAutoReturn()
         audioPlayer.setSpeechListener(null)
         audioPlayer.release()
         super.onDestroy()
+    }
+
+    override fun onPause() {
+        cancelPendingPartialAutoReturn()
+        super.onPause()
     }
 
     private fun showPage(page: AacPage) {
@@ -387,6 +402,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             "AAC_INPUT handle_click item=${item.id} inputLocked=false " +
                 "isSpeakingSentence=$isSpeakingSentence isSpeakingSingleIcon=$isSpeakingSingleIcon"
         )
+        cancelPendingPartialAutoReturn()
         confirmGuidedTopSuggestionIfYesItem(item)?.let { suggestedItem ->
             handleItemClick(suggestedItem)
             return
@@ -473,7 +489,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 if (!(allowParentAutoSentence && speechTimingSettings.autoSpeakSentenceEnabled)) {
                     speakSingleIconIfEnabled(singleIconText, speechRequestId, isSubIconTap)
                 }
-                scheduleAutoSpeakSentenceIfEnabled(speechRequestId, allowSingleItem = allowParentAutoSentence)
+                scheduleAutoSpeakSentenceIfEnabled(
+                    speechRequestId,
+                    allowSingleItem = allowParentAutoSentence,
+                    keepFollowUpOpenAfterSpeech = shouldKeepPainFollowUpOpenAfterSpeech(childItems)
+                )
                 setPromptText(resolveFollowUpQuestion(item))
                 currentV2VisibleHistory.addLast(currentVisibleItems)
                 showItems(childItems)
@@ -1004,8 +1024,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
     }
 
-    private fun scheduleAutoSpeakSentenceIfEnabled(requestId: Int, allowSingleItem: Boolean = false) {
+    private fun scheduleAutoSpeakSentenceIfEnabled(
+        requestId: Int,
+        allowSingleItem: Boolean = false,
+        keepFollowUpOpenAfterSpeech: Boolean = false
+    ) {
         cancelPendingAutoSpeakSentence()
+        pendingSentenceKeepsFollowUpOpen = false
         if (!speechTimingSettings.autoSpeakSentenceEnabled) {
             return
         }
@@ -1022,6 +1047,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
 
         Log.d(TAG, "AAC_SENTENCE AUTO_SCHEDULED count=$itemCount requestId=$requestId")
+        pendingSentenceKeepsFollowUpOpen = keepFollowUpOpenAfterSpeech
 
         val pending = Runnable {
             pendingAutoSpeakSentence = null
@@ -1068,6 +1094,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
         cancelPendingSingleIconSpeak()
         isSpeakingSingleIcon = false
         isSpeakingSentence = true
+        activeSentenceKeepsFollowUpOpen = pendingSentenceKeepsFollowUpOpen
+        pendingSentenceKeepsFollowUpOpen = false
         pendingSpeechMode = SpeechMode.SENTENCE
         activeSpeechMode = SpeechMode.SENTENCE
         Log.d(TAG, "AAC_SPEECH SENTENCE_START requestId=$requestId text=$text")
@@ -1080,6 +1108,31 @@ class AacCommunicatorActivity : AppCompatActivity() {
             Log.d(TAG, "AAC_SPEECH SENTENCE_CANCEL pending requestId=$lastSpeechRequestId")
         }
         pendingAutoSpeakSentence = null
+        pendingSentenceKeepsFollowUpOpen = false
+    }
+
+    private fun schedulePartialAutoReturnIfNeeded() {
+        cancelPendingPartialAutoReturn()
+        if (!speechTimingSettings.partialSentenceAutoReturnEnabled || currentV2VisibleHistory.isEmpty()) {
+            return
+        }
+        val delayMs = speechTimingSettings.partialSentenceAutoReturnMs
+        val pending = Runnable {
+            pendingPartialAutoReturn = null
+            Log.d(TAG, "AAC_NAV PARTIAL_AUTO_RETURN delayMs=$delayMs")
+            AacUsageStats.recordAutoReturnAfterPartial(this)
+            returnToRootMenu()
+        }
+        pendingPartialAutoReturn = pending
+        autoSpeakHandler.postDelayed(pending, delayMs)
+    }
+
+    private fun cancelPendingPartialAutoReturn() {
+        pendingPartialAutoReturn?.let { pending ->
+            autoSpeakHandler.removeCallbacks(pending)
+            Log.d(TAG, "AAC_NAV PARTIAL_AUTO_RETURN_CANCEL")
+        }
+        pendingPartialAutoReturn = null
     }
 
     private fun cancelPendingSingleIconSpeak() {
@@ -1099,6 +1152,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private fun cancelPendingSpeech() {
         cancelPendingSingleIconSpeak()
         cancelPendingAutoSpeakSentence()
+        cancelPendingPartialAutoReturn()
         isSpeakingSentence = false
         isSpeakingSingleIcon = false
         pendingSpeechMode = null
@@ -1151,11 +1205,23 @@ class AacCommunicatorActivity : AppCompatActivity() {
         isSpeakingSingleIcon = false
         pendingSpeechMode = null
         activeSpeechMode = null
+        activeSentenceKeepsFollowUpOpen = false
         Log.d(TAG, "AAC_SPEECH STATE_RESET reason=$reason")
     }
 
     private fun shouldAllowParentAutoSentence(item: AacItem): Boolean {
         return item.children.isNotEmpty() || item.opensSubicons
+    }
+
+    private fun shouldKeepPainFollowUpOpenAfterSpeech(childItems: List<AacItem>): Boolean {
+        if (childItems.isEmpty()) return false
+        val recentItems = recentSentenceAacItems()
+        if (recentItems.none { item -> item.id == "pain" || item.meaningGroup == "pain" }) return false
+        return childItems.any { item ->
+            item.id in PAIN_FOLLOW_UP_ITEM_IDS ||
+                item.id in PAIN_SIDE_ITEM_IDS ||
+                item.id in PAIN_TIME_ITEM_IDS
+        }
     }
 
     private fun resolveV2ChildItems(item: AacItem): List<AacItem> {
@@ -1755,6 +1821,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
         // Runtime fixes only the first grid-width items; remaining configured items flow normally.
         const val DEFAULT_PERSISTENT_TOP_ROW_COUNT = 5
         val DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "yes", "dont_understand", "thank_you", "sorry")
+        val PAIN_SIDE_ITEM_IDS = setOf("pain_left", "pain_right", "pain_both")
+        val PAIN_FOLLOW_UP_ITEM_IDS = setOf("pain_light", "pain_medium", "pain_strong")
+        val PAIN_TIME_ITEM_IDS = setOf(
+            "pain_since_today",
+            "pain_since_yesterday",
+            "pain_since_morning",
+            "pain_since_evening"
+        )
         val MISS_PERSON_TARGET_IDS = listOf(
             "person_dusan",
             "person_zana",

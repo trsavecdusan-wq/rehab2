@@ -8,10 +8,10 @@ object AacStarterContentV1 {
         starter("thank_you", "HVALA", "Hvala.", "core.thank_you", "CONFIRMATION", "core", listOf("hvala", "zahvala"), fixedTopRowPosition = 4, imagePath = "system/thank_you.png", iconSource = IconSource.SYSTEM),
         starter("help", "POMOČ", "Prosim, pomagajte mi.", "core.help", "NEED", "core", listOf("pomoč", "nujno"), visibleUnderIds = listOf("need", "please", "care"), opensSubicons = true, children = listOf("help_drinking", "help_feeding", "wc", "dressing", "washing_help", "position"), questionByLanguage = mapOf("sl" to "Pri čem potrebuješ pomoč?"), imagePath = "system/help.png", iconSource = IconSource.SYSTEM),
         starter("wait", "POČAKAJ", "Počakajte, prosim.", "core.wait", "CORE_ACTION", "core", listOf("počakaj", "čas"), placements = pageOne(21), imagePath = "system/wait.png", iconSource = IconSource.SYSTEM),
-        starter("repeat", "PONOVI", "Prosim, ponovite.", "core.repeat", "CORE_ACTION", "core", listOf("ponovi", "razumevanje"), placements = pageOne(20), opensSubicons = true, children = listOf("repeat_question", "repeat_last_sentence", "repeat_slower"), questionByLanguage = mapOf("sl" to "Kaj naj ponovim?"), imagePath = "system/repeat.png", iconSource = IconSource.SYSTEM),
+        starter("repeat", "PONOVI", "Prosim, ponovite.", "core.repeat", "CORE_ACTION", "core", listOf("ponovi", "razumevanje"), placements = pageOne(20), opensSubicons = true, children = listOf("pogovor", "repeat_question", "repeat_last_sentence", "repeat_slower"), questionByLanguage = mapOf("sl" to "Kaj naj ponovim?"), imagePath = "system/repeat.png", iconSource = IconSource.SYSTEM),
         starter("slower", "POČASNEJE", "Prosim, govorite počasneje.", "core.slower", "CORE_ACTION", "core", listOf("počasneje", "razumevanje"), visibleUnderIds = listOf("please"), opensSubicons = true, children = listOf("slower_little", "slower_much"), questionByLanguage = mapOf("sl" to "Kako počasi?"), imagePath = "system/slower.png", iconSource = IconSource.SYSTEM),
         starter("understand", "RAZUMEM", "Razumem.", "core.understand", "CONFIRMATION", "core", listOf("razumem", "potrditev")),
-        starter("people", "LJUDJE", "Ljudje.", "people.root", "PEOPLE", "people", listOf("ljudje", "osebe"), placements = pageOne(1), opensSubicons = true, children = listOf("about_me", "miss_someone", "person_dusan", "person_zana", "person_sergej", "person_julija", "person_oksana", "person_inna", "person_franc", "person_other"), questionByLanguage = mapOf("sl" to "O kom želiš govoriti?"), imagePath = "system/people.png", iconSource = IconSource.SYSTEM),
+        starter("people", "LJUDJE", "Ljudje.", "people.root", "PEOPLE", "people", listOf("ljudje", "osebe"), placements = pageOne(1), opensSubicons = true, children = listOf("about_me", "socialno", "miss_someone", "person_dusan", "person_zana", "person_sergej", "person_julija", "person_oksana", "person_inna", "person_franc", "person_other"), questionByLanguage = mapOf("sl" to "O kom želiš govoriti?"), imagePath = "system/people.png", iconSource = IconSource.SYSTEM),
         starter("need", "POTREBUJEM", "Potrebujem pomoč.", "need.root", "NEED", "need", listOf("potrebujem", "pomoč"), placements = pageOne(2), opensSubicons = true, children = listOf("help", "water", "food", "wc", "blanket", "wheelchair", "crutch", "doctor", "nurse", "therapy"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ?"), imagePath = "system/need.png", iconSource = IconSource.SYSTEM),
         starter("problem", "TEŽAVA", "Imam težavo.", "problem.root", "NEED", "problem", listOf("težava", "problem"), placements = pageOne(3), opensSubicons = true, children = listOf("pain", "cannot", "cold", "hot", "afraid", "bad", "uncomfortable", "dont_know_problem"), questionByLanguage = mapOf("sl" to "Kaj je narobe?"), imagePath = "system/problem.png", iconSource = IconSource.SYSTEM),
 
@@ -92,7 +92,7 @@ object AacStarterContentV1 {
         starter("feeling", "POČUTJE", "Rada bi povedala, kako se počutim.", "feeling.root", "FEELING", "feeling", listOf("počutje"), placements = pageOne(17), opensSubicons = true, children = listOf("good", "bad", "sad", "happy", "afraid", "tired", "cold_feeling", "hot_feeling", "sleepy", "need_rest", "cold", "hot", "peace", "rest"), questionByLanguage = mapOf("sl" to "Kako se počutiš?", "uk" to "Як ти почуваєшся?", "en" to "How do you feel?")),
         starter("care", "NEGA", "Potrebujem pomoč pri negi.", "care.root", "NEED", "care", listOf("nega", "pomoč"), placements = pageOne(18), opensSubicons = true, children = listOf("washing_help", "dressing_help", "bed", "wheelchair", "blanket", "pillow", "change_position", "crutch", "body_position", "movement_pain", "wait", "help"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ?", "uk" to "Що тобі потрібно?", "en" to "What do you need?")),
         starter("health", "ZDRAVJE", "Kaj je z zdravjem?", "health.root", "NEED", "health", listOf("zdravje"), placements = pageOne(19), opensSubicons = true, children = listOf("pain", "head", "arm", "leg", "belly", "back", "throat", "medicine", "therapy", "doctor"), questionByLanguage = mapOf("sl" to "Kaj je z zdravjem?", "uk" to "Що зі здоров'ям?", "en" to "What is wrong with health?")),
-        starter("more", "VEČ", "Kaj še potrebuješ?", "core.more", "CORE_ACTION", "core", listOf("več"), visibleUnderIds = listOf("legacy_more"), opensSubicons = true, children = listOf("repeat", "slower", "understand", "wheelchair", "not_safe", "stop_movement", "need_rest", "fear_falling", "move_me"), questionByLanguage = mapOf("sl" to "Kaj še potrebuješ?", "uk" to "Що ще потрібно?", "en" to "What else do you need?")),
+        starter("more", "VEČ", "Kaj še potrebuješ?", "core.more", "CORE_ACTION", "core", listOf("več"), visibleUnderIds = listOf("legacy_more"), opensSubicons = true, children = listOf("pogovor", "socialno", "repeat", "slower", "understand", "wheelchair", "not_safe", "stop_movement", "need_rest", "fear_falling", "move_me"), questionByLanguage = mapOf("sl" to "Kaj še potrebuješ?", "uk" to "Що ще потрібно?", "en" to "What else do you need?")),
         starter("pain_area", "BOLEČINA", "Kje te boli?", "pain.area", "PAIN", "pain", listOf("bolečina", "kje"), opensSubicons = true, children = listOf("head", "arm", "leg", "belly", "back", "chest", "throat"), questionByLanguage = mapOf("sl" to "Kje te boli?", "uk" to "Де тебе болить?", "en" to "Where does it hurt?")),
 
         starter("sister_zana", "SESTRA ŽANA", "Pokličite sestro Žano.", "people.sister_zana", "PEOPLE", "people", listOf("žana", "sestra"), placements = pageTwo(6)),
@@ -104,7 +104,25 @@ object AacStarterContentV1 {
         starter("miss_you", "POGREŠAM TE", "Pogrešam te.", "people.miss_you", "PEOPLE", "people", listOf("pogrešam", "ljubezen"), placements = pageTwo(13)),
         starter("love_you", "RADA TE IMAM", "Rada te imam.", "people.love_you", "PEOPLE", "people", listOf("rada_te_imam", "ljubezen"), placements = pageTwo(14), imagePath = "custom/emotion/love_you.jpg", iconSource = IconSource.CUSTOM),
         starter("sorry", "OPROSTI", "Oprosti.", "core.sorry", "FEELING", "core", listOf("oprosti"), placements = pageTwo(15), fixedTopRowPosition = 5, imagePath = "system/sorry.png", iconSource = IconSource.SYSTEM),
-        starter("please", "PROSIM", "Prosim.", "core.please", "CORE_ACTION", "core", listOf("prosim"), placements = pageOne(10) + pageTwo(16), opensSubicons = true, children = listOf("help", "wait", "repeat", "slower", "come_to_me", "look_at_me", "turn_me", "fix_me"), questionByLanguage = mapOf("sl" to "Kaj želiš prositi?"), imagePath = "system/please.png", iconSource = IconSource.SYSTEM),
+        starter("please", "PROSIM", "Prosim.", "core.please", "CORE_ACTION", "core", listOf("prosim"), placements = pageOne(10) + pageTwo(16), opensSubicons = true, children = listOf("pogovor", "socialno", "help", "wait", "repeat", "slower", "come_to_me", "look_at_me", "turn_me", "fix_me"), questionByLanguage = mapOf("sl" to "Kaj želiš prositi?"), imagePath = "system/please.png", iconSource = IconSource.SYSTEM),
+        starter("socialno", "SOCIALNO", "Socialno.", "social.root", "CORE_ACTION", "social", listOf("socialno", "pogovor"), visibleUnderIds = listOf("people", "please", "more"), opensSubicons = true, children = listOf("dober_dan", "dobro_jutro", "dober_vecer", "lahko_noc", "prosim", "oprosti_social", "v_redu_je", "rada_te_imam", "pogresam_te"), questionByLanguage = mapOf("sl" to "Kaj želiš povedati?")),
+        starter("pogovor", "POGOVOR", "Pogovor.", "conversation.root", "CORE_ACTION", "conversation", listOf("pogovor", "razumevanje"), visibleUnderIds = listOf("please", "repeat", "more"), opensSubicons = true, children = listOf("govori_pocasneje", "ponovi", "pocakaj", "nisem_koncala", "dajte_mi_cas", "napisi_mi", "pokazi_mi"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ pri pogovoru?")),
+        starter("dober_dan", "DOBER DAN", "Dober dan.", "social.good_day", "CORE_ACTION", "social", listOf("dober_dan", "pozdrav"), visibleUnderIds = listOf("socialno")),
+        starter("dobro_jutro", "DOBRO JUTRO", "Dobro jutro.", "social.good_morning", "CORE_ACTION", "social", listOf("dobro_jutro", "pozdrav"), visibleUnderIds = listOf("socialno")),
+        starter("dober_vecer", "DOBER VEČER", "Dober večer.", "social.good_evening", "CORE_ACTION", "social", listOf("dober_večer", "pozdrav"), visibleUnderIds = listOf("socialno")),
+        starter("lahko_noc", "LAHKO NOČ", "Lahko noč.", "social.good_night", "CORE_ACTION", "social", listOf("lahko_noč", "pozdrav"), visibleUnderIds = listOf("socialno")),
+        starter("prosim", "PROSIM", "Prosim.", "social.please", "CORE_ACTION", "social", listOf("prosim"), visibleUnderIds = listOf("socialno")),
+        starter("oprosti_social", "OPROSTI", "Oprosti.", "social.sorry", "CORE_ACTION", "social", listOf("oprosti"), visibleUnderIds = listOf("socialno")),
+        starter("v_redu_je", "V REDU JE", "V redu je.", "social.ok", "CORE_ACTION", "social", listOf("v_redu", "pomiritev"), visibleUnderIds = listOf("socialno")),
+        starter("rada_te_imam", "RADA TE IMAM", "Rada te imam.", "social.love_you", "PEOPLE", "social", listOf("rada_te_imam", "ljubezen"), visibleUnderIds = listOf("socialno")),
+        starter("pogresam_te", "POGREŠAM TE", "Pogrešam te.", "social.miss_you", "PEOPLE", "social", listOf("pogrešam", "ljubezen"), visibleUnderIds = listOf("socialno")),
+        starter("govori_pocasneje", "GOVORITE POČASI", "Govorite počasneje.", "conversation.slower", "CORE_ACTION", "conversation", listOf("počasneje", "razumevanje"), visibleUnderIds = listOf("pogovor")),
+        starter("ponovi", "PONOVI", "Prosim, ponovite.", "conversation.repeat", "CORE_ACTION", "conversation", listOf("ponovi", "razumevanje"), visibleUnderIds = listOf("pogovor")),
+        starter("pocakaj", "POČAKAJ", "Počakaj.", "conversation.wait", "CORE_ACTION", "conversation", listOf("počakaj", "čas"), visibleUnderIds = listOf("pogovor")),
+        starter("nisem_koncala", "NISEM KONČALA", "Nisem končala.", "conversation.not_finished", "CORE_ACTION", "conversation", listOf("nisem_končala", "čas"), visibleUnderIds = listOf("pogovor")),
+        starter("dajte_mi_cas", "DAJTE MI ČAS", "Dajte mi čas.", "conversation.give_time", "CORE_ACTION", "conversation", listOf("čas", "počakaj"), visibleUnderIds = listOf("pogovor")),
+        starter("napisi_mi", "NAPIŠI MI", "Napišite mi.", "conversation.write", "CORE_ACTION", "conversation", listOf("napiši", "razumevanje"), visibleUnderIds = listOf("pogovor")),
+        starter("pokazi_mi", "POKAŽI MI", "Pokažite mi.", "conversation.show", "CORE_ACTION", "conversation", listOf("pokaži", "razumevanje"), visibleUnderIds = listOf("pogovor")),
         starter("call_me", "POKLIČI ME", "Prosim, pokliči me.", "people.call_me", "CORE_ACTION", "people", listOf("pokliči_me"), placements = pageTwo(17)),
         starter("come_to_me", "PRIDI K MENI", "Prosim, pridi k meni.", "people.come_to_me", "CORE_ACTION", "people", listOf("pridi", "k_meni"), placements = pageOne(22) + pageTwo(19), imagePath = "system/come_to_me.png", iconSource = IconSource.SYSTEM),
         starter("look_at_me", "POGLEJ ME", "Prosim, poglej me.", "core.look_at_me", "CORE_ACTION", "core", listOf("poglej", "pozornost"), visibleUnderIds = listOf("please")),
@@ -206,25 +224,32 @@ object AacStarterContentV1 {
         starter("lie_down", "POLOŽI ME", "Prosim, položite me.", "care.lie_down", "NEED", "care", listOf("položi", "položaj", "nega"), visibleUnderIds = listOf("change_position")),
         starter("movement_pain", "BOLI PRI PREMIKU", "Boli me pri premiku.", "care.movement_pain", "PAIN", "care", listOf("premik", "boli"), visibleUnderIds = listOf("care")),
 
-        starter("pain", "BOLI ME", "Boli me.", "pain.general", "PAIN", "pain", listOf("bolečina", "boli"), placements = pageOne(6), opensSubicons = true, children = listOf("head", "belly", "leg", "arm", "back", "chest", "throat", "pain_light", "pain_medium", "pain_strong"), questionByLanguage = mapOf("sl" to "Kje te boli?", "uk" to "Де тебе болить?", "en" to "Where does it hurt?"), imagePath = "system/pain.png", iconSource = IconSource.SYSTEM),
-        starter("head", "GLAVA", "Boli me glava.", "pain.head", "PAIN", "pain", listOf("glava", "bolečina"), placements = pageFour(6), imagePath = "custom/pain/head.jpg", iconSource = IconSource.CUSTOM),
-        starter("arm", "ROKA", "Boli me roka.", "pain.arm", "PAIN", "pain", listOf("roka", "bolečina"), placements = pageFour(7), imagePath = "custom/pain/arm.jpg", iconSource = IconSource.CUSTOM),
-        starter("leg", "NOGA", "Boli me noga.", "pain.leg", "PAIN", "pain", listOf("noga", "bolečina"), placements = pageFour(8), imagePath = "custom/pain/leg.jpg", iconSource = IconSource.CUSTOM),
-        starter("back", "HRBET", "Boli me hrbet.", "pain.back", "PAIN", "pain", listOf("hrbet", "bolečina"), placements = pageFour(9), imagePath = "custom/pain/back.jpg", iconSource = IconSource.CUSTOM),
-        starter("belly", "TREBUH", "Boli me trebuh.", "pain.belly", "PAIN", "pain", listOf("trebuh", "bolečina"), placements = pageFour(10), imagePath = "custom/pain/belly.jpg", iconSource = IconSource.CUSTOM),
-        starter("chest", "PRSI", "Boli me v prsih.", "pain.chest", "PAIN", "pain", listOf("prsi", "bolečina"), placements = pageFour(11)),
-        starter("throat", "GRLO", "Boli me grlo.", "pain.throat", "PAIN", "pain", listOf("grlo", "bolečina"), placements = pageFour(12), imagePath = "custom/pain/throat.jpg", iconSource = IconSource.CUSTOM),
+        starter("pain", "BOLI ME", "Boli me.", "pain.general", "PAIN", "pain", listOf("bolečina", "boli"), placements = pageOne(6), opensSubicons = true, children = listOf("head", "belly", "leg", "arm", "back", "chest", "throat"), questionByLanguage = mapOf("sl" to "Kje te boli?", "uk" to "Де тебе болить?", "en" to "Where does it hurt?"), imagePath = "system/pain.png", iconSource = IconSource.SYSTEM),
+        starter("head", "GLAVA", "Boli me glava.", "pain.head", "PAIN", "pain", listOf("glava", "bolečina"), placements = pageFour(6), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?"), imagePath = "custom/pain/head.jpg", iconSource = IconSource.CUSTOM),
+        starter("arm", "ROKA", "Boli me roka.", "pain.arm", "PAIN", "pain", listOf("roka", "bolečina"), placements = pageFour(7), opensSubicons = true, children = painSideStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Katera stran?"), imagePath = "custom/pain/arm.jpg", iconSource = IconSource.CUSTOM),
+        starter("leg", "NOGA", "Boli me noga.", "pain.leg", "PAIN", "pain", listOf("noga", "bolečina"), placements = pageFour(8), opensSubicons = true, children = painSideStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Katera stran?"), imagePath = "custom/pain/leg.jpg", iconSource = IconSource.CUSTOM),
+        starter("back", "HRBET", "Boli me hrbet.", "pain.back", "PAIN", "pain", listOf("hrbet", "bolečina"), placements = pageFour(9), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?"), imagePath = "custom/pain/back.jpg", iconSource = IconSource.CUSTOM),
+        starter("belly", "TREBUH", "Boli me trebuh.", "pain.belly", "PAIN", "pain", listOf("trebuh", "bolečina"), placements = pageFour(10), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?"), imagePath = "custom/pain/belly.jpg", iconSource = IconSource.CUSTOM),
+        starter("chest", "PRSI", "Boli me v prsih.", "pain.chest", "PAIN", "pain", listOf("prsi", "bolečina"), placements = pageFour(11), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("throat", "GRLO", "Boli me grlo.", "pain.throat", "PAIN", "pain", listOf("grlo", "bolečina"), placements = pageFour(12), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?"), imagePath = "custom/pain/throat.jpg", iconSource = IconSource.CUSTOM),
+        starter("pain_left", "LEVA", "leva", "pain.left", "PAIN", "pain", listOf("leva", "stran"), visibleUnderIds = listOf("arm", "leg"), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("pain_right", "DESNA", "desna", "pain.right", "PAIN", "pain", listOf("desna", "stran"), visibleUnderIds = listOf("arm", "leg"), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("pain_both", "OBE", "obe", "pain.both", "PAIN", "pain", listOf("obe", "stran"), visibleUnderIds = listOf("arm", "leg"), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
         starter("left_side", "LEVA", "Na levi strani.", "pain.left", "PAIN", "pain", listOf("leva", "stran"), placements = pageFour(13)),
         starter("right_side", "DESNA", "Na desni strani.", "pain.right", "PAIN", "pain", listOf("desna", "stran"), placements = pageFour(14)),
         starter("other_body", "DRUGO", "Boli drugje.", "pain.other", "PAIN", "pain", listOf("drugo", "bolečina"), placements = pageFour(15)),
-        starter("pain_light", "MALO", "Malo boli.", "pain.light", "PAIN", "pain", listOf("malo_boli", "bolečina"), visibleUnderIds = listOf("pain")),
-        starter("pain_medium", "SREDNJE", "Srednje močno boli.", "pain.medium", "PAIN", "pain", listOf("srednje", "bolečina"), placements = pageFour(17)),
-        starter("pain_strong", "MOČNO", "Močno boli.", "pain.strong", "PAIN", "pain", listOf("močno_boli", "bolečina"), placements = pageFour(18)),
+        starter("pain_light", "MALO", "Malo boli.", "pain.light", "PAIN", "pain", listOf("malo_boli", "bolečina"), visibleUnderIds = listOf("pain", "head", "belly", "leg", "arm", "back", "chest", "throat", "pain_left", "pain_right", "pain_both"), opensSubicons = true, children = painTimeChildren(), questionByLanguage = mapOf("sl" to "Od kdaj boli?")),
+        starter("pain_medium", "SREDNJE", "Srednje močno boli.", "pain.medium", "PAIN", "pain", listOf("srednje", "bolečina"), placements = pageFour(17), opensSubicons = true, children = painTimeChildren(), questionByLanguage = mapOf("sl" to "Od kdaj boli?")),
+        starter("pain_strong", "MOČNO", "Močno boli.", "pain.strong", "PAIN", "pain", listOf("močno_boli", "bolečina"), placements = pageFour(18), opensSubicons = true, children = painTimeChildren(), questionByLanguage = mapOf("sl" to "Od kdaj boli?")),
         starter("pain_very", "ZELO", "Zelo boli.", "pain.very", "PAIN", "pain", listOf("zelo", "bolečina"), visibleUnderIds = listOf("pain"), imagePath = "custom/pain/detail/pain_very.jpg", iconSource = IconSource.CUSTOM),
         starter("pain_very_strong", "ZELO MOČNO", "Zelo močno boli.", "pain.very_strong", "PAIN", "pain", listOf("zelo_močno", "bolečina"), placements = pageFour(19)),
         starter("pain_now", "ZDAJ", "Boli me zdaj.", "pain.now", "PAIN", "pain", listOf("zdaj", "bolečina"), visibleUnderIds = listOf("pain"), imagePath = "custom/pain/detail/pain_now.jpg", iconSource = IconSource.CUSTOM),
         starter("pain_today", "DANES", "Boli me od danes.", "pain.today", "PAIN", "pain", listOf("danes", "bolečina"), visibleUnderIds = listOf("pain"), imagePath = "custom/pain/detail/pain_today.jpg", iconSource = IconSource.CUSTOM),
         starter("pain_many_days", "VEČ DNI", "Boli me več dni.", "pain.many_days", "PAIN", "pain", listOf("več_dni", "bolečina"), visibleUnderIds = listOf("pain"), imagePath = "custom/pain/detail/pain_many_days.jpg", iconSource = IconSource.CUSTOM),
+        starter("pain_since_today", "OD DANES", "Od danes", "pain.since_today", "PAIN", "pain", listOf("od_danes", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong")),
+        starter("pain_since_yesterday", "OD VČERAJ", "Od včeraj", "pain.since_yesterday", "PAIN", "pain", listOf("od_včeraj", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong")),
+        starter("pain_since_morning", "OD JUTRA", "Od jutra", "pain.since_morning", "PAIN", "pain", listOf("od_jutra", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong")),
+        starter("pain_since_evening", "OD VEČERA", "Od večera", "pain.since_evening", "PAIN", "pain", listOf("od_večera", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong")),
 
         starter("good", "DOBRO SEM", "Dobro sem.", "feeling.good", "FEELING", "feeling", listOf("dobro", "počutje"), visibleUnderIds = listOf("feeling")),
         starter("bad", "SLABO SEM", "Slabo se počutim.", "feeling.bad", "FEELING", "feeling", listOf("slabo", "počutje"), visibleUnderIds = listOf("feeling", "problem"), imagePath = "custom/emotion/bad.jpg", iconSource = IconSource.CUSTOM),
@@ -348,6 +373,42 @@ object AacStarterContentV1 {
         return listOf(AacPlacement(pageId = "page_4", position5x5 = position))
     }
 
+    private fun painSideStrengthAndTimeChildren(): List<String> {
+        return listOf(
+            "pain_left",
+            "pain_right",
+            "pain_both",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_since_today",
+            "pain_since_yesterday",
+            "pain_since_morning",
+            "pain_since_evening"
+        )
+    }
+
+    private fun painStrengthAndTimeChildren(): List<String> {
+        return listOf(
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_since_today",
+            "pain_since_yesterday",
+            "pain_since_morning",
+            "pain_since_evening"
+        )
+    }
+
+    private fun painTimeChildren(): List<String> {
+        return listOf(
+            "pain_since_today",
+            "pain_since_yesterday",
+            "pain_since_morning",
+            "pain_since_evening"
+        )
+    }
+
     private fun Int?.orZero(): Int = this ?: 0
 
     private const val START_PRIORITY = 100
@@ -364,7 +425,10 @@ object AacStarterContentV1 {
         "dressing", "position", "i_want", "dont_want",
         "rest", "drink", "food", "feeling", "care", "health",
         "sister_zana", "grandfather_sergej", "julija", "oksana", "inna",
-        "dusan", "franc", "miss_you", "love_you", "sorry", "please", "call_me", "when_come", "when_go", "when_therapy", "when_home", "when_eat",
+        "dusan", "franc", "miss_you", "love_you", "sorry", "please",
+        "socialno", "dober_dan", "dobro_jutro", "dober_vecer", "lahko_noc", "prosim", "oprosti_social", "v_redu_je", "rada_te_imam", "pogresam_te",
+        "pogovor", "govori_pocasneje", "ponovi", "pocakaj", "nisem_koncala", "dajte_mi_cas", "napisi_mi", "pokazi_mi",
+        "call_me", "when_come", "when_go", "when_therapy", "when_home", "when_eat",
         "time_group", "today", "tomorrow", "yesterday", "now", "morning", "afternoon", "evening", "night",
         "come_to_me", "look_at_me", "turn_me", "turn_left", "turn_right", "turn_back", "turn_side", "fix_me",
         "cannot_speak", "cannot_stand", "cannot_drink", "cannot_eat", "cannot_move", "cannot_understand", "happy",
@@ -375,8 +439,8 @@ object AacStarterContentV1 {
         "drink_warm", "drink_cold", "drink_small", "drink_more", "drink_no_additive", "coffee_plain", "coffee_white", "coffee_cappuccino",
         "soup", "bread", "fruit", "ice_cream", "potato", "rice", "meat", "sweet", "other_food", "food_yogurt", "food_banana",
         "food_apple", "food_lunch", "food_dinner", "food_little", "food_more", "food_enough", "food_later",
-        "head", "arm", "leg", "back", "belly", "chest", "throat", "left_side", "right_side", "other_body",
-        "pain_light", "pain_medium", "pain_strong", "pain_very", "pain_very_strong", "pain_now", "pain_today", "pain_many_days",
+        "head", "arm", "leg", "back", "belly", "chest", "throat", "pain_left", "pain_right", "pain_both", "left_side", "right_side", "other_body",
+        "pain_light", "pain_medium", "pain_strong", "pain_very", "pain_very_strong", "pain_now", "pain_today", "pain_many_days", "pain_since_today", "pain_since_yesterday", "pain_since_morning", "pain_since_evening",
         "water_detail", "cold_water", "warm_water", "non_sparkling_water", "sparkling_water", "not_thirsty",
         "not_hungry", "diaper", "wc_now", "wc_soon", "wc_help", "dressing_help", "washing_help", "body_position", "pillow", "blanket", "change_position", "sit_up", "lie_down", "uncomfortable",
         "clothing", "bed", "movement_pain",

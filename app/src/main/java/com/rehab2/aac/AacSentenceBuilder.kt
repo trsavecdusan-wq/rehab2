@@ -196,24 +196,29 @@ object AacSentenceBuilder {
     }
 
     private fun buildPainSentence(items: List<AacItem>): String {
-        val target = items.firstNotNullOfOrNull { item -> PAIN_TARGETS[item.idKey()] }
-        if (target == null) {
+        val bodyKey = items.firstNotNullOfOrNull { item ->
+            item.idKey().takeIf { key -> key in PAIN_BODY_FORMS || key in PAIN_TARGETS }
+        }
+        if (bodyKey == null) {
             return if (items.hasId("pain")) "Boli me." else ""
         }
+        val side = items.firstNotNullOfOrNull { item -> PAIN_SIDES[item.idKey()] }
+        val target = painTargetFor(bodyKey, side)
         val intensity = items.firstNotNullOfOrNull { item -> PAIN_INTENSITIES[item.idKey()] }
         val timePrefix = items.firstNotNullOfOrNull { item -> PAIN_TIME_PREFIXES[item.idKey()] }
+        val verb = painVerbFor(bodyKey, side)
         if (timePrefix != null && intensity != null) {
-            return "$timePrefix me ${painIntensityAdverb(intensity)} boli $target."
+            return "$timePrefix me ${painIntensityAdverb(intensity)} $verb $target."
         }
         if (timePrefix != null) {
-            return "$timePrefix me boli $target."
+            return "$timePrefix me $verb $target."
         }
         return when (intensity) {
-            "light" -> "Malo me boli $target."
-            "medium" -> "Srednje močno me boli $target."
-            "strong" -> "Močno me boli $target."
-            "very", "very_strong" -> "Zelo me boli $target."
-            else -> "Boli me $target."
+            "light" -> "Malo me $verb $target."
+            "medium" -> "Srednje močno me $verb $target."
+            "strong" -> "Močno me $verb $target."
+            "very", "very_strong" -> "Zelo me $verb $target."
+            else -> "${verb.replaceFirstChar { it.titlecase(Locale("sl", "SI")) }} me $target."
         }
     }
 
@@ -225,6 +230,24 @@ object AacSentenceBuilder {
             "very", "very_strong" -> "zelo"
             else -> ""
         }
+    }
+
+    private fun painTargetFor(bodyKey: String, side: String?): String {
+        val body = PAIN_BODY_FORMS[bodyKey]
+        if (body != null) {
+            return when (side) {
+                "left" -> body.left ?: body.singular
+                "right" -> body.right ?: body.singular
+                "both" -> body.both ?: body.singular
+                else -> body.singular
+            }
+        }
+        return PAIN_TARGETS[bodyKey].orEmpty()
+    }
+
+    private fun painVerbFor(bodyKey: String, side: String?): String {
+        val body = PAIN_BODY_FORMS[bodyKey] ?: return "boli"
+        return if (side == "both" && body.both != null) body.bothVerb else body.singularVerb
     }
 
     private fun itemKeys(item: AacItem): List<String> {
@@ -286,6 +309,15 @@ object AacSentenceBuilder {
         val accusative: String,
         val dative: String,
         val instrumental: String
+    )
+
+    private data class PainBodyForm(
+        val singular: String,
+        val left: String? = null,
+        val right: String? = null,
+        val both: String? = null,
+        val singularVerb: String = "boli",
+        val bothVerb: String = "bolita"
     )
 
     private val WANT_KEYS = setOf(
@@ -717,6 +749,32 @@ object AacSentenceBuilder {
         "throat" to "grlo"
     )
 
+    private val PAIN_BODY_FORMS = mapOf(
+        "leg" to PainBodyForm(
+            singular = "noga",
+            left = "leva noga",
+            right = "desna noga",
+            both = "obe nogi"
+        ),
+        "arm" to PainBodyForm(
+            singular = "roka",
+            left = "leva roka",
+            right = "desna roka",
+            both = "obe roki"
+        ),
+        "head" to PainBodyForm(singular = "glava"),
+        "belly" to PainBodyForm(singular = "trebuh"),
+        "back" to PainBodyForm(singular = "hrbet")
+    )
+
+    private val PAIN_SIDES = mapOf(
+        "pain_left" to "left",
+        "left_side" to "left",
+        "pain_right" to "right",
+        "right_side" to "right",
+        "pain_both" to "both"
+    )
+
     private val DRINK_MODIFIERS = mapOf(
         "drink_cold" to "cold",
         "drink_warm" to "warm",
@@ -736,6 +794,10 @@ object AacSentenceBuilder {
     private val PAIN_TIME_PREFIXES = mapOf(
         "pain_now" to "Zdaj",
         "pain_today" to "Od danes",
-        "pain_many_days" to "Ve\u010d dni"
+        "pain_many_days" to "Ve\u010d dni",
+        "pain_since_today" to "Od danes",
+        "pain_since_yesterday" to "Od včeraj",
+        "pain_since_morning" to "Od jutra",
+        "pain_since_evening" to "Od večera"
     )
 }

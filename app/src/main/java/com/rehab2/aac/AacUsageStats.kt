@@ -10,6 +10,8 @@ object AacUsageStats {
     private const val PREFS_FILE = "rehab2_prefs"
     const val PREF_CORRECTION_BACK_COUNT = "aac_correction_back_count"
     const val PREF_CORRECTION_LAST_AT = "aac_correction_last_at"
+    const val PREF_AUTO_RETURN_AFTER_PARTIAL_COUNT = "aac_auto_return_after_partial_count"
+    const val PREF_AUTO_RETURN_AFTER_PARTIAL_LAST_AT = "aac_auto_return_after_partial_last_at"
     private const val MIN_TOP_SUGGESTION_USE_COUNT = 5
 
     data class Entry(
@@ -93,6 +95,21 @@ object AacUsageStats {
     fun backCorrectionCount(context: Context): Long {
         return context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
             .getLong(PREF_CORRECTION_BACK_COUNT, 0L)
+            .coerceAtLeast(0L)
+    }
+
+    fun recordAutoReturnAfterPartial(context: Context, now: Long = System.currentTimeMillis()) {
+        val prefs = context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
+        val currentCount = prefs.getLong(PREF_AUTO_RETURN_AFTER_PARTIAL_COUNT, 0L).coerceAtLeast(0L)
+        prefs.edit()
+            .putLong(PREF_AUTO_RETURN_AFTER_PARTIAL_COUNT, currentCount + 1L)
+            .putLong(PREF_AUTO_RETURN_AFTER_PARTIAL_LAST_AT, now)
+            .apply()
+    }
+
+    fun autoReturnAfterPartialCount(context: Context): Long {
+        return context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
+            .getLong(PREF_AUTO_RETURN_AFTER_PARTIAL_COUNT, 0L)
             .coerceAtLeast(0L)
     }
 

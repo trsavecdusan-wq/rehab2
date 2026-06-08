@@ -197,6 +197,13 @@ class SettingsActivity : AppCompatActivity() {
             "4000 ms" to 4000L,
             "5000 ms" to 5000L
         )
+        private val PARTIAL_SENTENCE_AUTO_RETURN_OPTIONS = arrayOf(
+            "5s" to 5000L,
+            "10s" to 10000L,
+            "15s" to 15000L,
+            "20s" to 20000L,
+            "30s" to 30000L
+        )
         private const val PREF_AAC_GRID_SIZE = "aac_grid_size"
         private const val DEFAULT_AAC_GRID_SIZE = 3
         private val AAC_GRID_SIZE_OPTIONS = arrayOf(3, 4, 5)
@@ -316,6 +323,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editAutoSentenceDelay: EditText
     private lateinit var switchReturnToRootAfterSentence: SwitchCompat
     private lateinit var switchClearSentenceAfterSentence: SwitchCompat
+    private lateinit var switchPartialSentenceAutoReturn: SwitchCompat
+    private lateinit var editPartialSentenceAutoReturnDelay: EditText
     private lateinit var txtAacGridSizeStatus: TextView
     private lateinit var editAacGridSize: EditText
     private lateinit var switchPersistentTopRowEnabled: SwitchCompat
@@ -424,6 +433,8 @@ class SettingsActivity : AppCompatActivity() {
         editAutoSentenceDelay = findViewById(R.id.editAutoSentenceDelay)
         switchReturnToRootAfterSentence = findViewById(R.id.switchReturnToRootAfterSentence)
         switchClearSentenceAfterSentence = findViewById(R.id.switchClearSentenceAfterSentence)
+        switchPartialSentenceAutoReturn = findViewById(R.id.switchPartialSentenceAutoReturn)
+        editPartialSentenceAutoReturnDelay = findViewById(R.id.editPartialSentenceAutoReturnDelay)
         txtAacGridSizeStatus = findViewById(R.id.txtAacGridSizeStatus)
         editAacGridSize = findViewById(R.id.editAacGridSize)
         switchPersistentTopRowEnabled = findViewById(R.id.switchPersistentTopRowEnabled)
@@ -637,6 +648,9 @@ class SettingsActivity : AppCompatActivity() {
         editAutoSentenceDelay.setOnClickListener {
             showAutoSentenceDelayPicker()
         }
+        editPartialSentenceAutoReturnDelay.setOnClickListener {
+            showPartialSentenceAutoReturnDelayPicker()
+        }
         editAacGridSize.setOnClickListener {
             showAacGridSizePicker()
         }
@@ -838,7 +852,7 @@ class SettingsActivity : AppCompatActivity() {
                 setSettingsRangeVisible(content, R.id.subgroupCommunicatorProfile, R.id.switchRealWorldHelpersEnabled)
             }
             SettingsSection.SPEECH -> {
-                setSettingsRangeVisible(content, R.id.sectionSpeechApiSettings, R.id.switchClearSentenceAfterSentence)
+                setSettingsRangeVisible(content, R.id.sectionSpeechApiSettings, R.id.editPartialSentenceAutoReturnDelay)
                 setSettingsRangeVisible(content, R.id.subgroupSpeechVolume, R.id.btnTestAacSpeechLoudness)
                 setSettingsChildVisible(R.id.btnSaveSpeechApiSettings)
                 setSettingsChildVisible(R.id.btnTestSpeechApi)
@@ -1268,11 +1282,13 @@ class SettingsActivity : AppCompatActivity() {
         switchAutoSentenceSpeech.setOnCheckedChangeListener(null)
         switchReturnToRootAfterSentence.setOnCheckedChangeListener(null)
         switchClearSentenceAfterSentence.setOnCheckedChangeListener(null)
+        switchPartialSentenceAutoReturn.setOnCheckedChangeListener(null)
         switchSingleIconSpeech.isChecked = settings.speakSingleIconEnabled
         switchFastCompositionSkipLastIcon.isChecked = settings.fastCompositionSkipLastIconEnabled
         switchAutoSentenceSpeech.isChecked = settings.autoSpeakSentenceEnabled
         switchReturnToRootAfterSentence.isChecked = settings.returnToRootAfterSentenceEnabled
         switchClearSentenceAfterSentence.isChecked = settings.clearSentenceAfterSentenceEnabled
+        switchPartialSentenceAutoReturn.isChecked = settings.partialSentenceAutoReturnEnabled
         editSingleIconDelay.setText("${settings.mainIconSpeakDelayMs} ms")
         editSubIconDelay.setText("${settings.subIconSpeakDelayMs} ms")
         editAutoSentenceDelay.setText(
@@ -1282,9 +1298,11 @@ class SettingsActivity : AppCompatActivity() {
                 "OFF"
             }
         )
+        editPartialSentenceAutoReturnDelay.setText("${settings.partialSentenceAutoReturnMs / 1000L}s")
         editSingleIconDelay.isEnabled = settings.speakSingleIconEnabled
         editSubIconDelay.isEnabled = settings.speakSingleIconEnabled
         editAutoSentenceDelay.isEnabled = settings.autoSpeakSentenceEnabled
+        editPartialSentenceAutoReturnDelay.isEnabled = settings.partialSentenceAutoReturnEnabled
         bindSpeechTimingSwitchListeners()
     }
 
@@ -1411,9 +1429,17 @@ class SettingsActivity : AppCompatActivity() {
             val coreIconVisualAudit = auditCoreIconVisualQuality()
             val peoplePhotoAudit = auditPeoplePhotoStatus()
             val backCorrections = AacUsageStats.backCorrectionCount(this)
+            val partialAutoReturns = AacUsageStats.autoReturnAfterPartialCount(this)
             val emptySpeechItems = items.filter { explicitSlSpeechText(it).isBlank() }
             val missingCore = missingCoreAacLabels(items)
             val itemIds = items.map { it.id.trim() }.toSet()
+            val painSideOk = listOf("pain_left", "pain_right", "pain_both").all { it in itemIds }
+            val painTimeOk = listOf(
+                "pain_since_today",
+                "pain_since_yesterday",
+                "pain_since_morning",
+                "pain_since_evening"
+            ).all { it in itemIds }
             val missingTimeLabels = TIME_PACK_AUDIT_ITEMS
                 .filter { (itemId, _) -> itemId !in itemIds }
                 .map { (_, label) -> label }
@@ -1444,6 +1470,8 @@ class SettingsActivity : AppCompatActivity() {
             if (missingPlaceLabels.isNotEmpty()) warnings += "manjkajo ikone za kraje"
             if (missingActivityLabels.isNotEmpty()) warnings += "manjkajo ikone za dejavnosti"
             if (missingCareLabels.isNotEmpty()) warnings += "manjkajo ikone za nego"
+            if (!painSideOk) warnings += "manjkajo ikone za stran bolečine"
+            if (!painTimeOk) warnings += "manjkajo ikone za čas bolečine"
             if (coreWithoutSpeech.isNotEmpty()) warnings += "osnovne ikone nimajo govora"
             val overall = if (warnings.isEmpty()) "PRIPRAVLJENO ZA TEST" else "POTREBNA DOPOLNITEV"
             val activeProfile = AacProfileStore.getActiveAacProfile(this).displayName.ifBlank { "DOM" }
@@ -1510,6 +1538,8 @@ class SettingsActivity : AppCompatActivity() {
                     if (missingCareLabels.isEmpty()) "DA" else "manjka: ${missingCareLabels.joinToString(", ")}",
                     missingCareLabels.isEmpty()
                 ),
+                "BOLEČINA: stran telesa ${if (painSideOk) "DA" else "NE"}",
+                "BOLEČINA: čas ${if (painTimeOk) "DA" else "NE"}",
                 statusLine(
                     "Osnovne ikone",
                     if (missingCore.isEmpty()) "vse najdene" else "manjka: ${missingCore.joinToString(", ")}",
@@ -1517,6 +1547,7 @@ class SettingsActivity : AppCompatActivity() {
                 ),
                 statusLine("Govor", "${emptySpeechItems.size} ikon brez vpisanega govora", coreWithoutSpeech.isEmpty()),
                 "Popravki z NAZAJ: $backCorrections",
+                "Samodejni povratki po delnem stavku: $partialAutoReturns",
                 "Fotografija: ${if (patientProfilePhotoExists()) "DA" else "NE"}",
                 "",
                 "Skupno stanje: $overall"
@@ -2395,6 +2426,25 @@ class SettingsActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun showPartialSentenceAutoReturnDelayPicker() {
+        val settings = AacSpeechTimingSettings.read(this)
+        val labels = PARTIAL_SENTENCE_AUTO_RETURN_OPTIONS.map { it.first }.toTypedArray()
+        val selectedIndex = PARTIAL_SENTENCE_AUTO_RETURN_OPTIONS
+            .indexOfFirst { it.second == settings.partialSentenceAutoReturnMs }
+            .coerceAtLeast(1)
+        AlertDialog.Builder(this)
+            .setTitle("Čas povratka po delnem stavku")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val delayMs = PARTIAL_SENTENCE_AUTO_RETURN_OPTIONS[which].second
+                prefs.edit()
+                    .putLong(AacSpeechTimingSettings.PREF_PARTIAL_SENTENCE_AUTO_RETURN_MS, delayMs)
+                    .apply()
+                refreshSpeechTimingSection()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
     private fun showAacProfilePicker() {
         val options = AacProfileStore.loadProfilesFromStorage(this)
         val labels = options.map { it.displayName }.toTypedArray()
@@ -2496,6 +2546,12 @@ class SettingsActivity : AppCompatActivity() {
         switchClearSentenceAfterSentence.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit()
                 .putBoolean(AacSpeechTimingSettings.PREF_CLEAR_SENTENCE_AFTER_SENTENCE_ENABLED, isChecked)
+                .apply()
+            refreshSpeechTimingSection()
+        }
+        switchPartialSentenceAutoReturn.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit()
+                .putBoolean(AacSpeechTimingSettings.PREF_PARTIAL_SENTENCE_AUTO_RETURN_ENABLED, isChecked)
                 .apply()
             refreshSpeechTimingSection()
         }

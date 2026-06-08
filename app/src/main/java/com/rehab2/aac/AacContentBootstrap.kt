@@ -480,9 +480,11 @@ object AacContentBootstrap {
     private fun repairConversationTreeV3Metadata(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
         val guidedBranchIds = setOf(
             "people",
+            "socialno",
             "need",
             "problem",
             "please",
+            "pogovor",
             "what_root",
             "where_root",
             "when_root",
@@ -500,6 +502,7 @@ object AacContentBootstrap {
             "help",
             "repeat",
             "slower",
+            "more",
             "turn_me",
             "cannot",
             "cold_hot",
@@ -787,6 +790,11 @@ object AacContentBootstrap {
                     questionUk = "Де тебе болить?",
                     questionEn = "Where does it hurt?"
                 )
+                repaired += ensureGuidedPainNode(
+                    item = pain,
+                    children = listOf("head", "belly", "leg", "arm", "back", "chest", "throat"),
+                    questionSl = "Kje te boli?"
+                )
             }
         }
 
@@ -799,6 +807,39 @@ object AacContentBootstrap {
                 if (isUserProtected(item)) return@forEach
                 repaired += repair.applyTo(item)
             }
+        }
+        PAIN_GUIDED_NODE_REPAIRS.forEach { (id, children, questionSl) ->
+            val item = itemsById[id] ?: return@forEach
+            if (isUserProtected(item)) return@forEach
+            repaired += ensureGuidedPainNode(item, children, questionSl)
+        }
+        return repaired
+    }
+
+    private fun ensureGuidedPainNode(item: JSONObject, children: List<String>, questionSl: String): Int {
+        var repaired = 0
+        val currentChildren = stringList(item.optJSONArray("children"))
+        if (currentChildren != children) {
+            item.put("children", jsonArrayOf(children))
+            repaired++
+        }
+        if (!item.optBoolean("opensSubicons", false)) {
+            item.put("opensSubicons", true)
+            repaired++
+        }
+        if (item.optBoolean("speaksImmediately", true)) {
+            item.put("speaksImmediately", false)
+            repaired++
+        }
+        if (item.optString("actionType").isBlank() || item.optString("actionType") == "speak") {
+            item.put("actionType", "open_subicons")
+            repaired++
+        }
+        val questionByLanguage = item.optJSONObject("questionByLanguage") ?: JSONObject()
+        if (questionByLanguage.optString("sl").isBlank()) {
+            questionByLanguage.put("sl", questionSl)
+            item.put("questionByLanguage", questionByLanguage)
+            repaired++
         }
         return repaired
     }
@@ -1729,6 +1770,58 @@ object AacContentBootstrap {
             parentId = "pain"
         )
     )
+
+    private val PAIN_GUIDED_NODE_REPAIRS = listOf(
+        Triple("head", painStrengthAndTimeChildren(), "Kako močno boli?"),
+        Triple("belly", painStrengthAndTimeChildren(), "Kako močno boli?"),
+        Triple("back", painStrengthAndTimeChildren(), "Kako močno boli?"),
+        Triple("chest", painStrengthAndTimeChildren(), "Kako močno boli?"),
+        Triple("throat", painStrengthAndTimeChildren(), "Kako močno boli?"),
+        Triple("leg", painSideStrengthAndTimeChildren(), "Katera stran?"),
+        Triple("arm", painSideStrengthAndTimeChildren(), "Katera stran?"),
+        Triple("pain_left", painStrengthAndTimeChildren(), "Kako močno boli?"),
+        Triple("pain_right", painStrengthAndTimeChildren(), "Kako močno boli?"),
+        Triple("pain_both", painStrengthAndTimeChildren(), "Kako močno boli?"),
+        Triple("pain_light", painTimeChildren(), "Od kdaj boli?"),
+        Triple("pain_medium", painTimeChildren(), "Od kdaj boli?"),
+        Triple("pain_strong", painTimeChildren(), "Od kdaj boli?")
+    )
+
+    private fun painSideStrengthAndTimeChildren(): List<String> {
+        return listOf(
+            "pain_left",
+            "pain_right",
+            "pain_both",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_since_today",
+            "pain_since_yesterday",
+            "pain_since_morning",
+            "pain_since_evening"
+        )
+    }
+
+    private fun painStrengthAndTimeChildren(): List<String> {
+        return listOf(
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_since_today",
+            "pain_since_yesterday",
+            "pain_since_morning",
+            "pain_since_evening"
+        )
+    }
+
+    private fun painTimeChildren(): List<String> {
+        return listOf(
+            "pain_since_today",
+            "pain_since_yesterday",
+            "pain_since_morning",
+            "pain_since_evening"
+        )
+    }
 
     private data class RawItemsJson(
         val rootObject: JSONObject?,
