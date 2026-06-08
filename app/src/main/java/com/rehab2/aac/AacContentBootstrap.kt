@@ -480,6 +480,7 @@ object AacContentBootstrap {
     private fun repairConversationTreeV3Metadata(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
         val guidedBranchIds = setOf(
             "people",
+            "about_me",
             "socialno",
             "need",
             "problem",
@@ -513,6 +514,8 @@ object AacContentBootstrap {
             "drink",
             "hungry",
             "food",
+            "health",
+            "emergency",
             "pain",
             "wc",
             "real_world",

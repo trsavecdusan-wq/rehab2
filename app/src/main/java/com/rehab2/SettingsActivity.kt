@@ -244,6 +244,24 @@ class SettingsActivity : AppCompatActivity() {
             PersonPhotoAuditItem("person_oksana", "OKSANA", "person_oksana.jpg"),
             PersonPhotoAuditItem("person_sergej", "SERGEJ", "person_sergej.jpg")
         )
+        private val ABOUT_ME_PACK_AUDIT_ITEMS = listOf(
+            "about_me" to "O MENI",
+            "stroke_info" to "IMAM MOŽGANSKO KAP",
+            "speech_difficulty" to "TEŽKO GOVORIM",
+            "i_understand" to "RAZUMEM VAS",
+            "speak_slowly" to "GOVORITE POČASI",
+            "give_me_time" to "DAJTE MI ČAS",
+            "be_patient" to "POTRPITE Z MANO"
+        )
+        private val EMERGENCY_PACK_AUDIT_ITEMS = listOf(
+            "emergency" to "NUJNO",
+            "urgent_help" to "NUJNO",
+            "feel_bad" to "SLABO MI JE",
+            "cannot_breathe" to "NE MOREM DIHATI",
+            "chest_pain" to "BOLI ME V PRSIH",
+            "call_doctor" to "POKLIČI ZDRAVNIKA",
+            "call_nurse" to "POKLIČI SESTRO"
+        )
         private val TIME_PACK_AUDIT_ITEMS = listOf(
             "today" to "DANES",
             "tomorrow" to "JUTRI",
@@ -1440,6 +1458,12 @@ class SettingsActivity : AppCompatActivity() {
                 "pain_since_morning",
                 "pain_since_evening"
             ).all { it in itemIds }
+            val missingAboutMeLabels = ABOUT_ME_PACK_AUDIT_ITEMS
+                .filter { (itemId, _) -> itemId !in itemIds }
+                .map { (_, label) -> label }
+            val missingEmergencyLabels = EMERGENCY_PACK_AUDIT_ITEMS
+                .filter { (itemId, _) -> itemId !in itemIds }
+                .map { (_, label) -> label }
             val missingTimeLabels = TIME_PACK_AUDIT_ITEMS
                 .filter { (itemId, _) -> itemId !in itemIds }
                 .map { (_, label) -> label }
@@ -1472,6 +1496,8 @@ class SettingsActivity : AppCompatActivity() {
             if (missingCareLabels.isNotEmpty()) warnings += "manjkajo ikone za nego"
             if (!painSideOk) warnings += "manjkajo ikone za stran bolečine"
             if (!painTimeOk) warnings += "manjkajo ikone za čas bolečine"
+            if (missingAboutMeLabels.isNotEmpty()) warnings += "manjkajo ikone O MENI"
+            if (missingEmergencyLabels.isNotEmpty()) warnings += "manjkajo nujne ikone"
             if (coreWithoutSpeech.isNotEmpty()) warnings += "osnovne ikone nimajo govora"
             val overall = if (warnings.isEmpty()) "PRIPRAVLJENO ZA TEST" else "POTREBNA DOPOLNITEV"
             val activeProfile = AacProfileStore.getActiveAacProfile(this).displayName.ifBlank { "DOM" }
@@ -1540,6 +1566,16 @@ class SettingsActivity : AppCompatActivity() {
                 ),
                 "BOLEČINA: stran telesa ${if (painSideOk) "DA" else "NE"}",
                 "BOLEČINA: čas ${if (painTimeOk) "DA" else "NE"}",
+                statusLine(
+                    "O MENI",
+                    if (missingAboutMeLabels.isEmpty()) "DA" else "manjka: ${missingAboutMeLabels.joinToString(", ")}",
+                    missingAboutMeLabels.isEmpty()
+                ),
+                statusLine(
+                    "NUJNO",
+                    if (missingEmergencyLabels.isEmpty()) "DA" else "manjka: ${missingEmergencyLabels.joinToString(", ")}",
+                    missingEmergencyLabels.isEmpty()
+                ),
                 statusLine(
                     "Osnovne ikone",
                     if (missingCore.isEmpty()) "vse najdene" else "manjka: ${missingCore.joinToString(", ")}",
