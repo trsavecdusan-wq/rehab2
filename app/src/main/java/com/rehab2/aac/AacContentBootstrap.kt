@@ -488,6 +488,8 @@ object AacContentBootstrap {
             "what_root",
             "where_root",
             "when_root",
+            "place_group",
+            "i_want",
             "person_dusan",
             "person_zana",
             "person_sergej",
