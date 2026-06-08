@@ -293,6 +293,15 @@ class SettingsActivity : AppCompatActivity() {
             "visit" to "OBISK",
             "therapy" to "TERAPIJA"
         )
+        private val ANIMALS_PACK_AUDIT_ITEMS = listOf(
+            "animals" to "ŽIVALI",
+            "dog" to "PES",
+            "cat" to "MAČKA",
+            "bird" to "PTIČ",
+            "fish" to "RIBA",
+            "horse" to "KONJ",
+            "rabbit" to "ZAJEC"
+        )
         private val CARE_PACK_AUDIT_ITEMS = listOf(
             "care" to "NEGA",
             "washing_help" to "UMIVANJE",
@@ -1529,6 +1538,9 @@ class SettingsActivity : AppCompatActivity() {
             val missingActivityLabels = ACTIVITY_PACK_AUDIT_ITEMS
                 .filter { (itemId, _) -> itemId !in itemIds }
                 .map { (_, label) -> label }
+            val missingAnimalsLabels = ANIMALS_PACK_AUDIT_ITEMS
+                .filter { (itemId, _) -> itemId !in itemIds }
+                .map { (_, label) -> label }
             val missingCareLabels = CARE_PACK_AUDIT_ITEMS
                 .filter { (itemId, _) -> itemId !in itemIds }
                 .map { (_, label) -> label }
@@ -1555,6 +1567,7 @@ class SettingsActivity : AppCompatActivity() {
             if (missingTimeLabels.isNotEmpty()) warnings += "manjkajo časovne ikone"
             if (missingPlaceLabels.isNotEmpty()) warnings += "manjkajo ikone za kraje"
             if (missingActivityLabels.isNotEmpty()) warnings += "manjkajo ikone za dejavnosti"
+            if (missingAnimalsLabels.isNotEmpty()) warnings += "manjkajo ikone za živali"
             if (missingCareLabels.isNotEmpty()) warnings += "manjkajo ikone za nego"
             if (missingClothingLabels.isNotEmpty()) warnings += "manjkajo ikone za oblačila"
             if (missingOutdoorSmokingLabels.isNotEmpty()) warnings += "manjkajo ikone za zunaj/cigareto"
@@ -1629,6 +1642,11 @@ class SettingsActivity : AppCompatActivity() {
                     "DEJAVNOSTI",
                     if (missingActivityLabels.isEmpty()) "DA" else "manjka: ${missingActivityLabels.joinToString(", ")}",
                     missingActivityLabels.isEmpty()
+                ),
+                statusLine(
+                    "ŽIVALI",
+                    if (missingAnimalsLabels.isEmpty()) "DA" else "manjka: ${missingAnimalsLabels.joinToString(", ")}",
+                    missingAnimalsLabels.isEmpty()
                 ),
                 statusLine(
                     "NEGA",
