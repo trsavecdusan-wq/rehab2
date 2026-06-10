@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "guidedLearningModeEnabled": true,
+  "learningStatisticsEnabled": false,
+  "realUsageStatisticsSeparate": true,
+  "textDisplayMode": "ICON_AND_TEXT",
+  "perMainIconGuidedLearningEnabled": {
+    "wc": true,
+    "pain": true,
+    "thirsty": true,
+    "hungry": true,
+    "tired": true,
+    "i_want": true,
+    "need": true,
+    "people": true,
+    "miss_someone": true,
+    "call": true,
+    "feeling": true,
+    "place_group": true,
+    "care": true,
+    "health": true,
+    "dont_want": true,
+    "please": true,
+    "wait": true,
+    "repeat": true,
+    "pogovor": true,
+    "activity_group": true
+  }
+}

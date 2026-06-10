@@ -216,8 +216,9 @@ object AacContentPackValidator {
         return when (value?.trim()?.uppercase()) {
             "SOCA" -> IconSource.SOCA
             "ARASAAC" -> IconSource.ARASAAC
-            "PATIENT" -> IconSource.PATIENT
-            "CUSTOM" -> IconSource.CUSTOM
+            "PATIENT", "PATIENT_PHOTO" -> IconSource.PATIENT_PHOTO
+            "CUSTOM", "CUSTOM_PHOTO" -> IconSource.CUSTOM_PHOTO
+            "PLACE", "PLACE_PHOTO" -> IconSource.PLACE_PHOTO
             else -> IconSource.SYSTEM
         }
     }
@@ -228,7 +229,7 @@ object AacContentPackValidator {
             normalized.startsWith("soca/") || normalized.contains("/soca/") -> IconSource.SOCA
             normalized.startsWith("arasaac/") || normalized.contains("/arasaac/") -> IconSource.ARASAAC
             normalized.isBlank() -> IconSource.SYSTEM
-            else -> IconSource.CUSTOM
+            else -> IconSource.CUSTOM_PHOTO
         }
     }
 }

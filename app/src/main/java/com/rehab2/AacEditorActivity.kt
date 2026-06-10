@@ -168,7 +168,10 @@ class AacEditorActivity : AppCompatActivity() {
         val sources = AacImageGallery.sources(this)
             .filter { source ->
                 source.iconSource == IconSource.CUSTOM ||
+                    source.iconSource == IconSource.CUSTOM_PHOTO ||
                     source.iconSource == IconSource.PATIENT ||
+                    source.iconSource == IconSource.PATIENT_PHOTO ||
+                    source.iconSource == IconSource.PLACE_PHOTO ||
                     source.iconSource == IconSource.SOCA ||
                     source.iconSource == IconSource.ARASAAC
             }
@@ -299,8 +302,9 @@ class AacEditorActivity : AppCompatActivity() {
     private fun normalizedImageUsagePath(iconSource: IconSource, imagePath: String): String {
         val normalizedPath = imagePath.trim().replace('\\', '/').removePrefix("/")
         val sourcePrefix = when (iconSource) {
-            IconSource.CUSTOM -> "custom/"
-            IconSource.PATIENT -> "patient/"
+            IconSource.CUSTOM, IconSource.CUSTOM_PHOTO -> "custom/"
+            IconSource.PATIENT, IconSource.PATIENT_PHOTO -> "patient/"
+            IconSource.PLACE_PHOTO -> "places/"
             IconSource.SOCA -> "soca/"
             IconSource.ARASAAC -> "arasaac/"
             IconSource.SYSTEM -> "system/"
@@ -310,8 +314,9 @@ class AacEditorActivity : AppCompatActivity() {
 
     private fun imageCleanupSourceTitle(iconSource: IconSource): String {
         return when (iconSource) {
-            IconSource.CUSTOM -> "MOJE SLIKE"
-            IconSource.PATIENT -> "OSEBE / PACIENT"
+            IconSource.CUSTOM, IconSource.CUSTOM_PHOTO -> "MOJE SLIKE"
+            IconSource.PATIENT, IconSource.PATIENT_PHOTO -> "OSEBE / PACIENT"
+            IconSource.PLACE_PHOTO -> "KRAJI"
             IconSource.SOCA -> "SOČA"
             IconSource.ARASAAC -> "ARASAAC"
             IconSource.SYSTEM -> "SISTEMSKE IKONE"
@@ -1466,7 +1471,11 @@ class AacEditorActivity : AppCompatActivity() {
     }
 
     private fun canRenameImageSource(iconSource: IconSource): Boolean {
-        return iconSource == IconSource.CUSTOM || iconSource == IconSource.PATIENT
+        return iconSource == IconSource.CUSTOM ||
+            iconSource == IconSource.CUSTOM_PHOTO ||
+            iconSource == IconSource.PATIENT ||
+            iconSource == IconSource.PATIENT_PHOTO ||
+            iconSource == IconSource.PLACE_PHOTO
     }
 
     private fun isImageUsedByAacItem(entry: AacImageGallery.Entry): Boolean {
@@ -1522,8 +1531,9 @@ class AacEditorActivity : AppCompatActivity() {
 
     private fun simpleImageSourceTitle(iconSource: IconSource): String {
         return when (iconSource) {
-            IconSource.CUSTOM -> "IZBERI IZ MOJIH SLIK"
-            IconSource.PATIENT -> "IZBERI IZ OSEB"
+            IconSource.CUSTOM, IconSource.CUSTOM_PHOTO -> "IZBERI IZ MOJIH SLIK"
+            IconSource.PATIENT, IconSource.PATIENT_PHOTO -> "IZBERI IZ OSEB"
+            IconSource.PLACE_PHOTO -> "IZBERI IZ KRAJEV"
             IconSource.SOCA -> "IZBERI IZ SOČA"
             IconSource.ARASAAC -> "IZBERI IZ ARASAAC"
             IconSource.SYSTEM -> "SISTEMSKE IKONE"
@@ -1947,8 +1957,9 @@ class AacEditorActivity : AppCompatActivity() {
     private fun imageSourceDisplayName(iconSource: IconSource): String {
         return when (iconSource) {
             IconSource.SYSTEM -> "SISTEMSKE IKONE (SYSTEM)"
-            IconSource.CUSTOM -> "MOJE SLIKE (CUSTOM)"
-            IconSource.PATIENT -> "OSEBE / PACIENT (PATIENT)"
+            IconSource.CUSTOM, IconSource.CUSTOM_PHOTO -> "MOJE SLIKE (CUSTOM_PHOTO)"
+            IconSource.PATIENT, IconSource.PATIENT_PHOTO -> "OSEBE / PACIENT (PATIENT_PHOTO)"
+            IconSource.PLACE_PHOTO -> "KRAJI (PLACE_PHOTO)"
             IconSource.SOCA -> "SOČA (SOCA)"
             IconSource.ARASAAC -> "ARASAAC"
         }

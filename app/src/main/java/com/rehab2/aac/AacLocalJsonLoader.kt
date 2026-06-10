@@ -150,6 +150,14 @@ object AacLocalJsonLoader {
             translationSource = json.optNullableString("translationSource"),
             translationManualOverride = json.optBoolean("translationManualOverride", false),
             learningRepresentations = parseLearningRepresentations(json.optJSONArray("learningRepresentations")),
+            semanticType = parseSemanticType(
+                json.optNullableString("semanticType")
+                    ?: json.optNullableString("objectType")
+                    ?: json.optNullableString("meaningType")
+            ),
+            activeForPatient = json.optBoolean("activeForPatient", true),
+            learningModeEnabled = json.optBoolean("learningModeEnabled", true),
+            guidedQuestionsEnabled = json.optBoolean("guidedQuestionsEnabled", true),
             categoryId = json.optNullableString("categoryId")
                 ?: json.optNullableString("category"),
             meaning = json.optNullableString("meaning"),
@@ -166,9 +174,13 @@ object AacLocalJsonLoader {
             questionUk = json.optNullableString("questionUk"),
             questionByLanguage = parseLanguageTextMap(json.optJSONObject("questionByLanguage")),
             iconSource = parseIconSource(json.optString("iconSource")),
+            suggestedIconPath = json.optNullableString("suggestedIconPath")
+                ?: json.optNullableString("iconPath"),
             parentId = json.optNullableString("parentId"),
             visibleUnderIds = parseVisibleUnderIds(json),
+            canAppearInMultipleParents = json.optBoolean("canAppearInMultipleParents", true),
             placements = parsePlacements(json.optJSONArray("placements")),
+            protectedPlacement = json.optBoolean("protectedPlacement", false),
             isRootItem = if (json.has("isRootItem")) json.optBoolean("isRootItem", true) else json.optNullableString("parentId").isNullOrBlank(),
             isHiddenUntilParent = json.optBoolean("isHiddenUntilParent", false),
             fixedTopRowPosition = json.optFixedTopRowPosition(),
@@ -349,10 +361,29 @@ object AacLocalJsonLoader {
         return when (value?.trim()?.uppercase()) {
             "SOCA" -> IconSource.SOCA
             "ARASAAC" -> IconSource.ARASAAC
-            "PATIENT" -> IconSource.PATIENT
-            "CUSTOM" -> IconSource.CUSTOM
+            "PATIENT", "PATIENT_PHOTO" -> IconSource.PATIENT_PHOTO
+            "CUSTOM", "CUSTOM_PHOTO" -> IconSource.CUSTOM_PHOTO
+            "PLACE", "PLACE_PHOTO" -> IconSource.PLACE_PHOTO
             "SYSTEM" -> IconSource.SYSTEM
             else -> IconSource.SYSTEM
+        }
+    }
+
+    private fun parseSemanticType(value: String?): AacSemanticType {
+        return when (value?.trim()?.uppercase()) {
+            "STATE", "FEELING", "CONFIRMATION" -> AacSemanticType.STATE
+            "ACTION", "CORE_ACTION", "QUESTION", "SCENARIO" -> AacSemanticType.ACTION
+            "MODIFIER" -> AacSemanticType.MODIFIER
+            "PERSON", "PEOPLE" -> AacSemanticType.PERSON
+            "LOCATION", "PLACE" -> AacSemanticType.LOCATION
+            "TIME" -> AacSemanticType.TIME
+            "PROBLEM", "PAIN" -> AacSemanticType.PROBLEM
+            "HELPER" -> AacSemanticType.HELPER
+            "BODY_PART" -> AacSemanticType.BODY_PART
+            "DRINK" -> AacSemanticType.DRINK
+            "FOOD" -> AacSemanticType.FOOD
+            "CATEGORY", "NEED", "CARE", "ACTIVITY", "ENVIRONMENT" -> AacSemanticType.CATEGORY
+            else -> AacSemanticType.CATEGORY
         }
     }
 

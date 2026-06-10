@@ -111,9 +111,11 @@ object AacV2JsonParser {
         return when (value.trim().uppercase()) {
             "SOCA" -> IconSource.SOCA
             "ARASAAC" -> IconSource.ARASAAC
-            "PATIENT" -> IconSource.PATIENT
-            "CUSTOM" -> IconSource.CUSTOM
-            else -> IconSource.CUSTOM
+            "PATIENT", "PATIENT_PHOTO" -> IconSource.PATIENT_PHOTO
+            "CUSTOM", "CUSTOM_PHOTO" -> IconSource.CUSTOM_PHOTO
+            "PLACE", "PLACE_PHOTO" -> IconSource.PLACE_PHOTO
+            "SYSTEM" -> IconSource.SYSTEM
+            else -> IconSource.CUSTOM_PHOTO
         }
     }
 

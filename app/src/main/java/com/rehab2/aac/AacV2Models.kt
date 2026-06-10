@@ -4,8 +4,26 @@ enum class IconSource {
     SOCA,
     ARASAAC,
     PATIENT,
+    PATIENT_PHOTO,
     CUSTOM,
+    CUSTOM_PHOTO,
+    PLACE_PHOTO,
     SYSTEM
+}
+
+enum class AacSemanticType {
+    STATE,
+    ACTION,
+    MODIFIER,
+    PERSON,
+    LOCATION,
+    TIME,
+    PROBLEM,
+    HELPER,
+    BODY_PART,
+    DRINK,
+    FOOD,
+    CATEGORY
 }
 
 data class AacConcept(

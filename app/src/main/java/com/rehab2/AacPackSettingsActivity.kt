@@ -4867,8 +4867,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun iconSourceDir(iconSource: IconSource): File? {
         return when (iconSource) {
             IconSource.SOCA -> AacStoragePaths.getIconsSocaDir(this)
-            IconSource.CUSTOM -> AacStoragePaths.getIconsCustomDir(this)
-            IconSource.PATIENT -> AacStoragePaths.getIconsPatientDir(this)
+            IconSource.CUSTOM, IconSource.CUSTOM_PHOTO -> AacStoragePaths.getIconsCustomDir(this)
+            IconSource.PATIENT, IconSource.PATIENT_PHOTO -> AacStoragePaths.getIconsPatientDir(this)
+            IconSource.PLACE_PHOTO -> AacStoragePaths.getIconsPlacesDir(this)
             IconSource.ARASAAC -> AacStoragePaths.getIconsArasaacDir(this)
             IconSource.SYSTEM -> null
         }
@@ -4878,8 +4879,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         val relativePath = imageFile.relativeTo(sourceDir).invariantSeparatorsPath
         val prefix = when (iconSource) {
             IconSource.SOCA -> "soca"
-            IconSource.CUSTOM -> "custom"
-            IconSource.PATIENT -> "patient"
+            IconSource.CUSTOM, IconSource.CUSTOM_PHOTO -> "custom"
+            IconSource.PATIENT, IconSource.PATIENT_PHOTO -> "patient"
+            IconSource.PLACE_PHOTO -> "places"
             IconSource.ARASAAC -> "arasaac"
             IconSource.SYSTEM -> ""
         }
@@ -5448,8 +5450,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         return when (rawSource.trim().uppercase(Locale.ROOT)) {
             "SOCA" -> IconSource.SOCA
             "ARASAAC" -> IconSource.ARASAAC
-            "CUSTOM" -> IconSource.CUSTOM
-            "PATIENT" -> IconSource.PATIENT
+            "CUSTOM", "CUSTOM_PHOTO" -> IconSource.CUSTOM_PHOTO
+            "PATIENT", "PATIENT_PHOTO" -> IconSource.PATIENT_PHOTO
+            "PLACE", "PLACE_PHOTO" -> IconSource.PLACE_PHOTO
             "SYSTEM", "" -> IconSource.SYSTEM
             else -> null
         }
@@ -5712,7 +5715,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
             return when (this) {
                 ALL -> true
                 SOCA -> iconSource == IconSource.SOCA
-                CUSTOM -> iconSource == IconSource.CUSTOM || iconSource == IconSource.PATIENT
+                CUSTOM -> iconSource == IconSource.CUSTOM ||
+                    iconSource == IconSource.CUSTOM_PHOTO ||
+                    iconSource == IconSource.PATIENT ||
+                    iconSource == IconSource.PATIENT_PHOTO ||
+                    iconSource == IconSource.PLACE_PHOTO
                 ARASAAC -> iconSource == IconSource.ARASAAC
                 SYSTEM -> iconSource == IconSource.SYSTEM
             }
@@ -5757,7 +5764,11 @@ class AacPackSettingsActivity : AppCompatActivity() {
         fun matches(iconSource: IconSource): Boolean {
             return when (this) {
                 SOCA -> iconSource == IconSource.SOCA
-                CUSTOM -> iconSource == IconSource.CUSTOM || iconSource == IconSource.PATIENT
+                CUSTOM -> iconSource == IconSource.CUSTOM ||
+                    iconSource == IconSource.CUSTOM_PHOTO ||
+                    iconSource == IconSource.PATIENT ||
+                    iconSource == IconSource.PATIENT_PHOTO ||
+                    iconSource == IconSource.PLACE_PHOTO
                 ARASAAC -> iconSource == IconSource.ARASAAC
             }
         }

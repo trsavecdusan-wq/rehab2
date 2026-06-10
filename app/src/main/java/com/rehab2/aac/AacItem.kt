@@ -54,6 +54,10 @@ data class AacItem(
     val translationManualOverride: Boolean = false,
     // Learning reuses this AAC concept instead of creating a duplicate learning database object.
     val learningRepresentations: List<AacLearningRepresentation> = emptyList(),
+    val semanticType: AacSemanticType = AacSemanticType.CATEGORY,
+    val activeForPatient: Boolean = true,
+    val learningModeEnabled: Boolean = true,
+    val guidedQuestionsEnabled: Boolean = true,
     // Therapist organization only. Patient placement is controlled by placements/visibility metadata.
     val categoryId: String? = null,
     // Stable meaning/category semantics for future large content sets. This is not patient placement.
@@ -75,12 +79,15 @@ data class AacItem(
     // Local icon sources stay separate: SOCA -> icons/soca, CUSTOM/PATIENT -> icons/custom,
     // ARASAAC -> icons/arasaac, SYSTEM -> text/fallback only.
     val iconSource: IconSource = IconSource.SYSTEM,
+    val suggestedIconPath: String? = null,
     val parentId: String? = null,
     // Future visibility model: one AAC object can appear as root, under one parent,
     // under multiple parents, or inside learning/message flows without duplicating the item.
     val visibleUnderIds: List<String> = emptyList(),
+    val canAppearInMultipleParents: Boolean = true,
     // Future placement model uses a single 5x5 reference grid; smaller grids adapt from this order.
     val placements: List<AacPlacement> = emptyList(),
+    val protectedPlacement: Boolean = false,
     val isRootItem: Boolean = true,
     val isHiddenUntilParent: Boolean = false,
     // Optional content/settings hook for future therapist-configured fixed top-row positions 1..5.

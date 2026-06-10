@@ -11,6 +11,7 @@ object AacStoragePaths {
     const val ARASAAC_ICONS_DIR = "NovaRehab/icons/arasaac/"
     const val CUSTOM_ICONS_DIR = "NovaRehab/icons/custom/"
     const val PATIENT_ICONS_DIR = "NovaRehab/icons/patient/"
+    const val PLACES_ICONS_DIR = "NovaRehab/icons/places/"
     const val TRANSLATIONS_DATA_DIR = "NovaRehab/data/translations/"
     const val AUDIO_DATA_DIR = "NovaRehab/data/audio/"
     const val TTS_CACHE_DIR = "NovaRehab/audio/tts_cache/"
@@ -63,6 +64,11 @@ object AacStoragePaths {
         return File(externalFilesDir, PATIENT_ICONS_DIR)
     }
 
+    fun getIconsPlacesDir(context: Context): File? {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return null
+        return File(externalFilesDir, PLACES_ICONS_DIR)
+    }
+
     fun getImportDir(context: Context): File? {
         val externalFilesDir = context.getExternalFilesDir(null) ?: return null
         return File(externalFilesDir, IMPORT_DIR)
@@ -91,13 +97,14 @@ object AacStoragePaths {
             getIconsSystemDir(context),
             getIconsCustomDir(context),
             getIconsPatientDir(context),
+            getIconsPlacesDir(context),
             getIconsArasaacDir(context),
             getTranslationsDataDir(context),
             getAudioDataDir(context),
             getTtsCacheDir(context),
             getImportDir(context)
         )
-        return dirs.size == 11 && dirs.all { dir -> dir.exists() || dir.mkdirs() }
+        return dirs.size == 12 && dirs.all { dir -> dir.exists() || dir.mkdirs() }
     }
 
     fun resolveIconFile(context: Context, imagePath: String, iconSource: IconSource): File? {
@@ -125,14 +132,16 @@ object AacStoragePaths {
         val baseRelativeDir = when (iconSource) {
             IconSource.SOCA -> SOCA_ICONS_DIR
             IconSource.ARASAAC -> ARASAAC_ICONS_DIR
-            IconSource.CUSTOM -> CUSTOM_ICONS_DIR
-            IconSource.PATIENT -> PATIENT_ICONS_DIR
+            IconSource.CUSTOM, IconSource.CUSTOM_PHOTO -> CUSTOM_ICONS_DIR
+            IconSource.PATIENT, IconSource.PATIENT_PHOTO -> PATIENT_ICONS_DIR
+            IconSource.PLACE_PHOTO -> PLACES_ICONS_DIR
             IconSource.SYSTEM -> SYSTEM_ICONS_DIR
         }
 
         val fullRelativePath = if (
             normalizedPath.startsWith("custom/", ignoreCase = true) ||
             normalizedPath.startsWith("patient/", ignoreCase = true) ||
+            normalizedPath.startsWith("places/", ignoreCase = true) ||
             normalizedPath.startsWith("soca/", ignoreCase = true) ||
             normalizedPath.startsWith("system/", ignoreCase = true) ||
             normalizedPath.startsWith("arasaac/", ignoreCase = true)

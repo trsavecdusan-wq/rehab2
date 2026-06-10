@@ -40,7 +40,7 @@ object AacStarterContentV1 {
 
         starter("thirsty", "ŽEJNA SEM", "Žejna sem.", "drink.thirsty", "DRINK", "drink", listOf("žejna", "piti"), placements = pageOne(4), opensSubicons = true, children = listOf("water", "tea", "coffee", "juice", "drink_fanta", "drink_coca_cola", "drink_pepsi", "drink_milk"), questionByLanguage = mapOf("sl" to "Kaj bi pila?", "uk" to "Що ти хочеш пити?", "en" to "What do you want to drink?"), imagePath = "system/thirsty.png", iconSource = IconSource.SYSTEM),
         starter("hungry", "LAČNA SEM", "Lačna sem.", "food.hungry", "FOOD", "food", listOf("lačna", "jesti"), placements = pageOne(5), opensSubicons = true, children = listOf("soup", "bread", "fruit", "ice_cream", "potato", "rice", "food_yogurt", "food_banana", "food_apple", "food_lunch", "food_dinner", "sweet"), questionByLanguage = mapOf("sl" to "Kaj bi jedla?", "uk" to "Що ти хочеш їсти?", "en" to "What do you want to eat?"), imagePath = "system/hungry.png", iconSource = IconSource.SYSTEM),
-        starter("wc", "WC", "Moram na WC.", "care.wc", "NEED", "care", listOf("wc", "stranišče"), placements = pageOne(7), opensSubicons = true, children = listOf("wc_now", "wc_soon", "wc_help", "dressing_help", "washing_help"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ glede WC?"), imagePath = "system/wc.png", iconSource = IconSource.SYSTEM),
+        starter("wc", "WC", "Moram na WC.", "care.wc", "NEED", "care", listOf("wc", "stranišče"), placements = pageOne(7), opensSubicons = true, children = listOf("wc_wet", "wc_dirty", "wc_wet_and_dirty", "wc_diaper_change", "wc_burning", "wc_pain", "wc_itching", "wc_blood", "wc_please", "wc_now", "wc_very_urgent", "wc_call_nurse"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ glede WC?", "guided_wet" to "Ali si mokra?"), imagePath = "system/wc.png", iconSource = IconSource.SYSTEM),
         starter("tired", "UTRUJENA", "Utrujena sem.", "feeling.tired", "FEELING", "feeling", listOf("utrujena", "počutje"), placements = pageOne(8), visibleUnderIds = listOf("feeling"), imagePath = "system/tired.png", iconSource = IconSource.SYSTEM),
 
         starter("what_root", "KAJ?", "Kaj?", "question.what", "QUESTION", "question", listOf("kaj", "vprašanje"), placements = pageOne(11), opensSubicons = true, children = listOf("activity_group", "what_do", "what_is_this", "what_is_happening", "what_next", "what_did_i_say"), questionByLanguage = mapOf("sl" to "Kaj želiš vprašati?"), imagePath = "system/what.png", iconSource = IconSource.SYSTEM),
@@ -242,6 +242,17 @@ object AacStarterContentV1 {
         starter("dressing_help", "PREOBLAČENJE", "Potrebujem pomoč pri preoblačenju.", "care.dressing", "NEED", "care", listOf("preoblačenje", "nega"), visibleUnderIds = listOf("care")),
         starter("washing_help", "UMIVANJE", "Potrebujem pomoč pri umivanju.", "care.washing", "NEED", "care", listOf("umivanje", "nega"), visibleUnderIds = listOf("care"), imagePath = "custom/body/washing_help.jpg", iconSource = IconSource.CUSTOM),
         starter("body_position", "POPRAVI ME", "Prosim, popravite moj položaj.", "care.position", "NEED", "care", listOf("položaj", "nega"), visibleUnderIds = listOf("care"), imagePath = "custom/body/body_position.jpg", iconSource = IconSource.CUSTOM),
+        starter("wc_wet", "MOKRA SEM", "Mokra sem.", "wc.state.wet", "STATE", "wc", listOf("mokra", "wc"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/mokra_sem.png", iconSource = IconSource.ARASAAC),
+        starter("wc_dirty", "UMAZANA SEM", "Umazana sem.", "wc.state.dirty", "STATE", "wc", listOf("umazana", "wc"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/umazana_sem.png", iconSource = IconSource.ARASAAC),
+        starter("wc_wet_and_dirty", "OBOJE", "Mokra in umazana sem.", "wc.state.wet_dirty", "STATE", "wc", listOf("mokra", "umazana", "wc"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/oboje.png", iconSource = IconSource.ARASAAC),
+        starter("wc_diaper_change", "ZAMENJAVA PLENICE", "Potrebujem menjavo plenice.", "wc.action.diaper_change", "ACTION", "wc", listOf("plenica", "zamenjava"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/zamenjava_plenice.png", iconSource = IconSource.ARASAAC),
+        starter("wc_burning", "PEČE", "Peče me.", "wc.problem.burning", "PROBLEM", "wc", listOf("peče", "wc"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/pece.png", iconSource = IconSource.ARASAAC),
+        starter("wc_pain", "BOLI", "Boli me.", "wc.problem.pain", "PROBLEM", "wc", listOf("boli", "wc"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/boli.png", iconSource = IconSource.ARASAAC),
+        starter("wc_itching", "SRBI", "Srbi me.", "wc.problem.itching", "PROBLEM", "wc", listOf("srbi", "wc"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/srbi.png", iconSource = IconSource.ARASAAC),
+        starter("wc_blood", "KRI", "Vidim kri.", "wc.problem.blood", "PROBLEM", "wc", listOf("kri", "wc"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/kri.png", iconSource = IconSource.ARASAAC),
+        starter("wc_please", "PROSIM", "Prosim.", "wc.modifier.please", "MODIFIER", "wc", listOf("prosim", "wc"), visibleUnderIds = listOf("wc"), imagePath = "system/please.png", iconSource = IconSource.SYSTEM),
+        starter("wc_very_urgent", "ZELO NUJNO", "Zelo nujno.", "wc.modifier.very_urgent", "MODIFIER", "wc", listOf("zelo_nujno", "wc"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/zelo_nujno.png", iconSource = IconSource.ARASAAC),
+        starter("wc_call_nurse", "POKLIČI MEDICINSKO SESTRO", "Prosim, pokličite medicinsko sestro.", "wc.helper.call_nurse", "HELPER", "wc", listOf("medicinska_sestra", "wc"), visibleUnderIds = listOf("wc"), imagePath = "arasaac/wc/poklici_medicinsko_sestro.png", iconSource = IconSource.ARASAAC),
         starter("pillow", "BLAZINA", "Potrebujem blazino.", "care.pillow", "NEED", "care", listOf("blazina", "udobje"), visibleUnderIds = listOf("care")),
         starter("blanket", "ODEJA", "Potrebujem odejo.", "care.blanket", "NEED", "care", listOf("odeja", "udobje"), visibleUnderIds = listOf("care", "need"), imagePath = "custom/body/blanket.jpg", iconSource = IconSource.CUSTOM),
         starter("uncomfortable", "NEUDOBNO", "Neudobno mi je.", "care.uncomfortable", "FEELING", "care", listOf("neudobno", "udobje"), placements = pageOne(25), visibleUnderIds = listOf("care", "problem"), opensSubicons = true, children = listOf("position", "bed", "blanket", "wheelchair", "clothing"), questionByLanguage = mapOf("sl" to "Kaj je neudobno?"), imagePath = "custom/emotion/uncomfortable.jpg", iconSource = IconSource.CUSTOM),
@@ -376,15 +387,19 @@ object AacStarterContentV1 {
             speakTextSl = speech,
             speechText = speech,
             iconSource = iconSource,
+            suggestedIconPath = suggestedIconPath(iconSource, imagePath),
             isRootItem = visibleUnderIds.isEmpty(),
             isHiddenUntilParent = false,
             visibleUnderIds = visibleUnderIds,
+            canAppearInMultipleParents = true,
             children = children,
             placements = placements,
+            protectedPlacement = fixedTopRowPosition != null || id in CORE_V2_PROTECTED_MAIN_IDS,
             questionByLanguage = questionByLanguage,
             addsToSentence = addsToSentence,
             speaksImmediately = !opensSubicons,
             opensSubicons = opensSubicons,
+            semanticType = semanticTypeFor(meaningType),
             meaningId = meaningId,
             meaningType = meaningType,
             meaningGroup = meaningGroup,
@@ -393,6 +408,33 @@ object AacStarterContentV1 {
             searchKeywordsByLanguage = mapOf("sl" to semanticTags),
             priority = START_PRIORITY + STARTER_IDS.indexOf(id).takeIf { it >= 0 }.orZero()
         )
+    }
+
+    private fun semanticTypeFor(meaningType: String): AacSemanticType {
+        return when (meaningType.trim().uppercase()) {
+            "STATE", "FEELING", "CONFIRMATION" -> AacSemanticType.STATE
+            "ACTION", "CORE_ACTION", "QUESTION", "SCENARIO" -> AacSemanticType.ACTION
+            "MODIFIER" -> AacSemanticType.MODIFIER
+            "PEOPLE" -> AacSemanticType.PERSON
+            "PLACE" -> AacSemanticType.LOCATION
+            "TIME" -> AacSemanticType.TIME
+            "PROBLEM", "PAIN" -> AacSemanticType.PROBLEM
+            "HELPER" -> AacSemanticType.HELPER
+            "BODY_PART" -> AacSemanticType.BODY_PART
+            "DRINK" -> AacSemanticType.DRINK
+            "FOOD" -> AacSemanticType.FOOD
+            else -> AacSemanticType.CATEGORY
+        }
+    }
+
+    private fun suggestedIconPath(iconSource: IconSource, imagePath: String): String? {
+        val normalizedPath = imagePath.trim().replace('\\', '/').removePrefix("/")
+        if (normalizedPath.isBlank()) return null
+        return if (normalizedPath.startsWith("NovaRehab/icons/", ignoreCase = true)) {
+            normalizedPath
+        } else {
+            "NovaRehab/icons/$normalizedPath"
+        }
     }
 
     private fun pageOne(position: Int): List<AacPlacement> {
@@ -450,6 +492,28 @@ object AacStarterContentV1 {
     private fun Int?.orZero(): Int = this ?: 0
 
     private const val START_PRIORITY = 100
+    private val CORE_V2_PROTECTED_MAIN_IDS = setOf(
+        "wc",
+        "pain",
+        "thirsty",
+        "hungry",
+        "tired",
+        "i_want",
+        "need",
+        "people",
+        "miss_someone",
+        "call",
+        "feeling",
+        "place_group",
+        "care",
+        "health",
+        "dont_want",
+        "please",
+        "wait",
+        "repeat",
+        "pogovor",
+        "activity_group"
+    )
     private val STARTER_IDS = listOf(
         "no", "yes", "dont_understand", "thank_you", "sorry", "help", "wait", "repeat", "repeat_question", "repeat_last_sentence", "repeat_slower",
         "slower", "slower_little", "slower_much", "understand",
@@ -482,7 +546,7 @@ object AacStarterContentV1 {
         "head", "arm", "leg", "back", "belly", "chest", "throat", "pain_left", "pain_right", "pain_both", "left_side", "right_side", "other_body",
         "pain_light", "pain_medium", "pain_strong", "pain_very", "pain_very_strong", "pain_now", "pain_today", "pain_many_days", "pain_since_today", "pain_since_yesterday", "pain_since_morning", "pain_since_evening",
         "water_detail", "cold_water", "warm_water", "non_sparkling_water", "sparkling_water", "not_thirsty",
-        "not_hungry", "diaper", "wc_now", "wc_soon", "wc_help", "dressing_help", "washing_help", "body_position", "pillow", "blanket", "change_position", "sit_up", "lie_down", "uncomfortable",
+        "not_hungry", "diaper", "wc_now", "wc_soon", "wc_help", "wc_wet", "wc_dirty", "wc_wet_and_dirty", "wc_diaper_change", "wc_burning", "wc_pain", "wc_itching", "wc_blood", "wc_please", "wc_very_urgent", "wc_call_nurse", "dressing_help", "washing_help", "body_position", "pillow", "blanket", "change_position", "sit_up", "lie_down", "uncomfortable",
         "clothing", "shirt", "pants", "socks", "shoes", "jacket", "pajamas", "underwear", "hat", "scarf", "gloves", "bed", "movement_pain",
         "pain_area", "good", "bad", "afraid", "dont_know_problem", "angry", "cold", "hot", "peace",
         "daughter", "son", "therapist", "doctor", "nurse", "who_is_coming", "medicine", "therapy",

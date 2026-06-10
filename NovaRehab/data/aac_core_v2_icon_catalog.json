@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "id": "aac_core_v2_icon_catalog",
+  "versionName": "1.2.632",
+  "iconRoots": {
+    "ARASAAC": "NovaRehab/icons/arasaac/",
+    "PATIENT_PHOTO": "NovaRehab/icons/patient/",
+    "CUSTOM_PHOTO": "NovaRehab/icons/custom/",
+    "PLACE_PHOTO": "NovaRehab/icons/places/",
+    "SYSTEM": "NovaRehab/icons/system/"
+  },
+  "rules": {
+    "duplicateObjects": false,
+    "canAppearInMultipleParentsDefault": true,
+    "protectedPlacementForMainAndFixedIcons": true,
+    "aiMayMoveIcons": false,
+    "fixedTopRow": ["no", "dont_understand", "yes", "thank_you", "sorry"]
+  },
+  "items": [
+    { "id": "no", "labelSl": "NE", "semanticType": "MODIFIER", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/no.png", "priority": 1, "protectedPlacement": true },
+    { "id": "dont_understand", "labelSl": "NE RAZUMEM", "semanticType": "STATE", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/dont_understand.png", "priority": 2, "protectedPlacement": true },
+    { "id": "yes", "labelSl": "DA", "semanticType": "MODIFIER", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/yes.png", "priority": 3, "protectedPlacement": true },
+    { "id": "thank_you", "labelSl": "HVALA", "semanticType": "MODIFIER", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/thank_you.png", "priority": 4, "protectedPlacement": true },
+    { "id": "sorry", "labelSl": "OPROSTI", "semanticType": "MODIFIER", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/sorry.png", "priority": 5, "protectedPlacement": true },
+
+    { "id": "wc", "labelSl": "WC", "semanticType": "CATEGORY", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/wc.png", "priority": 10, "protectedPlacement": true },
+    { "id": "pain", "labelSl": "BOLI ME", "semanticType": "PROBLEM", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/pain.png", "priority": 11, "protectedPlacement": true },
+    { "id": "thirsty", "labelSl": "ŽEJNA SEM", "semanticType": "DRINK", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/thirsty.png", "priority": 12, "protectedPlacement": true },
+    { "id": "hungry", "labelSl": "LAČNA SEM", "semanticType": "FOOD", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/hungry.png", "priority": 13, "protectedPlacement": true },
+    { "id": "tired", "labelSl": "UTRUJENA SEM", "semanticType": "STATE", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/tired.png", "priority": 14, "protectedPlacement": true },
+    { "id": "i_want", "labelSl": "RADA BI", "semanticType": "ACTION", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/core/rada_bi.png", "priority": 15, "protectedPlacement": true },
+    { "id": "need", "labelSl": "POTREBUJEM", "semanticType": "ACTION", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/need.png", "priority": 16, "protectedPlacement": true },
+    { "id": "people", "labelSl": "LJUDJE", "semanticType": "CATEGORY", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/people.png", "priority": 17, "protectedPlacement": true },
+    { "id": "miss_someone", "labelSl": "POGREŠAM", "semanticType": "ACTION", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/miss_someone.png", "priority": 18, "protectedPlacement": true },
+    { "id": "call", "labelSl": "POKLIČI", "semanticType": "ACTION", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/core/poklici.png", "priority": 19, "protectedPlacement": true },
+    { "id": "feeling", "labelSl": "POČUTJE", "semanticType": "CATEGORY", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/core/pocutje.png", "priority": 20, "protectedPlacement": true },
+    { "id": "place_group", "labelSl": "KRAJ", "semanticType": "LOCATION", "iconSource": "PLACE_PHOTO", "suggestedIconPath": "NovaRehab/icons/places/kraj.jpg", "priority": 21, "protectedPlacement": true },
+    { "id": "care", "labelSl": "NEGA", "semanticType": "CATEGORY", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/core/nega.png", "priority": 22, "protectedPlacement": true },
+    { "id": "health", "labelSl": "ZDRAVJE", "semanticType": "CATEGORY", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/core/zdravje.png", "priority": 23, "protectedPlacement": true },
+    { "id": "dont_want", "labelSl": "NE ŽELIM", "semanticType": "ACTION", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/core/ne_zelim.png", "priority": 24, "protectedPlacement": true },
+    { "id": "please", "labelSl": "PROSIM", "semanticType": "MODIFIER", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/please.png", "priority": 25, "protectedPlacement": true },
+    { "id": "wait", "labelSl": "POČAKAJ", "semanticType": "ACTION", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/wait.png", "priority": 26, "protectedPlacement": true },
+    { "id": "repeat", "labelSl": "PONOVI", "semanticType": "ACTION", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/repeat.png", "priority": 27, "protectedPlacement": true },
+    { "id": "pogovor", "labelSl": "KOMUNIKACIJA", "semanticType": "CATEGORY", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/core/komunikacija.png", "priority": 28, "protectedPlacement": true },
+    { "id": "activity_group", "labelSl": "PROSTI ČAS", "semanticType": "CATEGORY", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/core/prosti_cas.png", "priority": 29, "protectedPlacement": true },
+
+    { "id": "wc_wet", "labelSl": "MOKRA SEM", "semanticType": "STATE", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/mokra_sem.png", "priority": 100 },
+    { "id": "wc_dirty", "labelSl": "UMAZANA SEM", "semanticType": "STATE", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/umazana_sem.png", "priority": 101 },
+    { "id": "wc_wet_and_dirty", "labelSl": "OBOJE", "semanticType": "STATE", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/oboje.png", "priority": 102 },
+    { "id": "wc_diaper_change", "labelSl": "ZAMENJAVA PLENICE", "semanticType": "ACTION", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/zamenjava_plenice.png", "priority": 103 },
+    { "id": "wc_burning", "labelSl": "PEČE", "semanticType": "PROBLEM", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/pece.png", "priority": 104 },
+    { "id": "wc_pain", "labelSl": "BOLI", "semanticType": "PROBLEM", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/boli.png", "priority": 105 },
+    { "id": "wc_itching", "labelSl": "SRBI", "semanticType": "PROBLEM", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/srbi.png", "priority": 106 },
+    { "id": "wc_blood", "labelSl": "KRI", "semanticType": "PROBLEM", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/kri.png", "priority": 107 },
+    { "id": "wc_please", "labelSl": "PROSIM", "semanticType": "MODIFIER", "iconSource": "SYSTEM", "suggestedIconPath": "NovaRehab/icons/system/please.png", "priority": 108 },
+    { "id": "wc_now", "labelSl": "TAKOJ", "semanticType": "MODIFIER", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/takoj.png", "priority": 109 },
+    { "id": "wc_very_urgent", "labelSl": "ZELO NUJNO", "semanticType": "MODIFIER", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/zelo_nujno.png", "priority": 110 },
+    { "id": "wc_call_nurse", "labelSl": "POKLIČI MEDICINSKO SESTRO", "semanticType": "HELPER", "iconSource": "ARASAAC", "suggestedIconPath": "NovaRehab/icons/arasaac/wc/poklici_medicinsko_sestro.png", "priority": 111 }
+  ],
+  "guidedQuestions": [
+    {
+      "id": "wc_wet_question",
+      "questionSl": "Ali si mokra?",
+      "yesStoresSemanticSelection": "wc_wet",
+      "noRejectsQuestion": true,
+      "usesFixedDaNeRow": true
+    }
+  ]
+}

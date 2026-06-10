@@ -6,6 +6,10 @@ object AacSentenceBuilder {
     fun buildSlovenianSentence(items: List<AacItem>): String {
         if (items.isEmpty()) return ""
 
+        if (AacWcV1SentenceBuilder.canBuild(items)) {
+            AacWcV1SentenceBuilder.buildSentence(items).takeIf { it.isNotBlank() }?.let { return it }
+        }
+
         simpleSentence(items)?.let { return it }
 
         val keys = items.flatMap(::itemKeys).toSet()
