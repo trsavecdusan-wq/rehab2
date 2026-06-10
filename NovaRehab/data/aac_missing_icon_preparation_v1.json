@@ -1,0 +1,566 @@
+﻿{
+    "metadata":  {
+                     "schemaVersion":  1,
+                     "preparationListId":  "aac_missing_icon_preparation_v1",
+                     "versionName":  "1.2.638",
+                     "generatedFor":  "NovaRehab Missing Icon Preparation List V1",
+                     "sourceAudit":  "NovaRehab/data/aac_icon_file_audit_v1.json",
+                     "sourceCatalog":  "NovaRehab/data/aac_icon_master_catalog_v1.json",
+                     "sourceObjectLibrary":  "NovaRehab/data/aac_object_library_v1.json",
+                     "runtimeImpact":  "none",
+                     "notes":  [
+                                   "Human-readable preparation list for missing/planned AAC icons.",
+                                   "Does not modify master catalog or object library.",
+                                   "Does not add image files.",
+                                   "Does not affect runtime behavior."
+                               ]
+                 },
+    "summary":  {
+                    "totalPreparationItems":  25,
+                    "whatToPhotograph":  {
+                                             "patientPhotos":  {
+                                                                   "count":  0,
+                                                                   "iconIds":  [
+
+                                                                               ],
+                                                                   "labelsSl":  [
+
+                                                                                ]
+                                                               },
+                                             "placePhotos":  {
+                                                                 "count":  1,
+                                                                 "iconIds":  [
+                                                                                 "icon_place_group"
+                                                                             ],
+                                                                 "labelsSl":  [
+                                                                                  "KRAJ"
+                                                                              ]
+                                                             }
+                                         },
+                    "whatToAddAsCustomObjectPhoto":  {
+                                                         "count":  5,
+                                                         "iconIds":  [
+                                                                         "icon_restaurant",
+                                                                         "icon_vending_drinks",
+                                                                         "icon_transport",
+                                                                         "icon_shop",
+                                                                         "icon_vending_coffee_tea"
+                                                                     ],
+                                                         "labelsSl":  [
+                                                                          "RESTAVRACIJA",
+                                                                          "AVTOMAT PIJAČ",
+                                                                          "PREVOZ",
+                                                                          "TRGOVINA",
+                                                                          "AVTOMAT KAVA/ČAJ"
+                                                                      ]
+                                                     },
+                    "whatToFindInArasaacOrSoca":  {
+                                                      "count":  19,
+                                                      "iconIds":  [
+                                                                      "icon_wc_wet",
+                                                                      "icon_pogovor",
+                                                                      "icon_call",
+                                                                      "icon_wc_call_nurse",
+                                                                      "icon_dont_want",
+                                                                      "icon_wc_wet_and_dirty",
+                                                                      "icon_wc_dirty",
+                                                                      "icon_wc_now",
+                                                                      "icon_activity_group",
+                                                                      "icon_feeling",
+                                                                      "icon_wc_pain",
+                                                                      "icon_wc_very_urgent",
+                                                                      "icon_wc_diaper_change",
+                                                                      "icon_wc_itching",
+                                                                      "icon_wc_blood",
+                                                                      "icon_i_want",
+                                                                      "icon_health",
+                                                                      "icon_wc_burning",
+                                                                      "icon_care"
+                                                                  ],
+                                                      "labelsSl":  [
+                                                                       "MOKRA SEM",
+                                                                       "KOMUNIKACIJA",
+                                                                       "POKLIČI",
+                                                                       "POKLIČI MEDICINSKO SESTRO",
+                                                                       "NE ŽELIM",
+                                                                       "OBOJE",
+                                                                       "UMAZANA SEM",
+                                                                       "TAKOJ",
+                                                                       "PROSTI ČAS",
+                                                                       "POČUTJE",
+                                                                       "BOLI",
+                                                                       "ZELO NUJNO",
+                                                                       "ZAMENJAVA PLENICE",
+                                                                       "SRBI",
+                                                                       "KRI",
+                                                                       "RADA BI",
+                                                                       "ZDRAVJE",
+                                                                       "PEČE",
+                                                                       "NEGA"
+                                                                   ]
+                                                  },
+                    "whatCanTemporarilyUseFallback":  {
+                                                          "count":  25,
+                                                          "iconIds":  [
+                                                                          "icon_transport",
+                                                                          "icon_restaurant",
+                                                                          "icon_vending_drinks",
+                                                                          "icon_shop",
+                                                                          "icon_vending_coffee_tea",
+                                                                          "icon_wc_wet",
+                                                                          "icon_activity_group",
+                                                                          "icon_wc_wet_and_dirty",
+                                                                          "icon_wc_dirty",
+                                                                          "icon_pogovor",
+                                                                          "icon_dont_want",
+                                                                          "icon_wc_now",
+                                                                          "icon_wc_call_nurse",
+                                                                          "icon_wc_very_urgent",
+                                                                          "icon_wc_blood",
+                                                                          "icon_wc_burning",
+                                                                          "icon_wc_diaper_change",
+                                                                          "icon_wc_itching",
+                                                                          "icon_wc_pain",
+                                                                          "icon_health",
+                                                                          "icon_feeling",
+                                                                          "icon_call",
+                                                                          "icon_care",
+                                                                          "icon_place_group",
+                                                                          "icon_i_want"
+                                                                      ]
+                                                      },
+                    "byPreparationGroup":  {
+                                               "PATIENT_PHOTO":  0,
+                                               "PLACE_PHOTO":  1,
+                                               "CUSTOM_OBJECT_PHOTO":  5,
+                                               "ARASAAC_OR_SOCA":  19
+                                           }
+                },
+    "preparationItems":  [
+                             {
+                                 "iconId":  "icon_transport",
+                                 "objectIds":  [
+                                                   "transport"
+                                               ],
+                                 "labelSl":  [
+                                                 "PREVOZ"
+                                             ],
+                                 "source":  "CUSTOM_PHOTO",
+                                 "expectedPath":  "NovaRehab/icons/custom/real_world/transport.jpg",
+                                 "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                                 "preparationGroup":  "CUSTOM_OBJECT_PHOTO",
+                                 "humanInstructionSl":  "Dodaj jasno realno fotografijo predmeta za: PREVOZ. Slika naj bo enostavna, brez motečega ozadja, in shranjena na pričakovano pot.",
+                                 "priority":  804,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi besedilno oznako ali najbližjo obstoječo kategorijsko ikono."
+                             },
+                             {
+                                 "iconId":  "icon_restaurant",
+                                 "objectIds":  [
+                                                   "restaurant"
+                                               ],
+                                 "labelSl":  [
+                                                 "RESTAVRACIJA"
+                                             ],
+                                 "source":  "CUSTOM_PHOTO",
+                                 "expectedPath":  "NovaRehab/icons/custom/real_world/restaurant.jpg",
+                                 "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                                 "preparationGroup":  "CUSTOM_OBJECT_PHOTO",
+                                 "humanInstructionSl":  "Dodaj jasno realno fotografijo predmeta za: RESTAVRACIJA. Slika naj bo enostavna, brez motečega ozadja, in shranjena na pričakovano pot.",
+                                 "priority":  803,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi besedilno oznako ali najbližjo obstoječo kategorijsko ikono."
+                             },
+                             {
+                                 "iconId":  "icon_vending_drinks",
+                                 "objectIds":  [
+                                                   "vending_drinks"
+                                               ],
+                                 "labelSl":  [
+                                                 "AVTOMAT PIJAČ"
+                                             ],
+                                 "source":  "CUSTOM_PHOTO",
+                                 "expectedPath":  "NovaRehab/icons/custom/real_world/vending_drinks.jpg",
+                                 "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                                 "preparationGroup":  "CUSTOM_OBJECT_PHOTO",
+                                 "humanInstructionSl":  "Dodaj jasno realno fotografijo predmeta za: AVTOMAT PIJAČ. Slika naj bo enostavna, brez motečega ozadja, in shranjena na pričakovano pot.",
+                                 "priority":  800,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi besedilno oznako ali najbližjo obstoječo kategorijsko ikono."
+                             },
+                             {
+                                 "iconId":  "icon_shop",
+                                 "objectIds":  [
+                                                   "shop"
+                                               ],
+                                 "labelSl":  [
+                                                 "TRGOVINA"
+                                             ],
+                                 "source":  "CUSTOM_PHOTO",
+                                 "expectedPath":  "NovaRehab/icons/custom/real_world/shop.jpg",
+                                 "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                                 "preparationGroup":  "CUSTOM_OBJECT_PHOTO",
+                                 "humanInstructionSl":  "Dodaj jasno realno fotografijo predmeta za: TRGOVINA. Slika naj bo enostavna, brez motečega ozadja, in shranjena na pričakovano pot.",
+                                 "priority":  802,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi besedilno oznako ali najbližjo obstoječo kategorijsko ikono."
+                             },
+                             {
+                                 "iconId":  "icon_vending_coffee_tea",
+                                 "objectIds":  [
+                                                   "vending_coffee_tea"
+                                               ],
+                                 "labelSl":  [
+                                                 "AVTOMAT KAVA/ČAJ"
+                                             ],
+                                 "source":  "CUSTOM_PHOTO",
+                                 "expectedPath":  "NovaRehab/icons/custom/real_world/vending_coffee_tea.jpg",
+                                 "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                                 "preparationGroup":  "CUSTOM_OBJECT_PHOTO",
+                                 "humanInstructionSl":  "Dodaj jasno realno fotografijo predmeta za: AVTOMAT KAVA/ČAJ. Slika naj bo enostavna, brez motečega ozadja, in shranjena na pričakovano pot.",
+                                 "priority":  801,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi besedilno oznako ali najbližjo obstoječo kategorijsko ikono."
+                             },
+                             {
+                                 "iconId":  "icon_wc_wet",
+                                 "objectIds":  [
+                                                   "wc_wet"
+                                               ],
+                                 "labelSl":  [
+                                                 "MOKRA SEM"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/mokra_sem.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: MOKRA SEM. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  100,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_activity_group",
+                                 "objectIds":  [
+                                                   "activity_group"
+                                               ],
+                                 "labelSl":  [
+                                                 "PROSTI ČAS"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/core/prosti_cas.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: PROSTI ČAS. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  29,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_wet_and_dirty",
+                                 "objectIds":  [
+                                                   "wc_wet_and_dirty"
+                                               ],
+                                 "labelSl":  [
+                                                 "OBOJE"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/oboje.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: OBOJE. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  102,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_dirty",
+                                 "objectIds":  [
+                                                   "wc_dirty"
+                                               ],
+                                 "labelSl":  [
+                                                 "UMAZANA SEM"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/umazana_sem.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: UMAZANA SEM. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  101,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_pogovor",
+                                 "objectIds":  [
+                                                   "pogovor"
+                                               ],
+                                 "labelSl":  [
+                                                 "KOMUNIKACIJA"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/core/komunikacija.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: KOMUNIKACIJA. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  28,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_dont_want",
+                                 "objectIds":  [
+                                                   "dont_want"
+                                               ],
+                                 "labelSl":  [
+                                                 "NE ŽELIM"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/core/ne_zelim.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: NE ŽELIM. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  24,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_now",
+                                 "objectIds":  [
+                                                   "wc_now"
+                                               ],
+                                 "labelSl":  [
+                                                 "TAKOJ"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/takoj.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: TAKOJ. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  109,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_call_nurse",
+                                 "objectIds":  [
+                                                   "wc_call_nurse"
+                                               ],
+                                 "labelSl":  [
+                                                 "POKLIČI MEDICINSKO SESTRO"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/poklici_medicinsko_sestro.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: POKLIČI MEDICINSKO SESTRO. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  111,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_very_urgent",
+                                 "objectIds":  [
+                                                   "wc_very_urgent"
+                                               ],
+                                 "labelSl":  [
+                                                 "ZELO NUJNO"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/zelo_nujno.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: ZELO NUJNO. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  110,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_blood",
+                                 "objectIds":  [
+                                                   "wc_blood"
+                                               ],
+                                 "labelSl":  [
+                                                 "KRI"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/kri.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: KRI. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  107,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_burning",
+                                 "objectIds":  [
+                                                   "wc_burning"
+                                               ],
+                                 "labelSl":  [
+                                                 "PEČE"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/pece.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: PEČE. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  104,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_diaper_change",
+                                 "objectIds":  [
+                                                   "wc_diaper_change"
+                                               ],
+                                 "labelSl":  [
+                                                 "ZAMENJAVA PLENICE"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/zamenjava_plenice.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: ZAMENJAVA PLENICE. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  103,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_itching",
+                                 "objectIds":  [
+                                                   "wc_itching"
+                                               ],
+                                 "labelSl":  [
+                                                 "SRBI"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/srbi.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: SRBI. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  106,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_wc_pain",
+                                 "objectIds":  [
+                                                   "wc_pain"
+                                               ],
+                                 "labelSl":  [
+                                                 "BOLI"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/wc/boli.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: BOLI. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  105,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_health",
+                                 "objectIds":  [
+                                                   "health"
+                                               ],
+                                 "labelSl":  [
+                                                 "ZDRAVJE"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/core/zdravje.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: ZDRAVJE. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  23,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_feeling",
+                                 "objectIds":  [
+                                                   "feeling"
+                                               ],
+                                 "labelSl":  [
+                                                 "POČUTJE"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/core/pocutje.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: POČUTJE. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  20,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_call",
+                                 "objectIds":  [
+                                                   "call"
+                                               ],
+                                 "labelSl":  [
+                                                 "POKLIČI"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/core/poklici.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: POKLIČI. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  19,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_care",
+                                 "objectIds":  [
+                                                   "care"
+                                               ],
+                                 "labelSl":  [
+                                                 "NEGA"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/core/nega.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: NEGA. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  22,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             },
+                             {
+                                 "iconId":  "icon_place_group",
+                                 "objectIds":  [
+                                                   "place_group"
+                                               ],
+                                 "labelSl":  [
+                                                 "KRAJ"
+                                             ],
+                                 "source":  "PLACE_PHOTO",
+                                 "expectedPath":  "NovaRehab/icons/places/kraj.jpg",
+                                 "recommendedAction":  "TAKE_PLACE_PHOTO",
+                                 "preparationGroup":  "PLACE_PHOTO",
+                                 "humanInstructionSl":  "Posnemi realno fotografijo lokacije za: KRAJ. Fotografija mora prikazovati dejansko mesto, ki ga Lana prepozna.",
+                                 "priority":  21,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi generično KRAJ/lokacija ikono, dokler ni posneta realna lokacija."
+                             },
+                             {
+                                 "iconId":  "icon_i_want",
+                                 "objectIds":  [
+                                                   "i_want"
+                                               ],
+                                 "labelSl":  [
+                                                 "RADA BI"
+                                             ],
+                                 "source":  "ARASAAC",
+                                 "expectedPath":  "NovaRehab/icons/arasaac/core/rada_bi.png",
+                                 "recommendedAction":  "ADD_ARASAAC_ICON",
+                                 "preparationGroup":  "ARASAAC_OR_SOCA",
+                                 "humanInstructionSl":  "Poišči ali pripravi ikono za: RADA BI. Ikona je lahko ARASAAC ali SOCA, glede na terapevtsko jasnost in Lanino razumevanje.",
+                                 "priority":  15,
+                                 "canUseTemporaryFallback":  true,
+                                 "fallbackSuggestion":  "Začasno uporabi sistemski fallback ali besedilno oznako, dokler ni izbrana terapevtsko jasna ikona."
+                             }
+                         ]
+}
