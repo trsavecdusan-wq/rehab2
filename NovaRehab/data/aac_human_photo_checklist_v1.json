@@ -1,0 +1,733 @@
+﻿{
+    "metadata":  {
+                     "version":  "v1.2.640",
+                     "purpose":  "Human-readable checklist for missing AAC icon/photo preparation",
+                     "runtimeImpact":  "none",
+                     "sourcePreparationList":  "NovaRehab/data/aac_missing_icon_preparation_v1.json",
+                     "sourceAudit":  "NovaRehab/data/aac_icon_file_audit_v1.json",
+                     "sourceCatalog":  "NovaRehab/data/aac_icon_master_catalog_v1.json",
+                     "sourceObjectLibrary":  "NovaRehab/data/aac_object_library_v1.json",
+                     "notes":  [
+                                   "Data-only checklist for preparing missing AAC icons and photos.",
+                                   "Does not modify runtime, catalog, object library, or image files.",
+                                   "Does not add new main icons."
+                               ]
+                 },
+    "sections":  {
+                     "placePhotos":  [
+                                         {
+                                             "labelSl":  [
+                                                             "KRAJ"
+                                                         ],
+                                             "objectIds":  [
+                                                               "place_group"
+                                                           ],
+                                             "targetPath":  "NovaRehab/icons/places/kraj.jpg",
+                                             "instructionSl":  "Fotografiraj lokacijo za: KRAJ.",
+                                             "priority":  21,
+                                             "photoGuidanceSl":  "Realna fotografija lokacije, iz perspektive pacientke, če je možno.",
+                                             "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/places/kraj.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                             "usableForTabletNow":  false
+                                         }
+                                     ],
+                     "customObjectPhotos":  [
+                                                {
+                                                    "labelSl":  [
+                                                                    "PREVOZ"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "transport"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/custom/real_world/transport.jpg",
+                                                    "instructionSl":  "Dodaj custom/object sliko za: PREVOZ.",
+                                                    "priority":  804,
+                                                    "photoGuidanceSl":  "Jasna realna fotografija predmeta, brez zmede v ozadju.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/transport.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "RESTAVRACIJA"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "restaurant"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/custom/real_world/restaurant.jpg",
+                                                    "instructionSl":  "Dodaj custom/object sliko za: RESTAVRACIJA.",
+                                                    "priority":  803,
+                                                    "photoGuidanceSl":  "Jasna realna fotografija predmeta, brez zmede v ozadju.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/restaurant.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "TRGOVINA"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "shop"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/custom/real_world/shop.jpg",
+                                                    "instructionSl":  "Dodaj custom/object sliko za: TRGOVINA.",
+                                                    "priority":  802,
+                                                    "photoGuidanceSl":  "Jasna realna fotografija predmeta, brez zmede v ozadju.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/shop.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "AVTOMAT KAVA/ČAJ"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "vending_coffee_tea"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/custom/real_world/vending_coffee_tea.jpg",
+                                                    "instructionSl":  "Dodaj custom/object sliko za: AVTOMAT KAVA/ČAJ.",
+                                                    "priority":  801,
+                                                    "photoGuidanceSl":  "Jasna realna fotografija predmeta, brez zmede v ozadju.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/vending_coffee_tea.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "AVTOMAT PIJAČ"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "vending_drinks"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/custom/real_world/vending_drinks.jpg",
+                                                    "instructionSl":  "Dodaj custom/object sliko za: AVTOMAT PIJAČ.",
+                                                    "priority":  800,
+                                                    "photoGuidanceSl":  "Jasna realna fotografija predmeta, brez zmede v ozadju.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/vending_drinks.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                }
+                                            ],
+                     "arasaacOrSocaIcons":  [
+                                                {
+                                                    "labelSl":  [
+                                                                    "POKLIČI MEDICINSKO SESTRO"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_call_nurse"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/poklici_medicinsko_sestro.png",
+                                                    "instructionSl":  "Poišči ikono za: POKLIČI MEDICINSKO SESTRO.",
+                                                    "priority":  111,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/poklici_medicinsko_sestro.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "ZELO NUJNO"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_very_urgent"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/zelo_nujno.png",
+                                                    "instructionSl":  "Poišči ikono za: ZELO NUJNO.",
+                                                    "priority":  110,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/zelo_nujno.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "TAKOJ"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_now"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/takoj.png",
+                                                    "instructionSl":  "Poišči ikono za: TAKOJ.",
+                                                    "priority":  109,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/takoj.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "KRI"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_blood"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/kri.png",
+                                                    "instructionSl":  "Poišči ikono za: KRI.",
+                                                    "priority":  107,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/kri.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "SRBI"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_itching"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/srbi.png",
+                                                    "instructionSl":  "Poišči ikono za: SRBI.",
+                                                    "priority":  106,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/srbi.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "BOLI"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_pain"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/boli.png",
+                                                    "instructionSl":  "Poišči ikono za: BOLI.",
+                                                    "priority":  105,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/boli.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "PEČE"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_burning"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/pece.png",
+                                                    "instructionSl":  "Poišči ikono za: PEČE.",
+                                                    "priority":  104,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/pece.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "ZAMENJAVA PLENICE"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_diaper_change"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/zamenjava_plenice.png",
+                                                    "instructionSl":  "Poišči ikono za: ZAMENJAVA PLENICE.",
+                                                    "priority":  103,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/zamenjava_plenice.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "OBOJE"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_wet_and_dirty"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/oboje.png",
+                                                    "instructionSl":  "Poišči ikono za: OBOJE.",
+                                                    "priority":  102,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/oboje.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "UMAZANA SEM"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_dirty"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/umazana_sem.png",
+                                                    "instructionSl":  "Poišči ikono za: UMAZANA SEM.",
+                                                    "priority":  101,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/umazana_sem.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "MOKRA SEM"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "wc_wet"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/wc/mokra_sem.png",
+                                                    "instructionSl":  "Poišči ikono za: MOKRA SEM.",
+                                                    "priority":  100,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/mokra_sem.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "PROSTI ČAS"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "activity_group"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/core/prosti_cas.png",
+                                                    "instructionSl":  "Poišči ikono za: PROSTI ČAS.",
+                                                    "priority":  29,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/prosti_cas.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "KOMUNIKACIJA"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "pogovor"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/core/komunikacija.png",
+                                                    "instructionSl":  "Poišči ikono za: KOMUNIKACIJA.",
+                                                    "priority":  28,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/komunikacija.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "NE ŽELIM"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "dont_want"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/core/ne_zelim.png",
+                                                    "instructionSl":  "Poišči ikono za: NE ŽELIM.",
+                                                    "priority":  24,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/ne_zelim.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "ZDRAVJE"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "health"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/core/zdravje.png",
+                                                    "instructionSl":  "Poišči ikono za: ZDRAVJE.",
+                                                    "priority":  23,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/zdravje.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "NEGA"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "care"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/core/nega.png",
+                                                    "instructionSl":  "Poišči ikono za: NEGA.",
+                                                    "priority":  22,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/nega.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "POČUTJE"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "feeling"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/core/pocutje.png",
+                                                    "instructionSl":  "Poišči ikono za: POČUTJE.",
+                                                    "priority":  20,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/pocutje.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "POKLIČI"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "call"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/core/poklici.png",
+                                                    "instructionSl":  "Poišči ikono za: POKLIČI.",
+                                                    "priority":  19,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/poklici.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                },
+                                                {
+                                                    "labelSl":  [
+                                                                    "RADA BI"
+                                                                ],
+                                                    "objectIds":  [
+                                                                      "i_want"
+                                                                  ],
+                                                    "targetPath":  "NovaRehab/icons/arasaac/core/rada_bi.png",
+                                                    "instructionSl":  "Poišči ikono za: RADA BI.",
+                                                    "priority":  15,
+                                                    "photoGuidanceSl":  "Izberi terapevtsko najbolj jasno ikono; SOCA ima prednost, če jo Lana že pozna.",
+                                                    "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/rada_bi.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                    "usableForTabletNow":  false
+                                                }
+                                            ],
+                     "canWaitFallbacks":  [
+                                              {
+                                                  "labelSl":  [
+                                                                  "PREVOZ"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "transport"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/custom/real_world/transport.jpg",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča besedilna oznaka ali najbližja kategorijska ikona.",
+                                                  "priority":  804,
+                                                  "photoGuidanceSl":  "Fallback je sprejemljiv za prvi test, prava fotografija pa bo boljša za vsakdanjo uporabo.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/transport.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "RESTAVRACIJA"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "restaurant"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/custom/real_world/restaurant.jpg",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča besedilna oznaka ali najbližja kategorijska ikona.",
+                                                  "priority":  803,
+                                                  "photoGuidanceSl":  "Fallback je sprejemljiv za prvi test, prava fotografija pa bo boljša za vsakdanjo uporabo.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/restaurant.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "TRGOVINA"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "shop"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/custom/real_world/shop.jpg",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča besedilna oznaka ali najbližja kategorijska ikona.",
+                                                  "priority":  802,
+                                                  "photoGuidanceSl":  "Fallback je sprejemljiv za prvi test, prava fotografija pa bo boljša za vsakdanjo uporabo.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/shop.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "AVTOMAT KAVA/ČAJ"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "vending_coffee_tea"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/custom/real_world/vending_coffee_tea.jpg",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča besedilna oznaka ali najbližja kategorijska ikona.",
+                                                  "priority":  801,
+                                                  "photoGuidanceSl":  "Fallback je sprejemljiv za prvi test, prava fotografija pa bo boljša za vsakdanjo uporabo.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/vending_coffee_tea.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "AVTOMAT PIJAČ"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "vending_drinks"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/custom/real_world/vending_drinks.jpg",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča besedilna oznaka ali najbližja kategorijska ikona.",
+                                                  "priority":  800,
+                                                  "photoGuidanceSl":  "Fallback je sprejemljiv za prvi test, prava fotografija pa bo boljša za vsakdanjo uporabo.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/custom/real_world/vending_drinks.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "POKLIČI MEDICINSKO SESTRO"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_call_nurse"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/poklici_medicinsko_sestro.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  111,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/poklici_medicinsko_sestro.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "ZELO NUJNO"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_very_urgent"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/zelo_nujno.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  110,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/zelo_nujno.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "TAKOJ"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_now"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/takoj.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  109,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/takoj.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "KRI"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_blood"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/kri.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  107,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/kri.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "SRBI"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_itching"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/srbi.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  106,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/srbi.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "BOLI"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_pain"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/boli.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  105,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/boli.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "PEČE"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_burning"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/pece.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  104,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/pece.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "ZAMENJAVA PLENICE"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_diaper_change"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/zamenjava_plenice.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  103,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/zamenjava_plenice.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "OBOJE"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_wet_and_dirty"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/oboje.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  102,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/oboje.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "UMAZANA SEM"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_dirty"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/umazana_sem.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  101,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/umazana_sem.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "MOKRA SEM"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "wc_wet"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/wc/mokra_sem.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  100,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/wc/mokra_sem.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "PROSTI ČAS"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "activity_group"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/core/prosti_cas.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  29,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/prosti_cas.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "KOMUNIKACIJA"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "pogovor"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/core/komunikacija.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  28,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/komunikacija.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "NE ŽELIM"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "dont_want"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/core/ne_zelim.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  24,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/ne_zelim.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "ZDRAVJE"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "health"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/core/zdravje.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  23,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/zdravje.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "NEGA"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "care"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/core/nega.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  22,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/nega.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "KRAJ"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "place_group"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/places/kraj.jpg",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča obstoječa lokacijska/kategorijska ikona.",
+                                                  "priority":  21,
+                                                  "photoGuidanceSl":  "Fallback je sprejemljiv samo začasno; realna fotografija bo bolj prepoznavna.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/places/kraj.jpg. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "POČUTJE"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "feeling"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/core/pocutje.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  20,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/pocutje.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "POKLIČI"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "call"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/core/poklici.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  19,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/poklici.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              },
+                                              {
+                                                  "labelSl":  [
+                                                                  "RADA BI"
+                                                              ],
+                                                  "objectIds":  [
+                                                                    "i_want"
+                                                                ],
+                                                  "targetPath":  "NovaRehab/icons/arasaac/core/rada_bi.png",
+                                                  "instructionSl":  "Ni nujno za prvi test, če začasno zadošča sistemski fallback ali besedilna oznaka.",
+                                                  "priority":  15,
+                                                  "photoGuidanceSl":  "Fallback lahko počaka do izbire terapevtsko jasne ARASAAC/SOCA ikone.",
+                                                  "namingRuleSl":  "Shrani točno na pot: NovaRehab/icons/arasaac/core/rada_bi.png. Ime datoteke in mapa naj ostaneta enaka kot v katalogu.",
+                                                  "usableForTabletNow":  true
+                                              }
+                                          ]
+                 },
+    "summary":  {
+                    "placePhotos":  1,
+                    "customObjectPhotos":  5,
+                    "arasaacOrSocaIcons":  19,
+                    "canWaitFallbacks":  25,
+                    "totalImmediatePreparationItems":  25
+                }
+}
