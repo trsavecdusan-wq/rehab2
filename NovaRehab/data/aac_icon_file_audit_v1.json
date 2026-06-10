@@ -1,0 +1,429 @@
+﻿{
+    "metadata":  {
+                     "schemaVersion":  1,
+                     "auditId":  "aac_icon_file_audit_v1",
+                     "versionName":  "1.2.636",
+                     "generatedFor":  "NovaRehab AAC Icon File Audit V1",
+                     "sourceCatalog":  "NovaRehab/data/aac_icon_master_catalog_v1.json",
+                     "sourceObjectLibrary":  "NovaRehab/data/aac_object_library_v1.json",
+                     "runtimeImpact":  "none",
+                     "notes":  [
+                                   "Data-only audit of missing/planned icon files.",
+                                   "Does not modify the icon master catalog.",
+                                   "Does not add, remove, or rename image files.",
+                                   "Does not affect APK runtime behavior."
+                               ]
+                 },
+    "summary":  {
+                    "missingOrPlannedCount":  25,
+                    "existingExpectedPaths":  0,
+                    "patientPhotosToTake":  0,
+                    "customObjectPhotosToAdd":  5,
+                    "arasaacOrSocaIconsToAdd":  19,
+                    "placePhotosToTake":  1,
+                    "systemIconsToAdd":  0,
+                    "catalogPathFixes":  0
+                },
+    "icons":  [
+                  {
+                      "iconId":  "icon_wc_diaper_change",
+                      "objectIds":  [
+                                        "wc_diaper_change"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "ZAMENJAVA PLENICE"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/zamenjava_plenice.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  103,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_itching",
+                      "objectIds":  [
+                                        "wc_itching"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "SRBI"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/srbi.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  106,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_pain",
+                      "objectIds":  [
+                                        "wc_pain"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "BOLI"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/boli.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  105,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_very_urgent",
+                      "objectIds":  [
+                                        "wc_very_urgent"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "ZELO NUJNO"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/zelo_nujno.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  110,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_blood",
+                      "objectIds":  [
+                                        "wc_blood"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "KRI"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/kri.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  107,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_burning",
+                      "objectIds":  [
+                                        "wc_burning"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "PEČE"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/pece.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  104,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_care",
+                      "objectIds":  [
+                                        "care"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "NEGA"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/core/nega.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  22,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_place_group",
+                      "objectIds":  [
+                                        "place_group"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "KRAJ"
+                                         ],
+                      "source":  "PLACE_PHOTO",
+                      "expectedPath":  "NovaRehab/icons/places/kraj.jpg",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "TAKE_PLACE_PHOTO",
+                      "priority":  21,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_i_want",
+                      "objectIds":  [
+                                        "i_want"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "RADA BI"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/core/rada_bi.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  15,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_health",
+                      "objectIds":  [
+                                        "health"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "ZDRAVJE"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/core/zdravje.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  23,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_feeling",
+                      "objectIds":  [
+                                        "feeling"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "POČUTJE"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/core/pocutje.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  20,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_call",
+                      "objectIds":  [
+                                        "call"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "POKLIČI"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/core/poklici.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  19,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_call_nurse",
+                      "objectIds":  [
+                                        "wc_call_nurse"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "POKLIČI MEDICINSKO SESTRO"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/poklici_medicinsko_sestro.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  111,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_shop",
+                      "objectIds":  [
+                                        "shop"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "TRGOVINA"
+                                         ],
+                      "source":  "CUSTOM_PHOTO",
+                      "expectedPath":  "NovaRehab/icons/custom/real_world/shop.jpg",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                      "priority":  802,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_vending_coffee_tea",
+                      "objectIds":  [
+                                        "vending_coffee_tea"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "AVTOMAT KAVA/ČAJ"
+                                         ],
+                      "source":  "CUSTOM_PHOTO",
+                      "expectedPath":  "NovaRehab/icons/custom/real_world/vending_coffee_tea.jpg",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                      "priority":  801,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_wet",
+                      "objectIds":  [
+                                        "wc_wet"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "MOKRA SEM"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/mokra_sem.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  100,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_transport",
+                      "objectIds":  [
+                                        "transport"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "PREVOZ"
+                                         ],
+                      "source":  "CUSTOM_PHOTO",
+                      "expectedPath":  "NovaRehab/icons/custom/real_world/transport.jpg",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                      "priority":  804,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_restaurant",
+                      "objectIds":  [
+                                        "restaurant"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "RESTAVRACIJA"
+                                         ],
+                      "source":  "CUSTOM_PHOTO",
+                      "expectedPath":  "NovaRehab/icons/custom/real_world/restaurant.jpg",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                      "priority":  803,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_vending_drinks",
+                      "objectIds":  [
+                                        "vending_drinks"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "AVTOMAT PIJAČ"
+                                         ],
+                      "source":  "CUSTOM_PHOTO",
+                      "expectedPath":  "NovaRehab/icons/custom/real_world/vending_drinks.jpg",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_CUSTOM_PHOTO",
+                      "priority":  800,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_pogovor",
+                      "objectIds":  [
+                                        "pogovor"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "KOMUNIKACIJA"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/core/komunikacija.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  28,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_dont_want",
+                      "objectIds":  [
+                                        "dont_want"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "NE ŽELIM"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/core/ne_zelim.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  24,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_now",
+                      "objectIds":  [
+                                        "wc_now"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "TAKOJ"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/takoj.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  109,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_activity_group",
+                      "objectIds":  [
+                                        "activity_group"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "PROSTI ČAS"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/core/prosti_cas.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  29,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_wet_and_dirty",
+                      "objectIds":  [
+                                        "wc_wet_and_dirty"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "OBOJE"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/oboje.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  102,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_dirty",
+                      "objectIds":  [
+                                        "wc_dirty"
+                                    ],
+                      "objectLabelsSl":  [
+                                             "UMAZANA SEM"
+                                         ],
+                      "source":  "ARASAAC",
+                      "expectedPath":  "NovaRehab/icons/arasaac/wc/umazana_sem.png",
+                      "currentStatus":  "missing",
+                      "fileExists":  false,
+                      "recommendedAction":  "ADD_ARASAAC_ICON",
+                      "priority":  101,
+                      "notes":  "Referenced icon file is not present at expected path. Planned path; file is not present in repo."
+                  }
+              ]
+}
