@@ -1,0 +1,1689 @@
+﻿{
+    "metadata":  {
+                     "schemaVersion":  1,
+                     "catalogId":  "aac_icon_master_catalog_v1",
+                     "versionName":  "1.2.634",
+                     "runtimeImpact":  "none",
+                     "statusRules":  {
+                                         "available":  "file exists locally",
+                                         "missing":  "planned path but file is absent",
+                                         "planned":  "future path or source not yet selected"
+                                     },
+                     "iconRoots":  {
+                                       "ARASAAC":  "NovaRehab/icons/arasaac/",
+                                       "PATIENT_PHOTO":  "NovaRehab/icons/patient/",
+                                       "CUSTOM_PHOTO":  "NovaRehab/icons/custom/",
+                                       "PLACE_PHOTO":  "NovaRehab/icons/places/",
+                                       "SYSTEM":  "NovaRehab/icons/system/"
+                                   },
+                     "notes":  [
+                                   "Data-only icon planning catalog.",
+                                   "Missing files are not marked available.",
+                                   "AI may not move protected icons."
+                               ]
+                 },
+    "icons":  [
+                  {
+                      "iconId":  "icon_crutch",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/crutch.jpg",
+                      "objectIds":  [
+                                        "crutch"
+                                    ],
+                      "status":  "available",
+                      "priority":  508,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_wheelchair",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/wheelchair.jpg",
+                      "objectIds":  [
+                                        "wheelchair"
+                                    ],
+                      "status":  "available",
+                      "priority":  507,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_nurse",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/care/nurse.jpg",
+                      "objectIds":  [
+                                        "nurse"
+                                    ],
+                      "status":  "available",
+                      "priority":  510,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_doctor",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/care/doctor.jpg",
+                      "objectIds":  [
+                                        "doctor"
+                                    ],
+                      "status":  "available",
+                      "priority":  509,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_blanket",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/blanket.jpg",
+                      "objectIds":  [
+                                        "blanket"
+                                    ],
+                      "status":  "available",
+                      "priority":  506,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_position",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/position.jpg",
+                      "objectIds":  [
+                                        "position"
+                                    ],
+                      "status":  "available",
+                      "priority":  503,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_dressing",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/dressing.jpg",
+                      "objectIds":  [
+                                        "dressing"
+                                    ],
+                      "status":  "available",
+                      "priority":  502,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_body_position",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/body_position.jpg",
+                      "objectIds":  [
+                                        "body_position"
+                                    ],
+                      "status":  "available",
+                      "priority":  505,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_washing_help",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/washing_help.jpg",
+                      "objectIds":  [
+                                        "washing_help"
+                                    ],
+                      "status":  "available",
+                      "priority":  504,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_cannot_speak",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/problem/cannot_speak.jpg",
+                      "objectIds":  [
+                                        "cannot_speak"
+                                    ],
+                      "status":  "available",
+                      "priority":  604,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_hot",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/emotion/hot.jpg",
+                      "objectIds":  [
+                                        "hot"
+                                    ],
+                      "status":  "available",
+                      "priority":  603,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_cannot_move",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/problem/cannot_move.jpg",
+                      "objectIds":  [
+                                        "cannot_move"
+                                    ],
+                      "status":  "available",
+                      "priority":  606,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_cannot_stand",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/problem/cannot_stand.jpg",
+                      "objectIds":  [
+                                        "cannot_stand"
+                                    ],
+                      "status":  "available",
+                      "priority":  605,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_cold",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/emotion/cold.jpg",
+                      "objectIds":  [
+                                        "cold"
+                                    ],
+                      "status":  "available",
+                      "priority":  602,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_uncomfortable",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/emotion/uncomfortable.jpg",
+                      "objectIds":  [
+                                        "uncomfortable"
+                                    ],
+                      "status":  "available",
+                      "priority":  512,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_therapy",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/care/therapy.jpg",
+                      "objectIds":  [
+                                        "therapy"
+                                    ],
+                      "status":  "available",
+                      "priority":  511,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_afraid",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/emotion/afraid.jpg",
+                      "objectIds":  [
+                                        "afraid"
+                                    ],
+                      "status":  "available",
+                      "priority":  601,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_bad",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/emotion/bad.jpg",
+                      "objectIds":  [
+                                        "bad"
+                                    ],
+                      "status":  "available",
+                      "priority":  600,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_help_feeding",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/help/help_feeding.jpg",
+                      "objectIds":  [
+                                        "help_feeding"
+                                    ],
+                      "status":  "available",
+                      "priority":  501,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_not_hungry",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/state/not_hungry.jpg",
+                      "objectIds":  [
+                                        "not_hungry"
+                                    ],
+                      "status":  "available",
+                      "priority":  312,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_food_later",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/detail/food_later.jpg",
+                      "objectIds":  [
+                                        "food_later"
+                                    ],
+                      "status":  "available",
+                      "priority":  311,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_arm",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/arm.jpg",
+                      "objectIds":  [
+                                        "arm"
+                                    ],
+                      "status":  "available",
+                      "priority":  401,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_head",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/head.jpg",
+                      "objectIds":  [
+                                        "head"
+                                    ],
+                      "status":  "available",
+                      "priority":  400,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_food_enough",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/detail/food_enough.jpg",
+                      "objectIds":  [
+                                        "food_enough"
+                                    ],
+                      "status":  "available",
+                      "priority":  310,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_sweet",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/sweet.jpg",
+                      "objectIds":  [
+                                        "sweet"
+                                    ],
+                      "status":  "available",
+                      "priority":  307,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_food_dinner",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/dinner.jpg",
+                      "objectIds":  [
+                                        "food_dinner"
+                                    ],
+                      "status":  "available",
+                      "priority":  306,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_food_more",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/detail/food_more.jpg",
+                      "objectIds":  [
+                                        "food_more"
+                                    ],
+                      "status":  "available",
+                      "priority":  309,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_food_little",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/detail/food_little.jpg",
+                      "objectIds":  [
+                                        "food_little"
+                                    ],
+                      "status":  "available",
+                      "priority":  308,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_pain_today",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/detail/pain_today.jpg",
+                      "objectIds":  [
+                                        "pain_today"
+                                    ],
+                      "status":  "available",
+                      "priority":  408,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_pain_now",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/detail/pain_now.jpg",
+                      "objectIds":  [
+                                        "pain_now"
+                                    ],
+                      "status":  "available",
+                      "priority":  407,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_help_drinking",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/help/help_drinking.jpg",
+                      "objectIds":  [
+                                        "help_drinking"
+                                    ],
+                      "status":  "available",
+                      "priority":  500,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_pain_many_days",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/detail/pain_many_days.jpg",
+                      "objectIds":  [
+                                        "pain_many_days"
+                                    ],
+                      "status":  "available",
+                      "priority":  409,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_pain_very",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/detail/pain_very.jpg",
+                      "objectIds":  [
+                                        "pain_very"
+                                    ],
+                      "status":  "available",
+                      "priority":  406,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_belly",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/belly.jpg",
+                      "objectIds":  [
+                                        "belly"
+                                    ],
+                      "status":  "available",
+                      "priority":  403,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_leg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/leg.jpg",
+                      "objectIds":  [
+                                        "leg"
+                                    ],
+                      "status":  "available",
+                      "priority":  402,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_throat",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/throat.jpg",
+                      "objectIds":  [
+                                        "throat"
+                                    ],
+                      "status":  "available",
+                      "priority":  405,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_back",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/pain/back.jpg",
+                      "objectIds":  [
+                                        "back"
+                                    ],
+                      "status":  "available",
+                      "priority":  404,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_cannot_understand",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/problem/cannot_understand.jpg",
+                      "objectIds":  [
+                                        "cannot_understand"
+                                    ],
+                      "status":  "available",
+                      "priority":  607,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_care_crutch_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/care/crutch.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2005,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: crutch."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_care_blanket_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/care/blanket.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2004,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: blanket."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_care_position_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/care/position.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2007,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: position."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_care_dressing_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/care/dressing.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2006,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: dressing."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_body_turn_side_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/turn_side.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2003,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: turn_side."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_body_turn_back_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/turn_back.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2000,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: turn_back."
+                  },
+                  {
+                      "iconId":  "icon_transport",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/real_world/transport.jpg",
+                      "objectIds":  [
+                                        "transport"
+                                    ],
+                      "status":  "missing",
+                      "priority":  804,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_body_turn_right_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/turn_right.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2002,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: turn_right."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_body_turn_left_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/body/turn_left.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2001,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: turn_left."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_wc_wc_now_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/wc/wc_now.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2014,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: wc_now."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_wc_wc_help_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/wc/wc_help.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2013,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: wc_help."
+                  },
+                  {
+                      "iconId":  "icon_local_system_come_to_me_png",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/come_to_me.png",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2016,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: come_to_me."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_wc_wc_soon_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/wc/wc_soon.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2015,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: wc_soon."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_emotion_person_where_is_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/emotion/person_where_is.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2012,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: person_where_is."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_care_wheelchair_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/care/wheelchair.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2009,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: wheelchair."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_care_washing_help_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/care/washing_help.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2008,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: washing_help."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_emotion_person_tell_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/emotion/person_tell.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2011,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: person_tell."
+                  },
+                  {
+                      "iconId":  "icon_local_custom_emotion_love_you_jpg",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/emotion/love_you.jpg",
+                      "objectIds":  [
+
+                                    ],
+                      "status":  "available",
+                      "priority":  2010,
+                      "notes":  "Existing local icon not yet mapped to a canonical object in this V1 catalog. File stem: love_you."
+                  },
+                  {
+                      "iconId":  "icon_restaurant",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/real_world/restaurant.jpg",
+                      "objectIds":  [
+                                        "restaurant"
+                                    ],
+                      "status":  "missing",
+                      "priority":  803,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_where_dusan",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/where/where_dusan.jpg",
+                      "objectIds":  [
+                                        "where_dusan"
+                                    ],
+                      "status":  "available",
+                      "priority":  706,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_where_zana",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/where/where_zana.jpg",
+                      "objectIds":  [
+                                        "where_zana"
+                                    ],
+                      "status":  "available",
+                      "priority":  705,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_where_phone",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/where/where_phone.jpg",
+                      "objectIds":  [
+                                        "where_phone"
+                                    ],
+                      "status":  "available",
+                      "priority":  708,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_where_are_we",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/where/where_are_we.jpg",
+                      "objectIds":  [
+                                        "where_are_we"
+                                    ],
+                      "status":  "available",
+                      "priority":  707,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_what_did_i_say",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/question/what_did_i_say.jpg",
+                      "objectIds":  [
+                                        "what_did_i_say"
+                                    ],
+                      "status":  "available",
+                      "priority":  704,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_what_is_this",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/question/what_is_this.jpg",
+                      "objectIds":  [
+                                        "what_is_this"
+                                    ],
+                      "status":  "available",
+                      "priority":  701,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_what_do",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/question/what_do.jpg",
+                      "objectIds":  [
+                                        "what_do"
+                                    ],
+                      "status":  "available",
+                      "priority":  700,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_what_next",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/question/what_next.jpg",
+                      "objectIds":  [
+                                        "what_next"
+                                    ],
+                      "status":  "available",
+                      "priority":  703,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_what_is_happening",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/question/what_is_happening.jpg",
+                      "objectIds":  [
+                                        "what_is_happening"
+                                    ],
+                      "status":  "available",
+                      "priority":  702,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_vending_drinks",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/real_world/vending_drinks.jpg",
+                      "objectIds":  [
+                                        "vending_drinks"
+                                    ],
+                      "status":  "missing",
+                      "priority":  800,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_when_eat",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/when/when_eat.jpg",
+                      "objectIds":  [
+                                        "when_eat"
+                                    ],
+                      "status":  "available",
+                      "priority":  714,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_shop",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/real_world/shop.jpg",
+                      "objectIds":  [
+                                        "shop"
+                                    ],
+                      "status":  "missing",
+                      "priority":  802,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_vending_coffee_tea",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/real_world/vending_coffee_tea.jpg",
+                      "objectIds":  [
+                                        "vending_coffee_tea"
+                                    ],
+                      "status":  "missing",
+                      "priority":  801,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_when_home",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/when/when_home.jpg",
+                      "objectIds":  [
+                                        "when_home"
+                                    ],
+                      "status":  "available",
+                      "priority":  713,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_when_come",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/when/when_come.jpg",
+                      "objectIds":  [
+                                        "when_come"
+                                    ],
+                      "status":  "available",
+                      "priority":  710,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_where_wheelchair",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/where/where_wheelchair.jpg",
+                      "objectIds":  [
+                                        "where_wheelchair"
+                                    ],
+                      "status":  "available",
+                      "priority":  709,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_when_therapy",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/when/when_therapy.jpg",
+                      "objectIds":  [
+                                        "when_therapy"
+                                    ],
+                      "status":  "available",
+                      "priority":  712,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_when_go",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/when/when_go.jpg",
+                      "objectIds":  [
+                                        "when_go"
+                                    ],
+                      "status":  "available",
+                      "priority":  711,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_food_lunch",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/meal.jpg",
+                      "objectIds":  [
+                                        "food_lunch"
+                                    ],
+                      "status":  "available",
+                      "priority":  305,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_wc_wet",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/mokra_sem.png",
+                      "objectIds":  [
+                                        "wc_wet"
+                                    ],
+                      "status":  "missing",
+                      "priority":  100,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_activity_group",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/core/prosti_cas.png",
+                      "objectIds":  [
+                                        "activity_group"
+                                    ],
+                      "status":  "missing",
+                      "priority":  29,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_wet_and_dirty",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/oboje.png",
+                      "objectIds":  [
+                                        "wc_wet_and_dirty"
+                                    ],
+                      "status":  "missing",
+                      "priority":  102,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_dirty",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/umazana_sem.png",
+                      "objectIds":  [
+                                        "wc_dirty"
+                                    ],
+                      "status":  "missing",
+                      "priority":  101,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_pogovor",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/core/komunikacija.png",
+                      "objectIds":  [
+                                        "pogovor"
+                                    ],
+                      "status":  "missing",
+                      "priority":  28,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_please",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/please.png",
+                      "objectIds":  [
+                                        "please"
+                                    ],
+                      "status":  "available",
+                      "priority":  25,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_dont_want",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/core/ne_zelim.png",
+                      "objectIds":  [
+                                        "dont_want"
+                                    ],
+                      "status":  "missing",
+                      "priority":  24,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_repeat",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/repeat.png",
+                      "objectIds":  [
+                                        "repeat"
+                                    ],
+                      "status":  "available",
+                      "priority":  27,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_wait",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/wait.png",
+                      "objectIds":  [
+                                        "wait"
+                                    ],
+                      "status":  "available",
+                      "priority":  26,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_wc_now",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/takoj.png",
+                      "objectIds":  [
+                                        "wc_now"
+                                    ],
+                      "status":  "missing",
+                      "priority":  109,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_please",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/please.png",
+                      "objectIds":  [
+                                        "wc_please"
+                                    ],
+                      "status":  "available",
+                      "priority":  108,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_wc_call_nurse",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/poklici_medicinsko_sestro.png",
+                      "objectIds":  [
+                                        "wc_call_nurse"
+                                    ],
+                      "status":  "missing",
+                      "priority":  111,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_very_urgent",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/zelo_nujno.png",
+                      "objectIds":  [
+                                        "wc_very_urgent"
+                                    ],
+                      "status":  "missing",
+                      "priority":  110,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_blood",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/kri.png",
+                      "objectIds":  [
+                                        "wc_blood"
+                                    ],
+                      "status":  "missing",
+                      "priority":  107,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_burning",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/pece.png",
+                      "objectIds":  [
+                                        "wc_burning"
+                                    ],
+                      "status":  "missing",
+                      "priority":  104,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_diaper_change",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/zamenjava_plenice.png",
+                      "objectIds":  [
+                                        "wc_diaper_change"
+                                    ],
+                      "status":  "missing",
+                      "priority":  103,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_itching",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/srbi.png",
+                      "objectIds":  [
+                                        "wc_itching"
+                                    ],
+                      "status":  "missing",
+                      "priority":  106,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_wc_pain",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/wc/boli.png",
+                      "objectIds":  [
+                                        "wc_pain"
+                                    ],
+                      "status":  "missing",
+                      "priority":  105,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_health",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/core/zdravje.png",
+                      "objectIds":  [
+                                        "health"
+                                    ],
+                      "status":  "missing",
+                      "priority":  23,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_pain",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/pain.png",
+                      "objectIds":  [
+                                        "pain"
+                                    ],
+                      "status":  "available",
+                      "priority":  11,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_wc",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/wc.png",
+                      "objectIds":  [
+                                        "wc"
+                                    ],
+                      "status":  "available",
+                      "priority":  10,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_hungry",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/hungry.png",
+                      "objectIds":  [
+                                        "hungry"
+                                    ],
+                      "status":  "available",
+                      "priority":  13,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_thirsty",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/thirsty.png",
+                      "objectIds":  [
+                                        "thirsty"
+                                    ],
+                      "status":  "available",
+                      "priority":  12,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_sorry",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/sorry.png",
+                      "objectIds":  [
+                                        "sorry"
+                                    ],
+                      "status":  "available",
+                      "priority":  5,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_dont_understand",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/dont_understand.png",
+                      "objectIds":  [
+                                        "dont_understand"
+                                    ],
+                      "status":  "available",
+                      "priority":  2,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_no",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/no.png",
+                      "objectIds":  [
+                                        "no"
+                                    ],
+                      "status":  "available",
+                      "priority":  1,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_thank_you",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/thank_you.png",
+                      "objectIds":  [
+                                        "thank_you"
+                                    ],
+                      "status":  "available",
+                      "priority":  4,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_yes",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/yes.png",
+                      "objectIds":  [
+                                        "yes"
+                                    ],
+                      "status":  "available",
+                      "priority":  3,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_feeling",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/core/pocutje.png",
+                      "objectIds":  [
+                                        "feeling"
+                                    ],
+                      "status":  "missing",
+                      "priority":  20,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_call",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/core/poklici.png",
+                      "objectIds":  [
+                                        "call"
+                                    ],
+                      "status":  "missing",
+                      "priority":  19,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_care",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/core/nega.png",
+                      "objectIds":  [
+                                        "care"
+                                    ],
+                      "status":  "missing",
+                      "priority":  22,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_place_group",
+                      "source":  "PLACE_PHOTO",
+                      "path":  "NovaRehab/icons/places/kraj.jpg",
+                      "objectIds":  [
+                                        "place_group"
+                                    ],
+                      "status":  "missing",
+                      "priority":  21,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_miss_someone",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/miss_someone.png",
+                      "objectIds":  [
+                                        "miss_someone"
+                                    ],
+                      "status":  "available",
+                      "priority":  18,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_i_want",
+                      "source":  "ARASAAC",
+                      "path":  "NovaRehab/icons/arasaac/core/rada_bi.png",
+                      "objectIds":  [
+                                        "i_want"
+                                    ],
+                      "status":  "missing",
+                      "priority":  15,
+                      "notes":  "Planned path; file is not present in repo."
+                  },
+                  {
+                      "iconId":  "icon_tired",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/tired.png",
+                      "objectIds":  [
+                                        "tired"
+                                    ],
+                      "status":  "available",
+                      "priority":  14,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_people",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/people.png",
+                      "objectIds":  [
+                                        "people"
+                                    ],
+                      "status":  "available",
+                      "priority":  17,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_need",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/need.png",
+                      "objectIds":  [
+                                        "need"
+                                    ],
+                      "status":  "available",
+                      "priority":  16,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_help",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/help.png",
+                      "objectIds":  [
+                                        "help"
+                                    ],
+                      "status":  "available",
+                      "priority":  30,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_drink_milk",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/drink_milk.jpg",
+                      "objectIds":  [
+                                        "drink_milk"
+                                    ],
+                      "status":  "available",
+                      "priority":  207,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_drink_pepsi",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/drink_pepsi.jpg",
+                      "objectIds":  [
+                                        "drink_pepsi"
+                                    ],
+                      "status":  "available",
+                      "priority":  206,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_coffee_white",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/detail/coffee_white.jpg",
+                      "objectIds":  [
+                                        "coffee_white"
+                                    ],
+                      "status":  "available",
+                      "priority":  209,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_coffee_plain",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/detail/coffee_plain.jpg",
+                      "objectIds":  [
+                                        "coffee_plain"
+                                    ],
+                      "status":  "available",
+                      "priority":  208,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_drink_coca_cola",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/drink_coca_cola.jpg",
+                      "objectIds":  [
+                                        "drink_coca_cola"
+                                    ],
+                      "status":  "available",
+                      "priority":  205,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_tea",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/tea.jpg",
+                      "objectIds":  [
+                                        "tea"
+                                    ],
+                      "status":  "available",
+                      "priority":  202,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_coffee",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/coffee.jpg",
+                      "objectIds":  [
+                                        "coffee"
+                                    ],
+                      "status":  "available",
+                      "priority":  201,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_drink_fanta",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/drink_fanta.jpg",
+                      "objectIds":  [
+                                        "drink_fanta"
+                                    ],
+                      "status":  "available",
+                      "priority":  204,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_juice",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/juice.jpg",
+                      "objectIds":  [
+                                        "juice"
+                                    ],
+                      "status":  "available",
+                      "priority":  203,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_food_yogurt",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/yogurt.jpg",
+                      "objectIds":  [
+                                        "food_yogurt"
+                                    ],
+                      "status":  "available",
+                      "priority":  302,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_bread",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/bread.jpg",
+                      "objectIds":  [
+                                        "bread"
+                                    ],
+                      "status":  "available",
+                      "priority":  301,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_food_apple",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/apple.jpg",
+                      "objectIds":  [
+                                        "food_apple"
+                                    ],
+                      "status":  "available",
+                      "priority":  304,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_food_banana",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/banana.jpg",
+                      "objectIds":  [
+                                        "food_banana"
+                                    ],
+                      "status":  "available",
+                      "priority":  303,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_soup",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/food/soup.jpg",
+                      "objectIds":  [
+                                        "soup"
+                                    ],
+                      "status":  "available",
+                      "priority":  300,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_tea_large",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/detail/tea_large.jpg",
+                      "objectIds":  [
+                                        "tea_large"
+                                    ],
+                      "status":  "available",
+                      "priority":  211,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_coffee_cappuccino",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/detail/coffee_cappuccino.jpg",
+                      "objectIds":  [
+                                        "coffee_cappuccino"
+                                    ],
+                      "status":  "available",
+                      "priority":  210,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_not_thirsty",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/state/not_thirsty.jpg",
+                      "objectIds":  [
+                                        "not_thirsty"
+                                    ],
+                      "status":  "available",
+                      "priority":  213,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_tea_regular",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/detail/tea_regular.jpg",
+                      "objectIds":  [
+                                        "tea_regular"
+                                    ],
+                      "status":  "available",
+                      "priority":  212,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_water",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/drinks/water.jpg",
+                      "objectIds":  [
+                                        "water"
+                                    ],
+                      "status":  "available",
+                      "priority":  200,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_what_root",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/what.png",
+                      "objectIds":  [
+                                        "what_root"
+                                    ],
+                      "status":  "available",
+                      "priority":  37,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_other",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/other.png",
+                      "objectIds":  [
+                                        "other"
+                                    ],
+                      "status":  "available",
+                      "priority":  36,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_when_root",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/when.png",
+                      "objectIds":  [
+                                        "when_root"
+                                    ],
+                      "status":  "available",
+                      "priority":  39,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_where_root",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/where.png",
+                      "objectIds":  [
+                                        "where_root"
+                                    ],
+                      "status":  "available",
+                      "priority":  38,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_home",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/home.png",
+                      "objectIds":  [
+                                        "home"
+                                    ],
+                      "status":  "available",
+                      "priority":  35,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_rest",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/rest.png",
+                      "objectIds":  [
+                                        "rest"
+                                    ],
+                      "status":  "available",
+                      "priority":  32,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_slower",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/slower.png",
+                      "objectIds":  [
+                                        "slower"
+                                    ],
+                      "status":  "available",
+                      "priority":  31,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_real_world",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/real_world.png",
+                      "objectIds":  [
+                                        "real_world"
+                                    ],
+                      "status":  "available",
+                      "priority":  34,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_problem",
+                      "source":  "SYSTEM",
+                      "path":  "NovaRehab/icons/system/problem.png",
+                      "objectIds":  [
+                                        "problem"
+                                    ],
+                      "status":  "available",
+                      "priority":  33,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_person_franc",
+                      "source":  "PATIENT_PHOTO",
+                      "path":  "NovaRehab/icons/patient/contacts/franc.jpg",
+                      "objectIds":  [
+                                        "person_franc"
+                                    ],
+                      "status":  "available",
+                      "priority":  106,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_person_inna",
+                      "source":  "PATIENT_PHOTO",
+                      "path":  "NovaRehab/icons/patient/contacts/inna.jpg",
+                      "objectIds":  [
+                                        "person_inna"
+                                    ],
+                      "status":  "available",
+                      "priority":  105,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_contact_call",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/people/contact_call.jpg",
+                      "objectIds":  [
+                                        "contact_call"
+                                    ],
+                      "status":  "available",
+                      "priority":  108,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_person_other",
+                      "source":  "CUSTOM_PHOTO",
+                      "path":  "NovaRehab/icons/custom/people/person_other.jpg",
+                      "objectIds":  [
+                                        "person_other"
+                                    ],
+                      "status":  "available",
+                      "priority":  107,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_person_oksana",
+                      "source":  "PATIENT_PHOTO",
+                      "path":  "NovaRehab/icons/patient/contacts/oksana.jpg",
+                      "objectIds":  [
+                                        "person_oksana"
+                                    ],
+                      "status":  "available",
+                      "priority":  104,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_person_zana",
+                      "source":  "PATIENT_PHOTO",
+                      "path":  "NovaRehab/icons/patient/contacts/zana.jpg",
+                      "objectIds":  [
+                                        "person_zana"
+                                    ],
+                      "status":  "available",
+                      "priority":  101,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_person_dusan",
+                      "source":  "PATIENT_PHOTO",
+                      "path":  "NovaRehab/icons/patient/contacts/dusan.jpg",
+                      "objectIds":  [
+                                        "person_dusan"
+                                    ],
+                      "status":  "available",
+                      "priority":  100,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_person_julija",
+                      "source":  "PATIENT_PHOTO",
+                      "path":  "NovaRehab/icons/patient/contacts/julija.jpg",
+                      "objectIds":  [
+                                        "person_julija"
+                                    ],
+                      "status":  "available",
+                      "priority":  103,
+                      "notes":  "Existing local icon."
+                  },
+                  {
+                      "iconId":  "icon_person_sergej",
+                      "source":  "PATIENT_PHOTO",
+                      "path":  "NovaRehab/icons/patient/contacts/sergej.jpg",
+                      "objectIds":  [
+                                        "person_sergej"
+                                    ],
+                      "status":  "available",
+                      "priority":  102,
+                      "notes":  "Existing local icon."
+                  }
+              ]
+}
+

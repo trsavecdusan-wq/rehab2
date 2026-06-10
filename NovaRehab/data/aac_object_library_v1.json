@@ -1,0 +1,2687 @@
+﻿{
+    "metadata":  {
+                     "schemaVersion":  1,
+                     "libraryId":  "aac_object_library_v1",
+                     "versionName":  "1.2.634",
+                     "generatedFor":  "NovaRehab AAC Object Library V1",
+                     "runtimeImpact":  "none",
+                     "canonicalIds":  "existing_aac_ids",
+                     "duplicateObjectsAllowed":  false,
+                     "mainIconsStable":  true,
+                     "aiMayMoveIcons":  false,
+                     "fixedTopRowLocked":  true,
+                     "notes":  [
+                                   "Data-only planning catalog.",
+                                   "Does not add main icons.",
+                                   "Does not change grid, speech, OTA, rollback, or runtime architecture."
+                               ]
+                 },
+    "fixedTopRow":  [
+                        {
+                            "position":  1,
+                            "id":  "no",
+                            "labelSl":  "NE"
+                        },
+                        {
+                            "position":  2,
+                            "id":  "dont_understand",
+                            "labelSl":  "NE RAZUMEM"
+                        },
+                        {
+                            "position":  3,
+                            "id":  "yes",
+                            "labelSl":  "DA"
+                        },
+                        {
+                            "position":  4,
+                            "id":  "thank_you",
+                            "labelSl":  "HVALA"
+                        },
+                        {
+                            "position":  5,
+                            "id":  "sorry",
+                            "labelSl":  "OPROSTI"
+                        }
+                    ],
+    "main20":  [
+                   "wc",
+                   "pain",
+                   "thirsty",
+                   "hungry",
+                   "tired",
+                   "i_want",
+                   "need",
+                   "people",
+                   "miss_someone",
+                   "call",
+                   "feeling",
+                   "place_group",
+                   "care",
+                   "health",
+                   "dont_want",
+                   "please",
+                   "wait",
+                   "repeat",
+                   "pogovor",
+                   "activity_group"
+               ],
+    "guidedQuestions":  [
+                            {
+                                "id":  "wc_wet_question",
+                                "questionSl":  "Ali si mokra?",
+                                "yesStoresSemanticSelection":  "wc_wet",
+                                "noRejectsQuestion":  true,
+                                "usesFixedDaNeRow":  true
+                            }
+                        ],
+    "objects":  [
+                    {
+                        "id":  "no",
+                        "labelSl":  "NE",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "Ne.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "fixed_top_row"
+                                        ],
+                        "aliasesSl":  [
+                                          "NE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_no"
+                    },
+                    {
+                        "id":  "dont_understand",
+                        "labelSl":  "NE RAZUMEM",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "Ne razumem.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "fixed_top_row"
+                                        ],
+                        "aliasesSl":  [
+                                          "NE RAZUMEM",
+                                          "NE VEM"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_dont_understand"
+                    },
+                    {
+                        "id":  "yes",
+                        "labelSl":  "DA",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "Da.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "fixed_top_row"
+                                        ],
+                        "aliasesSl":  [
+                                          "DA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_yes"
+                    },
+                    {
+                        "id":  "thank_you",
+                        "labelSl":  "HVALA",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "Hvala.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "fixed_top_row"
+                                        ],
+                        "aliasesSl":  [
+                                          "HVALA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_thank_you"
+                    },
+                    {
+                        "id":  "sorry",
+                        "labelSl":  "OPROSTI",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "Oprosti.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "fixed_top_row"
+                                        ],
+                        "aliasesSl":  [
+                                          "OPROSTI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_sorry"
+                    },
+                    {
+                        "id":  "wc",
+                        "labelSl":  "WC",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "Moram na WC.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "WC"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc"
+                    },
+                    {
+                        "id":  "pain",
+                        "labelSl":  "BOLI ME",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "Boli me.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "BOLI ME"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_pain"
+                    },
+                    {
+                        "id":  "thirsty",
+                        "labelSl":  "ŽEJNA SEM",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "Žejna sem.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "ŽEJNA SEM",
+                                          "ŽEJNA",
+                                          "PIJAČA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_thirsty"
+                    },
+                    {
+                        "id":  "hungry",
+                        "labelSl":  "LAČNA SEM",
+                        "semanticType":  "FOOD",
+                        "speechTextSl":  "Lačna sem.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "LAČNA SEM",
+                                          "LAČNA",
+                                          "HRANA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_hungry"
+                    },
+                    {
+                        "id":  "tired",
+                        "labelSl":  "UTRUJENA SEM",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "Utrujena sem.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "UTRUJENA SEM"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_tired"
+                    },
+                    {
+                        "id":  "i_want",
+                        "labelSl":  "RADA BI",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "Rada bi.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "RADA BI",
+                                          "HOČEM",
+                                          "ŽELIM"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_i_want"
+                    },
+                    {
+                        "id":  "need",
+                        "labelSl":  "POTREBUJEM",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "Potrebujem.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "POTREBUJEM"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_need"
+                    },
+                    {
+                        "id":  "people",
+                        "labelSl":  "LJUDJE",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "Ljudje.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "LJUDJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_people"
+                    },
+                    {
+                        "id":  "miss_someone",
+                        "labelSl":  "POGREŠAM",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "Pogrešam.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "POGREŠAM"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_miss_someone"
+                    },
+                    {
+                        "id":  "call",
+                        "labelSl":  "POKLIČI",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "Prosim, pokličite nekoga.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "POKLIČI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_call"
+                    },
+                    {
+                        "id":  "feeling",
+                        "labelSl":  "POČUTJE",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "Počutje.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "POČUTJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_feeling"
+                    },
+                    {
+                        "id":  "place_group",
+                        "labelSl":  "KRAJ",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "Izberite kraj.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "KRAJ",
+                                          "KJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_place_group"
+                    },
+                    {
+                        "id":  "care",
+                        "labelSl":  "NEGA",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "Nega.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "NEGA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_care"
+                    },
+                    {
+                        "id":  "health",
+                        "labelSl":  "ZDRAVJE",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "Zdravje.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "ZDRAVJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_health"
+                    },
+                    {
+                        "id":  "dont_want",
+                        "labelSl":  "NE ŽELIM",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "Ne želim.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "NE ŽELIM"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_dont_want"
+                    },
+                    {
+                        "id":  "please",
+                        "labelSl":  "PROSIM",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "Prosim.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "PROSIM"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_please"
+                    },
+                    {
+                        "id":  "wait",
+                        "labelSl":  "POČAKAJ",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "Počakajte, prosim.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "POČAKAJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wait"
+                    },
+                    {
+                        "id":  "repeat",
+                        "labelSl":  "PONOVI",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "Prosim, ponovite.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "PONOVI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_repeat"
+                    },
+                    {
+                        "id":  "pogovor",
+                        "labelSl":  "KOMUNIKACIJA",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "Komunikacija.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "KOMUNIKACIJA",
+                                          "POGOVOR"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_pogovor"
+                    },
+                    {
+                        "id":  "activity_group",
+                        "labelSl":  "PROSTI ČAS",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "Izberite dejavnost.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  true,
+                        "parentHints":  [
+                                            "main_20"
+                                        ],
+                        "aliasesSl":  [
+                                          "PROSTI ČAS",
+                                          "AKTIVNOST",
+                                          "PROSTI ČAS"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_activity_group"
+                    },
+                    {
+                        "id":  "wc_wet",
+                        "labelSl":  "MOKRA SEM",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "Mokra sem.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "MOKRA SEM",
+                                          "MOKRA"
+                                      ],
+                        "guidedQuestionRefs":  "wc_wet_question",
+                        "iconRef":  "icon_wc_wet"
+                    },
+                    {
+                        "id":  "wc_dirty",
+                        "labelSl":  "UMAZANA SEM",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "Umazana sem.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "UMAZANA SEM",
+                                          "UMAZANA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_dirty"
+                    },
+                    {
+                        "id":  "wc_wet_and_dirty",
+                        "labelSl":  "OBOJE",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "Mokra in umazana sem.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "OBOJE",
+                                          "MOKRA IN UMAZANA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_wet_and_dirty"
+                    },
+                    {
+                        "id":  "wc_diaper_change",
+                        "labelSl":  "ZAMENJAVA PLENICE",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "Potrebujem menjavo plenice.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "ZAMENJAVA PLENICE",
+                                          "PLENICA",
+                                          "ZAMENJAVA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_diaper_change"
+                    },
+                    {
+                        "id":  "wc_burning",
+                        "labelSl":  "PEČE",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "Peče me.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "PEČE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_burning"
+                    },
+                    {
+                        "id":  "wc_pain",
+                        "labelSl":  "BOLI",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "Boli me.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "BOLI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_pain"
+                    },
+                    {
+                        "id":  "wc_itching",
+                        "labelSl":  "SRBI",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "Srbi me.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "SRBI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_itching"
+                    },
+                    {
+                        "id":  "wc_blood",
+                        "labelSl":  "KRI",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "Vidim kri.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "KRI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_blood"
+                    },
+                    {
+                        "id":  "wc_please",
+                        "labelSl":  "PROSIM",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "Prosim.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "PROSIM"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_please"
+                    },
+                    {
+                        "id":  "wc_now",
+                        "labelSl":  "TAKOJ",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "Takoj.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "TAKOJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_now"
+                    },
+                    {
+                        "id":  "wc_very_urgent",
+                        "labelSl":  "ZELO NUJNO",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "Zelo nujno.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "ZELO NUJNO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_very_urgent"
+                    },
+                    {
+                        "id":  "wc_call_nurse",
+                        "labelSl":  "POKLIČI MEDICINSKO SESTRO",
+                        "semanticType":  "HELPER",
+                        "speechTextSl":  "Prosim, pokličite medicinsko sestro.",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "wc"
+                                        ],
+                        "aliasesSl":  [
+                                          "POKLIČI MEDICINSKO SESTRO",
+                                          "SESTRA",
+                                          "MEDICINSKA SESTRA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wc_call_nurse"
+                    },
+                    {
+                        "id":  "help",
+                        "labelSl":  "POMOČ",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "POMOČ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "POMOČ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_help"
+                    },
+                    {
+                        "id":  "slower",
+                        "labelSl":  "POČASNEJE",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "POČASNEJE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "POČASNEJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_slower"
+                    },
+                    {
+                        "id":  "rest",
+                        "labelSl":  "POČITEK",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "POČITEK",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "POČITEK"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_rest"
+                    },
+                    {
+                        "id":  "problem",
+                        "labelSl":  "TEŽAVA",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "TEŽAVA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "TEŽAVA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_problem"
+                    },
+                    {
+                        "id":  "real_world",
+                        "labelSl":  "RESNIČNI SVET",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "RESNIČNI SVET",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "RESNIČNI SVET"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_real_world"
+                    },
+                    {
+                        "id":  "home",
+                        "labelSl":  "DOMOV",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "DOMOV",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "DOMOV"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_home"
+                    },
+                    {
+                        "id":  "other",
+                        "labelSl":  "DRUGO",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "DRUGO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "DRUGO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_other"
+                    },
+                    {
+                        "id":  "what_root",
+                        "labelSl":  "KAJ?",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "KAJ?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "what_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KAJ?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_what_root"
+                    },
+                    {
+                        "id":  "where_root",
+                        "labelSl":  "KJE?",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "KJE?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "where_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KJE?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_where_root"
+                    },
+                    {
+                        "id":  "when_root",
+                        "labelSl":  "KDAJ?",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "KDAJ?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "when_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KDAJ?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_when_root"
+                    },
+                    {
+                        "id":  "person_dusan",
+                        "labelSl":  "DUŠAN",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "DUŠAN",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "people"
+                                        ],
+                        "aliasesSl":  [
+                                          "DUŠAN"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_person_dusan"
+                    },
+                    {
+                        "id":  "person_zana",
+                        "labelSl":  "ŽANA",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "ŽANA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "people"
+                                        ],
+                        "aliasesSl":  [
+                                          "ŽANA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_person_zana"
+                    },
+                    {
+                        "id":  "person_sergej",
+                        "labelSl":  "SERGEJ",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "SERGEJ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "people"
+                                        ],
+                        "aliasesSl":  [
+                                          "SERGEJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_person_sergej"
+                    },
+                    {
+                        "id":  "person_julija",
+                        "labelSl":  "JULIJA",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "JULIJA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "people"
+                                        ],
+                        "aliasesSl":  [
+                                          "JULIJA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_person_julija"
+                    },
+                    {
+                        "id":  "person_oksana",
+                        "labelSl":  "OKSANA",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "OKSANA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "people"
+                                        ],
+                        "aliasesSl":  [
+                                          "OKSANA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_person_oksana"
+                    },
+                    {
+                        "id":  "person_inna",
+                        "labelSl":  "INNA",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "INNA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "people"
+                                        ],
+                        "aliasesSl":  [
+                                          "INNA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_person_inna"
+                    },
+                    {
+                        "id":  "person_franc",
+                        "labelSl":  "FRANC",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "FRANC",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "people"
+                                        ],
+                        "aliasesSl":  [
+                                          "FRANC"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_person_franc"
+                    },
+                    {
+                        "id":  "person_other",
+                        "labelSl":  "DRUGA OSEBA",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "DRUGA OSEBA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "people"
+                                        ],
+                        "aliasesSl":  [
+                                          "DRUGA OSEBA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_person_other"
+                    },
+                    {
+                        "id":  "contact_call",
+                        "labelSl":  "POKLIČI",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "POKLIČI",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "people"
+                                        ],
+                        "aliasesSl":  [
+                                          "POKLIČI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_contact_call"
+                    },
+                    {
+                        "id":  "water",
+                        "labelSl":  "VODA",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "VODA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "VODA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_water"
+                    },
+                    {
+                        "id":  "coffee",
+                        "labelSl":  "KAVA",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "KAVA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "KAVA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_coffee"
+                    },
+                    {
+                        "id":  "tea",
+                        "labelSl":  "ČAJ",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "ČAJ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "ČAJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_tea"
+                    },
+                    {
+                        "id":  "juice",
+                        "labelSl":  "SOK",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "SOK",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "SOK"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_juice"
+                    },
+                    {
+                        "id":  "drink_fanta",
+                        "labelSl":  "FANTA",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "FANTA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "FANTA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_drink_fanta"
+                    },
+                    {
+                        "id":  "drink_coca_cola",
+                        "labelSl":  "COCA COLA",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "COCA COLA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "COCA COLA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_drink_coca_cola"
+                    },
+                    {
+                        "id":  "drink_pepsi",
+                        "labelSl":  "PEPSI",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "PEPSI",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "PEPSI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_drink_pepsi"
+                    },
+                    {
+                        "id":  "drink_milk",
+                        "labelSl":  "MLEKO",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "MLEKO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "MLEKO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_drink_milk"
+                    },
+                    {
+                        "id":  "coffee_plain",
+                        "labelSl":  "NAVADNA KAVA",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "NAVADNA KAVA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "NAVADNA KAVA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_coffee_plain"
+                    },
+                    {
+                        "id":  "coffee_white",
+                        "labelSl":  "BELA KAVA",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "BELA KAVA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "BELA KAVA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_coffee_white"
+                    },
+                    {
+                        "id":  "coffee_cappuccino",
+                        "labelSl":  "CAPPUCCINO",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "CAPPUCCINO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "CAPPUCCINO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_coffee_cappuccino"
+                    },
+                    {
+                        "id":  "tea_large",
+                        "labelSl":  "VELIK ČAJ",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "VELIK ČAJ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "VELIK ČAJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_tea_large"
+                    },
+                    {
+                        "id":  "tea_regular",
+                        "labelSl":  "NAVADEN ČAJ",
+                        "semanticType":  "DRINK",
+                        "speechTextSl":  "NAVADEN ČAJ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "NAVADEN ČAJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_tea_regular"
+                    },
+                    {
+                        "id":  "not_thirsty",
+                        "labelSl":  "NISEM ŽEJNA",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "NISEM ŽEJNA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "thirsty",
+                                            "drink"
+                                        ],
+                        "aliasesSl":  [
+                                          "NISEM ŽEJNA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_not_thirsty"
+                    },
+                    {
+                        "id":  "soup",
+                        "labelSl":  "JUHA",
+                        "semanticType":  "FOOD",
+                        "speechTextSl":  "JUHA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "JUHA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_soup"
+                    },
+                    {
+                        "id":  "bread",
+                        "labelSl":  "KRUH",
+                        "semanticType":  "FOOD",
+                        "speechTextSl":  "KRUH",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "KRUH"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_bread"
+                    },
+                    {
+                        "id":  "food_yogurt",
+                        "labelSl":  "JOGURT",
+                        "semanticType":  "FOOD",
+                        "speechTextSl":  "JOGURT",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "JOGURT"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_food_yogurt"
+                    },
+                    {
+                        "id":  "food_banana",
+                        "labelSl":  "BANANA",
+                        "semanticType":  "FOOD",
+                        "speechTextSl":  "BANANA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "BANANA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_food_banana"
+                    },
+                    {
+                        "id":  "food_apple",
+                        "labelSl":  "JABOLKO",
+                        "semanticType":  "FOOD",
+                        "speechTextSl":  "JABOLKO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "JABOLKO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_food_apple"
+                    },
+                    {
+                        "id":  "food_lunch",
+                        "labelSl":  "KOSILO",
+                        "semanticType":  "FOOD",
+                        "speechTextSl":  "KOSILO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "KOSILO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_food_lunch"
+                    },
+                    {
+                        "id":  "food_dinner",
+                        "labelSl":  "VEČERJA",
+                        "semanticType":  "FOOD",
+                        "speechTextSl":  "VEČERJA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "VEČERJA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_food_dinner"
+                    },
+                    {
+                        "id":  "sweet",
+                        "labelSl":  "SLADKO",
+                        "semanticType":  "FOOD",
+                        "speechTextSl":  "SLADKO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "SLADKO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_sweet"
+                    },
+                    {
+                        "id":  "food_little",
+                        "labelSl":  "MALO",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "MALO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "MALO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_food_little"
+                    },
+                    {
+                        "id":  "food_more",
+                        "labelSl":  "ŠE",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "ŠE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "ŠE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_food_more"
+                    },
+                    {
+                        "id":  "food_enough",
+                        "labelSl":  "DOVOLJ",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "DOVOLJ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "DOVOLJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_food_enough"
+                    },
+                    {
+                        "id":  "food_later",
+                        "labelSl":  "KASNEJE",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "KASNEJE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "KASNEJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_food_later"
+                    },
+                    {
+                        "id":  "not_hungry",
+                        "labelSl":  "NISEM LAČNA",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "NISEM LAČNA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "hungry",
+                                            "food"
+                                        ],
+                        "aliasesSl":  [
+                                          "NISEM LAČNA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_not_hungry"
+                    },
+                    {
+                        "id":  "head",
+                        "labelSl":  "GLAVA",
+                        "semanticType":  "BODY_PART",
+                        "speechTextSl":  "GLAVA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "GLAVA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_head"
+                    },
+                    {
+                        "id":  "arm",
+                        "labelSl":  "ROKA",
+                        "semanticType":  "BODY_PART",
+                        "speechTextSl":  "ROKA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "ROKA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_arm"
+                    },
+                    {
+                        "id":  "leg",
+                        "labelSl":  "NOGA",
+                        "semanticType":  "BODY_PART",
+                        "speechTextSl":  "NOGA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "NOGA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_leg"
+                    },
+                    {
+                        "id":  "belly",
+                        "labelSl":  "TREBUH",
+                        "semanticType":  "BODY_PART",
+                        "speechTextSl":  "TREBUH",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "TREBUH"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_belly"
+                    },
+                    {
+                        "id":  "back",
+                        "labelSl":  "HRBET",
+                        "semanticType":  "BODY_PART",
+                        "speechTextSl":  "HRBET",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "HRBET"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_back"
+                    },
+                    {
+                        "id":  "throat",
+                        "labelSl":  "GRLO",
+                        "semanticType":  "BODY_PART",
+                        "speechTextSl":  "GRLO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "GRLO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_throat"
+                    },
+                    {
+                        "id":  "pain_very",
+                        "labelSl":  "ZELO",
+                        "semanticType":  "MODIFIER",
+                        "speechTextSl":  "ZELO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "ZELO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_pain_very"
+                    },
+                    {
+                        "id":  "pain_now",
+                        "labelSl":  "ZDAJ",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "ZDAJ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "ZDAJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_pain_now"
+                    },
+                    {
+                        "id":  "pain_today",
+                        "labelSl":  "DANES",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "DANES",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "DANES"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_pain_today"
+                    },
+                    {
+                        "id":  "pain_many_days",
+                        "labelSl":  "VEČ DNI",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "VEČ DNI",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "pain"
+                                        ],
+                        "aliasesSl":  [
+                                          "VEČ DNI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_pain_many_days"
+                    },
+                    {
+                        "id":  "help_drinking",
+                        "labelSl":  "PITJE",
+                        "semanticType":  "HELPER",
+                        "speechTextSl":  "PITJE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "PITJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_help_drinking"
+                    },
+                    {
+                        "id":  "help_feeding",
+                        "labelSl":  "HRANJENJE",
+                        "semanticType":  "HELPER",
+                        "speechTextSl":  "HRANJENJE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "HRANJENJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_help_feeding"
+                    },
+                    {
+                        "id":  "dressing",
+                        "labelSl":  "OBLAČENJE",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "OBLAČENJE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "OBLAČENJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_dressing"
+                    },
+                    {
+                        "id":  "position",
+                        "labelSl":  "POLOŽAJ",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "POLOŽAJ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "POLOŽAJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_position"
+                    },
+                    {
+                        "id":  "washing_help",
+                        "labelSl":  "UMIVANJE",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "UMIVANJE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "UMIVANJE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_washing_help"
+                    },
+                    {
+                        "id":  "body_position",
+                        "labelSl":  "POPRAVI ME",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "POPRAVI ME",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "POPRAVI ME"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_body_position"
+                    },
+                    {
+                        "id":  "blanket",
+                        "labelSl":  "ODEJA",
+                        "semanticType":  "HELPER",
+                        "speechTextSl":  "ODEJA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "ODEJA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_blanket"
+                    },
+                    {
+                        "id":  "wheelchair",
+                        "labelSl":  "VOZIČEK",
+                        "semanticType":  "HELPER",
+                        "speechTextSl":  "VOZIČEK",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "VOZIČEK"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_wheelchair"
+                    },
+                    {
+                        "id":  "crutch",
+                        "labelSl":  "BERGLA",
+                        "semanticType":  "HELPER",
+                        "speechTextSl":  "BERGLA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "BERGLA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_crutch"
+                    },
+                    {
+                        "id":  "doctor",
+                        "labelSl":  "ZDRAVNIK",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "ZDRAVNIK",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "ZDRAVNIK"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_doctor"
+                    },
+                    {
+                        "id":  "nurse",
+                        "labelSl":  "MEDICINSKA SESTRA",
+                        "semanticType":  "PERSON",
+                        "speechTextSl":  "MEDICINSKA SESTRA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "MEDICINSKA SESTRA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_nurse"
+                    },
+                    {
+                        "id":  "therapy",
+                        "labelSl":  "TERAPIJA",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "TERAPIJA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "TERAPIJA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_therapy"
+                    },
+                    {
+                        "id":  "uncomfortable",
+                        "labelSl":  "NEUDOBNO",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "NEUDOBNO",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "need",
+                                            "care"
+                                        ],
+                        "aliasesSl":  [
+                                          "NEUDOBNO"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_uncomfortable"
+                    },
+                    {
+                        "id":  "bad",
+                        "labelSl":  "SLABO SEM",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "SLABO SEM",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "problem",
+                                            "feeling"
+                                        ],
+                        "aliasesSl":  [
+                                          "SLABO SEM"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_bad"
+                    },
+                    {
+                        "id":  "afraid",
+                        "labelSl":  "STRAH ME JE",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "STRAH ME JE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "problem",
+                                            "feeling"
+                                        ],
+                        "aliasesSl":  [
+                                          "STRAH ME JE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_afraid"
+                    },
+                    {
+                        "id":  "cold",
+                        "labelSl":  "MRAZ MI JE",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "MRAZ MI JE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "problem",
+                                            "feeling"
+                                        ],
+                        "aliasesSl":  [
+                                          "MRAZ MI JE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_cold"
+                    },
+                    {
+                        "id":  "hot",
+                        "labelSl":  "VROČE MI JE",
+                        "semanticType":  "STATE",
+                        "speechTextSl":  "VROČE MI JE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "problem",
+                                            "feeling"
+                                        ],
+                        "aliasesSl":  [
+                                          "VROČE MI JE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_hot"
+                    },
+                    {
+                        "id":  "cannot_speak",
+                        "labelSl":  "GOVORITI",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "GOVORITI",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "GOVORITI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_cannot_speak"
+                    },
+                    {
+                        "id":  "cannot_stand",
+                        "labelSl":  "VSTATI",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "VSTATI",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "VSTATI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_cannot_stand"
+                    },
+                    {
+                        "id":  "cannot_move",
+                        "labelSl":  "PREMAKNITI SE",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "PREMAKNITI SE",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "PREMAKNITI SE"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_cannot_move"
+                    },
+                    {
+                        "id":  "cannot_understand",
+                        "labelSl":  "RAZUMETI",
+                        "semanticType":  "PROBLEM",
+                        "speechTextSl":  "RAZUMETI",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+
+                                        ],
+                        "aliasesSl":  [
+                                          "RAZUMETI"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_cannot_understand"
+                    },
+                    {
+                        "id":  "what_do",
+                        "labelSl":  "KAJ BOMO DELALI?",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "KAJ BOMO DELALI?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "what_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KAJ BOMO DELALI?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_what_do"
+                    },
+                    {
+                        "id":  "what_is_this",
+                        "labelSl":  "KAJ JE TO?",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "KAJ JE TO?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "what_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KAJ JE TO?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_what_is_this"
+                    },
+                    {
+                        "id":  "what_is_happening",
+                        "labelSl":  "KAJ SE DOGAJA?",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "KAJ SE DOGAJA?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "what_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KAJ SE DOGAJA?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_what_is_happening"
+                    },
+                    {
+                        "id":  "what_next",
+                        "labelSl":  "KAJ BO POTEM?",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "KAJ BO POTEM?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "what_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KAJ BO POTEM?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_what_next"
+                    },
+                    {
+                        "id":  "what_did_i_say",
+                        "labelSl":  "KAJ SEM REKLA?",
+                        "semanticType":  "ACTION",
+                        "speechTextSl":  "KAJ SEM REKLA?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "what_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KAJ SEM REKLA?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_what_did_i_say"
+                    },
+                    {
+                        "id":  "where_zana",
+                        "labelSl":  "KJE JE ŽANA?",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "KJE JE ŽANA?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "where_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KJE JE ŽANA?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_where_zana"
+                    },
+                    {
+                        "id":  "where_dusan",
+                        "labelSl":  "KJE JE DUŠAN?",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "KJE JE DUŠAN?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "where_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KJE JE DUŠAN?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_where_dusan"
+                    },
+                    {
+                        "id":  "where_are_we",
+                        "labelSl":  "KJE SMO?",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "KJE SMO?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "where_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KJE SMO?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_where_are_we"
+                    },
+                    {
+                        "id":  "where_phone",
+                        "labelSl":  "KJE JE TELEFON?",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "KJE JE TELEFON?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "where_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KJE JE TELEFON?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_where_phone"
+                    },
+                    {
+                        "id":  "where_wheelchair",
+                        "labelSl":  "KJE JE VOZIČEK?",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "KJE JE VOZIČEK?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "where_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KJE JE VOZIČEK?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_where_wheelchair"
+                    },
+                    {
+                        "id":  "when_come",
+                        "labelSl":  "KDAJ PRIDE?",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "KDAJ PRIDE?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "when_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KDAJ PRIDE?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_when_come"
+                    },
+                    {
+                        "id":  "when_go",
+                        "labelSl":  "KDAJ GREMO?",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "KDAJ GREMO?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "when_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KDAJ GREMO?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_when_go"
+                    },
+                    {
+                        "id":  "when_therapy",
+                        "labelSl":  "KDAJ BO TERAPIJA?",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "KDAJ BO TERAPIJA?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "when_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KDAJ BO TERAPIJA?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_when_therapy"
+                    },
+                    {
+                        "id":  "when_home",
+                        "labelSl":  "KDAJ DOMOV?",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "KDAJ DOMOV?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "when_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KDAJ DOMOV?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_when_home"
+                    },
+                    {
+                        "id":  "when_eat",
+                        "labelSl":  "KDAJ JEMO?",
+                        "semanticType":  "TIME",
+                        "speechTextSl":  "KDAJ JEMO?",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "when_root"
+                                        ],
+                        "aliasesSl":  [
+                                          "KDAJ JEMO?"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_when_eat"
+                    },
+                    {
+                        "id":  "vending_drinks",
+                        "labelSl":  "AVTOMAT PIJAČ",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "AVTOMAT PIJAČ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "real_world"
+                                        ],
+                        "aliasesSl":  [
+                                          "AVTOMAT PIJAČ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_vending_drinks"
+                    },
+                    {
+                        "id":  "vending_coffee_tea",
+                        "labelSl":  "AVTOMAT KAVA/ČAJ",
+                        "semanticType":  "CATEGORY",
+                        "speechTextSl":  "AVTOMAT KAVA/ČAJ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "real_world"
+                                        ],
+                        "aliasesSl":  [
+                                          "AVTOMAT KAVA/ČAJ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_vending_coffee_tea"
+                    },
+                    {
+                        "id":  "shop",
+                        "labelSl":  "TRGOVINA",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "TRGOVINA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "real_world"
+                                        ],
+                        "aliasesSl":  [
+                                          "TRGOVINA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_shop"
+                    },
+                    {
+                        "id":  "restaurant",
+                        "labelSl":  "RESTAVRACIJA",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "RESTAVRACIJA",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "real_world"
+                                        ],
+                        "aliasesSl":  [
+                                          "RESTAVRACIJA"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_restaurant"
+                    },
+                    {
+                        "id":  "transport",
+                        "labelSl":  "PREVOZ",
+                        "semanticType":  "LOCATION",
+                        "speechTextSl":  "PREVOZ",
+                        "activeForPatient":  true,
+                        "canAppearInMultipleParents":  true,
+                        "protectedPlacement":  false,
+                        "parentHints":  [
+                                            "real_world"
+                                        ],
+                        "aliasesSl":  [
+                                          "PREVOZ"
+                                      ],
+                        "guidedQuestionRefs":  {
+
+                                               },
+                        "iconRef":  "icon_transport"
+                    }
+                ]
+}
+
