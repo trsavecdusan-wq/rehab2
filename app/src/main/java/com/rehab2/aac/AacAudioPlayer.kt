@@ -45,6 +45,8 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private var speechRequestSerial = 0
     @Volatile
     private var isSpeechActive = false
+    @Volatile
+    private var hasMusicAudioFocus = false
     private var speechListener: SpeechListener? = null
 
     override fun onInit(status: Int) {
@@ -283,6 +285,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
         if (isTtsFailed) {
             Toast.makeText(context, "GOVOR NI NA VOLJO", Toast.LENGTH_SHORT).show()
+            notifySpeechError()
             return
         }
 
@@ -312,11 +315,19 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
     @Suppress("DEPRECATION")
     private fun requestMusicAudioFocus() {
-        audioManager.requestAudioFocus(
+        val result = audioManager.requestAudioFocus(
             audioFocusChangeListener,
             AudioManager.STREAM_MUSIC,
             AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
         )
+        hasMusicAudioFocus = result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+    }
+
+    @Suppress("DEPRECATION")
+    private fun abandonMusicAudioFocus() {
+        if (!hasMusicAudioFocus) return
+        audioManager.abandonAudioFocus(audioFocusChangeListener)
+        hasMusicAudioFocus = false
     }
 
     private fun resolveTileSpeechText(item: AacItem, languageCode: String): String {
@@ -417,6 +428,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private fun notifySpeechCompleted() {
         if (!isSpeechActive) return
         isSpeechActive = false
+        abandonMusicAudioFocus()
         runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         Log.d(TAG, "SPEECH_COMPLETED")
         postSpeechCallback { it.onSpeechCompleted() }
@@ -425,6 +437,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private fun notifySpeechCancelled() {
         if (!isSpeechActive) return
         isSpeechActive = false
+        abandonMusicAudioFocus()
         runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         Log.d(TAG, "SPEECH_CANCELLED")
         postSpeechCallback { it.onSpeechCancelled() }
@@ -432,6 +445,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
     private fun notifySpeechError() {
         isSpeechActive = false
+        abandonMusicAudioFocus()
         runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         Log.d(TAG, "SPEECH_ERROR")
         postSpeechCallback { it.onSpeechError() }
