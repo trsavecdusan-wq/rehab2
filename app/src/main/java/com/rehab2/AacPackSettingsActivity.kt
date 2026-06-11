@@ -1486,40 +1486,108 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnCoreV2HomeRepair.backgroundTintList = ColorStateList.valueOf(BUSY_BUTTON_COLOR)
         txtStatus.text = "Zaklepam DOM stran AAC Core V2 ..."
         Thread {
-            val result = AacCoreV2HomeRepair.repair(this)
-            mainHandler.post {
-                btnCoreV2HomeRepair.isEnabled = true
-                btnCoreV2HomeRepair.backgroundTintList = ColorStateList.valueOf(0xFF8A6D2F.toInt())
-                when (result) {
-                    is AacCoreV2HomeRepair.Result.Success -> {
-                        txtStatus.text = buildString {
-                            append("DOM stran zaklenjena. Backup je shranjen. Zaprite in ponovno odprite komunikator.\n\n")
-                            append("executed: DA\n")
-                            append("Backup:\n${result.backupDir.absolutePath}\n\n")
-                            append("aac_items.json:\n${result.itemsFilePath}\n\n")
-                            append("dom.json:\n${result.domFilePath}\n\n")
-                            append("reader path check: AacLocalJsonLoader/AacRepository uporabljata AacStoragePaths za iste AAC poti.\n\n")
-                            append("fixed row changed: ${result.fixedRowUpdatedCount}\n")
-                            append("placements changed: ${result.placementsUpdatedCount}\n")
-                            append("dom root changed: ${result.domRootChangedCount}\n")
-                            append("removed DOM root links: ${result.removedDomRootItemCount}\n")
-                            append("JSON write verified: ${if (result.jsonWriteVerified) "DA" else "NE"}\n")
-                            if (result.noChangeReason.isNotBlank()) {
-                                append("Reason: ${result.noChangeReason}\n")
-                            }
-                            append("\nDOM before:\n${result.beforeDomRootItemIds.joinToString(", ")}\n")
-                            append("\nDOM after:\n${result.afterDomRootItemIds.joinToString(", ")}\n")
-                            append("\nfirst 25 after repair:\n")
-                            append(result.afterPage1Positions.take(25).joinToString("\n"))
+            val result = try {
+                AacCoreV2HomeRepair.execute(this)
+            } catch (error: Throwable) {
+                val reportPath = AacCoreV2HomeRepair.writeExceptionReport(
+                    context = this,
+                    error = error,
+                    stage = "activity_execute"
+                )
+                AacCoreV2HomeRepair.Result.Failure(
+                    buildString {
+                        append("Class: ${error.javaClass.name}\n")
+                        append("Message: ${error.message.orEmpty().ifBlank { "(empty)" }}")
+                        if (reportPath.isNotBlank()) {
+                            append("\nReport path: $reportPath")
                         }
-                        refreshLocalAacOverview()
                     }
-                    is AacCoreV2HomeRepair.Result.Failure -> {
-                        txtStatus.text = "Zaklep DOM strani ni uspel.\n${result.reason}"
+                )
+            }
+            val displayedResult = when (result) {
+                is AacCoreV2HomeRepair.Result.Success -> result
+                is AacCoreV2HomeRepair.Result.Failure -> {
+                    if ("Report path:" in result.reason) {
+                        result
+                    } else {
+                        val reportPath = AacCoreV2HomeRepair.writeFailureReport(
+                            context = this,
+                            reason = result.reason,
+                            stage = "activity_failure_result"
+                        )
+                        if (reportPath.isBlank()) {
+                            result
+                        } else {
+                            AacCoreV2HomeRepair.Result.Failure("${result.reason}\nReport path: $reportPath")
+                        }
                     }
                 }
             }
+            mainHandler.post {
+                btnCoreV2HomeRepair.isEnabled = true
+                btnCoreV2HomeRepair.backgroundTintList = ColorStateList.valueOf(0xFF8A6D2F.toInt())
+                val title = coreV2HomeRepairResultTitle(displayedResult)
+                val message = buildCoreV2HomeRepairResultMessage(displayedResult)
+                txtStatus.text = message
+                showCoreV2HomeRepairResultDialog(title, message)
+                if (displayedResult is AacCoreV2HomeRepair.Result.Success) {
+                    refreshLocalAacOverview()
+                }
+            }
         }.start()
+    }
+
+    private fun coreV2HomeRepairResultTitle(result: AacCoreV2HomeRepair.Result): String {
+        return when (result) {
+            is AacCoreV2HomeRepair.Result.Failure -> "ERROR"
+            is AacCoreV2HomeRepair.Result.Success -> {
+                val changed = result.fixedRowUpdatedCount + result.placementsUpdatedCount + result.domRootChangedCount
+                when {
+                    changed == 0 -> "NO CHANGES"
+                    result.jsonWriteVerified -> "SUCCESS"
+                    else -> "ERROR"
+                }
+            }
+        }
+    }
+
+    private fun buildCoreV2HomeRepairResultMessage(result: AacCoreV2HomeRepair.Result): String {
+        return when (result) {
+            is AacCoreV2HomeRepair.Result.Success -> {
+                val changed = result.fixedRowUpdatedCount + result.placementsUpdatedCount + result.domRootChangedCount
+                buildString {
+                    append("executed: DA\n")
+                    append("fixed row changed: ${result.fixedRowUpdatedCount}\n")
+                    append("placements changed: ${result.placementsUpdatedCount}\n")
+                    append("dom root changed: ${result.domRootChangedCount}\n")
+                    append("JSON write verified: ${if (result.jsonWriteVerified) "DA" else "NE"}\n\n")
+                    append("Backup:\n${result.backupDir.absolutePath}\n\n")
+                    append("aac_items.json:\n${result.itemsFilePath}\n\n")
+                    append("dom.json:\n${result.domFilePath}\n\n")
+                    append("first 25 after repair:\n")
+                    append(result.afterPage1Positions.take(25).joinToString("\n"))
+                    if (changed == 0) {
+                        append("\n\nNO CHANGES\n")
+                        append("Reason: ${result.noChangeReason.ifBlank { "No repair counters changed." }}\n")
+                        append("\nDOM before:\n${result.beforeDomRootItemIds.joinToString(", ")}\n")
+                        append("\nDOM after:\n${result.afterDomRootItemIds.joinToString(", ")}\n")
+                        append("\npage_1 before:\n${result.beforePage1Positions.take(25).joinToString("\n")}\n")
+                        append("\npage_1 after:\n${result.afterPage1Positions.take(25).joinToString("\n")}")
+                    }
+                }
+            }
+            is AacCoreV2HomeRepair.Result.Failure -> {
+                "executed: NE\n\n${result.reason}"
+            }
+        }
+    }
+
+    private fun showCoreV2HomeRepairResultDialog(title: String, message: String) {
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     private fun saveAacGridSize(gridSize: Int) {

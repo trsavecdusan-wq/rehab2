@@ -98,6 +98,54 @@ object AacCoreV2HomeRepair {
         data class Failure(val reason: String) : Result()
     }
 
+    fun execute(context: Context): Result = repair(context)
+
+    fun writeExceptionReport(context: Context, error: Throwable, stage: String): String {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return ""
+        val backupDir = createBackupDir(externalFilesDir) ?: return ""
+        val itemsFile = AacStoragePaths.getAacItemsFile(context)
+        val domFile = AacStoragePaths.getProfilesDataDir(context)?.let { profilesDir ->
+            File(profilesDir, DOM_PROFILE_FILE)
+        }
+        return try {
+            writeErrorReport(
+                backupDir = backupDir,
+                itemsFile = itemsFile,
+                domFile = domFile,
+                stage = stage,
+                errorClass = error.javaClass.name,
+                errorMessage = error.message.orEmpty(),
+                reason = "AacCoreV2HomeRepair exception"
+            )
+            backupDir.absolutePath
+        } catch (_: Exception) {
+            ""
+        }
+    }
+
+    fun writeFailureReport(context: Context, reason: String, stage: String): String {
+        val externalFilesDir = context.getExternalFilesDir(null) ?: return ""
+        val backupDir = createBackupDir(externalFilesDir) ?: return ""
+        val itemsFile = AacStoragePaths.getAacItemsFile(context)
+        val domFile = AacStoragePaths.getProfilesDataDir(context)?.let { profilesDir ->
+            File(profilesDir, DOM_PROFILE_FILE)
+        }
+        return try {
+            writeErrorReport(
+                backupDir = backupDir,
+                itemsFile = itemsFile,
+                domFile = domFile,
+                stage = stage,
+                errorClass = "",
+                errorMessage = "",
+                reason = reason
+            )
+            backupDir.absolutePath
+        } catch (_: Exception) {
+            ""
+        }
+    }
+
     fun repair(context: Context): Result {
         val externalFilesDir = context.getExternalFilesDir(null)
             ?: return Result.Failure("External files dir ni na voljo.")
@@ -231,6 +279,17 @@ object AacCoreV2HomeRepair {
                 noChangeReason = noChangeReason
             )
         } catch (error: Exception) {
+            runCatching {
+                writeErrorReport(
+                    backupDir = backupDir,
+                    itemsFile = itemsFile,
+                    domFile = domFile,
+                    stage = "repair_write",
+                    errorClass = error.javaClass.name,
+                    errorMessage = error.message.orEmpty(),
+                    reason = "Repair write failed"
+                )
+            }
             return Result.Failure(
                 "Repair ni mogel shraniti sprememb: ${error.message ?: error.javaClass.simpleName}. " +
                     "Backup je shranjen tukaj: ${backupDir.absolutePath}"
@@ -422,7 +481,7 @@ object AacCoreV2HomeRepair {
     ) {
         val report = JSONObject()
             .put("repairId", "aac_core_v2_home_repair")
-            .put("versionName", "1.2.646")
+            .put("versionName", "1.2.648")
             .put("executed", true)
             .put("itemsFilePath", itemsFile.absolutePath)
             .put("domFilePath", domFile.absolutePath)
@@ -450,6 +509,31 @@ object AacCoreV2HomeRepair {
                 lockedIds.forEach { itemId -> put(itemId) }
             })
             .put("warning", "Restart or reopen communicator after repair.")
+        File(backupDir, "repair_report.json").writeText(report.toString(2), Charsets.UTF_8)
+    }
+
+    private fun writeErrorReport(
+        backupDir: File,
+        itemsFile: File?,
+        domFile: File?,
+        stage: String,
+        errorClass: String,
+        errorMessage: String,
+        reason: String
+    ) {
+        val report = JSONObject()
+            .put("repairId", "aac_core_v2_home_repair")
+            .put("versionName", "1.2.648")
+            .put("executed", false)
+            .put("stage", stage)
+            .put("reason", reason)
+            .put("errorClass", errorClass)
+            .put("errorMessage", errorMessage)
+            .put("itemsFilePath", itemsFile?.absolutePath.orEmpty())
+            .put("itemsFileExists", itemsFile?.isFile == true)
+            .put("domFilePath", domFile?.absolutePath.orEmpty())
+            .put("domFileExists", domFile?.isFile == true)
+            .put("backupPath", backupDir.absolutePath)
         File(backupDir, "repair_report.json").writeText(report.toString(2), Charsets.UTF_8)
     }
 
