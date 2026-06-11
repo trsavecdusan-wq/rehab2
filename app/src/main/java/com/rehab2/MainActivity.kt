@@ -95,6 +95,11 @@ class MainActivity : AppCompatActivity() {
         private const val MAIN_AAC_HOME_PAGE_ID = "home"
         private const val PREFS_AAC_PATIENT_PAGES = "aac_patient_pages"
         private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
+        private const val CORE_V2_REPAIR_PREFS_NAME = "aac_core_v2_home_repair"
+        private const val KEY_CORE_V2_HOME_REPAIR_DONE = "aac_core_v2_home_repair_done"
+        private const val KEY_AAC_HOME_LAYOUT_VERSION = "aac_home_layout_version"
+        private const val CORE_V2_HOME_LAYOUT_VERSION = "core_v2"
+        private const val CORE_V2_HOME_PAGE_ID = "page_1"
         private const val PREFS_AAC_GRID_SETTINGS = "aac_grid_settings"
         private const val KEY_AAC_GRID_SIZE = "aac_grid_size"
         private const val KEY_SHOW_SUBICONS_ON_MAIN_PAGES = "show_subicons_on_main_pages"
@@ -186,6 +191,35 @@ class MainActivity : AppCompatActivity() {
             "family",
             "care",
             "nega"
+        )
+        private val CORE_V2_FIXED_TOP_ROW_POSITIONS = mapOf(
+            "no" to 1,
+            "dont_understand" to 2,
+            "yes" to 3,
+            "thank_you" to 4,
+            "sorry" to 5
+        )
+        private val CORE_V2_HOME_PAGE_POSITIONS = mapOf(
+            "wc" to 6,
+            "pain" to 7,
+            "thirsty" to 8,
+            "hungry" to 9,
+            "tired" to 10,
+            "i_want" to 11,
+            "need" to 12,
+            "people" to 13,
+            "miss_someone" to 14,
+            "call" to 15,
+            "feeling" to 16,
+            "place_group" to 17,
+            "care" to 18,
+            "health" to 19,
+            "dont_want" to 20,
+            "please" to 21,
+            "wait" to 22,
+            "repeat" to 23,
+            "pogovor" to 24,
+            "activity_group" to 25
         )
     }
 
@@ -517,15 +551,26 @@ class MainActivity : AppCompatActivity() {
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
         val items = mergeMainAacFallbackItems(fallbackItems, loadedItems)
         val startPageItems = selectMainStartPlacementItems(items)
+        val coreV2HomeLayoutActive = isCoreV2HomeLayoutActive(items)
         mainAacItemsById = items.associateBy { it.id }
         val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
             items.filter { it.isRootItem && !it.isHiddenUntilParent }
         )
         if (startPageItems.isEmpty()) {
-            currentMainAacPageDebugId = "fallback_root"
-            updateMainAacGridSelectionDebug("fallback_root", fallbackRootItems)
+            if (coreV2HomeLayoutActive) {
+                currentMainAacPageDebugId = "core_v2_empty"
+                updateMainAacGridSelectionDebug("core_v2_empty", emptyList())
+            } else {
+                currentMainAacPageDebugId = "fallback_root"
+                updateMainAacGridSelectionDebug("fallback_root", fallbackRootItems)
+            }
         }
-        showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
+        val displayItems = when {
+            startPageItems.isNotEmpty() -> startPageItems
+            coreV2HomeLayoutActive -> emptyList()
+            else -> fallbackRootItems
+        }
+        showMainAacItems(displayItems)
     }
 
     private fun ensureMainAacGridBindings() {
@@ -907,15 +952,26 @@ class MainActivity : AppCompatActivity() {
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
         val items = mergeMainAacFallbackItems(fallbackItems, loadedItems)
         val startPageItems = selectMainStartPlacementItems(items)
+        val coreV2HomeLayoutActive = isCoreV2HomeLayoutActive(items)
         mainAacItemsById = items.associateBy { it.id }
         val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
             items.filter { it.isRootItem && !it.isHiddenUntilParent }
         )
         if (startPageItems.isEmpty()) {
-            currentMainAacPageDebugId = "fallback_root"
-            updateMainAacGridSelectionDebug("fallback_root", fallbackRootItems)
+            if (coreV2HomeLayoutActive) {
+                currentMainAacPageDebugId = "core_v2_empty"
+                updateMainAacGridSelectionDebug("core_v2_empty", emptyList())
+            } else {
+                currentMainAacPageDebugId = "fallback_root"
+                updateMainAacGridSelectionDebug("fallback_root", fallbackRootItems)
+            }
         }
-        showMainAacItems(startPageItems.ifEmpty { fallbackRootItems })
+        val displayItems = when {
+            startPageItems.isNotEmpty() -> startPageItems
+            coreV2HomeLayoutActive -> emptyList()
+            else -> fallbackRootItems
+        }
+        showMainAacItems(displayItems)
     }
 
     private fun resetMainAacRootOnResume() {
@@ -1672,18 +1728,35 @@ class MainActivity : AppCompatActivity() {
         fallbackItems: List<AacItem>,
         loadedItems: List<AacItem>
     ): List<AacItem> {
+        val coreV2HomeLayoutActive = isCoreV2HomeLayoutActive(loadedItems)
         val loadedById = loadedItems.associateBy { it.id }
         val fallbackIds = fallbackItems.map { it.id }.toSet()
         val mergedFallbackItems = fallbackItems.map { fallbackItem ->
             loadedById[fallbackItem.id]?.let { storedItem ->
-                mergeMainAacFallbackItem(fallbackItem, storedItem)
+                mergeMainAacFallbackItem(fallbackItem, storedItem, coreV2HomeLayoutActive)
             } ?: fallbackItem
         }
         val extraLoadedItems = loadedItems.filter { it.id !in fallbackIds }
         return mergedFallbackItems + extraLoadedItems
     }
 
-    private fun mergeMainAacFallbackItem(fallbackItem: AacItem, storedItem: AacItem): AacItem {
+    private fun mergeMainAacFallbackItem(
+        fallbackItem: AacItem,
+        storedItem: AacItem,
+        coreV2HomeLayoutActive: Boolean
+    ): AacItem {
+        val mergedPlacements = when {
+            storedItem.placements.isNotEmpty() -> if (coreV2HomeLayoutActive) {
+                storedItem.placements.filter { placement ->
+                    placement.pageId != CORE_V2_HOME_PAGE_ID ||
+                        CORE_V2_HOME_PAGE_POSITIONS[fallbackItem.id] == placement.position5x5
+                }
+            } else {
+                storedItem.placements
+            }
+            coreV2HomeLayoutActive -> emptyList()
+            else -> fallbackItem.placements
+        }
         return fallbackItem.copy(
             labelSl = storedItem.labelSl.ifBlank { fallbackItem.labelSl },
             speakTextSl = storedItem.speakTextSl ?: fallbackItem.speakTextSl,
@@ -1707,7 +1780,7 @@ class MainActivity : AppCompatActivity() {
             conceptId = storedItem.conceptId ?: fallbackItem.conceptId,
             children = storedItem.children.ifEmpty { fallbackItem.children },
             visibleUnderIds = storedItem.visibleUnderIds.ifEmpty { fallbackItem.visibleUnderIds },
-            placements = storedItem.placements.ifEmpty { fallbackItem.placements },
+            placements = mergedPlacements,
             isRootItem = storedItem.isRootItem,
             isHiddenUntilParent = storedItem.isHiddenUntilParent,
             fixedTopRowPosition = storedItem.fixedTopRowPosition ?: fallbackItem.fixedTopRowPosition,
@@ -1716,6 +1789,38 @@ class MainActivity : AppCompatActivity() {
             opensSubicons = storedItem.opensSubicons,
             priority = storedItem.priority
         )
+    }
+
+    private fun isCoreV2HomeLayoutActive(items: List<AacItem>): Boolean {
+        return isCoreV2HomeRepairMarked() ||
+            isCoreV2HomeLayout(items) ||
+            isCoreV2DomProfileItemIds()
+    }
+
+    private fun isCoreV2HomeRepairMarked(): Boolean {
+        val prefs = getSharedPreferences(CORE_V2_REPAIR_PREFS_NAME, MODE_PRIVATE)
+        return prefs.getBoolean(KEY_CORE_V2_HOME_REPAIR_DONE, false) ||
+            prefs.getString(KEY_AAC_HOME_LAYOUT_VERSION, "").orEmpty() == CORE_V2_HOME_LAYOUT_VERSION
+    }
+
+    private fun isCoreV2HomeLayout(items: List<AacItem>): Boolean {
+        val itemsById = items.associateBy { it.id }
+        val fixedMatches = CORE_V2_FIXED_TOP_ROW_POSITIONS.all { (itemId, position) ->
+            itemsById[itemId]?.fixedTopRowPosition == position
+        }
+        val pageMatches = CORE_V2_HOME_PAGE_POSITIONS.all { (itemId, position) ->
+            itemsById[itemId]?.placements?.any { placement ->
+                placement.pageId == CORE_V2_HOME_PAGE_ID && placement.position5x5 == position
+            } == true
+        }
+        return fixedMatches && pageMatches
+    }
+
+    private fun isCoreV2DomProfileItemIds(): Boolean {
+        val lockedIds = CORE_V2_FIXED_TOP_ROW_POSITIONS.keys.toList() + CORE_V2_HOME_PAGE_POSITIONS.keys.toList()
+        return AacLocalJsonLoader.loadProfiles(this).any { profile ->
+            profile.id == "dom" && profile.itemIds == lockedIds
+        }
     }
 
     private fun selectMainStartPlacementItems(items: List<AacItem>): List<AacItem> {
