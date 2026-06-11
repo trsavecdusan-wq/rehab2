@@ -79,6 +79,18 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/btnCoreV2HomeRepair"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="#8A6D2F"
+            android:text="ZAKLENI DOMOV STRAN (AAC CORE V2)"
+            android:textAllCaps="false"
+            android:textColor="#F4F7FA"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

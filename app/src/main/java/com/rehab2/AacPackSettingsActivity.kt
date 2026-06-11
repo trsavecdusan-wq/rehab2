@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.rehab2.aac.AacContentBootstrap
+import com.rehab2.aac.AacCoreV2HomeRepair
 import com.rehab2.aac.AacIconZipImporter
 import com.rehab2.aac.AacLocalJsonLoader
 import com.rehab2.aac.AacPackExporter
@@ -123,6 +124,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private lateinit var communicatorDashboardActions: LinearLayout
     private lateinit var txtAacBootstrapStatus: TextView
     private lateinit var btnRepairAacBootstrap: Button
+    private lateinit var btnCoreV2HomeRepair: Button
     private lateinit var txtAacGridSizeStatus: TextView
     private lateinit var btnAacGrid3x3: Button
     private lateinit var btnAacGrid4x4: Button
@@ -260,6 +262,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
         communicatorDashboardActions = findViewById(R.id.communicatorDashboardActions)
         txtAacBootstrapStatus = findViewById(R.id.txtAacBootstrapStatus)
         btnRepairAacBootstrap = findViewById(R.id.btnRepairAacBootstrap)
+        btnCoreV2HomeRepair = findViewById(R.id.btnCoreV2HomeRepair)
         txtAacGridSizeStatus = findViewById(R.id.txtAacGridSizeStatus)
         btnAacGrid3x3 = findViewById(R.id.btnAacGrid3x3)
         btnAacGrid4x4 = findViewById(R.id.btnAacGrid4x4)
@@ -490,6 +493,9 @@ class AacPackSettingsActivity : AppCompatActivity() {
         }
         btnRepairAacBootstrap.setOnClickListener {
             repairPatientAacBootstrap()
+        }
+        btnCoreV2HomeRepair.setOnClickListener {
+            confirmCoreV2HomeRepair()
         }
         btnAacGrid3x3.setOnClickListener { saveAacGridSize(3) }
         btnAacGrid4x4.setOnClickListener { saveAacGridSize(4) }
@@ -1460,6 +1466,47 @@ class AacPackSettingsActivity : AppCompatActivity() {
             append("DOM povezanih ikon: ${result.domProfileLinkedItemCount}")
         }
         refreshLocalAacOverview()
+    }
+
+    private fun confirmCoreV2HomeRepair() {
+        AlertDialog.Builder(this)
+            .setTitle("ZAKLENI DOMOV STRAN")
+            .setMessage(
+                "To bo uredilo DOM AAC na eno stran: 5 fiksnih ikon in 20 glavnih ikon.\n\n" +
+                    "Obstoječe slike, osebe, podikone in govor se ne bodo izbrisali.\n" +
+                    "Pred spremembo bo narejen backup."
+            )
+            .setPositiveButton("ZAKLENI") { _, _ -> runCoreV2HomeRepair() }
+            .setNegativeButton("PREKLIČI", null)
+            .show()
+    }
+
+    private fun runCoreV2HomeRepair() {
+        btnCoreV2HomeRepair.isEnabled = false
+        btnCoreV2HomeRepair.backgroundTintList = ColorStateList.valueOf(BUSY_BUTTON_COLOR)
+        txtStatus.text = "Zaklepam DOM stran AAC Core V2 ..."
+        Thread {
+            val result = AacCoreV2HomeRepair.repair(this)
+            mainHandler.post {
+                btnCoreV2HomeRepair.isEnabled = true
+                btnCoreV2HomeRepair.backgroundTintList = ColorStateList.valueOf(0xFF8A6D2F.toInt())
+                when (result) {
+                    is AacCoreV2HomeRepair.Result.Success -> {
+                        txtStatus.text = buildString {
+                            append("DOM stran zaklenjena. Backup je shranjen. Zaprite in ponovno odprite komunikator.\n\n")
+                            append("Backup:\n${result.backupDir.absolutePath}\n\n")
+                            append("Fixed row popravki: ${result.fixedRowUpdatedCount}\n")
+                            append("Placement/root popravki: ${result.placementsUpdatedCount}\n")
+                            append("Odstranjenih DOM root povezav: ${result.removedDomRootItemCount}")
+                        }
+                        refreshLocalAacOverview()
+                    }
+                    is AacCoreV2HomeRepair.Result.Failure -> {
+                        txtStatus.text = "Zaklep DOM strani ni uspel.\n${result.reason}"
+                    }
+                }
+            }
+        }.start()
     }
 
     private fun saveAacGridSize(gridSize: Int) {
