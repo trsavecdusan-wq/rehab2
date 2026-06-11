@@ -16,6 +16,10 @@ object AacCoreV2HomeRepair {
     private const val KEY_PATIENT_PAGES = "patient_pages"
     private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
     private const val PATIENT_PAGE_FIELD_SEPARATOR = "\u001F"
+    private const val CORE_V2_REPAIR_PREFS_NAME = "aac_core_v2_home_repair"
+    private const val KEY_CORE_V2_HOME_REPAIR_DONE = "aac_core_v2_home_repair_done"
+    private const val KEY_AAC_HOME_LAYOUT_VERSION = "aac_home_layout_version"
+    private const val CORE_V2_HOME_LAYOUT_VERSION = "core_v2"
 
     private val lockedIds = listOf(
         "no",
@@ -251,6 +255,7 @@ object AacCoreV2HomeRepair {
             domFile.writeText(outputDom.toString(2), Charsets.UTF_8)
             writePatientPagePrefs(context)
             writeActiveDomProfile(context)
+            writeCoreV2HomeRepairMarker(context)
 
             val writtenItems = parseItemsFile(itemsFile)
             val writtenDom = parseDomFile(domFile)
@@ -497,6 +502,14 @@ object AacCoreV2HomeRepair {
             .apply()
     }
 
+    private fun writeCoreV2HomeRepairMarker(context: Context) {
+        context.getSharedPreferences(CORE_V2_REPAIR_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_CORE_V2_HOME_REPAIR_DONE, true)
+            .putString(KEY_AAC_HOME_LAYOUT_VERSION, CORE_V2_HOME_LAYOUT_VERSION)
+            .apply()
+    }
+
     private fun writeReport(
         backupDir: File,
         itemsFile: File,
@@ -516,13 +529,15 @@ object AacCoreV2HomeRepair {
     ) {
         val report = JSONObject()
             .put("repairId", "aac_core_v2_home_repair")
-            .put("versionName", "1.2.650")
+            .put("versionName", "1.2.652")
             .put("executed", true)
             .put("itemsFilePath", itemsFile.absolutePath)
             .put("domFilePath", domFile.absolutePath)
             .put("backupPath", backupDir.absolutePath)
             .put("activeProfileBefore", activeProfileBefore)
             .put("activeProfileAfter", activeProfileAfter)
+            .put("coreV2HomeRepairMarker", true)
+            .put("aacHomeLayoutVersion", CORE_V2_HOME_LAYOUT_VERSION)
             .put("beforeDomRootCount", beforeDomRootItemIds.size)
             .put("afterDomRootCount", afterDomRootItemIds.size)
             .put("repositoryPathCheck", "AacLocalJsonLoader, AacRepository, editor, diagnostics and repair all use AacStoragePaths for AAC items and profiles.")
@@ -562,7 +577,7 @@ object AacCoreV2HomeRepair {
     ) {
         val report = JSONObject()
             .put("repairId", "aac_core_v2_home_repair")
-            .put("versionName", "1.2.650")
+            .put("versionName", "1.2.652")
             .put("executed", false)
             .put("stage", stage)
             .put("reason", reason)

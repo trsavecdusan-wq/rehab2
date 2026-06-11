@@ -13,6 +13,10 @@ object AacContentBootstrap {
     private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
     private const val PATIENT_PAGE_SEPARATOR = "\u001E"
     private const val PATIENT_PAGE_FIELD_SEPARATOR = "\u001F"
+    private const val CORE_V2_REPAIR_PREFS_NAME = "aac_core_v2_home_repair"
+    private const val KEY_CORE_V2_HOME_REPAIR_DONE = "aac_core_v2_home_repair_done"
+    private const val KEY_AAC_HOME_LAYOUT_VERSION = "aac_home_layout_version"
+    private const val CORE_V2_HOME_LAYOUT_VERSION = "core_v2"
     private const val DEFAULT_PAGE_ID = "page_1"
     private const val DEFAULT_PAGE_TITLE = "STRAN 1"
     private const val DOM_PROFILE_ID = "dom"
@@ -199,7 +203,7 @@ object AacContentBootstrap {
         }
         val addedPlacements = defaultPagePlacements + starterPlacements
         val repairedFixedTopRowMetadata = repairFixedTopRowMetadata(itemsArray)
-        val repairedDefaultPageV3Placements = repairDefaultPageV3Placements(itemsArray, defaultPageId)
+        val repairedDefaultPageV3Placements = repairDefaultPageV3Placements(context, itemsArray, defaultPageId)
         val repairedNoUnderstandLabels = repairNoUnderstandSystemLabels(itemsArray)
         val repairedDrinkSpeechItems = repairDrinkChildSpeechItems(itemsArray)
         val repairedFoodSpeechItems = repairFoodChildSpeechItems(itemsArray)
@@ -631,8 +635,11 @@ object AacContentBootstrap {
         return repaired
     }
 
-    private fun repairDefaultPageV3Placements(itemsArray: JSONArray, pageId: String): Int {
+    private fun repairDefaultPageV3Placements(context: Context, itemsArray: JSONArray, pageId: String): Int {
         if (pageId.isBlank()) return 0
+        if (isCoreV2HomeRepairMarked(context) || isCoreV2HomeLayout(itemsArray, pageId)) {
+            return 0
+        }
         val desiredPositions = mapOf(
             "people" to 1,
             "need" to 2,
@@ -714,6 +721,70 @@ object AacContentBootstrap {
             }
         }
         return repaired
+    }
+
+    private fun isCoreV2HomeRepairMarked(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(CORE_V2_REPAIR_PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_CORE_V2_HOME_REPAIR_DONE, false) ||
+            prefs.getString(KEY_AAC_HOME_LAYOUT_VERSION, "").orEmpty() == CORE_V2_HOME_LAYOUT_VERSION
+    }
+
+    private fun isCoreV2HomeLayout(itemsArray: JSONArray, pageId: String): Boolean {
+        val expectedFixedPositions = mapOf(
+            "no" to 1,
+            "dont_understand" to 2,
+            "yes" to 3,
+            "thank_you" to 4,
+            "sorry" to 5
+        )
+        val expectedPagePositions = mapOf(
+            "wc" to 6,
+            "pain" to 7,
+            "thirsty" to 8,
+            "hungry" to 9,
+            "tired" to 10,
+            "i_want" to 11,
+            "need" to 12,
+            "people" to 13,
+            "miss_someone" to 14,
+            "call" to 15,
+            "feeling" to 16,
+            "place_group" to 17,
+            "care" to 18,
+            "health" to 19,
+            "dont_want" to 20,
+            "please" to 21,
+            "wait" to 22,
+            "repeat" to 23,
+            "pogovor" to 24,
+            "activity_group" to 25
+        )
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+        val fixedMatches = expectedFixedPositions.all { (itemId, position) ->
+            itemsById[itemId]?.optInt("fixedTopRowPosition", 0) == position
+        }
+        val pageMatches = expectedPagePositions.all { (itemId, position) ->
+            itemHasPlacement(itemsById[itemId], pageId, position)
+        }
+        return fixedMatches && pageMatches
+    }
+
+    private fun itemHasPlacement(item: JSONObject?, pageId: String, position: Int): Boolean {
+        val placements = item?.optJSONArray("placements") ?: return false
+        for (index in 0 until placements.length()) {
+            val placement = placements.optJSONObject(index) ?: continue
+            if (
+                placement.optString("pageId").trim() == pageId &&
+                placement.optInt("position5x5", 0) == position
+            ) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun repairDrinkChildSpeechItems(itemsArray: JSONArray): Int {
