@@ -979,7 +979,7 @@ class SettingsActivity : AppCompatActivity() {
             .setPositiveButton("NADALJUJ") { _, _ ->
                 val enteredPin = input.text?.toString().orEmpty()
                 if (enteredPin == currentAdvancedSettingsPin() || isProgrammerPin(enteredPin)) {
-                    setSettingsDisplayMode(SettingsDisplayMode.ADVANCED)
+                    unlockAdvancedSettingsMode()
                 } else {
                     setSettingsDisplayMode(SettingsDisplayMode.THERAPIST)
                     Toast.makeText(this, "Napačen PIN", Toast.LENGTH_SHORT).show()
@@ -989,6 +989,13 @@ class SettingsActivity : AppCompatActivity() {
                 setSettingsDisplayMode(SettingsDisplayMode.THERAPIST)
             }
             .show()
+    }
+
+    private fun unlockAdvancedSettingsMode() {
+        settingsDisplayMode = SettingsDisplayMode.ADVANCED
+        activeSettingsSection = null
+        showSettingsHub()
+        Toast.makeText(this, "Napredni način odklenjen", Toast.LENGTH_SHORT).show()
     }
 
     private fun currentAdvancedSettingsPin(): String {
