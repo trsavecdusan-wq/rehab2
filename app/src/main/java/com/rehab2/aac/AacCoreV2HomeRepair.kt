@@ -529,7 +529,7 @@ object AacCoreV2HomeRepair {
     ) {
         val report = JSONObject()
             .put("repairId", "aac_core_v2_home_repair")
-            .put("versionName", "1.2.654")
+            .put("versionName", "1.2.656")
             .put("executed", true)
             .put("itemsFilePath", itemsFile.absolutePath)
             .put("domFilePath", domFile.absolutePath)
@@ -577,7 +577,7 @@ object AacCoreV2HomeRepair {
     ) {
         val report = JSONObject()
             .put("repairId", "aac_core_v2_home_repair")
-            .put("versionName", "1.2.654")
+            .put("versionName", "1.2.656")
             .put("executed", false)
             .put("stage", stage)
             .put("reason", reason)

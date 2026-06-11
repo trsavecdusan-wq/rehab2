@@ -326,6 +326,7 @@ class MainActivity : AppCompatActivity() {
     private val pendingMainAacPretranslationLanguages = mutableSetOf<String>()
     private var mainAacAutoSentenceMaySpeakSingle = false
     private var isMainAacInputLocked = false
+    private var shouldLockMainAacInputOnSpeechStart = true
     private var isMainAacTerminalSelectionAccepted = false
     private var shouldResetMainAacRootAfterSpeech = false
     private var selectedMainAacItemId: String? = null
@@ -403,18 +404,23 @@ class MainActivity : AppCompatActivity() {
         aacAudioPlayer = AacAudioPlayer(this)
         aacAudioPlayer.setSpeechListener(object : AacAudioPlayer.SpeechListener {
             override fun onSpeechStarted() {
-                lockMainAacInput()
+                if (shouldLockMainAacInputOnSpeechStart) {
+                    lockMainAacInput()
+                }
             }
 
             override fun onSpeechCompleted() {
+                shouldLockMainAacInputOnSpeechStart = true
                 completeMainAacSpeechLock()
             }
 
             override fun onSpeechCancelled() {
+                shouldLockMainAacInputOnSpeechStart = true
                 completeMainAacSpeechLock()
             }
 
             override fun onSpeechError() {
+                shouldLockMainAacInputOnSpeechStart = true
                 completeMainAacSpeechLock()
             }
         })
@@ -1000,7 +1006,6 @@ class MainActivity : AppCompatActivity() {
             selectedMainAacItemId = item.id
             updateMainAacConversationContextForBranch(item)
             prepareMainAacContextPrompt(item)
-            lockMainAacInput()
             mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
             currentMainAacPageDebugId = item.targetPageId
             showMainAacItems(targetPageItems)
@@ -1017,7 +1022,6 @@ class MainActivity : AppCompatActivity() {
                 selectedMainAacItemId = item.id
                 updateMainAacConversationContextForBranch(item)
                 prepareMainAacContextPrompt(item)
-                lockMainAacInput()
                 mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
                 currentMainAacPageDebugId = "children:${item.id}"
                 updateMainAacGridSelectionDebug(currentMainAacPageDebugId, childItems)
@@ -1066,6 +1070,7 @@ class MainActivity : AppCompatActivity() {
             .ifBlank { mainAacQuestionFallback(item, languageCode) }
         if (prompt.isNotBlank()) {
             showMainAacQuestion(prompt)
+            shouldLockMainAacInputOnSpeechStart = false
             aacAudioPlayer.speakText(prompt, languageCode)
         } else {
             hideMainAacQuestion()
@@ -1252,6 +1257,7 @@ class MainActivity : AppCompatActivity() {
         if (resolvedSpeechText.isNotBlank()) {
             selectedMainAacItemId = item.id
             recordMainAacUsage(item)
+            shouldLockMainAacInputOnSpeechStart = true
             lockMainAacInput()
             aacAudioPlayer.speakText(resolvedSpeechText, languageCode)
             shouldResetMainAacRootAfterSpeech = true
@@ -2217,6 +2223,7 @@ class MainActivity : AppCompatActivity() {
         val languageCode = getActiveSpeechLanguage()
         val sentence = mainAacSentenceManager.getSpeakText(languageCode).trim()
         if (shouldSpeakSentence && sentence.isNotBlank()) {
+            shouldLockMainAacInputOnSpeechStart = true
             lockMainAacInput()
             cancelMainAacGuidedAutoComplete()
             aacAudioPlayer.speakText(sentence, languageCode)
@@ -2228,6 +2235,7 @@ class MainActivity : AppCompatActivity() {
     private fun speakMainAacSentenceNow(languageCode: String) {
         val sentence = mainAacSentenceManager.getSpeakText(languageCode).trim()
         if (sentence.isNotBlank()) {
+            shouldLockMainAacInputOnSpeechStart = true
             lockMainAacInput()
             showMainAacQuestion(sentence)
             aacAudioPlayer.speakText(sentence, languageCode)
