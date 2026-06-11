@@ -1494,10 +1494,23 @@ class AacPackSettingsActivity : AppCompatActivity() {
                     is AacCoreV2HomeRepair.Result.Success -> {
                         txtStatus.text = buildString {
                             append("DOM stran zaklenjena. Backup je shranjen. Zaprite in ponovno odprite komunikator.\n\n")
+                            append("executed: DA\n")
                             append("Backup:\n${result.backupDir.absolutePath}\n\n")
-                            append("Fixed row popravki: ${result.fixedRowUpdatedCount}\n")
-                            append("Placement/root popravki: ${result.placementsUpdatedCount}\n")
-                            append("Odstranjenih DOM root povezav: ${result.removedDomRootItemCount}")
+                            append("aac_items.json:\n${result.itemsFilePath}\n\n")
+                            append("dom.json:\n${result.domFilePath}\n\n")
+                            append("reader path check: AacLocalJsonLoader/AacRepository uporabljata AacStoragePaths za iste AAC poti.\n\n")
+                            append("fixed row changed: ${result.fixedRowUpdatedCount}\n")
+                            append("placements changed: ${result.placementsUpdatedCount}\n")
+                            append("dom root changed: ${result.domRootChangedCount}\n")
+                            append("removed DOM root links: ${result.removedDomRootItemCount}\n")
+                            append("JSON write verified: ${if (result.jsonWriteVerified) "DA" else "NE"}\n")
+                            if (result.noChangeReason.isNotBlank()) {
+                                append("Reason: ${result.noChangeReason}\n")
+                            }
+                            append("\nDOM before:\n${result.beforeDomRootItemIds.joinToString(", ")}\n")
+                            append("\nDOM after:\n${result.afterDomRootItemIds.joinToString(", ")}\n")
+                            append("\nfirst 25 after repair:\n")
+                            append(result.afterPage1Positions.take(25).joinToString("\n"))
                         }
                         refreshLocalAacOverview()
                     }

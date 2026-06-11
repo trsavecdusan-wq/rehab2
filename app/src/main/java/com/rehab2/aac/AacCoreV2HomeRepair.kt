@@ -81,9 +81,18 @@ object AacCoreV2HomeRepair {
     sealed class Result {
         data class Success(
             val backupDir: File,
+            val itemsFilePath: String,
+            val domFilePath: String,
+            val beforeDomRootItemIds: List<String>,
+            val afterDomRootItemIds: List<String>,
+            val beforePage1Positions: List<String>,
+            val afterPage1Positions: List<String>,
             val fixedRowUpdatedCount: Int,
             val placementsUpdatedCount: Int,
-            val removedDomRootItemCount: Int
+            val domRootChangedCount: Int,
+            val removedDomRootItemCount: Int,
+            val jsonWriteVerified: Boolean,
+            val noChangeReason: String
         ) : Result()
 
         data class Failure(val reason: String) : Result()
@@ -105,6 +114,7 @@ object AacCoreV2HomeRepair {
         if (missingIds.isNotEmpty()) {
             return Result.Failure("Manjkajo zaklenjeni AAC itemi: ${missingIds.joinToString(", ")}")
         }
+        val beforePage1Positions = page1PositionLines(parsedItems.itemsArray)
 
         val profilesDir = AacStoragePaths.getProfilesDataDir(context)
             ?: return Result.Failure("Mape profilov ni mogoce odpreti.")
@@ -170,9 +180,15 @@ object AacCoreV2HomeRepair {
         domProfile.put("itemIds", JSONArray().apply {
             lockedIds.forEach { itemId -> put(itemId) }
         })
+        val afterDomTargetIds = lockedIds
+        val domRootChangedCount = if (previousDomIds == afterDomTargetIds) 0 else 1
         val removedDomRootItemCount = previousDomIds.filterNot { it in lockedIds }.distinct().size
         val outputDom = writeDomProfile(domRoot, domProfile)
 
+        var afterDomRootItemIds = emptyList<String>()
+        var afterPage1Positions = emptyList<String>()
+        var jsonWriteVerified = false
+        var noChangeReason = ""
         try {
             if (!profilesDir.exists() && !profilesDir.mkdirs()) {
                 return Result.Failure("Mape profilov ni bilo mogoce ustvariti.")
@@ -180,7 +196,40 @@ object AacCoreV2HomeRepair {
             itemsFile.writeText(parsedItems.toJsonText(), Charsets.UTF_8)
             domFile.writeText(outputDom.toString(2), Charsets.UTF_8)
             writePatientPagePrefs(context)
-            writeReport(backupDir, fixedRowUpdatedCount, placementsUpdatedCount, removedDomRootItemCount)
+
+            val writtenItems = parseItemsFile(itemsFile)
+            val writtenDom = parseDomFile(domFile)
+            afterDomRootItemIds = stringList(domProfile(writtenDom?.root ?: JSONObject())?.optJSONArray("itemIds"))
+            afterPage1Positions = writtenItems?.let { page1PositionLines(it.itemsArray) }.orEmpty()
+            jsonWriteVerified = writtenItems != null &&
+                writtenDom != null &&
+                afterDomRootItemIds == afterDomTargetIds &&
+                page1PositionMatchesLocked(writtenItems.itemsArray)
+            noChangeReason = buildNoChangeReason(
+                fixedRowUpdatedCount = fixedRowUpdatedCount,
+                placementsUpdatedCount = placementsUpdatedCount,
+                domRootChangedCount = domRootChangedCount,
+                beforeDomRootItemIds = previousDomIds,
+                afterDomRootItemIds = afterDomRootItemIds,
+                beforePage1Positions = beforePage1Positions,
+                afterPage1Positions = afterPage1Positions,
+                jsonWriteVerified = jsonWriteVerified
+            )
+            writeReport(
+                backupDir = backupDir,
+                itemsFile = itemsFile,
+                domFile = domFile,
+                beforeDomRootItemIds = previousDomIds,
+                afterDomRootItemIds = afterDomRootItemIds,
+                beforePage1Positions = beforePage1Positions,
+                afterPage1Positions = afterPage1Positions,
+                fixedRowUpdatedCount = fixedRowUpdatedCount,
+                placementsUpdatedCount = placementsUpdatedCount,
+                domRootChangedCount = domRootChangedCount,
+                removedDomRootItemCount = removedDomRootItemCount,
+                jsonWriteVerified = jsonWriteVerified,
+                noChangeReason = noChangeReason
+            )
         } catch (error: Exception) {
             return Result.Failure(
                 "Repair ni mogel shraniti sprememb: ${error.message ?: error.javaClass.simpleName}. " +
@@ -190,9 +239,18 @@ object AacCoreV2HomeRepair {
 
         return Result.Success(
             backupDir = backupDir,
+            itemsFilePath = itemsFile.absolutePath,
+            domFilePath = domFile.absolutePath,
+            beforeDomRootItemIds = previousDomIds,
+            afterDomRootItemIds = afterDomRootItemIds,
+            beforePage1Positions = beforePage1Positions,
+            afterPage1Positions = afterPage1Positions,
             fixedRowUpdatedCount = fixedRowUpdatedCount,
             placementsUpdatedCount = placementsUpdatedCount,
-            removedDomRootItemCount = removedDomRootItemCount
+            domRootChangedCount = domRootChangedCount,
+            removedDomRootItemCount = removedDomRootItemCount,
+            jsonWriteVerified = jsonWriteVerified,
+            noChangeReason = noChangeReason
         )
     }
 
@@ -253,6 +311,66 @@ object AacCoreV2HomeRepair {
         return oldText != next.toString()
     }
 
+    private fun page1PositionLines(itemsArray: JSONArray): List<String> {
+        return page1PositionIds(itemsArray).mapIndexed { index, itemIds ->
+            "${index + 1}: ${itemIds.ifEmpty { listOf("-") }.joinToString(", ")}"
+        }
+    }
+
+    private fun page1PositionMatchesLocked(itemsArray: JSONArray): Boolean {
+        val slots = page1PositionIds(itemsArray)
+        return slots.size == lockedIds.size &&
+            slots.map { it.singleOrNull().orEmpty() } == lockedIds
+    }
+
+    private fun page1PositionIds(itemsArray: JSONArray): List<List<String>> {
+        val slots = List(lockedIds.size) { mutableListOf<String>() }
+        itemObjects(itemsArray).forEach { item ->
+            val itemId = item.optString("id").trim()
+            if (itemId.isBlank()) return@forEach
+            val fixedPosition = item.optInt("fixedTopRowPosition", 0)
+            if (fixedPosition in 1..5) {
+                slots[fixedPosition - 1].addUnique(itemId)
+            }
+            val placements = item.optJSONArray("placements") ?: return@forEach
+            for (index in 0 until placements.length()) {
+                val placement = placements.optJSONObject(index) ?: continue
+                if (placement.optString("pageId").trim() != HOME_PAGE_ID) continue
+                val position = placement.optInt("position5x5", 0)
+                if (position in 1..lockedIds.size) {
+                    slots[position - 1].addUnique(itemId)
+                }
+            }
+        }
+        return slots.map { it.toList() }
+    }
+
+    private fun MutableList<String>.addUnique(value: String) {
+        if (value !in this) add(value)
+    }
+
+    private fun buildNoChangeReason(
+        fixedRowUpdatedCount: Int,
+        placementsUpdatedCount: Int,
+        domRootChangedCount: Int,
+        beforeDomRootItemIds: List<String>,
+        afterDomRootItemIds: List<String>,
+        beforePage1Positions: List<String>,
+        afterPage1Positions: List<String>,
+        jsonWriteVerified: Boolean
+    ): String {
+        if (fixedRowUpdatedCount + placementsUpdatedCount + domRootChangedCount != 0) {
+            return ""
+        }
+        if (!jsonWriteVerified) {
+            return "No counters changed, but JSON write verification failed after repair."
+        }
+        if (beforeDomRootItemIds == afterDomRootItemIds && beforePage1Positions == afterPage1Positions) {
+            return "No counters changed because DOM itemIds and page_1 positions already matched the repair target before writing."
+        }
+        return "No counters changed, but before/after snapshots differ. Check repair_report.json for path or parser mismatch."
+    }
+
     private fun domProfile(root: JSONObject): JSONObject? {
         if (root.optString("id").trim() == DOM_PROFILE_ID) return root
         val profiles = root.optJSONArray("profiles") ?: return null
@@ -289,16 +407,45 @@ object AacCoreV2HomeRepair {
 
     private fun writeReport(
         backupDir: File,
+        itemsFile: File,
+        domFile: File,
+        beforeDomRootItemIds: List<String>,
+        afterDomRootItemIds: List<String>,
+        beforePage1Positions: List<String>,
+        afterPage1Positions: List<String>,
         fixedRowUpdatedCount: Int,
         placementsUpdatedCount: Int,
-        removedDomRootItemCount: Int
+        domRootChangedCount: Int,
+        removedDomRootItemCount: Int,
+        jsonWriteVerified: Boolean,
+        noChangeReason: String
     ) {
         val report = JSONObject()
             .put("repairId", "aac_core_v2_home_repair")
-            .put("versionName", "1.2.642")
+            .put("versionName", "1.2.646")
+            .put("executed", true)
+            .put("itemsFilePath", itemsFile.absolutePath)
+            .put("domFilePath", domFile.absolutePath)
+            .put("backupPath", backupDir.absolutePath)
+            .put("repositoryPathCheck", "AacLocalJsonLoader, AacRepository, editor, diagnostics and repair all use AacStoragePaths for AAC items and profiles.")
+            .put("beforeDomRootItemIds", JSONArray().apply {
+                beforeDomRootItemIds.forEach { itemId -> put(itemId) }
+            })
+            .put("afterDomRootItemIds", JSONArray().apply {
+                afterDomRootItemIds.forEach { itemId -> put(itemId) }
+            })
+            .put("beforePage1Positions", JSONArray().apply {
+                beforePage1Positions.forEach { line -> put(line) }
+            })
+            .put("afterPage1Positions", JSONArray().apply {
+                afterPage1Positions.forEach { line -> put(line) }
+            })
             .put("fixedRowUpdatedCount", fixedRowUpdatedCount)
             .put("placementsUpdatedCount", placementsUpdatedCount)
+            .put("domRootChangedCount", domRootChangedCount)
             .put("removedDomRootItemCount", removedDomRootItemCount)
+            .put("jsonWriteVerified", jsonWriteVerified)
+            .put("noChangeReason", noChangeReason)
             .put("lockedIds", JSONArray().apply {
                 lockedIds.forEach { itemId -> put(itemId) }
             })
