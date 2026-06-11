@@ -1541,7 +1541,10 @@ class AacPackSettingsActivity : AppCompatActivity() {
         return when (result) {
             is AacCoreV2HomeRepair.Result.Failure -> "ERROR"
             is AacCoreV2HomeRepair.Result.Success -> {
-                val changed = result.fixedRowUpdatedCount + result.placementsUpdatedCount + result.domRootChangedCount
+                val changed = result.fixedRowUpdatedCount +
+                    result.placementsUpdatedCount +
+                    result.domRootChangedCount +
+                    result.activeProfileChangedCount
                 when {
                     changed == 0 -> "NO CHANGES"
                     result.jsonWriteVerified -> "SUCCESS"
@@ -1554,23 +1557,31 @@ class AacPackSettingsActivity : AppCompatActivity() {
     private fun buildCoreV2HomeRepairResultMessage(result: AacCoreV2HomeRepair.Result): String {
         return when (result) {
             is AacCoreV2HomeRepair.Result.Success -> {
-                val changed = result.fixedRowUpdatedCount + result.placementsUpdatedCount + result.domRootChangedCount
+                val changed = result.fixedRowUpdatedCount +
+                    result.placementsUpdatedCount +
+                    result.domRootChangedCount +
+                    result.activeProfileChangedCount
                 buildString {
                     append("executed: DA\n")
                     append("fixed row changed: ${result.fixedRowUpdatedCount}\n")
                     append("placements changed: ${result.placementsUpdatedCount}\n")
                     append("dom root changed: ${result.domRootChangedCount}\n")
+                    append("active profile changed: ${result.activeProfileChangedCount}\n")
                     append("JSON write verified: ${if (result.jsonWriteVerified) "DA" else "NE"}\n\n")
+                    append("before root count: ${result.beforeDomRootCount}\n")
+                    append("after root count: ${result.afterDomRootCount}\n")
+                    append("active profile before: ${result.activeProfileBefore}\n")
+                    append("active profile after: ${result.activeProfileAfter}\n\n")
                     append("Backup:\n${result.backupDir.absolutePath}\n\n")
                     append("aac_items.json:\n${result.itemsFilePath}\n\n")
                     append("dom.json:\n${result.domFilePath}\n\n")
+                    append("DOM before:\n${result.beforeDomRootItemIds.joinToString(", ")}\n\n")
+                    append("DOM after:\n${result.afterDomRootItemIds.joinToString(", ")}\n\n")
                     append("first 25 after repair:\n")
                     append(result.afterPage1Positions.take(25).joinToString("\n"))
                     if (changed == 0) {
                         append("\n\nNO CHANGES\n")
                         append("Reason: ${result.noChangeReason.ifBlank { "No repair counters changed." }}\n")
-                        append("\nDOM before:\n${result.beforeDomRootItemIds.joinToString(", ")}\n")
-                        append("\nDOM after:\n${result.afterDomRootItemIds.joinToString(", ")}\n")
                         append("\npage_1 before:\n${result.beforePage1Positions.take(25).joinToString("\n")}\n")
                         append("\npage_1 after:\n${result.afterPage1Positions.take(25).joinToString("\n")}")
                     }

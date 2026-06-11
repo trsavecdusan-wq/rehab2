@@ -85,6 +85,11 @@ object AacCoreV2HomeRepair {
             val domFilePath: String,
             val beforeDomRootItemIds: List<String>,
             val afterDomRootItemIds: List<String>,
+            val beforeDomRootCount: Int,
+            val afterDomRootCount: Int,
+            val activeProfileBefore: String,
+            val activeProfileAfter: String,
+            val activeProfileChangedCount: Int,
             val beforePage1Positions: List<String>,
             val afterPage1Positions: List<String>,
             val fixedRowUpdatedCount: Int,
@@ -157,6 +162,7 @@ object AacCoreV2HomeRepair {
 
         val parsedItems = parseItemsFile(itemsFile)
             ?: return Result.Failure("aac_items.json je pokvarjen ali nima polja items.")
+        val activeProfileBefore = activeProfileId(context)
         val itemsById = itemObjects(parsedItems.itemsArray).associateBy { it.optString("id").trim() }
         val missingIds = lockedIds.filterNot { it in itemsById }
         if (missingIds.isNotEmpty()) {
@@ -244,6 +250,7 @@ object AacCoreV2HomeRepair {
             itemsFile.writeText(parsedItems.toJsonText(), Charsets.UTF_8)
             domFile.writeText(outputDom.toString(2), Charsets.UTF_8)
             writePatientPagePrefs(context)
+            writeActiveDomProfile(context)
 
             val writtenItems = parseItemsFile(itemsFile)
             val writtenDom = parseDomFile(domFile)
@@ -257,6 +264,8 @@ object AacCoreV2HomeRepair {
                 fixedRowUpdatedCount = fixedRowUpdatedCount,
                 placementsUpdatedCount = placementsUpdatedCount,
                 domRootChangedCount = domRootChangedCount,
+                activeProfileBefore = activeProfileBefore,
+                activeProfileAfter = activeProfileId(context),
                 beforeDomRootItemIds = previousDomIds,
                 afterDomRootItemIds = afterDomRootItemIds,
                 beforePage1Positions = beforePage1Positions,
@@ -267,6 +276,8 @@ object AacCoreV2HomeRepair {
                 backupDir = backupDir,
                 itemsFile = itemsFile,
                 domFile = domFile,
+                activeProfileBefore = activeProfileBefore,
+                activeProfileAfter = activeProfileId(context),
                 beforeDomRootItemIds = previousDomIds,
                 afterDomRootItemIds = afterDomRootItemIds,
                 beforePage1Positions = beforePage1Positions,
@@ -302,6 +313,11 @@ object AacCoreV2HomeRepair {
             domFilePath = domFile.absolutePath,
             beforeDomRootItemIds = previousDomIds,
             afterDomRootItemIds = afterDomRootItemIds,
+            beforeDomRootCount = previousDomIds.size,
+            afterDomRootCount = afterDomRootItemIds.size,
+            activeProfileBefore = activeProfileBefore,
+            activeProfileAfter = activeProfileId(context),
+            activeProfileChangedCount = if (activeProfileBefore == DOM_PROFILE_ID) 0 else 1,
             beforePage1Positions = beforePage1Positions,
             afterPage1Positions = afterPage1Positions,
             fixedRowUpdatedCount = fixedRowUpdatedCount,
@@ -412,20 +428,23 @@ object AacCoreV2HomeRepair {
         fixedRowUpdatedCount: Int,
         placementsUpdatedCount: Int,
         domRootChangedCount: Int,
+        activeProfileBefore: String,
+        activeProfileAfter: String,
         beforeDomRootItemIds: List<String>,
         afterDomRootItemIds: List<String>,
         beforePage1Positions: List<String>,
         afterPage1Positions: List<String>,
         jsonWriteVerified: Boolean
     ): String {
-        if (fixedRowUpdatedCount + placementsUpdatedCount + domRootChangedCount != 0) {
+        val activeProfileChangedCount = if (activeProfileBefore == activeProfileAfter) 0 else 1
+        if (fixedRowUpdatedCount + placementsUpdatedCount + domRootChangedCount + activeProfileChangedCount != 0) {
             return ""
         }
         if (!jsonWriteVerified) {
             return "No counters changed, but JSON write verification failed after repair."
         }
         if (beforeDomRootItemIds == afterDomRootItemIds && beforePage1Positions == afterPage1Positions) {
-            return "No counters changed because DOM itemIds and page_1 positions already matched the repair target before writing."
+            return "No counters changed because DOM itemIds, active profile and page_1 positions already matched the repair target before writing."
         }
         return "No counters changed, but before/after snapshots differ. Check repair_report.json for path or parser mismatch."
     }
@@ -464,10 +483,26 @@ object AacCoreV2HomeRepair {
             .apply()
     }
 
+    private fun activeProfileId(context: Context): String {
+        return context.getSharedPreferences(AacProfileStore.PREFS_FILE, Context.MODE_PRIVATE)
+            .getString(AacProfileStore.PREF_ACTIVE_PROFILE_ID, AacProfileStore.DEFAULT_PROFILE_ID)
+            .orEmpty()
+            .ifBlank { AacProfileStore.DEFAULT_PROFILE_ID }
+    }
+
+    private fun writeActiveDomProfile(context: Context) {
+        context.getSharedPreferences(AacProfileStore.PREFS_FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putString(AacProfileStore.PREF_ACTIVE_PROFILE_ID, DOM_PROFILE_ID)
+            .apply()
+    }
+
     private fun writeReport(
         backupDir: File,
         itemsFile: File,
         domFile: File,
+        activeProfileBefore: String,
+        activeProfileAfter: String,
         beforeDomRootItemIds: List<String>,
         afterDomRootItemIds: List<String>,
         beforePage1Positions: List<String>,
@@ -481,11 +516,15 @@ object AacCoreV2HomeRepair {
     ) {
         val report = JSONObject()
             .put("repairId", "aac_core_v2_home_repair")
-            .put("versionName", "1.2.648")
+            .put("versionName", "1.2.650")
             .put("executed", true)
             .put("itemsFilePath", itemsFile.absolutePath)
             .put("domFilePath", domFile.absolutePath)
             .put("backupPath", backupDir.absolutePath)
+            .put("activeProfileBefore", activeProfileBefore)
+            .put("activeProfileAfter", activeProfileAfter)
+            .put("beforeDomRootCount", beforeDomRootItemIds.size)
+            .put("afterDomRootCount", afterDomRootItemIds.size)
             .put("repositoryPathCheck", "AacLocalJsonLoader, AacRepository, editor, diagnostics and repair all use AacStoragePaths for AAC items and profiles.")
             .put("beforeDomRootItemIds", JSONArray().apply {
                 beforeDomRootItemIds.forEach { itemId -> put(itemId) }
@@ -523,7 +562,7 @@ object AacCoreV2HomeRepair {
     ) {
         val report = JSONObject()
             .put("repairId", "aac_core_v2_home_repair")
-            .put("versionName", "1.2.648")
+            .put("versionName", "1.2.650")
             .put("executed", false)
             .put("stage", stage)
             .put("reason", reason)
