@@ -8,9 +8,11 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import org.json.JSONArray
+import org.json.JSONObject
 
 class RadioPlayerController(
-    context: Context,
+    private val context: Context,
     private val onStatusChanged: (String) -> Unit,
     private val onDebug: (String) -> Unit = {}
 ) {
@@ -101,10 +103,31 @@ class RadioPlayerController(
 
     private fun trace(message: String) {
         Log.d(TAG, message)
-        onDebug("RADIO $message")
+        val event = "RADIO $message"
+        appendAudioDiagnosticEvent(event)
+        onDebug(event)
+    }
+
+    private fun appendAudioDiagnosticEvent(event: String) {
+        val prefs = context.getSharedPreferences(PREFS_AUDIO_DIAGNOSTICS, Context.MODE_PRIVATE)
+        val existing = prefs.getString(KEY_AUDIO_EVENTS, "[]").orEmpty()
+        val sourceArray = runCatching { JSONArray(existing) }.getOrElse { JSONArray() }
+        val events = mutableListOf<JSONObject>()
+        for (index in 0 until sourceArray.length()) {
+            sourceArray.optJSONObject(index)?.let(events::add)
+        }
+        events += JSONObject()
+            .put("timestamp", System.currentTimeMillis())
+            .put("event", event.take(180))
+        val targetArray = JSONArray()
+        events.takeLast(AUDIO_EVENT_LIMIT).forEach { targetArray.put(it) }
+        prefs.edit().putString(KEY_AUDIO_EVENTS, targetArray.toString()).apply()
     }
 
     private companion object {
         const val TAG = "RadioPlayerController"
+        const val PREFS_AUDIO_DIAGNOSTICS = "audio_diagnostics"
+        const val KEY_AUDIO_EVENTS = "audio_events"
+        const val AUDIO_EVENT_LIMIT = 20
     }
 }

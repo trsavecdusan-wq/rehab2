@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.BatteryManager
@@ -57,6 +58,7 @@ import com.rehab2.aac.OpenAiAacSpeechApiClient
 import com.rehab2.aac.PatientProfileSettings
 import com.rehab2.aac.StatusOrientationSettings
 import com.rehab2.aac.WeatherSource
+import org.json.JSONArray
 import java.io.File
 import java.text.DateFormat
 import java.text.Normalizer
@@ -148,6 +150,9 @@ class SettingsActivity : AppCompatActivity() {
         private const val DEFAULT_CRITICAL_BATTERY_PERCENT = 20
         private const val DEFAULT_KEEP_SCREEN_ON_WHILE_CHARGING = true
         private const val REQUEST_IMPORT_SPEECH_API_KEY = 3001
+        private const val PREFS_AUDIO_DIAGNOSTICS = "audio_diagnostics"
+        private const val KEY_AUDIO_EVENTS = "audio_events"
+        private const val PREF_ACTIVE_SPEECH_LANGUAGE = "active_speech_language"
         private val SPEECH_VOICE_OPTIONS = arrayOf(
             "marin",
             "alloy",
@@ -761,6 +766,9 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnTestAudioDucking).setOnClickListener {
             testAudioDucking()
         }
+        findViewById<Button>(R.id.btnAudioDiagnostics).setOnClickListener {
+            showAudioDiagnosticsDialog()
+        }
         editStatusWeatherSourceName.setOnClickListener {
             showStatusWeatherSourcePicker()
         }
@@ -936,7 +944,7 @@ class SettingsActivity : AppCompatActivity() {
             }
             SettingsSection.SPEECH -> {
                 setSettingsRangeVisible(content, R.id.sectionSpeechApiSettings, R.id.editPartialSentenceAutoReturnDelay)
-                setSettingsRangeVisible(content, R.id.subgroupSpeechVolume, R.id.btnTestAacSpeechLoudness)
+                setSettingsRangeVisible(content, R.id.subgroupSpeechVolume, R.id.btnAudioDiagnostics)
                 setSettingsChildVisible(R.id.btnSaveSpeechApiSettings)
                 setSettingsChildVisible(R.id.btnTestSpeechApi)
                 setSettingsChildVisible(R.id.btnImportSpeechApiKey)
@@ -2096,6 +2104,76 @@ class SettingsActivity : AppCompatActivity() {
             speakText("To je test govora med radiem.")
         }
         Toast.makeText(this, "Test govora. \u010ce radio igra, se za\u010dasno zni\u017ea.", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showAudioDiagnosticsDialog() {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val events = readAudioDiagnosticEvents()
+        val packageInfo = runCatching { packageManager.getPackageInfo(packageName, 0) }.getOrNull()
+        val report = buildString {
+            appendLine("APP")
+            appendLine("versionName: ${packageInfo?.versionName ?: "unknown"}")
+            @Suppress("DEPRECATION")
+            appendLine("versionCode: ${packageInfo?.versionCode ?: -1}")
+            appendLine()
+            appendLine("NAPRAVA")
+            appendLine("media volume: ${audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)} / ${audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)}")
+            appendLine("active speech language: ${prefs.getString(PREF_ACTIVE_SPEECH_LANGUAGE, "sl").orEmpty().ifBlank { "sl" }}")
+            appendLine()
+            appendLine("ZADNJI KLJUCNI DOGODKI")
+            appendLine("last AAC click: ${latestAudioEvent(events, "AAC click")}")
+            appendLine("last resolved speechText: ${latestAudioEvent(events, "AAC resolved")}")
+            appendLine("last speakText call: ${latestAudioEvent(events, "speakText called")}")
+            appendLine("last TTS status/error: ${latestAudioEvent(events, "TTS")}")
+            appendLine("last audio focus result: ${latestAudioEvent(events, "audio focus request")}")
+            appendLine("last radio click: ${latestAudioEvent(events, "RADIO tile click")}")
+            appendLine("last radio play request: ${latestAudioEvent(events, "RADIO play request")}")
+            appendLine("last radio player error: ${latestAudioEvent(events, "player error")}")
+            appendLine()
+            appendLine("ZADNJIH 20 AUDIO DOGODKOV")
+            if (events.isEmpty()) {
+                appendLine("(ni zabelezenih audio dogodkov)")
+            } else {
+                events.forEach { event ->
+                    appendLine("${formatAudioEventTime(event.timestamp)}  ${event.text}")
+                }
+            }
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("AUDIO DIAGNOSTIKA")
+            .setMessage(report)
+            .setPositiveButton(R.string.dialog_ok, null)
+            .show()
+    }
+
+    private data class AudioDiagnosticEvent(
+        val timestamp: Long,
+        val text: String
+    )
+
+    private fun readAudioDiagnosticEvents(): List<AudioDiagnosticEvent> {
+        val raw = getSharedPreferences(PREFS_AUDIO_DIAGNOSTICS, MODE_PRIVATE)
+            .getString(KEY_AUDIO_EVENTS, "[]")
+            .orEmpty()
+        val array = runCatching { JSONArray(raw) }.getOrElse { JSONArray() }
+        return buildList {
+            for (index in 0 until array.length()) {
+                val item = array.optJSONObject(index) ?: continue
+                val text = item.optString("event").trim()
+                if (text.isBlank()) continue
+                add(AudioDiagnosticEvent(item.optLong("timestamp", 0L), text))
+            }
+        }
+    }
+
+    private fun latestAudioEvent(events: List<AudioDiagnosticEvent>, marker: String): String {
+        return events.lastOrNull { it.text.contains(marker, ignoreCase = true) }?.text ?: "-"
+    }
+
+    private fun formatAudioEventTime(timestamp: Long): String {
+        if (timestamp <= 0L) return "--:--:--"
+        return DateFormat.getTimeInstance(DateFormat.MEDIUM, Locale.getDefault()).format(Date(timestamp))
     }
 
     private fun refreshStatusOrientationSection() {

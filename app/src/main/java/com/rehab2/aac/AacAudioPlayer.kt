@@ -12,6 +12,8 @@ import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.widget.Toast
 import com.rehab2.radio.RadioDuckingCoordinator
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
@@ -503,7 +505,25 @@ class AacAudioPlayer(
 
     private fun traceAudio(message: String) {
         Log.d(TAG, message)
-        audioDebug("AAC $message")
+        val event = "AAC $message"
+        appendAudioDiagnosticEvent(event)
+        audioDebug(event)
+    }
+
+    private fun appendAudioDiagnosticEvent(event: String) {
+        val prefs = context.getSharedPreferences(PREFS_AUDIO_DIAGNOSTICS, Context.MODE_PRIVATE)
+        val existing = prefs.getString(KEY_AUDIO_EVENTS, "[]").orEmpty()
+        val sourceArray = runCatching { JSONArray(existing) }.getOrElse { JSONArray() }
+        val events = mutableListOf<JSONObject>()
+        for (index in 0 until sourceArray.length()) {
+            sourceArray.optJSONObject(index)?.let(events::add)
+        }
+        events += JSONObject()
+            .put("timestamp", System.currentTimeMillis())
+            .put("event", event.take(180))
+        val targetArray = JSONArray()
+        events.takeLast(AUDIO_EVENT_LIMIT).forEach { targetArray.put(it) }
+        prefs.edit().putString(KEY_AUDIO_EVENTS, targetArray.toString()).apply()
     }
 
     private fun postSpeechCallback(callback: (SpeechListener) -> Unit) {
@@ -526,5 +546,8 @@ class AacAudioPlayer(
         const val MIN_AUDIO_DURATION_MS = 700
         const val MAX_LOUDNESS_GAIN_MB = 400
         const val SPEECH_GENERATION_TIMEOUT_MS = 1800L
+        const val PREFS_AUDIO_DIAGNOSTICS = "audio_diagnostics"
+        const val KEY_AUDIO_EVENTS = "audio_events"
+        const val AUDIO_EVENT_LIMIT = 20
     }
 }

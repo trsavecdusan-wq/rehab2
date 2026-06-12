@@ -1132,6 +1132,16 @@
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/btnAudioDiagnostics"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#3A3F45"
+            android:text="AUDIO DIAGNOSTIKA"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/txtStatusOrientationTitle"
             android:layout_width="match_parent"

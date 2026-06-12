@@ -71,6 +71,8 @@ import com.rehab2.aac.WeatherClient
 import com.rehab2.radio.RadioPlayerController
 import com.rehab2.radio.SavedRadioStation
 import com.rehab2.radio.RadioStationStore
+import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -170,6 +172,9 @@ class MainActivity : AppCompatActivity() {
         private const val MAIN_AAC_WATER_TEMPERATURE_GROUP = "temperature"
         private const val MAIN_AAC_WATER_CARBONATION_GROUP = "carbonation"
         private const val AUDIO_DEBUG_VISIBLE_MS = 45_000L
+        private const val PREFS_AUDIO_DIAGNOSTICS = "audio_diagnostics"
+        private const val KEY_AUDIO_EVENTS = "audio_events"
+        private const val AUDIO_EVENT_LIMIT = 20
         private val MAIN_AAC_CONVERSATION_GROUP_KEYS = setOf(
             "drink",
             "drinks",
@@ -4027,6 +4032,7 @@ class MainActivity : AppCompatActivity() {
         if (safeEvent.isBlank()) return
         lastAudioDebugEvent = safeEvent.take(180)
         lastAudioDebugEventAtMs = System.currentTimeMillis()
+        appendAudioDiagnosticEvent(lastAudioDebugEvent)
         Log.d(TAG, "LAST AUDIO EVENT: $lastAudioDebugEvent")
         if (::txtStatusWeather.isInitialized) {
             runOnUiThread {
@@ -4039,6 +4045,23 @@ class MainActivity : AppCompatActivity() {
     private fun isRecentAudioDebugEvent(): Boolean {
         return lastAudioDebugEvent.isNotBlank() &&
             System.currentTimeMillis() - lastAudioDebugEventAtMs <= AUDIO_DEBUG_VISIBLE_MS
+    }
+
+    private fun appendAudioDiagnosticEvent(event: String) {
+        val prefs = getSharedPreferences(PREFS_AUDIO_DIAGNOSTICS, MODE_PRIVATE)
+        val existing = prefs.getString(KEY_AUDIO_EVENTS, "[]").orEmpty()
+        val sourceArray = runCatching { JSONArray(existing) }.getOrElse { JSONArray() }
+        val events = mutableListOf<JSONObject>()
+        for (index in 0 until sourceArray.length()) {
+            sourceArray.optJSONObject(index)?.let(events::add)
+        }
+        events += JSONObject()
+            .put("timestamp", System.currentTimeMillis())
+            .put("event", event)
+        val trimmed = events.takeLast(AUDIO_EVENT_LIMIT)
+        val targetArray = JSONArray()
+        trimmed.forEach { targetArray.put(it) }
+        prefs.edit().putString(KEY_AUDIO_EVENTS, targetArray.toString()).apply()
     }
 
     private fun stationKey(station: SavedRadioStation): String {
