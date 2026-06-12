@@ -338,6 +338,8 @@ class MainActivity : AppCompatActivity() {
     private var isMainAacTerminalSelectionAccepted = false
     private var shouldResetMainAacRootAfterSpeech = false
     private var selectedMainAacItemId: String? = null
+    private var mainAacTapId = 0L
+    private var mainAacSpeakCallNumberForTap = 0
     private var currentMainAacConversationParentItem: AacItem? = null
     private var currentMainAacConversationItems: List<AacItem> = emptyList()
     private val currentMainAacModifierItemsByGroup = mutableMapOf<String, AacItem>()
@@ -882,11 +884,13 @@ class MainActivity : AppCompatActivity() {
                     }
                     return true
                 }
+                mainAacTapId += 1
+                mainAacSpeakCallNumberForTap = 0
                 selectedMainAacItemId = item.id
                 val languageCode = getActiveSpeechLanguage()
                 val speechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
                 recordLastAudioEvent(
-                    "AAC click itemId=${item.id} label=${item.labelSl} speech='${speechText.take(60)}' speaksImmediately=${item.speaksImmediately}"
+                    "AAC click tapId=$mainAacTapId itemId=${item.id} label=${item.labelSl} speech='${speechText.take(60)}' language=$languageCode speaksImmediately=${item.speaksImmediately}"
                 )
                 refreshMainAacInputLockVisualState()
                 handleMainAacItemAction(item)
@@ -1269,11 +1273,29 @@ class MainActivity : AppCompatActivity() {
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
         recordLastAudioEvent(
-            "AAC resolved itemId=${item.id} speech='${resolvedSpeechText.take(60)}' inContext=$inContextFlow"
+            "AAC resolved tapId=$mainAacTapId itemId=${item.id} speech='${resolvedSpeechText.take(60)}' language=$languageCode inContext=$inContextFlow"
         )
         if (inContextFlow && (item.addsToSentence || AacGuidedPromptEngine.isFollowUpAnswer(item))) {
             selectedMainAacItemId = item.id
             recordMainAacUsage(item)
+            if (isMainAacTerminalChild(item)) {
+                cancelMainAacGuidedAutoComplete()
+                if (resolvedSpeechText.isNotBlank()) {
+                    shouldLockMainAacInputOnSpeechStart = true
+                    lockMainAacInput()
+                    speakMainAacTextOnce(
+                        source = "terminal_child",
+                        itemId = item.id,
+                        text = resolvedSpeechText,
+                        languageCode = languageCode
+                    )
+                    shouldResetMainAacRootAfterSpeech = true
+                } else {
+                    recordLastAudioEvent("AAC no speech tapId=$mainAacTapId itemId=${item.id} reason=blank_terminal_child")
+                }
+                clearMainAacSentenceState()
+                return
+            }
             val speechText = mainAacNaturalConversationSpeech(
                 item = item,
                 languageCode = languageCode,
@@ -1294,13 +1316,38 @@ class MainActivity : AppCompatActivity() {
             recordMainAacUsage(item)
             shouldLockMainAacInputOnSpeechStart = true
             lockMainAacInput()
-            recordLastAudioEvent("AAC calling speakText itemId=${item.id} text='${resolvedSpeechText.take(60)}'")
-            aacAudioPlayer.speakText(resolvedSpeechText, languageCode)
+            speakMainAacTextOnce(
+                source = "direct_terminal",
+                itemId = item.id,
+                text = resolvedSpeechText,
+                languageCode = languageCode
+            )
             shouldResetMainAacRootAfterSpeech = true
         } else {
             recordLastAudioEvent("AAC no speech: blank resolved text itemId=${item.id}")
         }
         clearMainAacSentenceState()
+    }
+
+    private fun isMainAacTerminalChild(item: AacItem): Boolean {
+        return mainAacHistory.isNotEmpty() &&
+            item.targetPageId.isBlank() &&
+            item.children.isEmpty() &&
+            !item.opensSubicons &&
+            mainAacChildrenFor(item).isEmpty()
+    }
+
+    private fun speakMainAacTextOnce(
+        source: String,
+        itemId: String,
+        text: String,
+        languageCode: String
+    ) {
+        mainAacSpeakCallNumberForTap += 1
+        recordLastAudioEvent(
+            "AAC speakCall #$mainAacSpeakCallNumberForTap tapId=$mainAacTapId source=$source itemId=$itemId resolvedSpeechText='${text.take(80)}' language=$languageCode"
+        )
+        aacAudioPlayer.speakText(text, languageCode)
     }
 
     private fun mainAacQuestionFallback(item: AacItem, languageCode: String): String {
@@ -1455,7 +1502,12 @@ class MainActivity : AppCompatActivity() {
         isMainAacTerminalSelectionAccepted = true
         lockMainAacInput()
         showMainAacQuestion(safeSentence)
-        aacAudioPlayer.speakText(safeSentence, languageCode)
+        speakMainAacTextOnce(
+            source = "guided_auto_complete",
+            itemId = selectedMainAacItemId ?: "(none)",
+            text = safeSentence,
+            languageCode = languageCode
+        )
         shouldResetMainAacRootAfterSpeech = true
         clearMainAacSentenceState()
     }
