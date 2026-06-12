@@ -169,6 +169,7 @@ class MainActivity : AppCompatActivity() {
         private const val MAIN_AAC_WATER_DETAIL_ID = "water_detail"
         private const val MAIN_AAC_WATER_TEMPERATURE_GROUP = "temperature"
         private const val MAIN_AAC_WATER_CARBONATION_GROUP = "carbonation"
+        private const val AUDIO_DEBUG_VISIBLE_MS = 45_000L
         private val MAIN_AAC_CONVERSATION_GROUP_KEYS = setOf(
             "drink",
             "drinks",
@@ -293,6 +294,8 @@ class MainActivity : AppCompatActivity() {
     @Volatile private var currentStatusWeatherText: String? = null
     @Volatile private var isStatusWeatherFetchRunning = false
     private var lastStatusWeatherFetchAtMs = 0L
+    private var lastAudioDebugEvent: String = ""
+    private var lastAudioDebugEventAtMs: Long = 0L
     private var hasCurrentSpeedData = false
     private var previousTrackedLocation: Location? = null
     private var locationPermissionRequestShown = false
@@ -401,25 +404,31 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         prefs = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-        aacAudioPlayer = AacAudioPlayer(this)
+        aacAudioPlayer = AacAudioPlayer(this) { event ->
+            recordLastAudioEvent(event)
+        }
         aacAudioPlayer.setSpeechListener(object : AacAudioPlayer.SpeechListener {
             override fun onSpeechStarted() {
+                recordLastAudioEvent("AAC callback onSpeechStarted lock=$shouldLockMainAacInputOnSpeechStart")
                 if (shouldLockMainAacInputOnSpeechStart) {
                     lockMainAacInput()
                 }
             }
 
             override fun onSpeechCompleted() {
+                recordLastAudioEvent("AAC callback onSpeechCompleted")
                 shouldLockMainAacInputOnSpeechStart = true
                 completeMainAacSpeechLock()
             }
 
             override fun onSpeechCancelled() {
+                recordLastAudioEvent("AAC callback onSpeechCancelled")
                 shouldLockMainAacInputOnSpeechStart = true
                 completeMainAacSpeechLock()
             }
 
             override fun onSpeechError() {
+                recordLastAudioEvent("AAC callback onSpeechError")
                 shouldLockMainAacInputOnSpeechStart = true
                 completeMainAacSpeechLock()
             }
@@ -460,16 +469,23 @@ class MainActivity : AppCompatActivity() {
         )
         fallbackRadioLabels = radioTiles.map { it.text }
         configureVolumeSlider()
-        radioPlayerController = RadioPlayerController(this) { status ->
-            if (status == "Napaka pri predvajanju") {
-                runOnUiThread {
-                    Toast.makeText(this, "Postaja se ne predvaja", Toast.LENGTH_SHORT).show()
-                    radioPlayerController.stop()
-                    activeStationKey = null
-                    updateRadioTileColors()
+        radioPlayerController = RadioPlayerController(
+            this,
+            onStatusChanged = { status ->
+                recordLastAudioEvent("RADIO status=$status")
+                if (status == "Napaka pri predvajanju") {
+                    runOnUiThread {
+                        Toast.makeText(this, "Postaja se ne predvaja", Toast.LENGTH_SHORT).show()
+                        radioPlayerController.stop()
+                        activeStationKey = null
+                        updateRadioTileColors()
+                    }
                 }
+            },
+            onDebug = { event ->
+                recordLastAudioEvent(event)
             }
-        }
+        )
 
         radioTiles.forEachIndexed { index, textView ->
             textView.setOnClickListener {
@@ -737,6 +753,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun lockMainAacInput() {
+        recordLastAudioEvent("AAC input locked")
         isMainAacInputLocked = true
         mainHandler.removeCallbacks(mainAacInputUnlockRunnable)
         mainHandler.postDelayed(mainAacInputUnlockRunnable, MAIN_AAC_INPUT_LOCK_TIMEOUT_MS)
@@ -744,6 +761,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun unlockMainAacInput() {
+        recordLastAudioEvent("AAC input unlocked")
         mainHandler.removeCallbacks(mainAacInputUnlockRunnable)
         isMainAacInputLocked = false
         selectedMainAacItemId = null
@@ -835,6 +853,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleMainAacTileTouch(event: MotionEvent, item: AacItem): Boolean {
         if (isMainAacInputLocked) {
+            recordLastAudioEvent("AAC click blocked locked itemId=${item.id}")
             return true
         }
         when (event.actionMasked) {
@@ -859,6 +878,11 @@ class MainActivity : AppCompatActivity() {
                     return true
                 }
                 selectedMainAacItemId = item.id
+                val languageCode = getActiveSpeechLanguage()
+                val speechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+                recordLastAudioEvent(
+                    "AAC click itemId=${item.id} label=${item.labelSl} speech='${speechText.take(60)}' speaksImmediately=${item.speaksImmediately}"
+                )
                 refreshMainAacInputLockVisualState()
                 handleMainAacItemAction(item)
                 return true
@@ -989,6 +1013,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleMainAacItemAction(item: AacItem) {
         if (isMainAacInputLocked) {
+            recordLastAudioEvent("AAC action ignored locked itemId=${item.id}")
             return
         }
         if (mainAacHistory.isNotEmpty() && normalizeMainAacKey(item.id) == "back_to_main") {
@@ -1002,6 +1027,7 @@ class MainActivity : AppCompatActivity() {
         }
         val targetPageItems = mainAacPageItems(item.targetPageId)
         if (targetPageItems.isNotEmpty()) {
+            recordLastAudioEvent("AAC opens target page itemId=${item.id} target=${item.targetPageId}")
             isMainAacTerminalSelectionAccepted = false
             selectedMainAacItemId = item.id
             updateMainAacConversationContextForBranch(item)
@@ -1018,6 +1044,7 @@ class MainActivity : AppCompatActivity() {
             (childItems.isNotEmpty() && (mainAacHistory.isNotEmpty() || AacGuidedPromptEngine.hasFlow(item)))
         if (canOpenChildItems) {
             if (childItems.isNotEmpty()) {
+                recordLastAudioEvent("AAC opens children itemId=${item.id} count=${childItems.size}")
                 isMainAacTerminalSelectionAccepted = false
                 selectedMainAacItemId = item.id
                 updateMainAacConversationContextForBranch(item)
@@ -1236,6 +1263,9 @@ class MainActivity : AppCompatActivity() {
     ) {
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
+        recordLastAudioEvent(
+            "AAC resolved itemId=${item.id} speech='${resolvedSpeechText.take(60)}' inContext=$inContextFlow"
+        )
         if (inContextFlow && (item.addsToSentence || AacGuidedPromptEngine.isFollowUpAnswer(item))) {
             selectedMainAacItemId = item.id
             recordMainAacUsage(item)
@@ -1259,8 +1289,11 @@ class MainActivity : AppCompatActivity() {
             recordMainAacUsage(item)
             shouldLockMainAacInputOnSpeechStart = true
             lockMainAacInput()
+            recordLastAudioEvent("AAC calling speakText itemId=${item.id} text='${resolvedSpeechText.take(60)}'")
             aacAudioPlayer.speakText(resolvedSpeechText, languageCode)
             shouldResetMainAacRootAfterSpeech = true
+        } else {
+            recordLastAudioEvent("AAC no speech: blank resolved text itemId=${item.id}")
         }
         clearMainAacSentenceState()
     }
@@ -3211,6 +3244,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshCompactStatusWeather() {
+        if (isRecentAudioDebugEvent()) {
+            txtStatusWeather.visibility = View.VISIBLE
+            txtStatusWeather.text = "LAST AUDIO EVENT: $lastAudioDebugEvent"
+            return
+        }
         val settings = StatusOrientationSettings.load(this)
         if (!settings.speakWeather || settings.weatherSourceUrl.isBlank()) {
             currentStatusWeatherText = null
@@ -3952,7 +3990,9 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun handleRadioTileClick(index: Int) {
+        recordLastAudioEvent("RADIO tile click index=${index + 1}")
         if (index == MP3_TILE_INDEX) {
+            recordLastAudioEvent("RADIO MP3 tile opens local music")
             radioPlayerController.stop()
             activeStationKey = null
             updateRadioTileColors()
@@ -3962,12 +4002,14 @@ class MainActivity : AppCompatActivity() {
 
         val station = visibleRadioStations.getOrNull(index)
         if (station == null) {
+            recordLastAudioEvent("RADIO missing station index=${index + 1}")
             Toast.makeText(this, getString(R.string.radio_station_missing), Toast.LENGTH_SHORT).show()
             return
         }
 
         val key = stationKey(station)
         if (activeStationKey == key) {
+            recordLastAudioEvent("RADIO stop active station=${station.buttonLabel.ifBlank { station.name }}")
             radioPlayerController.stop()
             activeStationKey = null
             updateRadioTileColors()
@@ -3976,7 +4018,27 @@ class MainActivity : AppCompatActivity() {
 
         activeStationKey = key
         updateRadioTileColors()
+        recordLastAudioEvent("RADIO play request station=${station.buttonLabel.ifBlank { station.name }}")
         radioPlayerController.play(station.streamUrl)
+    }
+
+    private fun recordLastAudioEvent(event: String) {
+        val safeEvent = event.trim()
+        if (safeEvent.isBlank()) return
+        lastAudioDebugEvent = safeEvent.take(180)
+        lastAudioDebugEventAtMs = System.currentTimeMillis()
+        Log.d(TAG, "LAST AUDIO EVENT: $lastAudioDebugEvent")
+        if (::txtStatusWeather.isInitialized) {
+            runOnUiThread {
+                txtStatusWeather.visibility = View.VISIBLE
+                txtStatusWeather.text = "LAST AUDIO EVENT: $lastAudioDebugEvent"
+            }
+        }
+    }
+
+    private fun isRecentAudioDebugEvent(): Boolean {
+        return lastAudioDebugEvent.isNotBlank() &&
+            System.currentTimeMillis() - lastAudioDebugEventAtMs <= AUDIO_DEBUG_VISIBLE_MS
     }
 
     private fun stationKey(station: SavedRadioStation): String {

@@ -14,9 +14,13 @@ import android.widget.Toast
 import com.rehab2.radio.RadioDuckingCoordinator
 import java.io.File
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.log10
 
-class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener {
+class AacAudioPlayer(
+    private val context: Context,
+    private val audioDebug: (String) -> Unit = {}
+) : TextToSpeech.OnInitListener {
     interface SpeechListener {
         fun onSpeechStarted()
         fun onSpeechCompleted()
@@ -50,14 +54,17 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     private var speechListener: SpeechListener? = null
 
     override fun onInit(status: Int) {
+        traceAudio("TTS onInit status=$status")
         if (status != TextToSpeech.SUCCESS) {
             isTtsFailed = true
             isTtsReady = false
+            traceAudio("TTS unavailable: init failed")
             return
         }
 
         isTtsReady = configureTtsLanguage(AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
         isTtsFailed = !isTtsReady
+        traceAudio("TTS available=$isTtsReady")
         textToSpeech?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
                 notifySpeechStarted()
@@ -94,9 +101,11 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
     }
 
     fun playOrSpeak(item: AacItem, languageCode: String) {
+        traceAudio("playOrSpeak itemId=${item.id} label=${item.labelSl}")
         stopPlayback(notifyCancellation = false)
         val requestSerial = nextSpeechRequestSerial()
         val fallbackText = resolveTileSpeechText(item, languageCode)
+        traceAudio("playOrSpeak resolvedText='${fallbackText.take(80)}'")
 
         playGeneratedSpeechOrFallback(
             text = fallbackText,
@@ -106,16 +115,19 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         ) {
             val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
             if (playAudioFileIfAvailable(directAudioFile)) {
+                traceAudio("selected path=direct audio file=${directAudioFile?.absolutePath}")
                 Toast.makeText(context, "AUDIO DIRECT: ${item.id}", Toast.LENGTH_SHORT).show()
                 return@playGeneratedSpeechOrFallback
             }
 
             val cachedAudioFile = speechCache.getExistingCacheFile(item.id)
             if (playAudioFileIfAvailable(cachedAudioFile)) {
+                traceAudio("selected path=cached audio file=${cachedAudioFile?.absolutePath}")
                 Toast.makeText(context, "AUDIO CACHE: ${item.id}", Toast.LENGTH_SHORT).show()
                 return@playGeneratedSpeechOrFallback
             }
 
+            traceAudio("selected path=Android TTS fallback itemId=${item.id}")
             speakAndroidFallback(fallbackText, languageCode)
         }
     }
@@ -126,7 +138,9 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
     fun speakText(text: String, languageCode: String) {
         val trimmed = text.trim()
+        traceAudio("speakText called text='${trimmed.take(80)}' language=$languageCode")
         if (trimmed.isEmpty()) {
+            traceAudio("speakText ignored: blank text")
             return
         }
 
@@ -139,6 +153,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             requestSerial = requestSerial,
             generatedLog = "AUDIO GENERATED"
         ) {
+            traceAudio("selected path=Android TTS fallback")
             speakAndroidFallback(trimmed, languageCode)
         }
     }
@@ -165,6 +180,14 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         fallback: () -> Unit
     ) {
         showSpeechApiConfigIssueIfNeeded()
+        traceAudio("speech generation requested serial=$requestSerial")
+        val handled = AtomicBoolean(false)
+        mainHandler.postDelayed({
+            if (requestSerial == speechRequestSerial && handled.compareAndSet(false, true)) {
+                traceAudio("speech generation timeout -> Android TTS fallback")
+                fallback()
+            }
+        }, SPEECH_GENERATION_TIMEOUT_MS)
         Thread {
             val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
                 text = text,
@@ -173,14 +196,21 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
             mainHandler.post {
                 if (requestSerial != speechRequestSerial) {
+                    traceAudio("speech generation ignored: stale serial=$requestSerial current=$speechRequestSerial")
+                    return@post
+                }
+                if (!handled.compareAndSet(false, true)) {
+                    traceAudio("speech generation ignored: fallback already used")
                     return@post
                 }
 
                 if (playAudioFileIfAvailable(generatedAudioFile)) {
                     Log.d(TAG, generatedLog)
+                    traceAudio("selected path=generated audio file=${generatedAudioFile?.absolutePath}")
                     return@post
                 }
 
+                traceAudio("generated audio unavailable -> fallback")
                 fallback()
             }
         }.start()
@@ -191,6 +221,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         if (!configFile.exists() || !configFile.isFile || configFile.length() <= 0L) {
             AacSpeechApiConfig.ensureExampleConfigFile(context)
             Log.d(TAG, AacSpeechApiConfig.readDiagnostics(context))
+            traceAudio("Speech API config missing")
             Toast.makeText(context, "Speech API config manjka", Toast.LENGTH_SHORT).show()
             return
         }
@@ -198,6 +229,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         val config = AacSpeechApiConfig.read(context)
         Log.d(TAG, AacSpeechApiConfig.readDiagnostics(context))
         if (config.enabled && config.apiKey.isBlank()) {
+            traceAudio("Speech API enabled but API key missing")
             Toast.makeText(context, "Speech API key manjka", Toast.LENGTH_SHORT).show()
         }
     }
@@ -211,10 +243,12 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
 
     private fun playAudioFileIfAvailable(audioFile: File?): Boolean {
         if (audioFile == null || !audioFile.exists() || !audioFile.isFile) {
+            traceAudio("audio file unavailable=${audioFile?.absolutePath}")
             return false
         }
 
         return try {
+            traceAudio("play audio file=${audioFile.absolutePath}")
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(audioFile.absolutePath)
                 setOnCompletionListener {
@@ -238,7 +272,8 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
                 notifySpeechStarted()
             }
             true
-        } catch (_: Exception) {
+        } catch (error: Exception) {
+            traceAudio("audio file play error=${error.javaClass.simpleName}: ${error.message}")
             releaseMediaPlayer()
             notifySpeechError()
             false
@@ -250,18 +285,21 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
         val selectedResult = tts.setLanguage(Locale.forLanguageTag(normalizedLanguage))
         Log.d(TAG, "TTS language selected=$normalizedLanguage result=$selectedResult")
+        traceAudio("TTS language selected=$normalizedLanguage result=$selectedResult")
         if (isLanguageUsable(selectedResult)) {
             return true
         }
 
         val slovenianResult = tts.setLanguage(Locale("sl"))
         Log.d(TAG, "TTS language sl result=$slovenianResult")
+        traceAudio("TTS language sl result=$slovenianResult")
         if (isLanguageUsable(slovenianResult)) {
             return true
         }
 
         val defaultResult = tts.setLanguage(Locale.getDefault())
         Log.d(TAG, "TTS language default=${Locale.getDefault()} result=$defaultResult")
+        traceAudio("TTS language default=${Locale.getDefault()} result=$defaultResult")
         if (isLanguageUsable(defaultResult)) {
             return true
         }
@@ -279,16 +317,19 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         if (!isTtsReady && !isTtsFailed) {
             pendingTextToSpeak = text
             pendingLanguageCode = AacLanguageResolver.normalize(languageCode)
+            traceAudio("TTS not ready; queued text")
             Toast.makeText(context, "TTS PRIPRAVLJAM: ${text}", Toast.LENGTH_SHORT).show()
             return
         }
 
         if (isTtsFailed) {
+            traceAudio("TTS unavailable before speak")
             Toast.makeText(context, "GOVOR NI NA VOLJO", Toast.LENGTH_SHORT).show()
             notifySpeechError()
             return
         }
 
+        traceAudio("TTS speak request text='${text.take(80)}'")
         Toast.makeText(context, "TTS: ${text}", Toast.LENGTH_SHORT).show()
         requestMusicAudioFocus()
         val params = Bundle().apply {
@@ -299,14 +340,17 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         when (result) {
             TextToSpeech.SUCCESS -> {
                 Log.d(TAG, "TTS speak OK: $text")
+                traceAudio("TTS speak OK")
             }
             TextToSpeech.ERROR -> {
                 Log.e(TAG, "TTS speak ERROR: $text")
+                traceAudio("TTS speak ERROR")
                 notifySpeechError()
                 Toast.makeText(context, "TTS speak ERROR", Toast.LENGTH_SHORT).show()
             }
             else -> {
                 Log.e(TAG, "TTS speak unavailable: $text")
+                traceAudio("TTS speak unavailable result=$result")
                 notifySpeechError()
                 Toast.makeText(context, "TTS speak ERROR", Toast.LENGTH_SHORT).show()
             }
@@ -321,6 +365,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
             AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
         )
         hasMusicAudioFocus = result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+        traceAudio("audio focus request result=$result granted=$hasMusicAudioFocus")
     }
 
     @Suppress("DEPRECATION")
@@ -328,6 +373,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         if (!hasMusicAudioFocus) return
         audioManager.abandonAudioFocus(audioFocusChangeListener)
         hasMusicAudioFocus = false
+        traceAudio("audio focus abandoned")
     }
 
     private fun resolveTileSpeechText(item: AacItem, languageCode: String): String {
@@ -422,6 +468,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         isSpeechActive = true
         runCatching { RadioDuckingCoordinator.duckForSpeech(context) }
         Log.d(TAG, "SPEECH_STARTED")
+        traceAudio("onSpeechStarted")
         postSpeechCallback { it.onSpeechStarted() }
     }
 
@@ -431,6 +478,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         abandonMusicAudioFocus()
         runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         Log.d(TAG, "SPEECH_COMPLETED")
+        traceAudio("onSpeechCompleted")
         postSpeechCallback { it.onSpeechCompleted() }
     }
 
@@ -440,6 +488,7 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         abandonMusicAudioFocus()
         runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         Log.d(TAG, "SPEECH_CANCELLED")
+        traceAudio("onSpeechCancelled")
         postSpeechCallback { it.onSpeechCancelled() }
     }
 
@@ -448,7 +497,13 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         abandonMusicAudioFocus()
         runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
         Log.d(TAG, "SPEECH_ERROR")
+        traceAudio("notifySpeechError called")
         postSpeechCallback { it.onSpeechError() }
+    }
+
+    private fun traceAudio(message: String) {
+        Log.d(TAG, message)
+        audioDebug("AAC $message")
     }
 
     private fun postSpeechCallback(callback: (SpeechListener) -> Unit) {
@@ -470,5 +525,6 @@ class AacAudioPlayer(private val context: Context) : TextToSpeech.OnInitListener
         const val TAG = "AacAudioPlayer"
         const val MIN_AUDIO_DURATION_MS = 700
         const val MAX_LOUDNESS_GAIN_MB = 400
+        const val SPEECH_GENERATION_TIMEOUT_MS = 1800L
     }
 }

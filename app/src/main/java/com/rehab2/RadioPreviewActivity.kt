@@ -47,7 +47,7 @@ class RadioPreviewActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.txtPreviewTags).text = tags
         findViewById<TextView>(R.id.txtPreviewUrl).text = streamUrl
 
-        playerController = RadioPlayerController(this) { status ->
+        playerController = RadioPlayerController(this, onStatusChanged = { status ->
             runOnUiThread {
                 statusText.text = status
                 if (status == "Postaja deluje") {
@@ -57,7 +57,7 @@ class RadioPreviewActivity : AppCompatActivity() {
                     Toast.makeText(this, "Postaja se ne predvaja", Toast.LENGTH_SHORT).show()
                 }
             }
-        }
+        })
 
         findViewById<Button>(R.id.btnTestStation).setOnClickListener {
             if (streamUrl.isBlank()) {
