@@ -879,7 +879,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 selectedMainAacItemId = item.id
                 val languageCode = getActiveSpeechLanguage()
-                val speechText = resolveMainAacSingleLanguageSpeakText(item, languageCode)
+                val speechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
                 recordLastAudioEvent(
                     "AAC click itemId=${item.id} label=${item.labelSl} speech='${speechText.take(60)}' speaksImmediately=${item.speaksImmediately}"
                 )
@@ -1078,7 +1078,7 @@ class MainActivity : AppCompatActivity() {
             item = item,
             languageCode = languageCode,
             resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode),
-            resolvedSpeechText = resolveMainAacSingleLanguageSpeakText(item, languageCode),
+            resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode),
             inContextFlow = mainAacHistory.isNotEmpty()
         )
     }
@@ -1636,22 +1636,6 @@ class MainActivity : AppCompatActivity() {
         return AacStoredTranslationCache.needsTranslationRefresh(item, normalizedLanguage)
     }
 
-    private fun resolveMainAacSingleLanguageSpeakText(item: AacItem, languageCode: String): String {
-        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
-        val localizedSpeech = item.speechTextByLanguage[normalizedLanguage]
-            ?.trim()
-            ?.takeIf { it.isNotEmpty() }
-        val localizedLabel = item.labelByLanguage[normalizedLanguage]
-            ?.trim()
-            ?.takeIf { it.isNotEmpty() }
-        return localizedSpeech
-            ?: item.speakTextSl?.trim()?.takeIf { it.isNotEmpty() }
-            ?: item.speechText?.trim()?.takeIf { it.isNotEmpty() }
-            ?: localizedLabel
-            ?: item.labelSl.trim().takeIf { it.isNotEmpty() }
-            ?: item.id
-    }
-
     private fun translateMainAacItemForAction(item: AacItem, languageCode: String) {
         val normalizedLanguage = languageCode.trim().lowercase(Locale.ROOT)
         val translationKey = "${item.id}:$normalizedLanguage"
@@ -1675,7 +1659,7 @@ class MainActivity : AppCompatActivity() {
                         item = item,
                         languageCode = normalizedLanguage,
                         resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, normalizedLanguage),
-                        resolvedSpeechText = resolveMainAacSingleLanguageSpeakText(item, normalizedLanguage),
+                        resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, normalizedLanguage),
                         inContextFlow = mainAacHistory.isNotEmpty()
                     )
                     return@post
