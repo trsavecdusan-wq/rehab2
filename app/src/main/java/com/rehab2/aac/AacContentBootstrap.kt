@@ -548,7 +548,7 @@ object AacContentBootstrap {
                 labelSl = "OBLAČENJE",
                 labelUk = "ОДЯГ",
                 speechSl = "Prosim, pomagajte mi pri oblačenju.",
-                speechUk = "Будь ласка, допоможіть мені з одяганням."
+                speechUk = "Допоможіть мені одягнутися."
             ),
             "help_washing" to ToaletaTerminalRepair(
                 labelSl = "UMIVANJE",
