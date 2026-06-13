@@ -340,6 +340,7 @@ class MainActivity : AppCompatActivity() {
     private var selectedMainAacItemId: String? = null
     private var mainAacTapId = 0L
     private var mainAacSpeakCallNumberForTap = 0
+    private var hadMainAacSelectionBeforeTap = false
     private var currentMainAacConversationParentItem: AacItem? = null
     private var currentMainAacConversationItems: List<AacItem> = emptyList()
     private val currentMainAacModifierItemsByGroup = mutableMapOf<String, AacItem>()
@@ -896,12 +897,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 mainAacTapId += 1
                 mainAacSpeakCallNumberForTap = 0
+                hadMainAacSelectionBeforeTap = selectedMainAacItemId != null ||
+                    currentMainAacConversationItems.isNotEmpty()
                 selectedMainAacItemId = item.id
                 val languageCode = getActiveSpeechLanguage()
                 val speechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
                 recordLastAudioEvent(
                     "AAC click tapId=$mainAacTapId itemId=${item.id} label=${item.labelSl} speech='${speechText.take(60)}' language=$languageCode speaksImmediately=${item.speaksImmediately}"
                 )
+                recordToaletaSpeechSourceDiagnostics(item, speechText, "click")
                 refreshMainAacInputLockVisualState()
                 handleMainAacItemAction(item)
                 return true
@@ -1121,7 +1125,7 @@ class MainActivity : AppCompatActivity() {
             showPreviousMainAacItems()
             return true
         }
-        if (selectedMainAacItemId != null || currentMainAacConversationItems.isNotEmpty()) {
+        if (hadMainAacSelectionBeforeTap || currentMainAacConversationItems.isNotEmpty()) {
             recordLastAudioEvent("AAC NE silent dismissSelection page=$currentMainAacPageDebugId")
             selectedMainAacItemId = null
             isMainAacTerminalSelectionAccepted = false
@@ -1129,6 +1133,7 @@ class MainActivity : AppCompatActivity() {
             refreshMainAacInputLockVisualState()
             return true
         }
+        recordLastAudioEvent("AAC NE root communication speech allowed page=$currentMainAacPageDebugId")
         return false
     }
 
@@ -1319,6 +1324,7 @@ class MainActivity : AppCompatActivity() {
         recordLastAudioEvent(
             "AAC resolved tapId=$mainAacTapId itemId=${item.id} speech='${resolvedSpeechText.take(60)}' language=$languageCode inContext=$inContextFlow"
         )
+        recordToaletaSpeechSourceDiagnostics(item, resolvedSpeechText, "resolved")
         if (inContextFlow && (item.addsToSentence || AacGuidedPromptEngine.isFollowUpAnswer(item))) {
             selectedMainAacItemId = item.id
             recordMainAacUsage(item)
@@ -1392,6 +1398,25 @@ class MainActivity : AppCompatActivity() {
             "AAC speakCall #$mainAacSpeakCallNumberForTap tapId=$mainAacTapId source=$source itemId=$itemId resolvedSpeechText='${text.take(80)}' language=$languageCode"
         )
         aacAudioPlayer.speakText(text, languageCode)
+    }
+
+    private fun recordToaletaSpeechSourceDiagnostics(
+        item: AacItem,
+        finalText: String,
+        phase: String
+    ) {
+        if (item.id != "help_dressing" && item.id != "help_washing") {
+            return
+        }
+        val rawLanguage = getRawActiveSpeechLanguage().orEmpty()
+        val normalizedLanguage = AacLanguageResolver.normalize(rawLanguage)
+        val resolvedSpeech = AacLocalizedTextResolver.resolveSpeakText(item, rawLanguage)
+        recordLastAudioEvent(
+            "AAC TOALETA diag phase=$phase itemId=${item.id} rawLang=$rawLanguage normalizedLang=$normalizedLanguage labelSl='${item.labelSl}' labelUk='${item.labelByLanguage["uk"].orEmpty()}' speechText='${item.speechText.orEmpty().take(40)}'"
+        )
+        recordLastAudioEvent(
+            "AAC TOALETA diag itemId=${item.id} speechUk='${item.speechTextByLanguage["uk"].orEmpty().take(70)}' resolved='${resolvedSpeech.take(70)}' finalTts='${finalText.take(70)}' ttsLang=$normalizedLanguage"
+        )
     }
 
     private fun mainAacQuestionFallback(item: AacItem, languageCode: String): String {
@@ -3491,11 +3516,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getActiveSpeechLanguage(): String {
-        return prefs.getString(PREF_ACTIVE_SPEECH_LANGUAGE, null)
+        return getRawActiveSpeechLanguage()
             ?.trim()
             ?.lowercase(Locale.ROOT)
             ?.takeIf { it.isNotBlank() }
             ?: "sl"
+    }
+
+    private fun getRawActiveSpeechLanguage(): String? {
+        return prefs.getString(PREF_ACTIVE_SPEECH_LANGUAGE, null)
     }
 
     private fun getConfiguredSpeechLanguages(): List<String> {

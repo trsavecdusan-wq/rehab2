@@ -288,6 +288,7 @@ class AacAudioPlayer(
         val selectedResult = tts.setLanguage(Locale.forLanguageTag(normalizedLanguage))
         Log.d(TAG, "TTS language selected=$normalizedLanguage result=$selectedResult")
         traceAudio("TTS language selected=$normalizedLanguage result=$selectedResult")
+        traceAudio("TTS voice selected=${tts.voice?.name ?: "unknown"} locale=${tts.voice?.locale?.toLanguageTag() ?: "unknown"}")
         if (isLanguageUsable(selectedResult)) {
             return true
         }
@@ -331,7 +332,7 @@ class AacAudioPlayer(
             return
         }
 
-        traceAudio("TTS speak request text='${text.take(80)}'")
+        traceAudio("TTS speak request text='${text.take(80)}' language=${AacLanguageResolver.normalize(languageCode)} voice=${textToSpeech?.voice?.name ?: "unknown"}")
         Toast.makeText(context, "TTS: ${text}", Toast.LENGTH_SHORT).show()
         requestMusicAudioFocus()
         val params = Bundle().apply {
