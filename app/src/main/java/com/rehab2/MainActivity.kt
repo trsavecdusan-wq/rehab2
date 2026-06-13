@@ -171,7 +171,6 @@ class MainActivity : AppCompatActivity() {
         private const val MAIN_AAC_WATER_DETAIL_ID = "water_detail"
         private const val MAIN_AAC_WATER_TEMPERATURE_GROUP = "temperature"
         private const val MAIN_AAC_WATER_CARBONATION_GROUP = "carbonation"
-        private const val AUDIO_DEBUG_VISIBLE_MS = 45_000L
         private const val PREFS_AUDIO_DIAGNOSTICS = "audio_diagnostics"
         private const val KEY_AUDIO_EVENTS = "audio_events"
         private const val AUDIO_EVENT_LIMIT = 20
@@ -299,8 +298,6 @@ class MainActivity : AppCompatActivity() {
     @Volatile private var currentStatusWeatherText: String? = null
     @Volatile private var isStatusWeatherFetchRunning = false
     private var lastStatusWeatherFetchAtMs = 0L
-    private var lastAudioDebugEvent: String = ""
-    private var lastAudioDebugEventAtMs: Long = 0L
     private var hasCurrentSpeedData = false
     private var previousTrackedLocation: Location? = null
     private var locationPermissionRequestShown = false
@@ -3301,11 +3298,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshCompactStatusWeather() {
-        if (isRecentAudioDebugEvent()) {
-            txtStatusWeather.visibility = View.VISIBLE
-            txtStatusWeather.text = "LAST AUDIO EVENT: $lastAudioDebugEvent"
-            return
-        }
         val settings = StatusOrientationSettings.load(this)
         if (!settings.speakWeather || settings.weatherSourceUrl.isBlank()) {
             currentStatusWeatherText = null
@@ -4082,21 +4074,9 @@ class MainActivity : AppCompatActivity() {
     private fun recordLastAudioEvent(event: String) {
         val safeEvent = event.trim()
         if (safeEvent.isBlank()) return
-        lastAudioDebugEvent = safeEvent.take(180)
-        lastAudioDebugEventAtMs = System.currentTimeMillis()
-        appendAudioDiagnosticEvent(lastAudioDebugEvent)
-        Log.d(TAG, "LAST AUDIO EVENT: $lastAudioDebugEvent")
-        if (::txtStatusWeather.isInitialized) {
-            runOnUiThread {
-                txtStatusWeather.visibility = View.VISIBLE
-                txtStatusWeather.text = "LAST AUDIO EVENT: $lastAudioDebugEvent"
-            }
-        }
-    }
-
-    private fun isRecentAudioDebugEvent(): Boolean {
-        return lastAudioDebugEvent.isNotBlank() &&
-            System.currentTimeMillis() - lastAudioDebugEventAtMs <= AUDIO_DEBUG_VISIBLE_MS
+        val storedEvent = safeEvent.take(180)
+        appendAudioDiagnosticEvent(storedEvent)
+        Log.d(TAG, "AUDIO EVENT: $storedEvent")
     }
 
     private fun appendAudioDiagnosticEvent(event: String) {
