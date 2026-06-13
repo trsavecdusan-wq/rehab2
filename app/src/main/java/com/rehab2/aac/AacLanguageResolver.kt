@@ -16,6 +16,11 @@ object AacLanguageResolver {
 
     fun normalize(value: String?): String {
         val code = value?.trim()?.lowercase(Locale.ROOT).orEmpty()
-        return code.ifBlank { DEFAULT_LANGUAGE_CODE }
+        return when {
+            code.isBlank() -> DEFAULT_LANGUAGE_CODE
+            code == "ua" || code == "uk-ua" || code == "ua-ua" || code.startsWith("ua_") -> "uk"
+            code.startsWith("uk_") -> "uk"
+            else -> code
+        }
     }
 }
