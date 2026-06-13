@@ -1040,6 +1040,9 @@ class MainActivity : AppCompatActivity() {
             recordLastAudioEvent("AAC action ignored locked itemId=${item.id}")
             return
         }
+        if (handleMainAacSilentNoNavigation(item)) {
+            return
+        }
         if (mainAacHistory.isNotEmpty() && normalizeMainAacKey(item.id) == "back_to_main") {
             showPreviousMainAacItems()
             return
@@ -1105,6 +1108,28 @@ class MainActivity : AppCompatActivity() {
             resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode),
             inContextFlow = mainAacHistory.isNotEmpty()
         )
+    }
+
+    private fun handleMainAacSilentNoNavigation(item: AacItem): Boolean {
+        if (normalizeMainAacKey(item.id) != "no") {
+            return false
+        }
+        if (mainAacHistory.isNotEmpty()) {
+            recordLastAudioEvent("AAC NE silent navigateBack page=$currentMainAacPageDebugId")
+            selectedMainAacItemId = null
+            isMainAacTerminalSelectionAccepted = false
+            showPreviousMainAacItems()
+            return true
+        }
+        if (selectedMainAacItemId != null || currentMainAacConversationItems.isNotEmpty()) {
+            recordLastAudioEvent("AAC NE silent dismissSelection page=$currentMainAacPageDebugId")
+            selectedMainAacItemId = null
+            isMainAacTerminalSelectionAccepted = false
+            clearMainAacSentenceState()
+            refreshMainAacInputLockVisualState()
+            return true
+        }
+        return false
     }
 
     private fun prepareMainAacContextPrompt(item: AacItem) {
