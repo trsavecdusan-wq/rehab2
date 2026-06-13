@@ -96,7 +96,9 @@ class MainActivity : AppCompatActivity() {
         private const val DEFAULT_ADMIN_PIN = "0416"
         private const val MAIN_AAC_HOME_PAGE_ID = "home"
         private const val PREFS_AAC_PATIENT_PAGES = "aac_patient_pages"
+        private const val KEY_PATIENT_PAGES = "patient_pages"
         private const val KEY_DEFAULT_PATIENT_PAGE_ID = "default_patient_page_id"
+        private const val PATIENT_PAGE_FIELD_SEPARATOR = "\u001F"
         private const val CORE_V2_REPAIR_PREFS_NAME = "aac_core_v2_home_repair"
         private const val KEY_CORE_V2_HOME_REPAIR_DONE = "aac_core_v2_home_repair_done"
         private const val KEY_AAC_HOME_LAYOUT_VERSION = "aac_home_layout_version"
@@ -321,6 +323,7 @@ class MainActivity : AppCompatActivity() {
     private var mainAacTouchStartY = 0f
     private var configuredMainAacGridSize: Int = 0
     private var currentMainAacPageDebugId: String = "root"
+    private var coreV2HomeLayoutCurrentlyActive = false
     private var lastMainAacPageItemCountBeforeFixed = 0
     private var lastMainAacFixedRowItemCount = 0
     private var lastMainAacNormalItemCount = 0
@@ -576,8 +579,12 @@ class MainActivity : AppCompatActivity() {
         AacContentBootstrap.ensurePatientStartupContent(this, fallbackItems)
         val loadedItems = AacLocalJsonLoader.loadItems(this, fallbackItems)
         val items = mergeMainAacFallbackItems(fallbackItems, loadedItems)
-        val startPageItems = selectMainStartPlacementItems(items)
         val coreV2HomeLayoutActive = isCoreV2HomeLayoutActive(items)
+        coreV2HomeLayoutCurrentlyActive = coreV2HomeLayoutActive
+        if (coreV2HomeLayoutActive) {
+            enforceCoreV2SinglePatientHomePage()
+        }
+        val startPageItems = selectMainStartPlacementItems(items, coreV2HomeLayoutActive)
         mainAacItemsById = items.associateBy { it.id }
         val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
             items.filter { it.isRootItem && !it.isHiddenUntilParent }
@@ -837,6 +844,9 @@ class MainActivity : AppCompatActivity() {
         if (isMainAacInputLocked) {
             return
         }
+        if (isCoreV2SingleHomePageVisible()) {
+            return
+        }
         if (currentMainAacGridPageIndex <= 0) {
             return
         }
@@ -846,6 +856,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showNextMainAacGridPage() {
         if (isMainAacInputLocked) {
+            return
+        }
+        if (isCoreV2SingleHomePageVisible()) {
             return
         }
         if (currentMainAacGridPageIndex >= lastMainAacGridPageCount - 1) {
@@ -908,6 +921,11 @@ class MainActivity : AppCompatActivity() {
             lastMainAacGridPageCount = 1
             currentMainAacGridPageIndex = 0
             return emptyList()
+        }
+        if (isCoreV2SingleHomePageVisible()) {
+            lastMainAacGridPageCount = 1
+            currentMainAacGridPageIndex = 0
+            return items.take(capacity)
         }
         val allFixedItems = fixedTopRowItems(mainAacItemsById.values.toList())
         val visibleFixedItems = visibleFixedTopRowItems(allFixedItems).take(capacity)
@@ -1896,6 +1914,18 @@ class MainActivity : AppCompatActivity() {
             prefs.getString(KEY_AAC_HOME_LAYOUT_VERSION, "").orEmpty() == CORE_V2_HOME_LAYOUT_VERSION
     }
 
+    private fun enforceCoreV2SinglePatientHomePage() {
+        getSharedPreferences(PREFS_AAC_PATIENT_PAGES, MODE_PRIVATE)
+            .edit()
+            .putString(KEY_PATIENT_PAGES, CORE_V2_HOME_PAGE_ID + PATIENT_PAGE_FIELD_SEPARATOR + "DOM")
+            .putString(KEY_DEFAULT_PATIENT_PAGE_ID, CORE_V2_HOME_PAGE_ID)
+            .apply()
+    }
+
+    private fun isCoreV2SingleHomePageVisible(): Boolean {
+        return coreV2HomeLayoutCurrentlyActive && currentMainAacPageDebugId == CORE_V2_HOME_PAGE_ID
+    }
+
     private fun isCoreV2HomeLayout(items: List<AacItem>): Boolean {
         val itemsById = items.associateBy { it.id }
         val fixedMatches = CORE_V2_FIXED_TOP_ROW_POSITIONS.all { (itemId, position) ->
@@ -1916,13 +1946,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun selectMainStartPlacementItems(items: List<AacItem>): List<AacItem> {
-        val defaultPageId = getSharedPreferences(PREFS_AAC_PATIENT_PAGES, MODE_PRIVATE)
-            .getString(KEY_DEFAULT_PATIENT_PAGE_ID, "")
-            .orEmpty()
-            .trim()
-            .takeIf { isSafeMainAacPageId(it) }
-            ?: MAIN_AAC_HOME_PAGE_ID
+    private fun selectMainStartPlacementItems(
+        items: List<AacItem>,
+        coreV2HomeLayoutActive: Boolean = isCoreV2HomeLayoutActive(items)
+    ): List<AacItem> {
+        val defaultPageId = if (coreV2HomeLayoutActive) {
+            CORE_V2_HOME_PAGE_ID
+        } else {
+            getSharedPreferences(PREFS_AAC_PATIENT_PAGES, MODE_PRIVATE)
+                .getString(KEY_DEFAULT_PATIENT_PAGE_ID, "")
+                .orEmpty()
+                .trim()
+                .takeIf { isSafeMainAacPageId(it) }
+                ?: MAIN_AAC_HOME_PAGE_ID
+        }
         currentMainAacPageDebugId = defaultPageId
         return mainAacPageItems(defaultPageId, items)
     }
@@ -2027,6 +2064,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacSelectedGridSize(): Int {
+        if (coreV2HomeLayoutCurrentlyActive || isCoreV2HomeRepairMarked()) {
+            return 5
+        }
         return getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
             .getInt(KEY_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE)
             .takeIf { it in 3..6 }
