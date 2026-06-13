@@ -41,6 +41,32 @@ object AacContentBootstrap {
         0x0A
     )
 
+    private val TOALETA_V1_WC_CHILDREN = listOf(
+        "wc_wet",
+        "wc_dirty",
+        "wc_wet_and_dirty",
+        "nurse_help"
+    )
+    private val TOALETA_V1_NURSE_CHILDREN = listOf(
+        "help_dressing",
+        "help_washing",
+        "help_showering",
+        "noticed_blood"
+    )
+    private val TOALETA_V1_EXCLUDED_WC_CHILDREN = setOf(
+        "wc_diaper_change",
+        "wc_burning",
+        "wc_pain",
+        "wc_itching",
+        "wc_blood",
+        "wc_please",
+        "wc_now",
+        "wc_soon",
+        "wc_help",
+        "wc_very_urgent",
+        "wc_call_nurse"
+    )
+
     private val BUNDLED_SYSTEM_ICON_FILES = listOf(
         "come_to_me.png",
         "dont_understand.png",
@@ -160,6 +186,7 @@ object AacContentBootstrap {
         val starterItems = AacStarterContentV1.items()
         val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems + starterItems)
         val repairedStarterCategoryChildren = repairStarterCategoryChildren(itemsArray, starterItems)
+        val repairedToaletaV1Tree = repairToaletaV1Tree(itemsArray)
         val repairedPeopleGroupChildren = repairPeopleGroupChildren(itemsArray)
         val repairedConversationTreeV3Metadata = repairConversationTreeV3Metadata(itemsArray, starterItems)
         val repairedRootSystemIcons = repairRootSystemIconMetadata(context, itemsArray)
@@ -212,6 +239,7 @@ object AacContentBootstrap {
             addedPlacements > 0 ||
             mergedMissingSystemItems > 0 ||
             repairedStarterCategoryChildren > 0 ||
+            repairedToaletaV1Tree > 0 ||
             repairedPeopleGroupChildren > 0 ||
             repairedConversationTreeV3Metadata > 0 ||
             repairedRootSystemIcons > 0 ||
@@ -253,7 +281,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren peopleGroupChildrenRepaired=$repairedPeopleGroupChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren toaletaV1TreeRepaired=$repairedToaletaV1Tree peopleGroupChildrenRepaired=$repairedPeopleGroupChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -460,6 +488,124 @@ object AacContentBootstrap {
                 }
             }
         return repaired
+    }
+
+    private fun repairToaletaV1Tree(itemsArray: JSONArray): Int {
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+        var repaired = 0
+
+        itemsById["wc"]?.let { item ->
+            repaired += putIfDifferent(item, "labelSl", "TOALETA")
+            repaired += putIfDifferent(item, "speakTextSl", "Toaleta.")
+            repaired += putIfDifferent(item, "speechText", "Toaleta.")
+            repaired += putIfDifferent(item, "actionType", "open_subicons")
+            repaired += putIfDifferent(item, "opensSubicons", true)
+            repaired += putIfDifferent(item, "speaksImmediately", false)
+            repaired += replaceChildrenIfDifferent(item, TOALETA_V1_WC_CHILDREN)
+            repaired += ensureQuestionSl(item, "Kaj potrebuješ glede toalete?")
+        }
+
+        itemsById["nurse_help"]?.let { item ->
+            repaired += putIfDifferent(item, "labelSl", "MEDICINSKA SESTRA")
+            repaired += putIfDifferent(item, "speakTextSl", "Medicinska sestra.")
+            repaired += putIfDifferent(item, "speechText", "Medicinska sestra.")
+            repaired += putIfDifferent(item, "actionType", "open_subicons")
+            repaired += putIfDifferent(item, "opensSubicons", true)
+            repaired += putIfDifferent(item, "speaksImmediately", false)
+            repaired += replaceChildrenIfDifferent(item, TOALETA_V1_NURSE_CHILDREN)
+            repaired += ensureOnlyVisibleUnder(item, listOf("wc"))
+            repaired += ensureQuestionSl(item, "Kakšno pomoč potrebuješ?")
+        }
+
+        val terminalRepairs = mapOf(
+            "wc_wet" to ("MOKRA SEM" to "Prosim, zamenjajte mi plenico. Mokra sem."),
+            "wc_dirty" to ("UMAZANA SEM" to "Prosim, zamenjajte mi plenico. Umazana sem."),
+            "wc_wet_and_dirty" to ("OBOJE" to "Prosim, zamenjajte mi plenico. Mokra in umazana sem."),
+            "help_dressing" to ("POMOČ PRI OBLAČENJU" to "Prosim, pomagajte mi pri oblačenju."),
+            "help_washing" to ("POMOČ PRI UMIVANJU" to "Prosim, pomagajte mi pri umivanju."),
+            "help_showering" to ("POMOČ PRI TUŠIRANJU" to "Prosim, pomagajte mi pri tuširanju."),
+            "noticed_blood" to ("OPAZILA SEM KRI" to "Opazila sem kri.")
+        )
+        terminalRepairs.forEach { (id, labelAndSpeech) ->
+            val item = itemsById[id] ?: return@forEach
+            val parentId = if (id in TOALETA_V1_WC_CHILDREN) "wc" else "nurse_help"
+            repaired += putIfDifferent(item, "labelSl", labelAndSpeech.first)
+            repaired += putIfDifferent(item, "speakTextSl", labelAndSpeech.second)
+            repaired += putIfDifferent(item, "speechText", labelAndSpeech.second)
+            repaired += putIfDifferent(item, "actionType", "speak")
+            repaired += putIfDifferent(item, "opensSubicons", false)
+            repaired += putIfDifferent(item, "speaksImmediately", true)
+            repaired += removeChildrenIfPresent(item)
+            repaired += ensureOnlyVisibleUnder(item, listOf(parentId))
+        }
+
+        TOALETA_V1_EXCLUDED_WC_CHILDREN.forEach { id ->
+            itemsById[id]?.let { item ->
+                repaired += removeVisibleUnderValue(item, "wc")
+            }
+        }
+
+        return repaired
+    }
+
+    private fun replaceChildrenIfDifferent(item: JSONObject, children: List<String>): Int {
+        if (stringList(item.optJSONArray("children")) == children) return 0
+        item.put("children", jsonArrayOf(children))
+        return 1
+    }
+
+    private fun removeChildrenIfPresent(item: JSONObject): Int {
+        if (!item.has("children")) return 0
+        item.remove("children")
+        return 1
+    }
+
+    private fun ensureOnlyVisibleUnder(item: JSONObject, parentIds: List<String>): Int {
+        if (stringList(item.optJSONArray("visibleUnderIds")) == parentIds) return 0
+        item.put("visibleUnderIds", jsonArrayOf(parentIds))
+        return 1
+    }
+
+    private fun removeVisibleUnderValue(item: JSONObject, parentId: String): Int {
+        val current = stringList(item.optJSONArray("visibleUnderIds"))
+        if (parentId !in current) return 0
+        val next = current.filterNot { it == parentId }
+        if (next.isEmpty()) {
+            item.remove("visibleUnderIds")
+        } else {
+            item.put("visibleUnderIds", jsonArrayOf(next))
+        }
+        return 1
+    }
+
+    private fun ensureQuestionSl(item: JSONObject, question: String): Int {
+        val questions = item.optJSONObject("questionByLanguage") ?: JSONObject()
+        if (questions.optString("sl") == question) {
+            if (!item.has("questionByLanguage")) {
+                item.put("questionByLanguage", questions)
+                return 1
+            }
+            return 0
+        }
+        questions.put("sl", question)
+        item.put("questionByLanguage", questions)
+        return 1
+    }
+
+    private fun putIfDifferent(item: JSONObject, key: String, value: String): Int {
+        if (item.optString(key) == value) return 0
+        item.put(key, value)
+        return 1
+    }
+
+    private fun putIfDifferent(item: JSONObject, key: String, value: Boolean): Int {
+        if (item.has(key) && item.optBoolean(key) == value) return 0
+        item.put(key, value)
+        return 1
     }
 
     private fun repairPeopleGroupChildren(itemsArray: JSONArray): Int {

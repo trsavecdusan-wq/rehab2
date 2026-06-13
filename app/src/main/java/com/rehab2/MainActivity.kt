@@ -2535,15 +2535,15 @@ class MainActivity : AppCompatActivity() {
             ),
             mainAacItem(
                 "wc",
-                "WC",
-                "moram na WC",
+                "TOALETA",
+                "Toaleta.",
                 labelUk = "ТУАЛЕТ",
                 labelEn = "TOILET",
                 speakTextUk = "Мені потрібно в туалет",
                 speechTextEn = "I need the toilet",
                 opensSubicons = true,
-                children = listOf("wc_now", "wc_soon", "wc_help", "dressing_help", "washing_help"),
-                questionByLanguage = mapOf("sl" to "Kaj potrebuješ glede WC?"),
+                children = listOf("wc_wet", "wc_dirty", "wc_wet_and_dirty", "nurse_help"),
+                questionByLanguage = mapOf("sl" to "Kaj potrebuješ glede toalete?"),
                 placements = mainAacPageOnePlacement(7)
             ),
             mainAacItem(
