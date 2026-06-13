@@ -502,44 +502,86 @@ object AacContentBootstrap {
             repaired += putIfDifferent(item, "labelSl", "TOALETA")
             repaired += putIfDifferent(item, "speakTextSl", "Toaleta.")
             repaired += putIfDifferent(item, "speechText", "Toaleta.")
+            repaired += putLanguageValue(item, "labelByLanguage", "uk", "ТУАЛЕТ")
+            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Туалет.")
             repaired += putIfDifferent(item, "actionType", "open_subicons")
             repaired += putIfDifferent(item, "opensSubicons", true)
             repaired += putIfDifferent(item, "speaksImmediately", false)
             repaired += replaceChildrenIfDifferent(item, TOALETA_V1_WC_CHILDREN)
-            repaired += ensureQuestionSl(item, "Kaj potrebuješ glede toalete?")
+            repaired += removeQuestionMetadata(item)
         }
 
         itemsById["nurse_help"]?.let { item ->
             repaired += putIfDifferent(item, "labelSl", "MEDICINSKA SESTRA")
             repaired += putIfDifferent(item, "speakTextSl", "Medicinska sestra.")
             repaired += putIfDifferent(item, "speechText", "Medicinska sestra.")
+            repaired += putLanguageValue(item, "labelByLanguage", "uk", "СЕСТРА")
+            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Медична сестра.")
             repaired += putIfDifferent(item, "actionType", "open_subicons")
             repaired += putIfDifferent(item, "opensSubicons", true)
             repaired += putIfDifferent(item, "speaksImmediately", false)
             repaired += replaceChildrenIfDifferent(item, TOALETA_V1_NURSE_CHILDREN)
             repaired += ensureOnlyVisibleUnder(item, listOf("wc"))
-            repaired += ensureQuestionSl(item, "Kakšno pomoč potrebuješ?")
+            repaired += removeQuestionMetadata(item)
         }
 
         val terminalRepairs = mapOf(
-            "wc_wet" to ("MOKRA SEM" to "Prosim, zamenjajte mi plenico. Mokra sem."),
-            "wc_dirty" to ("UMAZANA SEM" to "Prosim, zamenjajte mi plenico. Umazana sem."),
-            "wc_wet_and_dirty" to ("OBOJE" to "Prosim, zamenjajte mi plenico. Mokra in umazana sem."),
-            "help_dressing" to ("POMOČ PRI OBLAČENJU" to "Prosim, pomagajte mi pri oblačenju."),
-            "help_washing" to ("POMOČ PRI UMIVANJU" to "Prosim, pomagajte mi pri umivanju."),
-            "help_showering" to ("POMOČ PRI TUŠIRANJU" to "Prosim, pomagajte mi pri tuširanju."),
-            "noticed_blood" to ("OPAZILA SEM KRI" to "Opazila sem kri.")
+            "wc_wet" to ToaletaTerminalRepair(
+                labelSl = "MOKRA",
+                labelUk = "МОКРА",
+                speechSl = "Prosim, zamenjajte mi plenico. Mokra sem.",
+                speechUk = "Будь ласка, замініть мені підгузок. Я мокра."
+            ),
+            "wc_dirty" to ToaletaTerminalRepair(
+                labelSl = "UMAZANA",
+                labelUk = "БРУДНА",
+                speechSl = "Prosim, zamenjajte mi plenico. Umazana sem.",
+                speechUk = "Будь ласка, замініть мені підгузок. Я брудна."
+            ),
+            "wc_wet_and_dirty" to ToaletaTerminalRepair(
+                labelSl = "OBOJE",
+                labelUk = "ОБОЄ",
+                speechSl = "Prosim, zamenjajte mi plenico. Mokra in umazana sem.",
+                speechUk = "Будь ласка, замініть мені підгузок. Я мокра і брудна."
+            ),
+            "help_dressing" to ToaletaTerminalRepair(
+                labelSl = "OBLAČENJE",
+                labelUk = "ОДЯГ",
+                speechSl = "Prosim, pomagajte mi pri oblačenju.",
+                speechUk = "Будь ласка, допоможіть мені одягнутися."
+            ),
+            "help_washing" to ToaletaTerminalRepair(
+                labelSl = "UMIVANJE",
+                labelUk = "МИТТЯ",
+                speechSl = "Prosim, pomagajte mi pri umivanju.",
+                speechUk = "Будь ласка, допоможіть мені вмитися."
+            ),
+            "help_showering" to ToaletaTerminalRepair(
+                labelSl = "TUŠ",
+                labelUk = "ДУШ",
+                speechSl = "Prosim, pomagajte mi pri tuširanju.",
+                speechUk = "Будь ласка, допоможіть мені прийняти душ."
+            ),
+            "noticed_blood" to ToaletaTerminalRepair(
+                labelSl = "KRI",
+                labelUk = "КРОВ",
+                speechSl = "Opazila sem kri.",
+                speechUk = "Я помітила кров."
+            )
         )
-        terminalRepairs.forEach { (id, labelAndSpeech) ->
+        terminalRepairs.forEach { (id, repair) ->
             val item = itemsById[id] ?: return@forEach
             val parentId = if (id in TOALETA_V1_WC_CHILDREN) "wc" else "nurse_help"
-            repaired += putIfDifferent(item, "labelSl", labelAndSpeech.first)
-            repaired += putIfDifferent(item, "speakTextSl", labelAndSpeech.second)
-            repaired += putIfDifferent(item, "speechText", labelAndSpeech.second)
+            repaired += putIfDifferent(item, "labelSl", repair.labelSl)
+            repaired += putIfDifferent(item, "speakTextSl", repair.speechSl)
+            repaired += putIfDifferent(item, "speechText", repair.speechSl)
+            repaired += putLanguageValue(item, "labelByLanguage", "uk", repair.labelUk)
+            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", repair.speechUk)
             repaired += putIfDifferent(item, "actionType", "speak")
             repaired += putIfDifferent(item, "opensSubicons", false)
             repaired += putIfDifferent(item, "speaksImmediately", true)
             repaired += removeChildrenIfPresent(item)
+            repaired += removeQuestionMetadata(item)
             repaired += ensureOnlyVisibleUnder(item, listOf(parentId))
         }
 
@@ -582,17 +624,28 @@ object AacContentBootstrap {
         return 1
     }
 
-    private fun ensureQuestionSl(item: JSONObject, question: String): Int {
-        val questions = item.optJSONObject("questionByLanguage") ?: JSONObject()
-        if (questions.optString("sl") == question) {
-            if (!item.has("questionByLanguage")) {
-                item.put("questionByLanguage", questions)
+    private fun removeQuestionMetadata(item: JSONObject): Int {
+        var repaired = 0
+        listOf("questionSl", "questionUk", "questionByLanguage", "followUpQuestion").forEach { key ->
+            if (item.has(key)) {
+                item.remove(key)
+                repaired++
+            }
+        }
+        return repaired
+    }
+
+    private fun putLanguageValue(item: JSONObject, objectKey: String, languageCode: String, value: String): Int {
+        val languageObject = item.optJSONObject(objectKey) ?: JSONObject()
+        if (languageObject.optString(languageCode) == value) {
+            if (!item.has(objectKey)) {
+                item.put(objectKey, languageObject)
                 return 1
             }
             return 0
         }
-        questions.put("sl", question)
-        item.put("questionByLanguage", questions)
+        languageObject.put(languageCode, value)
+        item.put(objectKey, languageObject)
         return 1
     }
 
@@ -607,6 +660,13 @@ object AacContentBootstrap {
         item.put(key, value)
         return 1
     }
+
+    private data class ToaletaTerminalRepair(
+        val labelSl: String,
+        val labelUk: String,
+        val speechSl: String,
+        val speechUk: String
+    )
 
     private fun repairPeopleGroupChildren(itemsArray: JSONArray): Int {
         val itemsById = itemObjects(itemsArray)

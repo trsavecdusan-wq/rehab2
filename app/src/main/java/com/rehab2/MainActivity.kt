@@ -1109,6 +1109,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun prepareMainAacContextPrompt(item: AacItem) {
         clearMainAacSentenceState(clearConversationContext = false)
+        if (item.id == "wc" || item.id == "nurse_help") {
+            hideMainAacQuestion()
+            return
+        }
         val languageCode = getActiveSpeechLanguage()
         val guidedPrompt = if (languageCode.trim().lowercase(Locale.ROOT) == "sl") {
             AacGuidedPromptEngine.questionFor(item)
@@ -2296,6 +2300,9 @@ class MainActivity : AppCompatActivity() {
             .filter { child -> item.id in child.visibleUnderIds && child.id !in item.children }
             .sortedBy { it.priority }
         val existingChildren = explicitChildren + visibleUnderChildren
+        if (item.id == "wc" || item.id == "nurse_help") {
+            return existingChildren.distinctBy { child -> child.id }
+        }
         val guidedChildren = AacGuidedPromptEngine.childIdsFor(item).mapNotNull { childId -> mainAacItemsById[childId] }
         val children = (existingChildren + guidedChildren).distinctBy { child -> child.id }
         return if (guidedChildren.isNotEmpty()) {
@@ -2543,7 +2550,6 @@ class MainActivity : AppCompatActivity() {
                 speechTextEn = "I need the toilet",
                 opensSubicons = true,
                 children = listOf("wc_wet", "wc_dirty", "wc_wet_and_dirty", "nurse_help"),
-                questionByLanguage = mapOf("sl" to "Kaj potrebuješ glede toalete?"),
                 placements = mainAacPageOnePlacement(7)
             ),
             mainAacItem(
