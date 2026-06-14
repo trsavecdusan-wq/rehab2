@@ -56,7 +56,7 @@ object AacGuidedPromptEngine {
             )
             "pain", "pain_area" -> AacGuidedPrompt(
                 questionSl = "Kaj te boli?",
-                childIds = listOf("head", "arm", "leg", "belly", "back", "throat")
+                childIds = listOf("head", "left_arm", "right_arm", "left_leg", "right_leg", "back", "belly", "chest")
             )
             "wc" -> AacGuidedPrompt(
                 questionSl = "Kaj potrebuje\u0161 glede WC?",
@@ -127,11 +127,11 @@ object AacGuidedPromptEngine {
             )
             rootId in PAIN_ROOT_IDS && selectedId in PAIN_BODY_PART_IDS -> AacGuidedPrompt(
                 questionSl = "Kako mo\u010dno?",
-                childIds = listOf("pain_light", "pain_medium", "pain_very")
+                childIds = listOf("pain_light", "pain_medium", "pain_strong", "pain_very_strong")
             )
             rootId in PAIN_ROOT_IDS && selectedId in PAIN_INTENSITY_IDS -> AacGuidedPrompt(
                 questionSl = "Od kdaj?",
-                childIds = listOf("pain_now", "pain_today", "pain_many_days")
+                childIds = listOf("pain_since_today", "pain_since_yesterday", "pain_since_morning", "pain_since_evening", "pain_since_long")
             )
             else -> null
         }
@@ -172,8 +172,53 @@ object AacGuidedPromptEngine {
         "sweet"
     )
     private val PAIN_ROOT_IDS = setOf("pain", "pain_area")
-    private val PAIN_BODY_PART_IDS = setOf("head", "arm", "leg", "belly", "back", "chest", "throat")
-    private val PAIN_INTENSITY_IDS = setOf("pain_light", "pain_medium", "pain_very", "pain_very_strong")
+    private val PAIN_BODY_PART_IDS = setOf(
+        "head",
+        "left_arm",
+        "right_arm",
+        "left_leg",
+        "right_leg",
+        "back",
+        "belly",
+        "chest",
+        "neck",
+        "eye",
+        "ear",
+        "nose",
+        "mouth",
+        "tooth",
+        "arm_shoulder",
+        "arm_upper",
+        "arm_elbow",
+        "arm_forearm",
+        "arm_wrist",
+        "arm_fingers",
+        "leg_hip",
+        "leg_thigh",
+        "leg_knee",
+        "leg_shin",
+        "leg_ankle",
+        "leg_foot",
+        "leg_toes",
+        "back_upper",
+        "back_middle",
+        "back_lower",
+        "belly_left",
+        "belly_right",
+        "belly_upper",
+        "belly_lower",
+        "eye_left",
+        "eye_right",
+        "eye_both",
+        "ear_left",
+        "ear_right",
+        "ear_both",
+        "tooth_left",
+        "tooth_right",
+        "tooth_upper",
+        "tooth_lower"
+    )
+    private val PAIN_INTENSITY_IDS = setOf("pain_light", "pain_medium", "pain_strong", "pain_very", "pain_very_strong")
     private val FOLLOW_UP_ANSWER_IDS = setOf(
         "yes",
         "drink_cold",
@@ -189,10 +234,22 @@ object AacGuidedPromptEngine {
         "food_later",
         "pain_light",
         "pain_medium",
+        "pain_strong",
         "pain_very",
         "pain_now",
         "pain_today",
         "pain_many_days",
-        "pain_very_strong"
+        "pain_very_strong",
+        "pain_since_today",
+        "pain_since_yesterday",
+        "pain_since_morning",
+        "pain_since_evening",
+        "pain_since_long",
+        "pain_when_moving",
+        "pain_when_lifting",
+        "pain_when_gripping",
+        "pain_when_walking",
+        "pain_when_sitting",
+        "pain_when_standing"
     )
 }

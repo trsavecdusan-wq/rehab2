@@ -885,6 +885,38 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/subgroupCommunicatorPainScope"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="BOLI ME"
+            android:textColor="#F4F7FA"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/helperCommunicatorPainScope"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="ZaÄŤetna verzija prikaĹľe samo najpogostejĹˇe veje. RazĹˇirjena verzija doda oko, uho, nos, usta, zob, vrat in podrobnejĹˇe podveje."
+            android:textColor="#C8D0D8"
+            android:textSize="15sp" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchPainExtendedVersionEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:minHeight="56dp"
+            android:paddingVertical="8dp"
+            android:text="BOLI ME â€” razĹˇirjena verzija"
+            android:textColor="#F4F7FA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/subgroupCommunicatorGuided"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

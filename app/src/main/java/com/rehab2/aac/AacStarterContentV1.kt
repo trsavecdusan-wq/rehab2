@@ -278,17 +278,51 @@ object AacStarterContentV1 {
         starter("lie_down", "POLOŽI ME", "Prosim, položite me.", "care.lie_down", "NEED", "care", listOf("položi", "položaj", "nega"), visibleUnderIds = listOf("change_position")),
         starter("movement_pain", "BOLI PRI PREMIKU", "Boli me pri premiku.", "care.movement_pain", "PAIN", "care", listOf("premik", "boli"), visibleUnderIds = listOf("care")),
 
-        starter("pain", "BOLI ME", "Boli me.", "pain.general", "PAIN", "pain", listOf("bolečina", "boli"), placements = pageOne(6), opensSubicons = true, children = listOf("head", "belly", "leg", "arm", "back", "chest", "throat"), questionByLanguage = mapOf("sl" to "Kje te boli?", "uk" to "Де тебе болить?", "en" to "Where does it hurt?"), imagePath = "system/pain.png", iconSource = IconSource.SYSTEM),
-        starter("head", "GLAVA", "Boli me glava.", "pain.head", "PAIN", "pain", listOf("glava", "bolečina"), placements = pageFour(6), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?"), imagePath = "custom/pain/head.jpg", iconSource = IconSource.CUSTOM),
-        starter("arm", "ROKA", "Boli me roka.", "pain.arm", "PAIN", "pain", listOf("roka", "bolečina"), placements = pageFour(7), opensSubicons = true, children = painSideStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Katera stran?"), imagePath = "custom/pain/arm.jpg", iconSource = IconSource.CUSTOM),
-        starter("leg", "NOGA", "Boli me noga.", "pain.leg", "PAIN", "pain", listOf("noga", "bolečina"), placements = pageFour(8), opensSubicons = true, children = painSideStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Katera stran?"), imagePath = "custom/pain/leg.jpg", iconSource = IconSource.CUSTOM),
-        starter("back", "HRBET", "Boli me hrbet.", "pain.back", "PAIN", "pain", listOf("hrbet", "bolečina"), placements = pageFour(9), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?"), imagePath = "custom/pain/back.jpg", iconSource = IconSource.CUSTOM),
-        starter("belly", "TREBUH", "Boli me trebuh.", "pain.belly", "PAIN", "pain", listOf("trebuh", "bolečina"), placements = pageFour(10), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?"), imagePath = "custom/pain/belly.jpg", iconSource = IconSource.CUSTOM),
-        starter("chest", "PRSI", "Boli me v prsih.", "pain.chest", "PAIN", "pain", listOf("prsi", "bolečina"), placements = pageFour(11), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
-        starter("throat", "GRLO", "Boli me grlo.", "pain.throat", "PAIN", "pain", listOf("grlo", "bolečina"), placements = pageFour(12), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?"), imagePath = "custom/pain/throat.jpg", iconSource = IconSource.CUSTOM),
-        starter("pain_left", "LEVA", "leva", "pain.left", "PAIN", "pain", listOf("leva", "stran"), visibleUnderIds = listOf("arm", "leg"), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
-        starter("pain_right", "DESNA", "desna", "pain.right", "PAIN", "pain", listOf("desna", "stran"), visibleUnderIds = listOf("arm", "leg"), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
-        starter("pain_both", "OBE", "obe", "pain.both", "PAIN", "pain", listOf("obe", "stran"), visibleUnderIds = listOf("arm", "leg"), opensSubicons = true, children = painStrengthAndTimeChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("pain", "BOLI ME", "Boli me.", "pain.general", "PAIN", "pain", listOf("bolečina", "boli"), placements = pageOne(6), opensSubicons = true, children = painRootChildren(), questionByLanguage = mapOf("sl" to "Izberi, kaj te boli.", "uk" to "Де тебе болить?", "en" to "Where does it hurt?"), imagePath = "system/pain.png", iconSource = IconSource.SYSTEM),
+        starter("head", "GLAVA", "Boli me glava.", "pain.head", "PAIN", "pain", listOf("glava", "bolečina"), placements = pageFour(6), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?"), imagePath = "custom/pain/head.jpg", iconSource = IconSource.CUSTOM),
+        starter("left_arm", "LEVA ROKA", "Boli me leva roka.", "pain.left_arm", "PAIN", "pain", listOf("leva", "roka", "bolečina"), opensSubicons = true, children = painArmDetailChildren(), questionByLanguage = mapOf("sl" to "Kje na levi roki?"), imagePath = "custom/pain/arm.jpg", iconSource = IconSource.CUSTOM),
+        starter("right_arm", "DESNA ROKA", "Boli me desna roka.", "pain.right_arm", "PAIN", "pain", listOf("desna", "roka", "bolečina"), opensSubicons = true, children = painArmDetailChildren(), questionByLanguage = mapOf("sl" to "Kje na desni roki?"), imagePath = "custom/pain/arm.jpg", iconSource = IconSource.CUSTOM),
+        starter("left_leg", "LEVA NOGA", "Boli me leva noga.", "pain.left_leg", "PAIN", "pain", listOf("leva", "noga", "bolečina"), opensSubicons = true, children = painLegDetailChildren(), questionByLanguage = mapOf("sl" to "Kje na levi nogi?"), imagePath = "custom/pain/leg.jpg", iconSource = IconSource.CUSTOM),
+        starter("right_leg", "DESNA NOGA", "Boli me desna noga.", "pain.right_leg", "PAIN", "pain", listOf("desna", "noga", "bolečina"), opensSubicons = true, children = painLegDetailChildren(), questionByLanguage = mapOf("sl" to "Kje na desni nogi?"), imagePath = "custom/pain/leg.jpg", iconSource = IconSource.CUSTOM),
+        starter("back", "HRBET", "Boli me hrbet.", "pain.back", "PAIN", "pain", listOf("hrbet", "bolečina"), placements = pageFour(9), opensSubicons = true, children = painBackDetailChildren(), questionByLanguage = mapOf("sl" to "Kje na hrbtu?"), imagePath = "custom/pain/back.jpg", iconSource = IconSource.CUSTOM),
+        starter("belly", "TREBUH", "Boli me trebuh.", "pain.belly", "PAIN", "pain", listOf("trebuh", "bolečina"), placements = pageFour(10), opensSubicons = true, children = painBellyDetailChildren(), questionByLanguage = mapOf("sl" to "Kje v trebuhu?"), imagePath = "custom/pain/belly.jpg", iconSource = IconSource.CUSTOM),
+        starter("chest", "PRSI", "Boli me v prsih.", "pain.chest", "PAIN", "pain", listOf("prsi", "bolečina"), placements = pageFour(11), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("neck", "VRAT", "Boli me vrat.", "pain.neck", "PAIN", "pain", listOf("vrat", "bolečina"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("eye", "OKO", "Boli me oko.", "pain.eye", "PAIN", "pain", listOf("oko", "bolečina"), opensSubicons = true, children = painEyeSideChildren(), questionByLanguage = mapOf("sl" to "Katero oko?")),
+        starter("ear", "UHO", "Boli me uho.", "pain.ear", "PAIN", "pain", listOf("uho", "bolečina"), opensSubicons = true, children = painEarSideChildren(), questionByLanguage = mapOf("sl" to "Katero uho?")),
+        starter("nose", "NOS", "Boli me nos.", "pain.nose", "PAIN", "pain", listOf("nos", "bolečina"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("mouth", "USTA", "Bolijo me usta.", "pain.mouth", "PAIN", "pain", listOf("usta", "bolečina"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("tooth", "ZOB", "Boli me zob.", "pain.tooth", "PAIN", "pain", listOf("zob", "bolečina"), opensSubicons = true, children = painToothPartChildren(), questionByLanguage = mapOf("sl" to "Kateri zob?")),
+        starter("arm_shoulder", "RAMA", "Boli me rama.", "pain.arm.shoulder", "PAIN", "pain", listOf("rama", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("arm_upper", "NADLAHT", "Boli me nadlaht.", "pain.arm.upper", "PAIN", "pain", listOf("nadlaht", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("arm_elbow", "KOMOLEC", "Boli me komolec.", "pain.arm.elbow", "PAIN", "pain", listOf("komolec", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("arm_forearm", "PODLAHT", "Boli me podlaht.", "pain.arm.forearm", "PAIN", "pain", listOf("podlaht", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("arm_wrist", "ZAPESTJE", "Boli me zapestje.", "pain.arm.wrist", "PAIN", "pain", listOf("zapestje", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("arm_fingers", "PRSTI", "Bolijo me prsti na roki.", "pain.arm.fingers", "PAIN", "pain", listOf("prsti", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("leg_hip", "KOLK", "Boli me kolk.", "pain.leg.hip", "PAIN", "pain", listOf("kolk", "noga", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("leg_thigh", "STEGNO", "Boli me stegno.", "pain.leg.thigh", "PAIN", "pain", listOf("stegno", "noga", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("leg_knee", "KOLENO", "Boli me koleno.", "pain.leg.knee", "PAIN", "pain", listOf("koleno", "noga", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("leg_shin", "GOLEN", "Boli me golen.", "pain.leg.shin", "PAIN", "pain", listOf("golen", "noga", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("leg_ankle", "GLEŽENJ", "Boli me gleženj.", "pain.leg.ankle", "PAIN", "pain", listOf("gleženj", "noga", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("leg_foot", "STOPALO", "Boli me stopalo.", "pain.leg.foot", "PAIN", "pain", listOf("stopalo", "noga", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("leg_toes", "PRSTI", "Bolijo me prsti na nogi.", "pain.leg.toes", "PAIN", "pain", listOf("prsti", "noga", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("back_upper", "ZGORNJI DEL", "Boli me zgornji del hrbta.", "pain.back.upper", "PAIN", "pain", listOf("zgornji", "hrbet", "bolečina"), visibleUnderIds = listOf("back"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("back_middle", "SREDNJI DEL", "Boli me srednji del hrbta.", "pain.back.middle", "PAIN", "pain", listOf("srednji", "hrbet", "bolečina"), visibleUnderIds = listOf("back"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("back_lower", "SPODNJI DEL", "Boli me spodnji del hrbta.", "pain.back.lower", "PAIN", "pain", listOf("spodnji", "hrbet", "bolečina"), visibleUnderIds = listOf("back"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("belly_left", "LEVO", "Boli me leva stran trebuha.", "pain.belly.left", "PAIN", "pain", listOf("levo", "trebuh", "bolečina"), visibleUnderIds = listOf("belly"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("belly_right", "DESNO", "Boli me desna stran trebuha.", "pain.belly.right", "PAIN", "pain", listOf("desno", "trebuh", "bolečina"), visibleUnderIds = listOf("belly"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("belly_upper", "ZGORAJ", "Boli me zgornji del trebuha.", "pain.belly.upper", "PAIN", "pain", listOf("zgoraj", "trebuh", "bolečina"), visibleUnderIds = listOf("belly"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("belly_lower", "SPODAJ", "Boli me spodnji del trebuha.", "pain.belly.lower", "PAIN", "pain", listOf("spodaj", "trebuh", "bolečina"), visibleUnderIds = listOf("belly"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("eye_left", "LEVO", "Boli me levo oko.", "pain.eye.left", "PAIN", "pain", listOf("levo", "oko", "bolečina"), visibleUnderIds = listOf("eye"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("eye_right", "DESNO", "Boli me desno oko.", "pain.eye.right", "PAIN", "pain", listOf("desno", "oko", "bolečina"), visibleUnderIds = listOf("eye"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("eye_both", "OBE", "Bolita me obe očesi.", "pain.eye.both", "PAIN", "pain", listOf("obe", "oko", "bolečina"), visibleUnderIds = listOf("eye"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("ear_left", "LEVO", "Boli me levo uho.", "pain.ear.left", "PAIN", "pain", listOf("levo", "uho", "bolečina"), visibleUnderIds = listOf("ear"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("ear_right", "DESNO", "Boli me desno uho.", "pain.ear.right", "PAIN", "pain", listOf("desno", "uho", "bolečina"), visibleUnderIds = listOf("ear"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("ear_both", "OBE", "Bolita me obe ušesi.", "pain.ear.both", "PAIN", "pain", listOf("obe", "uho", "bolečina"), visibleUnderIds = listOf("ear"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("tooth_left", "LEVO", "Boli me levi zob.", "pain.tooth.left", "PAIN", "pain", listOf("levo", "zob", "bolečina"), visibleUnderIds = listOf("tooth"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("tooth_right", "DESNO", "Boli me desni zob.", "pain.tooth.right", "PAIN", "pain", listOf("desno", "zob", "bolečina"), visibleUnderIds = listOf("tooth"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("tooth_upper", "ZGORAJ", "Boli me zgornji zob.", "pain.tooth.upper", "PAIN", "pain", listOf("zgoraj", "zob", "bolečina"), visibleUnderIds = listOf("tooth"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("tooth_lower", "SPODAJ", "Boli me spodnji zob.", "pain.tooth.lower", "PAIN", "pain", listOf("spodaj", "zob", "bolečina"), visibleUnderIds = listOf("tooth"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
         starter("left_side", "LEVA", "Na levi strani.", "pain.left", "PAIN", "pain", listOf("leva", "stran"), placements = pageFour(13)),
         starter("right_side", "DESNA", "Na desni strani.", "pain.right", "PAIN", "pain", listOf("desna", "stran"), placements = pageFour(14)),
         starter("other_body", "DRUGO", "Boli drugje.", "pain.other", "PAIN", "pain", listOf("drugo", "bolečina"), placements = pageFour(15)),
@@ -296,14 +330,21 @@ object AacStarterContentV1 {
         starter("pain_medium", "SREDNJE", "Srednje močno boli.", "pain.medium", "PAIN", "pain", listOf("srednje", "bolečina"), placements = pageFour(17), opensSubicons = true, children = painTimeChildren(), questionByLanguage = mapOf("sl" to "Od kdaj boli?")),
         starter("pain_strong", "MOČNO", "Močno boli.", "pain.strong", "PAIN", "pain", listOf("močno_boli", "bolečina"), placements = pageFour(18), opensSubicons = true, children = painTimeChildren(), questionByLanguage = mapOf("sl" to "Od kdaj boli?")),
         starter("pain_very", "ZELO", "Zelo boli.", "pain.very", "PAIN", "pain", listOf("zelo", "bolečina"), visibleUnderIds = listOf("pain"), imagePath = "custom/pain/detail/pain_very.jpg", iconSource = IconSource.CUSTOM),
-        starter("pain_very_strong", "ZELO MOČNO", "Zelo močno boli.", "pain.very_strong", "PAIN", "pain", listOf("zelo_močno", "bolečina"), placements = pageFour(19)),
+        starter("pain_very_strong", "ZELO MOČNO", "Zelo močno boli.", "pain.very_strong", "PAIN", "pain", listOf("zelo_močno", "bolečina"), placements = pageFour(19), opensSubicons = true, children = painTimeChildren(), questionByLanguage = mapOf("sl" to "Od kdaj boli?")),
         starter("pain_now", "ZDAJ", "Boli me zdaj.", "pain.now", "PAIN", "pain", listOf("zdaj", "bolečina"), visibleUnderIds = listOf("pain"), imagePath = "custom/pain/detail/pain_now.jpg", iconSource = IconSource.CUSTOM),
         starter("pain_today", "DANES", "Boli me od danes.", "pain.today", "PAIN", "pain", listOf("danes", "bolečina"), visibleUnderIds = listOf("pain"), imagePath = "custom/pain/detail/pain_today.jpg", iconSource = IconSource.CUSTOM),
         starter("pain_many_days", "VEČ DNI", "Boli me več dni.", "pain.many_days", "PAIN", "pain", listOf("več_dni", "bolečina"), visibleUnderIds = listOf("pain"), imagePath = "custom/pain/detail/pain_many_days.jpg", iconSource = IconSource.CUSTOM),
-        starter("pain_since_today", "OD DANES", "Od danes", "pain.since_today", "PAIN", "pain", listOf("od_danes", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong")),
-        starter("pain_since_yesterday", "OD VČERAJ", "Od včeraj", "pain.since_yesterday", "PAIN", "pain", listOf("od_včeraj", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong")),
-        starter("pain_since_morning", "OD JUTRA", "Od jutra", "pain.since_morning", "PAIN", "pain", listOf("od_jutra", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong")),
-        starter("pain_since_evening", "OD VEČERA", "Od večera", "pain.since_evening", "PAIN", "pain", listOf("od_večera", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong")),
+        starter("pain_since_today", "OD DANES", "Od danes", "pain.since_today", "PAIN", "pain", listOf("od_danes", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong", "pain_very_strong")),
+        starter("pain_since_yesterday", "OD VČERAJ", "Od včeraj", "pain.since_yesterday", "PAIN", "pain", listOf("od_včeraj", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong", "pain_very_strong")),
+        starter("pain_since_morning", "OD JUTRA", "Od jutra", "pain.since_morning", "PAIN", "pain", listOf("od_jutra", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong", "pain_very_strong")),
+        starter("pain_since_evening", "OD VEČERA", "Od večera", "pain.since_evening", "PAIN", "pain", listOf("od_večera", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong", "pain_very_strong")),
+        starter("pain_since_long", "ŽE DOLGO", "Že dolgo", "pain.since_long", "PAIN", "pain", listOf("dolgo", "čas", "bolečina"), visibleUnderIds = listOf("pain_light", "pain_medium", "pain_strong", "pain_very_strong")),
+        starter("pain_when_moving", "PRI GIBANJU", "Pri gibanju", "pain.when_moving", "PAIN", "pain", listOf("gibanje", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm")),
+        starter("pain_when_lifting", "PRI DVIGOVANJU", "Pri dvigovanju", "pain.when_lifting", "PAIN", "pain", listOf("dvigovanje", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm")),
+        starter("pain_when_gripping", "PRI PRIJEMU", "Pri prijemu", "pain.when_gripping", "PAIN", "pain", listOf("prijem", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm")),
+        starter("pain_when_walking", "PRI HOJI", "Pri hoji", "pain.when_walking", "PAIN", "pain", listOf("hoja", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg", "back")),
+        starter("pain_when_sitting", "PRI SEDENJU", "Pri sedenju", "pain.when_sitting", "PAIN", "pain", listOf("sedenje", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg", "back")),
+        starter("pain_when_standing", "PRI VSTAJANJU", "Pri vstajanju", "pain.when_standing", "PAIN", "pain", listOf("vstajanje", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg", "back")),
 
         starter("good", "DOBRO SEM", "Dobro sem.", "feeling.good", "FEELING", "feeling", listOf("dobro", "počutje"), visibleUnderIds = listOf("feeling")),
         starter("bad", "SLABO SEM", "Slabo se počutim.", "feeling.bad", "FEELING", "feeling", listOf("slabo", "počutje"), visibleUnderIds = listOf("feeling", "problem"), imagePath = "custom/emotion/bad.jpg", iconSource = IconSource.CUSTOM),
@@ -477,6 +518,111 @@ object AacStarterContentV1 {
         )
     }
 
+    private fun painRootChildren(): List<String> {
+        return listOf(
+            "head",
+            "left_arm",
+            "right_arm",
+            "left_leg",
+            "right_leg",
+            "back",
+            "belly",
+            "chest",
+            "eye",
+            "ear",
+            "nose",
+            "mouth",
+            "tooth",
+            "neck"
+        )
+    }
+
+    private fun painArmDetailChildren(): List<String> {
+        return listOf(
+            "arm_shoulder",
+            "arm_upper",
+            "arm_elbow",
+            "arm_forearm",
+            "arm_wrist",
+            "arm_fingers",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong",
+            "pain_when_moving",
+            "pain_when_lifting",
+            "pain_when_gripping"
+        )
+    }
+
+    private fun painLegDetailChildren(): List<String> {
+        return listOf(
+            "leg_hip",
+            "leg_thigh",
+            "leg_knee",
+            "leg_shin",
+            "leg_ankle",
+            "leg_foot",
+            "leg_toes",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong",
+            "pain_when_walking",
+            "pain_when_sitting",
+            "pain_when_standing"
+        )
+    }
+
+    private fun painBackDetailChildren(): List<String> {
+        return listOf(
+            "back_upper",
+            "back_middle",
+            "back_lower",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong",
+            "pain_when_walking",
+            "pain_when_sitting",
+            "pain_when_standing"
+        )
+    }
+
+    private fun painBellyDetailChildren(): List<String> {
+        return listOf(
+            "belly_left",
+            "belly_right",
+            "belly_upper",
+            "belly_lower",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong"
+        )
+    }
+
+    private fun painEyeSideChildren(): List<String> {
+        return listOf("eye_left", "eye_right", "eye_both")
+    }
+
+    private fun painEarSideChildren(): List<String> {
+        return listOf("ear_left", "ear_right", "ear_both")
+    }
+
+    private fun painToothPartChildren(): List<String> {
+        return listOf("tooth_left", "tooth_right", "tooth_upper", "tooth_lower")
+    }
+
+    private fun painStrengthChildren(): List<String> {
+        return listOf(
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong"
+        )
+    }
+
     private fun painStrengthAndTimeChildren(): List<String> {
         return listOf(
             "pain_light",
@@ -494,7 +640,8 @@ object AacStarterContentV1 {
             "pain_since_today",
             "pain_since_yesterday",
             "pain_since_morning",
-            "pain_since_evening"
+            "pain_since_evening",
+            "pain_since_long"
         )
     }
 

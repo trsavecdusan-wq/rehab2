@@ -1,4 +1,4 @@
-package com.rehab2.aac
+﻿package com.rehab2.aac
 
 import android.content.Context
 import android.util.Log
@@ -502,8 +502,8 @@ object AacContentBootstrap {
             repaired += putIfDifferent(item, "labelSl", "TOALETA")
             repaired += putIfDifferent(item, "speakTextSl", "Toaleta.")
             repaired += putIfDifferent(item, "speechText", "Toaleta.")
-            repaired += putLanguageValue(item, "labelByLanguage", "uk", "ТУАЛЕТ")
-            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Туалет.")
+            repaired += putLanguageValue(item, "labelByLanguage", "uk", "Đ˘ĐŁĐĐ›Đ•Đ˘")
+            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Đ˘ŃĐ°Đ»ĐµŃ‚.")
             repaired += putIfDifferent(item, "actionType", "open_subicons")
             repaired += putIfDifferent(item, "opensSubicons", true)
             repaired += putIfDifferent(item, "speaksImmediately", false)
@@ -515,8 +515,8 @@ object AacContentBootstrap {
             repaired += putIfDifferent(item, "labelSl", "MEDICINSKA SESTRA")
             repaired += putIfDifferent(item, "speakTextSl", "Medicinska sestra.")
             repaired += putIfDifferent(item, "speechText", "Medicinska sestra.")
-            repaired += putLanguageValue(item, "labelByLanguage", "uk", "СЕСТРА")
-            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Медична сестра.")
+            repaired += putLanguageValue(item, "labelByLanguage", "uk", "ĐˇĐ•ĐˇĐ˘Đ Đ")
+            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "ĐśĐµĐ´Đ¸Ń‡Đ˝Đ° ŃĐµŃŃ‚Ń€Đ°.")
             repaired += putIfDifferent(item, "actionType", "open_subicons")
             repaired += putIfDifferent(item, "opensSubicons", true)
             repaired += putIfDifferent(item, "speaksImmediately", false)
@@ -528,45 +528,45 @@ object AacContentBootstrap {
         val terminalRepairs = mapOf(
             "wc_wet" to ToaletaTerminalRepair(
                 labelSl = "MOKRA",
-                labelUk = "МОКРА",
+                labelUk = "ĐśĐžĐšĐ Đ",
                 speechSl = "Prosim, zamenjajte mi plenico. Mokra sem.",
-                speechUk = "Будь ласка, замініть мені підгузок. Я мокра."
+                speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ·Đ°ĐĽŃ–Đ˝Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐżŃ–Đ´ĐłŃĐ·ĐľĐş. ĐŻ ĐĽĐľĐşŃ€Đ°."
             ),
             "wc_dirty" to ToaletaTerminalRepair(
                 labelSl = "UMAZANA",
-                labelUk = "БРУДНА",
+                labelUk = "Đ‘Đ ĐŁĐ”ĐťĐ",
                 speechSl = "Prosim, zamenjajte mi plenico. Umazana sem.",
-                speechUk = "Будь ласка, замініть мені підгузок. Я брудна."
+                speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ·Đ°ĐĽŃ–Đ˝Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐżŃ–Đ´ĐłŃĐ·ĐľĐş. ĐŻ Đ±Ń€ŃĐ´Đ˝Đ°."
             ),
             "wc_wet_and_dirty" to ToaletaTerminalRepair(
                 labelSl = "OBOJE",
-                labelUk = "ОБОЄ",
+                labelUk = "ĐžĐ‘ĐžĐ„",
                 speechSl = "Prosim, zamenjajte mi plenico. Mokra in umazana sem.",
-                speechUk = "Будь ласка, замініть мені підгузок. Я мокра і брудна."
+                speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ·Đ°ĐĽŃ–Đ˝Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐżŃ–Đ´ĐłŃĐ·ĐľĐş. ĐŻ ĐĽĐľĐşŃ€Đ° Ń– Đ±Ń€ŃĐ´Đ˝Đ°."
             ),
             "help_dressing" to ToaletaTerminalRepair(
-                labelSl = "OBLAČENJE",
-                labelUk = "ОДЯГ",
-                speechSl = "Prosim, pomagajte mi, da se oblečem.",
-                speechUk = "Допоможіть мені одягнутися."
+                labelSl = "OBLAÄŚENJE",
+                labelUk = "ĐžĐ”ĐŻĐ“",
+                speechSl = "Prosim, pomagajte mi, da se obleÄŤem.",
+                speechUk = "Đ”ĐľĐżĐľĐĽĐľĐ¶Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐľĐ´ŃŹĐłĐ˝ŃŃ‚Đ¸ŃŃŹ."
             ),
             "help_washing" to ToaletaTerminalRepair(
                 labelSl = "UMIVANJE",
-                labelUk = "МИТТЯ",
+                labelUk = "ĐśĐĐ˘Đ˘ĐŻ",
                 speechSl = "Prosim, pomagajte mi pri umivanju.",
-                speechUk = "Будь ласка, допоможіть мені вмитися."
+                speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ´ĐľĐżĐľĐĽĐľĐ¶Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– Đ˛ĐĽĐ¸Ń‚Đ¸ŃŃŹ."
             ),
             "help_showering" to ToaletaTerminalRepair(
-                labelSl = "TUŠ",
-                labelUk = "ДУШ",
-                speechSl = "Prosim, pomagajte mi pri tuširanju.",
-                speechUk = "Будь ласка, допоможіть мені прийняти душ."
+                labelSl = "TUĹ ",
+                labelUk = "Đ”ĐŁĐ¨",
+                speechSl = "Prosim, pomagajte mi pri tuĹˇiranju.",
+                speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ´ĐľĐżĐľĐĽĐľĐ¶Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐżŃ€Đ¸ĐąĐ˝ŃŹŃ‚Đ¸ Đ´ŃŃ."
             ),
             "noticed_blood" to ToaletaTerminalRepair(
                 labelSl = "KRI",
-                labelUk = "КРОВ",
+                labelUk = "ĐšĐ ĐžĐ’",
                 speechSl = "Opazila sem kri.",
-                speechUk = "Я помітила кров."
+                speechUk = "ĐŻ ĐżĐľĐĽŃ–Ń‚Đ¸Đ»Đ° ĐşŃ€ĐľĐ˛."
             )
         )
         terminalRepairs.forEach { (id, repair) ->
@@ -791,20 +791,20 @@ object AacContentBootstrap {
             item.put("labelSl", "NE RAZUMEM")
             item.put("text", "NE RAZUMEM")
             item.put("baseText", "NE RAZUMEM")
-            item.put("labelUk", "Я НЕ РОЗУМІЮ")
+            item.put("labelUk", "ĐŻ ĐťĐ• Đ ĐžĐ—ĐŁĐśĐ†Đ®")
             item.put("labelEn", "I DON'T UNDERSTAND")
             item.put("speechText", "ne razumem")
             item.put("speakTextSl", "ne razumem")
-            item.put("speakTextUk", "Я не розумію")
+            item.put("speakTextUk", "ĐŻ Đ˝Đµ Ń€ĐľĐ·ŃĐĽŃ–ŃŽ")
             item.put("speechTextEn", "I don't understand")
             item.put("labelByLanguage", JSONObject(item.optJSONObject("labelByLanguage")?.toString() ?: "{}").apply {
                 put("sl", "NE RAZUMEM")
-                put("uk", "Я НЕ РОЗУМІЮ")
+                put("uk", "ĐŻ ĐťĐ• Đ ĐžĐ—ĐŁĐśĐ†Đ®")
                 put("en", "I DON'T UNDERSTAND")
             })
             item.put("speechTextByLanguage", JSONObject(item.optJSONObject("speechTextByLanguage")?.toString() ?: "{}").apply {
                 put("sl", "ne razumem")
-                put("uk", "Я не розумію")
+                put("uk", "ĐŻ Đ˝Đµ Ń€ĐľĐ·ŃĐĽŃ–ŃŽ")
                 put("en", "I don't understand")
             })
             repaired++
@@ -1005,8 +1005,8 @@ object AacContentBootstrap {
                 repaired += ensureParentQuestionMetadata(
                     item = parent,
                     childRepairs = DRINK_CHILD_REPAIRS,
-                    questionSl = "Kaj želiš piti?",
-                    questionUk = "Що ти хочеш пити?",
+                    questionSl = "Kaj ĹľeliĹˇ piti?",
+                    questionUk = "Đ©Đľ Ń‚Đ¸ Ń…ĐľŃ‡ĐµŃ ĐżĐ¸Ń‚Đ¸?",
                     questionEn = "What do you want to drink?"
                 )
             }
@@ -1037,8 +1037,8 @@ object AacContentBootstrap {
                 repaired += ensureParentQuestionMetadata(
                     item = food,
                     childRepairs = FOOD_CHILD_REPAIRS,
-                    questionSl = "Kaj želiš jesti?",
-                    questionUk = "Що ти хочеш їсти?",
+                    questionSl = "Kaj ĹľeliĹˇ jesti?",
+                    questionUk = "Đ©Đľ Ń‚Đ¸ Ń…ĐľŃ‡ĐµŃ Ń—ŃŃ‚Đ¸?",
                     questionEn = "What do you want to eat?"
                 )
             }
@@ -1070,13 +1070,13 @@ object AacContentBootstrap {
                     item = pain,
                     childRepairs = PAIN_CHILD_REPAIRS,
                     questionSl = "Kje te boli?",
-                    questionUk = "Де тебе болить?",
+                    questionUk = "Đ”Đµ Ń‚ĐµĐ±Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ?",
                     questionEn = "Where does it hurt?"
                 )
                 repaired += ensureGuidedPainNode(
                     item = pain,
-                    children = listOf("head", "belly", "leg", "arm", "back", "chest", "throat"),
-                    questionSl = "Kje te boli?"
+                    children = painRootChildren(),
+                    questionSl = "Izberi, kaj te boli."
                 )
             }
         }
@@ -1191,12 +1191,12 @@ object AacContentBootstrap {
         return setOf(
             question.removeSuffix("?"),
             question
-                .replace("Що ти хочеш", "Що хочеш")
+                .replace("Đ©Đľ Ń‚Đ¸ Ń…ĐľŃ‡ĐµŃ", "Đ©Đľ Ń…ĐľŃ‡ĐµŃ")
                 .removeSuffix("?"),
             question
-                .replace("Що ти хочеш", "Що хочеш"),
-            question.replace("Де тебе болить", "Де болить").removeSuffix("?"),
-            question.replace("Де тебе болить", "Де болить")
+                .replace("Đ©Đľ Ń‚Đ¸ Ń…ĐľŃ‡ĐµŃ", "Đ©Đľ Ń…ĐľŃ‡ĐµŃ"),
+            question.replace("Đ”Đµ Ń‚ĐµĐ±Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ", "Đ”Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ").removeSuffix("?"),
+            question.replace("Đ”Đµ Ń‚ĐµĐ±Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ", "Đ”Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ")
         )
             .map { it.trim().lowercase() }
             .filter { it.isNotBlank() && it != question.trim().lowercase() }
@@ -1867,23 +1867,23 @@ object AacContentBootstrap {
             values += normalizedFullSpeech
                 .replace("I want to eat ", "I want ")
                 .replace("I want to drink ", "I want ")
-                .replace("Я хочу їсти ", "Я хочу ")
-                .replace("Я хочу пити ", "Я хочу ")
+                .replace("ĐŻ Ń…ĐľŃ‡Ń Ń—ŃŃ‚Đ¸ ", "ĐŻ Ń…ĐľŃ‡Ń ")
+                .replace("ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ ", "ĐŻ Ń…ĐľŃ‡Ń ")
                 .trim()
                 .lowercase()
             values += normalizedFullSpeech
-                .replace("želim jesti ", "")
-                .replace("želim piti ", "")
+                .replace("Ĺľelim jesti ", "")
+                .replace("Ĺľelim piti ", "")
                 .replace("boli me v ", "")
                 .replace("boli me ", "")
                 .replace("I want to eat ", "")
                 .replace("I want to drink ", "")
                 .replace("My ", "")
                 .replace(" hurts", "")
-                .replace("У мене болить у ", "")
-                .replace("У мене болить ", "")
-                .replace("Я хочу їсти ", "")
-                .replace("Я хочу пити ", "")
+                .replace("ĐŁ ĐĽĐµĐ˝Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ Ń ", "")
+                .replace("ĐŁ ĐĽĐµĐ˝Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ ", "")
+                .replace("ĐŻ Ń…ĐľŃ‡Ń Ń—ŃŃ‚Đ¸ ", "")
+                .replace("ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ ", "")
                 .trim()
                 .lowercase()
             return values.filter { it.isNotBlank() }.toSet()
@@ -1912,40 +1912,40 @@ object AacContentBootstrap {
         FoodChildRepair(
             id = "water",
             labelSl = "VODA",
-            labelUk = "ВОДА",
+            labelUk = "Đ’ĐžĐ”Đ",
             labelEn = "WATER",
-            speakTextSl = "želim piti vodo",
-            speakTextUk = "Я хочу пити воду",
+            speakTextSl = "Ĺľelim piti vodo",
+            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ Đ˛ĐľĐ´Ń",
             speechTextEn = "I want to drink water",
             parentId = "drink"
         ),
         FoodChildRepair(
             id = "juice",
             labelSl = "SOK",
-            labelUk = "СІК",
+            labelUk = "ĐˇĐ†Đš",
             labelEn = "JUICE",
-            speakTextSl = "želim piti sok",
-            speakTextUk = "Я хочу пити сік",
+            speakTextSl = "Ĺľelim piti sok",
+            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ ŃŃ–Đş",
             speechTextEn = "I want to drink juice",
             parentId = "drink"
         ),
         FoodChildRepair(
             id = "tea",
-            labelSl = "ČAJ",
-            labelUk = "ЧАЙ",
+            labelSl = "ÄŚAJ",
+            labelUk = "Đ§ĐĐ™",
             labelEn = "TEA",
-            speakTextSl = "želim piti čaj",
-            speakTextUk = "Я хочу пити чай",
+            speakTextSl = "Ĺľelim piti ÄŤaj",
+            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ Ń‡Đ°Đą",
             speechTextEn = "I want to drink tea",
             parentId = "drink"
         ),
         FoodChildRepair(
             id = "coffee",
             labelSl = "KAVA",
-            labelUk = "КАВА",
+            labelUk = "ĐšĐĐ’Đ",
             labelEn = "COFFEE",
-            speakTextSl = "želim piti kavo",
-            speakTextUk = "Я хочу пити каву",
+            speakTextSl = "Ĺľelim piti kavo",
+            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ ĐşĐ°Đ˛Ń",
             speechTextEn = "I want to drink coffee",
             parentId = "drink"
         )
@@ -1955,28 +1955,28 @@ object AacContentBootstrap {
         FoodChildRepair(
             id = "soup",
             labelSl = "JUHA",
-            labelUk = "СУП",
+            labelUk = "ĐˇĐŁĐź",
             labelEn = "SOUP",
-            speakTextSl = "želim jesti juho",
-            speakTextUk = "Я хочу їсти суп",
+            speakTextSl = "Ĺľelim jesti juho",
+            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń Ń—ŃŃ‚Đ¸ ŃŃĐż",
             speechTextEn = "I want to eat soup"
         ),
         FoodChildRepair(
             id = "bread",
             labelSl = "KRUH",
-            labelUk = "ХЛІБ",
+            labelUk = "ĐĄĐ›Đ†Đ‘",
             labelEn = "BREAD",
-            speakTextSl = "želim jesti kruh",
-            speakTextUk = "Я хочу їсти хліб",
+            speakTextSl = "Ĺľelim jesti kruh",
+            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń Ń—ŃŃ‚Đ¸ Ń…Đ»Ń–Đ±",
             speechTextEn = "I want to eat bread"
         ),
         FoodChildRepair(
             id = "fruit",
             labelSl = "SADJE",
-            labelUk = "ФРУКТИ",
+            labelUk = "Đ¤Đ ĐŁĐšĐ˘Đ",
             labelEn = "FRUIT",
-            speakTextSl = "želim jesti sadje",
-            speakTextUk = "Я хочу їсти фрукти",
+            speakTextSl = "Ĺľelim jesti sadje",
+            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń Ń—ŃŃ‚Đ¸ Ń„Ń€ŃĐşŃ‚Đ¸",
             speechTextEn = "I want to eat fruit"
         )
     )
@@ -1985,89 +1985,124 @@ object AacContentBootstrap {
         FoodChildRepair(
             id = "head",
             labelSl = "GLAVA",
-            labelUk = "ГОЛОВА",
+            labelUk = "Đ“ĐžĐ›ĐžĐ’Đ",
             labelEn = "HEAD",
             speakTextSl = "boli me glava",
-            speakTextUk = "У мене болить голова",
+            speakTextUk = "ĐŁ ĐĽĐµĐ˝Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ ĐłĐľĐ»ĐľĐ˛Đ°",
             speechTextEn = "My head hurts",
             parentId = "pain"
         ),
         FoodChildRepair(
             id = "arm",
             labelSl = "ROKA",
-            labelUk = "РУКА",
+            labelUk = "Đ ĐŁĐšĐ",
             labelEn = "ARM",
             speakTextSl = "boli me roka",
-            speakTextUk = "У мене болить рука",
+            speakTextUk = "ĐŁ ĐĽĐµĐ˝Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ Ń€ŃĐşĐ°",
             speechTextEn = "My arm hurts",
             parentId = "pain"
         ),
         FoodChildRepair(
             id = "leg",
             labelSl = "NOGA",
-            labelUk = "НОГА",
+            labelUk = "ĐťĐžĐ“Đ",
             labelEn = "LEG",
             speakTextSl = "boli me noga",
-            speakTextUk = "У мене болить нога",
+            speakTextUk = "ĐŁ ĐĽĐµĐ˝Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ Đ˝ĐľĐłĐ°",
             speechTextEn = "My leg hurts",
             parentId = "pain"
         ),
         FoodChildRepair(
             id = "belly",
             labelSl = "TREBUH",
-            labelUk = "ЖИВІТ",
+            labelUk = "Đ–ĐĐ’Đ†Đ˘",
             labelEn = "BELLY",
             speakTextSl = "boli me trebuh",
-            speakTextUk = "У мене болить живіт",
+            speakTextUk = "ĐŁ ĐĽĐµĐ˝Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ Đ¶Đ¸Đ˛Ń–Ń‚",
             speechTextEn = "My stomach hurts",
             parentId = "pain"
         ),
         FoodChildRepair(
             id = "back",
             labelSl = "HRBET",
-            labelUk = "СПИНА",
+            labelUk = "ĐˇĐźĐĐťĐ",
             labelEn = "BACK",
             speakTextSl = "boli me hrbet",
-            speakTextUk = "У мене болить спина",
+            speakTextUk = "ĐŁ ĐĽĐµĐ˝Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ ŃĐżĐ¸Đ˝Đ°",
             speechTextEn = "My back hurts",
             parentId = "pain"
         ),
         FoodChildRepair(
             id = "chest",
             labelSl = "PRSI",
-            labelUk = "ГРУДИ",
+            labelUk = "Đ“Đ ĐŁĐ”Đ",
             labelEn = "CHEST",
             speakTextSl = "boli me v prsih",
-            speakTextUk = "У мене болить у грудях",
+            speakTextUk = "ĐŁ ĐĽĐµĐ˝Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ Ń ĐłŃ€ŃĐ´ŃŹŃ…",
             speechTextEn = "My chest hurts",
             parentId = "pain"
         ),
         FoodChildRepair(
             id = "throat",
             labelSl = "GRLO",
-            labelUk = "ГОРЛО",
+            labelUk = "Đ“ĐžĐ Đ›Đž",
             labelEn = "THROAT",
             speakTextSl = "boli me grlo",
-            speakTextUk = "У мене болить горло",
+            speakTextUk = "ĐŁ ĐĽĐµĐ˝Đµ Đ±ĐľĐ»Đ¸Ń‚ŃŚ ĐłĐľŃ€Đ»Đľ",
             speechTextEn = "My throat hurts",
             parentId = "pain"
         )
     )
 
     private val PAIN_GUIDED_NODE_REPAIRS = listOf(
-        Triple("head", painStrengthAndTimeChildren(), "Kako močno boli?"),
-        Triple("belly", painStrengthAndTimeChildren(), "Kako močno boli?"),
-        Triple("back", painStrengthAndTimeChildren(), "Kako močno boli?"),
-        Triple("chest", painStrengthAndTimeChildren(), "Kako močno boli?"),
-        Triple("throat", painStrengthAndTimeChildren(), "Kako močno boli?"),
-        Triple("leg", painSideStrengthAndTimeChildren(), "Katera stran?"),
-        Triple("arm", painSideStrengthAndTimeChildren(), "Katera stran?"),
-        Triple("pain_left", painStrengthAndTimeChildren(), "Kako močno boli?"),
-        Triple("pain_right", painStrengthAndTimeChildren(), "Kako močno boli?"),
-        Triple("pain_both", painStrengthAndTimeChildren(), "Kako močno boli?"),
+        Triple("head", painStrengthChildren(), "Kako močno boli?"),
+        Triple("left_arm", painArmDetailChildren(), "Kje na levi roki?"),
+        Triple("right_arm", painArmDetailChildren(), "Kje na desni roki?"),
+        Triple("left_leg", painLegDetailChildren(), "Kje na levi nogi?"),
+        Triple("right_leg", painLegDetailChildren(), "Kje na desni nogi?"),
+        Triple("back", painBackDetailChildren(), "Kje na hrbtu?"),
+        Triple("belly", painBellyDetailChildren(), "Kje v trebuhu?"),
+        Triple("chest", painStrengthChildren(), "Kako močno boli?"),
+        Triple("neck", painStrengthChildren(), "Kako močno boli?"),
+        Triple("eye", listOf("eye_left", "eye_right", "eye_both"), "Katero oko?"),
+        Triple("ear", listOf("ear_left", "ear_right", "ear_both"), "Katero uho?"),
+        Triple("nose", painStrengthChildren(), "Kako močno boli?"),
+        Triple("mouth", painStrengthChildren(), "Kako močno boli?"),
+        Triple("tooth", listOf("tooth_left", "tooth_right", "tooth_upper", "tooth_lower"), "Kateri zob?"),
+        Triple("arm_shoulder", painStrengthChildren(), "Kako močno boli?"),
+        Triple("arm_upper", painStrengthChildren(), "Kako močno boli?"),
+        Triple("arm_elbow", painStrengthChildren(), "Kako močno boli?"),
+        Triple("arm_forearm", painStrengthChildren(), "Kako močno boli?"),
+        Triple("arm_wrist", painStrengthChildren(), "Kako močno boli?"),
+        Triple("arm_fingers", painStrengthChildren(), "Kako močno boli?"),
+        Triple("leg_hip", painStrengthChildren(), "Kako močno boli?"),
+        Triple("leg_thigh", painStrengthChildren(), "Kako močno boli?"),
+        Triple("leg_knee", painStrengthChildren(), "Kako močno boli?"),
+        Triple("leg_shin", painStrengthChildren(), "Kako močno boli?"),
+        Triple("leg_ankle", painStrengthChildren(), "Kako močno boli?"),
+        Triple("leg_foot", painStrengthChildren(), "Kako močno boli?"),
+        Triple("leg_toes", painStrengthChildren(), "Kako močno boli?"),
+        Triple("back_upper", painStrengthChildren(), "Kako močno boli?"),
+        Triple("back_middle", painStrengthChildren(), "Kako močno boli?"),
+        Triple("back_lower", painStrengthChildren(), "Kako močno boli?"),
+        Triple("belly_left", painStrengthChildren(), "Kako močno boli?"),
+        Triple("belly_right", painStrengthChildren(), "Kako močno boli?"),
+        Triple("belly_upper", painStrengthChildren(), "Kako močno boli?"),
+        Triple("belly_lower", painStrengthChildren(), "Kako močno boli?"),
+        Triple("eye_left", painStrengthChildren(), "Kako močno boli?"),
+        Triple("eye_right", painStrengthChildren(), "Kako močno boli?"),
+        Triple("eye_both", painStrengthChildren(), "Kako močno boli?"),
+        Triple("ear_left", painStrengthChildren(), "Kako močno boli?"),
+        Triple("ear_right", painStrengthChildren(), "Kako močno boli?"),
+        Triple("ear_both", painStrengthChildren(), "Kako močno boli?"),
+        Triple("tooth_left", painStrengthChildren(), "Kako močno boli?"),
+        Triple("tooth_right", painStrengthChildren(), "Kako močno boli?"),
+        Triple("tooth_upper", painStrengthChildren(), "Kako močno boli?"),
+        Triple("tooth_lower", painStrengthChildren(), "Kako močno boli?"),
         Triple("pain_light", painTimeChildren(), "Od kdaj boli?"),
         Triple("pain_medium", painTimeChildren(), "Od kdaj boli?"),
-        Triple("pain_strong", painTimeChildren(), "Od kdaj boli?")
+        Triple("pain_strong", painTimeChildren(), "Od kdaj boli?"),
+        Triple("pain_very_strong", painTimeChildren(), "Od kdaj boli?")
     )
 
     private fun painSideStrengthAndTimeChildren(): List<String> {
@@ -2081,7 +2116,101 @@ object AacContentBootstrap {
             "pain_since_today",
             "pain_since_yesterday",
             "pain_since_morning",
-            "pain_since_evening"
+            "pain_since_evening",
+            "pain_since_long"
+        )
+    }
+
+    private fun painRootChildren(): List<String> {
+        return listOf(
+            "head",
+            "left_arm",
+            "right_arm",
+            "left_leg",
+            "right_leg",
+            "back",
+            "belly",
+            "chest",
+            "eye",
+            "ear",
+            "nose",
+            "mouth",
+            "tooth",
+            "neck"
+        )
+    }
+
+    private fun painArmDetailChildren(): List<String> {
+        return listOf(
+            "arm_shoulder",
+            "arm_upper",
+            "arm_elbow",
+            "arm_forearm",
+            "arm_wrist",
+            "arm_fingers",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong",
+            "pain_when_moving",
+            "pain_when_lifting",
+            "pain_when_gripping"
+        )
+    }
+
+    private fun painLegDetailChildren(): List<String> {
+        return listOf(
+            "leg_hip",
+            "leg_thigh",
+            "leg_knee",
+            "leg_shin",
+            "leg_ankle",
+            "leg_foot",
+            "leg_toes",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong",
+            "pain_when_walking",
+            "pain_when_sitting",
+            "pain_when_standing"
+        )
+    }
+
+    private fun painBackDetailChildren(): List<String> {
+        return listOf(
+            "back_upper",
+            "back_middle",
+            "back_lower",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong",
+            "pain_when_walking",
+            "pain_when_sitting",
+            "pain_when_standing"
+        )
+    }
+
+    private fun painBellyDetailChildren(): List<String> {
+        return listOf(
+            "belly_left",
+            "belly_right",
+            "belly_upper",
+            "belly_lower",
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong"
+        )
+    }
+
+    private fun painStrengthChildren(): List<String> {
+        return listOf(
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong"
         )
     }
 
@@ -2102,7 +2231,8 @@ object AacContentBootstrap {
             "pain_since_today",
             "pain_since_yesterday",
             "pain_since_morning",
-            "pain_since_evening"
+            "pain_since_evening",
+            "pain_since_long"
         )
     }
 

@@ -176,6 +176,7 @@ class MainActivity : AppCompatActivity() {
         private const val PREFS_AUDIO_DIAGNOSTICS = "audio_diagnostics"
         private const val KEY_AUDIO_EVENTS = "audio_events"
         private const val AUDIO_EVENT_LIMIT = 20
+        private const val KEY_AAC_PAIN_EXTENDED_VERSION_ENABLED = "aac_pain_extended_version_enabled"
         private val MAIN_AAC_CONVERSATION_GROUP_KEYS = setOf(
             "drink",
             "drinks",
@@ -198,6 +199,36 @@ class MainActivity : AppCompatActivity() {
             "family",
             "care",
             "nega"
+        )
+        private val AAC_PAIN_EXTENDED_ROOT_IDS = setOf(
+            "eye",
+            "ear",
+            "nose",
+            "mouth",
+            "tooth",
+            "neck"
+        )
+        private val AAC_PAIN_EXTENDED_DETAIL_IDS = setOf(
+            "arm_shoulder",
+            "arm_upper",
+            "arm_elbow",
+            "arm_forearm",
+            "arm_wrist",
+            "arm_fingers",
+            "leg_hip",
+            "leg_thigh",
+            "leg_knee",
+            "leg_shin",
+            "leg_ankle",
+            "leg_foot",
+            "leg_toes",
+            "back_upper",
+            "back_middle",
+            "back_lower",
+            "belly_left",
+            "belly_right",
+            "belly_upper",
+            "belly_lower"
         )
         private val CORE_V2_FIXED_TOP_ROW_POSITIONS = mapOf(
             "no" to 1,
@@ -2354,12 +2385,41 @@ class MainActivity : AppCompatActivity() {
             return existingChildren.distinctBy { child -> child.id }
         }
         val guidedChildren = AacGuidedPromptEngine.childIdsFor(item).mapNotNull { childId -> mainAacItemsById[childId] }
-        val children = (existingChildren + guidedChildren).distinctBy { child -> child.id }
+        val children = filterPainExtendedChildren(
+            parentItem = item,
+            children = (existingChildren + guidedChildren).distinctBy { child -> child.id }
+        )
         return if (guidedChildren.isNotEmpty()) {
             sortMainAacGuidedItemsByUsage(children)
         } else {
             children
         }
+    }
+
+    private fun filterPainExtendedChildren(parentItem: AacItem, children: List<AacItem>): List<AacItem> {
+        if (isPainExtendedVersionEnabled()) {
+            return children
+        }
+        val parentId = normalizeMainAacKey(parentItem.id)
+        val hiddenIds = when (parentId) {
+            "pain" -> AAC_PAIN_EXTENDED_ROOT_IDS
+            "left_arm",
+            "right_arm",
+            "left_leg",
+            "right_leg",
+            "back",
+            "belly" -> AAC_PAIN_EXTENDED_DETAIL_IDS
+            else -> emptySet<String>()
+        }
+        if (hiddenIds.isEmpty()) {
+            return children
+        }
+        return children.filter { child -> normalizeMainAacKey(child.id) !in hiddenIds }
+    }
+
+    private fun isPainExtendedVersionEnabled(): Boolean {
+        return getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
+            .getBoolean(KEY_AAC_PAIN_EXTENDED_VERSION_ENABLED, false)
     }
 
     private fun recordMainAacUsage(item: AacItem) {

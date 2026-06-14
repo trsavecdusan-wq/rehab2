@@ -215,6 +215,8 @@ class SettingsActivity : AppCompatActivity() {
         private const val PREF_AAC_PERSISTENT_TOP_ROW_ENABLED = "aac_persistent_top_row_enabled"
         private const val PREF_AAC_PERSISTENT_TOP_ROW_COUNT = "aac_persistent_top_row_count"
         private const val PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = "aac_persistent_top_row_item_ids"
+        private const val PREFS_AAC_GRID_SETTINGS = "aac_grid_settings"
+        private const val KEY_AAC_PAIN_EXTENDED_VERSION_ENABLED = "aac_pain_extended_version_enabled"
         private const val DEFAULT_AAC_PERSISTENT_TOP_ROW_COUNT = 5
         private val AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS = arrayOf(3, 4, 5)
         private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "dont_understand", "yes", "thank_you", "sorry")
@@ -416,6 +418,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var txtAacGridSizeStatus: TextView
     private lateinit var editAacGridSize: EditText
     private lateinit var switchPersistentTopRowEnabled: SwitchCompat
+    private lateinit var switchPainExtendedVersionEnabled: SwitchCompat
     private lateinit var txtPersistentTopRowStatus: TextView
     private lateinit var editPersistentTopRowCount: EditText
     private lateinit var txtAacPatientAuditStatus: TextView
@@ -526,6 +529,7 @@ class SettingsActivity : AppCompatActivity() {
         txtAacGridSizeStatus = findViewById(R.id.txtAacGridSizeStatus)
         editAacGridSize = findViewById(R.id.editAacGridSize)
         switchPersistentTopRowEnabled = findViewById(R.id.switchPersistentTopRowEnabled)
+        switchPainExtendedVersionEnabled = findViewById(R.id.switchPainExtendedVersionEnabled)
         txtPersistentTopRowStatus = findViewById(R.id.txtPersistentTopRowStatus)
         editPersistentTopRowCount = findViewById(R.id.editPersistentTopRowCount)
         txtAacPatientAuditStatus = findViewById(R.id.txtAacPatientAuditStatus)
@@ -852,6 +856,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshAacPatientAuditPanel()
         refreshAacGridSizeSection()
         refreshPersistentTopRowSection()
+        refreshPainScopeSection()
         refreshGuidedFollowUpSection()
         refreshAacCommunicationContextSection()
         refreshVendingCodesSection()
@@ -1419,6 +1424,14 @@ class SettingsActivity : AppCompatActivity() {
         editPersistentTopRowCount.setText("$count ikon")
         editPersistentTopRowCount.isEnabled = enabled
         bindPersistentTopRowSwitchListener()
+    }
+
+    private fun refreshPainScopeSection() {
+        val enabled = getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
+            .getBoolean(KEY_AAC_PAIN_EXTENDED_VERSION_ENABLED, false)
+        switchPainExtendedVersionEnabled.setOnCheckedChangeListener(null)
+        switchPainExtendedVersionEnabled.isChecked = enabled
+        bindPainScopeSwitchListener()
     }
 
     private fun refreshGuidedFollowUpSection() {
@@ -2783,6 +2796,17 @@ class SettingsActivity : AppCompatActivity() {
                 .putBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, isChecked)
                 .apply()
             refreshPersistentTopRowSection()
+        }
+    }
+
+    private fun bindPainScopeSwitchListener() {
+        switchPainExtendedVersionEnabled.setOnCheckedChangeListener { _, isChecked ->
+            getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_AAC_PAIN_EXTENDED_VERSION_ENABLED, isChecked)
+                .apply()
+            refreshPainScopeSection()
+            Toast.makeText(this, "Zaprite in ponovno odprite komunikator.", Toast.LENGTH_SHORT).show()
         }
     }
 
