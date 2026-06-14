@@ -315,6 +315,16 @@ class MainActivity : AppCompatActivity() {
             "back_middle",
             "back_lower"
         )
+        private val AAC_PAIN_ROOT_VISUAL_SLOT_BY_ID = mapOf(
+            "back" to 16,
+            "belly" to 17,
+            "chest" to 18,
+            "left_arm" to 20,
+            "left_leg" to 21,
+            "head" to 22,
+            "right_leg" to 23,
+            "right_arm" to 24
+        )
         private val CORE_V2_FIXED_TOP_ROW_POSITIONS = mapOf(
             "no" to 1,
             "dont_understand" to 2,
@@ -1104,11 +1114,33 @@ class MainActivity : AppCompatActivity() {
                 answerSlots += row * gridSize + column
             }
         }
-        visibleItems
-            .filter { item -> item.id !in fixedIds }
+        val normalVisibleItems = visibleItems.filter { item -> item.id !in fixedIds }
+        if (applyPainRootVisualSlots(slots, normalVisibleItems, gridSize)) {
+            return slots
+        }
+        normalVisibleItems
             .zip(answerSlots)
             .forEach { (item, slotIndex) -> slots[slotIndex] = item }
         return slots
+    }
+
+    private fun applyPainRootVisualSlots(
+        slots: MutableList<AacItem?>,
+        items: List<AacItem>,
+        gridSize: Int
+    ): Boolean {
+        if (gridSize != 5 || normalizeMainAacKey(selectedMainAacItemId.orEmpty()) != "pain") {
+            return false
+        }
+        val itemIds = items.map { item -> normalizeMainAacKey(item.id) }.toSet()
+        if (itemIds != AAC_PAIN_ROOT_VISUAL_SLOT_BY_ID.keys) {
+            return false
+        }
+        items.forEach { item ->
+            val slotIndex = AAC_PAIN_ROOT_VISUAL_SLOT_BY_ID[normalizeMainAacKey(item.id)] ?: return@forEach
+            slots[slotIndex] = item
+        }
+        return true
     }
 
     private fun resetMainAacRoot() {
