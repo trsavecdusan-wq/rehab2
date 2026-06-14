@@ -999,20 +999,18 @@ object AacContentBootstrap {
             .mapNotNull { item -> item.optString("id").trim().takeIf { it.isNotBlank() }?.let { it to item } }
             .toMap()
 
-        listOf("drink", "thirsty").forEach { parentId ->
+        DRINK_TREE_CHILDREN.forEach { (parentId, childIds) ->
             itemsById[parentId]?.let { parent ->
                 if (isUserProtected(parent)) return@let
-                repaired += ensureParentQuestionMetadata(
+                repaired += ensureDrinkBranchMetadata(
                     item = parent,
-                    childRepairs = DRINK_CHILD_REPAIRS,
-                    questionSl = "Kaj ĹľeliĹˇ piti?",
-                    questionUk = "Đ©Đľ Ń‚Đ¸ Ń…ĐľŃ‡ĐµŃ ĐżĐ¸Ń‚Đ¸?",
-                    questionEn = "What do you want to drink?"
+                    childIds = childIds,
+                    questionSl = DRINK_BRANCH_QUESTIONS[parentId] ?: "Izberi, kaj želiš piti."
                 )
             }
         }
 
-        DRINK_CHILD_REPAIRS.forEach { repair ->
+        DRINK_SPEECH_REPAIRS.forEach { repair ->
             val item = itemsById[repair.id]
             if (item == null) {
                 itemsArray.put(repair.toJson())
@@ -1166,6 +1164,46 @@ object AacContentBootstrap {
             "en",
             questionEn,
             legacyQuestionValues(questionEn) + setOf(item.optString("speechTextEn").trim().lowercase())
+        )
+        item.put("questionByLanguage", questionByLanguage)
+        if (!item.optBoolean("opensSubicons", false)) {
+            item.put("opensSubicons", true)
+            repaired++
+        }
+        if (item.optBoolean("addsToSentence", true)) {
+            item.put("addsToSentence", false)
+            repaired++
+        }
+        if (item.optBoolean("speaksImmediately", true)) {
+            item.put("speaksImmediately", false)
+            repaired++
+        }
+        if (item.optString("actionType").isBlank() || item.optString("actionType") == "speak") {
+            item.put("actionType", "open_subicons")
+            repaired++
+        }
+        return repaired
+    }
+
+    private fun ensureDrinkBranchMetadata(
+        item: JSONObject,
+        childIds: List<String>,
+        questionSl: String
+    ): Int {
+        if (isUserProtected(item)) return 0
+        var repaired = 0
+        val currentChildren = stringList(item.optJSONArray("children"))
+        if (currentChildren != childIds) {
+            item.put("children", jsonArrayOf(childIds))
+            repaired++
+        }
+        val questionByLanguage = item.optJSONObject("questionByLanguage") ?: JSONObject()
+        repaired += putLanguageIfBlankOrLegacy(
+            questionByLanguage,
+            "sl",
+            questionSl,
+            legacyQuestionValues(questionSl) +
+                setOf(item.optString("speechText").trim().lowercase(), item.optString("speakTextSl").trim().lowercase())
         )
         item.put("questionByLanguage", questionByLanguage)
         if (!item.optBoolean("opensSubicons", false)) {
@@ -1898,6 +1936,132 @@ object AacContentBootstrap {
         }
     }
 
+    private data class DrinkSpeechRepair(
+        val id: String,
+        val labelSl: String,
+        val speechTextSl: String,
+        val parentId: String
+    ) {
+        fun toJson(): JSONObject {
+            return JSONObject()
+                .put("id", id)
+                .put("labelSl", labelSl)
+                .put("text", labelSl)
+                .put("baseText", labelSl)
+                .put("speechText", speechTextSl)
+                .put("speakTextSl", speechTextSl)
+                .put("speechTextByLanguage", JSONObject().put("sl", speechTextSl))
+                .put("imagePath", "")
+                .put("iconSource", IconSource.SYSTEM.name)
+                .put("actionType", "speak")
+                .put("targetPageId", "")
+                .put("conceptId", id)
+                .put("parentId", parentId)
+                .put("visibleUnderIds", JSONArray().put(parentId))
+                .put("isRootItem", false)
+                .put("isHiddenUntilParent", true)
+                .put("addsToSentence", true)
+                .put("speaksImmediately", true)
+                .put("opensSubicons", false)
+        }
+
+        fun applyTo(item: JSONObject): Int {
+            var repaired = 0
+            val legacySpeechSlValues = legacyValues(labelSl, "", id, speechTextSl)
+            repaired += putIfBlankOrLegacy(item, "speechText", speechTextSl, legacySpeechSlValues)
+            repaired += putIfBlankOrLegacy(item, "speakTextSl", speechTextSl, legacySpeechSlValues)
+            val speechTextByLanguage = item.optJSONObject("speechTextByLanguage") ?: JSONObject()
+            repaired += putLanguageIfBlankOrLegacy(speechTextByLanguage, "sl", speechTextSl, legacySpeechSlValues)
+            item.put("speechTextByLanguage", speechTextByLanguage)
+            repaired += putIfBlank(item, "parentId", parentId)
+            if (!hasJsonArrayValue(item.optJSONArray("visibleUnderIds"), parentId)) {
+                val visibleUnderIds = item.optJSONArray("visibleUnderIds") ?: JSONArray()
+                visibleUnderIds.put(parentId)
+                item.put("visibleUnderIds", visibleUnderIds)
+                repaired++
+            }
+            if (item.optBoolean("isRootItem", true)) {
+                item.put("isRootItem", false)
+                repaired++
+            }
+            if (!item.optBoolean("isHiddenUntilParent", false)) {
+                item.put("isHiddenUntilParent", true)
+                repaired++
+            }
+            if (!item.optBoolean("addsToSentence", true)) {
+                item.put("addsToSentence", true)
+                repaired++
+            }
+            if (!item.optBoolean("speaksImmediately", true)) {
+                item.put("speaksImmediately", true)
+                repaired++
+            }
+            if (item.optBoolean("opensSubicons", false)) {
+                item.put("opensSubicons", false)
+                repaired++
+            }
+            if (item.optString("actionType").isBlank() || item.optString("actionType") == "open_subicons") {
+                item.put("actionType", "speak")
+                repaired++
+            }
+            return repaired
+        }
+
+        private fun putIfBlank(item: JSONObject, key: String, value: String): Int {
+            return if (item.optString(key).trim().isBlank()) {
+                item.put(key, value)
+                1
+            } else {
+                0
+            }
+        }
+
+        private fun putIfBlankOrLegacy(item: JSONObject, key: String, value: String, legacyValues: Set<String>): Int {
+            val current = item.optString(key).trim()
+            return if (current.isBlank() || current.lowercase() in legacyValues) {
+                item.put(key, value)
+                1
+            } else {
+                0
+            }
+        }
+
+        private fun putLanguageIfBlankOrLegacy(
+            target: JSONObject,
+            key: String,
+            value: String,
+            legacyValues: Set<String>
+        ): Int {
+            val current = target.optString(key).trim()
+            return if (current.isBlank() || current.lowercase() in legacyValues) {
+                target.put(key, value)
+                1
+            } else {
+                0
+            }
+        }
+
+        private fun legacyValues(labelSl: String, labelEn: String, id: String, fullSpeech: String): Set<String> {
+            val values = mutableSetOf(labelSl.lowercase(), labelEn.lowercase(), id)
+            val normalizedFullSpeech = fullSpeech.trim()
+            values += normalizedFullSpeech
+            values += normalizedFullSpeech
+                .replace("Prosim, rada bi ", "")
+                .replace("Rada bi ", "")
+                .trim()
+                .lowercase()
+            return values.filter { it.isNotBlank() }.toSet()
+        }
+
+        private fun hasJsonArrayValue(array: JSONArray?, expected: String): Boolean {
+            if (array == null) return false
+            for (index in 0 until array.length()) {
+                if (array.optString(index).trim() == expected) return true
+            }
+            return false
+        }
+    }
+
     private fun putLanguageIfBlankOrLegacy(target: JSONObject, key: String, value: String, legacyValues: Set<String>): Int {
         val current = target.optString(key).trim()
         return if (current.isBlank() || current.lowercase() in legacyValues) {
@@ -1908,47 +2072,79 @@ object AacContentBootstrap {
         }
     }
 
-    private val DRINK_CHILD_REPAIRS = listOf(
-        FoodChildRepair(
-            id = "water",
-            labelSl = "VODA",
-            labelUk = "Đ’ĐžĐ”Đ",
-            labelEn = "WATER",
-            speakTextSl = "Ĺľelim piti vodo",
-            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ Đ˛ĐľĐ´Ń",
-            speechTextEn = "I want to drink water",
-            parentId = "drink"
-        ),
-        FoodChildRepair(
-            id = "juice",
-            labelSl = "SOK",
-            labelUk = "ĐˇĐ†Đš",
-            labelEn = "JUICE",
-            speakTextSl = "Ĺľelim piti sok",
-            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ ŃŃ–Đş",
-            speechTextEn = "I want to drink juice",
-            parentId = "drink"
-        ),
-        FoodChildRepair(
-            id = "tea",
-            labelSl = "ÄŚAJ",
-            labelUk = "Đ§ĐĐ™",
-            labelEn = "TEA",
-            speakTextSl = "Ĺľelim piti ÄŤaj",
-            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ Ń‡Đ°Đą",
-            speechTextEn = "I want to drink tea",
-            parentId = "drink"
-        ),
-        FoodChildRepair(
-            id = "coffee",
-            labelSl = "KAVA",
-            labelUk = "ĐšĐĐ’Đ",
-            labelEn = "COFFEE",
-            speakTextSl = "Ĺľelim piti kavo",
-            speakTextUk = "ĐŻ Ń…ĐľŃ‡Ń ĐżĐ¸Ń‚Đ¸ ĐşĐ°Đ˛Ń",
-            speechTextEn = "I want to drink coffee",
-            parentId = "drink"
-        )
+    private val DRINK_TREE_CHILDREN = mapOf(
+        "thirsty" to listOf("water", "tea", "coffee", "juice", "sparkling_drink", "milk_drinks"),
+        "drink" to listOf("water", "tea", "coffee", "juice", "sparkling_drink", "milk_drinks"),
+        "water" to listOf("non_sparkling_water", "flavored_water", "mineral_water", "cold_water"),
+        "tea" to listOf("tea_chamomile", "tea_fruit", "tea_green", "tea_black", "tea_mint", "tea_rosehip"),
+        "tea_chamomile" to listOf("tea_chamomile_lemon", "tea_chamomile_honey", "tea_chamomile_honey_lemon"),
+        "tea_fruit" to listOf("tea_fruit_lemon", "tea_fruit_honey", "tea_fruit_honey_lemon"),
+        "tea_green" to listOf("tea_green_lemon", "tea_green_honey", "tea_green_honey_lemon"),
+        "tea_black" to listOf("tea_black_lemon", "tea_black_honey", "tea_black_honey_lemon"),
+        "tea_mint" to listOf("tea_mint_lemon", "tea_mint_honey", "tea_mint_honey_lemon"),
+        "tea_rosehip" to listOf("tea_rosehip_lemon", "tea_rosehip_honey", "tea_rosehip_honey_lemon"),
+        "coffee" to listOf("coffee_plain", "coffee_milk", "coffee_no_sugar"),
+        "juice" to listOf("orange_juice", "apple_juice", "blueberry_juice", "strawberry_juice", "cedevita"),
+        "sparkling_drink" to listOf("drink_fanta", "drink_coca_cola", "drink_pepsi", "radenska"),
+        "milk_drinks" to listOf("drink_yogurt", "cocoa_drink", "drink_milk", "chocolate_milk")
+    )
+
+    private val DRINK_BRANCH_QUESTIONS = mapOf(
+        "thirsty" to "Izberi, kaj želiš piti.",
+        "drink" to "Izberi, kaj želiš piti.",
+        "water" to "Kakšno vodo?",
+        "tea" to "Kakšen čaj?",
+        "tea_chamomile" to "Kaj dodaš v kamilični čaj?",
+        "tea_fruit" to "Kaj dodaš v sadni čaj?",
+        "tea_green" to "Kaj dodaš v zeleni čaj?",
+        "tea_black" to "Kaj dodaš v črni čaj?",
+        "tea_mint" to "Kaj dodaš v metin čaj?",
+        "tea_rosehip" to "Kaj dodaš v šipkov čaj?",
+        "coffee" to "Kakšno kavo?",
+        "juice" to "Kakšen sok?",
+        "sparkling_drink" to "Katero gazirano pijačo?",
+        "milk_drinks" to "Kateri mlečni napitek?"
+    )
+
+    private val DRINK_SPEECH_REPAIRS = listOf(
+        DrinkSpeechRepair("non_sparkling_water", "NAVADNA", "Prosim, rada bi navadno vodo.", "water"),
+        DrinkSpeechRepair("flavored_water", "VODA Z OKUSOM", "Prosim, rada bi vodo z okusom.", "water"),
+        DrinkSpeechRepair("mineral_water", "MINERALNA", "Prosim, rada bi mineralno vodo.", "water"),
+        DrinkSpeechRepair("cold_water", "HLADNA", "Prosim, rada bi hladno vodo.", "water"),
+        DrinkSpeechRepair("tea_chamomile_lemon", "Z LIMONO", "Prosim, rada bi kamilični čaj z limono.", "tea_chamomile"),
+        DrinkSpeechRepair("tea_chamomile_honey", "Z MEDOM", "Prosim, rada bi kamilični čaj z medom.", "tea_chamomile"),
+        DrinkSpeechRepair("tea_chamomile_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi kamilični čaj z medom in limono.", "tea_chamomile"),
+        DrinkSpeechRepair("tea_fruit_lemon", "Z LIMONO", "Prosim, rada bi sadni čaj z limono.", "tea_fruit"),
+        DrinkSpeechRepair("tea_fruit_honey", "Z MEDOM", "Prosim, rada bi sadni čaj z medom.", "tea_fruit"),
+        DrinkSpeechRepair("tea_fruit_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi sadni čaj z medom in limono.", "tea_fruit"),
+        DrinkSpeechRepair("tea_green_lemon", "Z LIMONO", "Prosim, rada bi zeleni čaj z limono.", "tea_green"),
+        DrinkSpeechRepair("tea_green_honey", "Z MEDOM", "Prosim, rada bi zeleni čaj z medom.", "tea_green"),
+        DrinkSpeechRepair("tea_green_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi zeleni čaj z medom in limono.", "tea_green"),
+        DrinkSpeechRepair("tea_black_lemon", "Z LIMONO", "Prosim, rada bi črni čaj z limono.", "tea_black"),
+        DrinkSpeechRepair("tea_black_honey", "Z MEDOM", "Prosim, rada bi črni čaj z medom.", "tea_black"),
+        DrinkSpeechRepair("tea_black_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi črni čaj z medom in limono.", "tea_black"),
+        DrinkSpeechRepair("tea_mint_lemon", "Z LIMONO", "Prosim, rada bi metin čaj z limono.", "tea_mint"),
+        DrinkSpeechRepair("tea_mint_honey", "Z MEDOM", "Prosim, rada bi metin čaj z medom.", "tea_mint"),
+        DrinkSpeechRepair("tea_mint_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi metin čaj z medom in limono.", "tea_mint"),
+        DrinkSpeechRepair("tea_rosehip_lemon", "Z LIMONO", "Prosim, rada bi šipkov čaj z limono.", "tea_rosehip"),
+        DrinkSpeechRepair("tea_rosehip_honey", "Z MEDOM", "Prosim, rada bi šipkov čaj z medom.", "tea_rosehip"),
+        DrinkSpeechRepair("tea_rosehip_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi šipkov čaj z medom in limono.", "tea_rosehip"),
+        DrinkSpeechRepair("coffee_plain", "NAVADNA", "Prosim, rada bi navadno kavo.", "coffee"),
+        DrinkSpeechRepair("coffee_milk", "Z MLEKOM", "Prosim, rada bi kavo z mlekom.", "coffee"),
+        DrinkSpeechRepair("coffee_no_sugar", "BREZ SLADKORJA", "Prosim, rada bi kavo brez sladkorja.", "coffee"),
+        DrinkSpeechRepair("orange_juice", "POMARANČNI", "Prosim, rada bi pomarančni sok.", "juice"),
+        DrinkSpeechRepair("apple_juice", "JABOLČNI", "Prosim, rada bi jabolčni sok.", "juice"),
+        DrinkSpeechRepair("blueberry_juice", "BOROVNIČEV", "Prosim, rada bi borovničev sok.", "juice"),
+        DrinkSpeechRepair("strawberry_juice", "JAGODNI", "Prosim, rada bi jagodni sok.", "juice"),
+        DrinkSpeechRepair("cedevita", "CEDEVITA", "Prosim, rada bi Cedevito.", "juice"),
+        DrinkSpeechRepair("drink_fanta", "FANTA", "Prosim, rada bi Fanto.", "sparkling_drink"),
+        DrinkSpeechRepair("drink_coca_cola", "COCA COLA", "Prosim, rada bi Coca-Colo.", "sparkling_drink"),
+        DrinkSpeechRepair("drink_pepsi", "PEPSI", "Prosim, rada bi Pepsi.", "sparkling_drink"),
+        DrinkSpeechRepair("radenska", "RADENSKA", "Prosim, rada bi Radensko.", "sparkling_drink"),
+        DrinkSpeechRepair("drink_yogurt", "JOGURT", "Prosim, rada bi jogurt.", "milk_drinks"),
+        DrinkSpeechRepair("cocoa_drink", "KAKAV", "Prosim, rada bi kakav.", "milk_drinks"),
+        DrinkSpeechRepair("drink_milk", "MLEKO", "Prosim, rada bi mleko.", "milk_drinks"),
+        DrinkSpeechRepair("chocolate_milk", "ČOKOLADNO MLEKO", "Prosim, rada bi čokoladno mleko.", "milk_drinks")
     )
 
     private val FOOD_CHILD_REPAIRS = listOf(

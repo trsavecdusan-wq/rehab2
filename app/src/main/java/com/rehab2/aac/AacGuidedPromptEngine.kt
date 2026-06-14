@@ -38,16 +38,14 @@ object AacGuidedPromptEngine {
     private fun promptForId(id: String): AacGuidedPrompt? {
         return when (normalize(id)) {
             "thirsty", "drink" -> AacGuidedPrompt(
-                questionSl = "Kaj bi pila?",
+                questionSl = "Izberi, kaj želiš piti.",
                 childIds = listOf(
                     "water",
                     "tea",
                     "coffee",
-                    "drink_fanta",
-                    "drink_coca_cola",
-                    "drink_pepsi",
                     "juice",
-                    "drink_milk"
+                    "sparkling_drink",
+                    "milk_drinks"
                 )
             )
             "hungry", "food" -> AacGuidedPrompt(
@@ -109,18 +107,6 @@ object AacGuidedPromptEngine {
 
     private fun dailyLifeFollowUp(rootId: String, selectedId: String): AacGuidedPrompt? {
         return when {
-            rootId in DRINK_ROOT_IDS && selectedId == "tea" -> AacGuidedPrompt(
-                questionSl = "Velika skodelica?",
-                childIds = listOf("tea_large", "tea_regular")
-            )
-            rootId in DRINK_ROOT_IDS && selectedId == "coffee" -> AacGuidedPrompt(
-                questionSl = "Kak\u0161na kava?",
-                childIds = listOf("coffee_plain", "coffee_white", "coffee_cappuccino")
-            )
-            rootId in DRINK_ROOT_IDS && selectedId == "drink_fanta" -> AacGuidedPrompt(
-                questionSl = "Kak\u0161na Fanta?",
-                childIds = listOf("drink_cold", "drink_no_additive")
-            )
             rootId in FOOD_ROOT_IDS && selectedId in FOOD_TARGET_IDS -> AacGuidedPrompt(
                 questionSl = "Koliko ali kdaj?",
                 childIds = listOf("food_little", "food_more", "food_enough", "food_later")
@@ -155,11 +141,9 @@ object AacGuidedPromptEngine {
         "water",
         "tea",
         "coffee",
-        "drink_fanta",
-        "drink_pepsi",
-        "drink_coca_cola",
         "juice",
-        "drink_milk"
+        "sparkling_drink",
+        "milk_drinks"
     )
     private val FOOD_TARGET_IDS = setOf(
         "soup",
@@ -227,8 +211,8 @@ object AacGuidedPromptEngine {
         "drink_more",
         "drink_no_additive",
         "coffee_plain",
-        "coffee_white",
-        "coffee_cappuccino",
+        "coffee_milk",
+        "coffee_no_sugar",
         "food_little",
         "food_enough",
         "food_later",

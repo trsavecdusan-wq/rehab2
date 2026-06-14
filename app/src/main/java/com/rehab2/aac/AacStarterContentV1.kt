@@ -38,7 +38,7 @@ object AacStarterContentV1 {
         starter("call_my_caregiver", "POKLIČI SKRBNIKA", PatientProfileSettings.EMPTY_FIELD_SENTENCE, "patient.call_my_caregiver", "PEOPLE", "patient_profile", listOf("pokliči", "skrbnik"), visibleUnderIds = listOf("about_me")),
         starter("call_my_therapist", "POKLIČI TERAPEVTA", PatientProfileSettings.EMPTY_FIELD_SENTENCE, "patient.call_my_therapist", "PEOPLE", "patient_profile", listOf("pokliči", "terapevt"), visibleUnderIds = listOf("about_me")),
 
-        starter("thirsty", "ŽEJNA SEM", "Žejna sem.", "drink.thirsty", "DRINK", "drink", listOf("žejna", "piti"), placements = pageOne(4), opensSubicons = true, children = listOf("water", "tea", "coffee", "juice", "drink_fanta", "drink_coca_cola", "drink_pepsi", "drink_milk"), questionByLanguage = mapOf("sl" to "Kaj bi pila?", "uk" to "Що ти хочеш пити?", "en" to "What do you want to drink?"), imagePath = "system/thirsty.png", iconSource = IconSource.SYSTEM),
+        starter("thirsty", "ŽEJNA SEM", "Izberi, kaj želiš piti.", "drink.thirsty", "DRINK", "drink", listOf("žejna", "piti"), placements = pageOne(4), opensSubicons = true, children = drinkRootChildren(), questionByLanguage = mapOf("sl" to "Izberi, kaj želiš piti.", "uk" to "Що ти хочеш пити?", "en" to "What do you want to drink?"), imagePath = "system/thirsty.png", iconSource = IconSource.SYSTEM),
         starter("hungry", "LAČNA SEM", "Lačna sem.", "food.hungry", "FOOD", "food", listOf("lačna", "jesti"), placements = pageOne(5), opensSubicons = true, children = listOf("soup", "bread", "fruit", "ice_cream", "potato", "rice", "food_yogurt", "food_banana", "food_apple", "food_lunch", "food_dinner", "sweet"), questionByLanguage = mapOf("sl" to "Kaj bi jedla?", "uk" to "Що ти хочеш їсти?", "en" to "What do you want to eat?"), imagePath = "system/hungry.png", iconSource = IconSource.SYSTEM),
         starter("wc", "TOALETA", "Toaleta.", "care.wc", "NEED", "care", listOf("wc", "stranišče", "toaleta"), placements = pageOne(7), opensSubicons = true, children = listOf("wc_wet", "wc_dirty", "wc_wet_and_dirty", "nurse_help"), labelByLanguage = mapOf("uk" to "ТУАЛЕТ"), speechTextByLanguage = mapOf("uk" to "Туалет."), imagePath = "system/wc.png", iconSource = IconSource.SYSTEM),
         starter("tired", "UTRUJENA", "Utrujena sem.", "feeling.tired", "FEELING", "feeling", listOf("utrujena", "počutje"), placements = pageOne(8), visibleUnderIds = listOf("feeling"), imagePath = "system/tired.png", iconSource = IconSource.SYSTEM),
@@ -108,7 +108,7 @@ object AacStarterContentV1 {
         starter("ashtray", "PEPELNIK", "Potrebujem pepelnik.", "daily.ashtray", "CORE_ACTION", "daily_life", listOf("pepelnik", "cigareta"), visibleUnderIds = listOf("i_want")),
         starter("dont_want", "NOČEM", "Tega nočem.", "core.dont_want", "CORE_ACTION", "core", listOf("nočem", "zavrnitev"), visibleUnderIds = listOf("problem", "other")),
         starter("rest", "POČITEK", "Rada bi počivala.", "care.rest", "NEED", "care", listOf("počitek", "utrujena"), placements = pageOne(9), imagePath = "system/rest.png", iconSource = IconSource.SYSTEM),
-        starter("drink", "PIJAČA", "Rada bi pijačo.", "drink.root", "DRINK", "drink", listOf("pijača", "piti"), visibleUnderIds = listOf("legacy_drink"), opensSubicons = true, children = listOf("water", "tea", "coffee", "juice", "drink_fanta", "drink_coca_cola", "drink_pepsi", "drink_milk"), questionByLanguage = mapOf("sl" to "Kaj bi pila?", "uk" to "Що ти хочеш пити?", "en" to "What do you want to drink?")),
+        starter("drink", "PIJAČA", "Izberi, kaj želiš piti.", "drink.root", "DRINK", "drink", listOf("pijača", "piti"), visibleUnderIds = listOf("legacy_drink"), opensSubicons = true, children = drinkRootChildren(), questionByLanguage = mapOf("sl" to "Izberi, kaj želiš piti.", "uk" to "Що ти хочеш пити?", "en" to "What do you want to drink?")),
         starter("food", "HRANA", "Rada bi hrano.", "food.root", "FOOD", "food", listOf("hrana", "jesti"), visibleUnderIds = listOf("need", "legacy_food"), opensSubicons = true, children = listOf("soup", "bread", "fruit", "ice_cream", "potato", "rice", "food_yogurt", "food_banana", "food_apple", "food_lunch", "food_dinner", "sweet"), questionByLanguage = mapOf("sl" to "Kaj bi jedla?", "uk" to "Що ти хочеш їсти?", "en" to "What do you want to eat?")),
         starter("feeling", "POČUTJE", "Rada bi povedala, kako se počutim.", "feeling.root", "FEELING", "feeling", listOf("počutje"), placements = pageOne(17), opensSubicons = true, children = listOf("good", "bad", "sad", "happy", "afraid", "tired", "cold_feeling", "hot_feeling", "sleepy", "need_rest", "cold", "hot", "peace", "rest"), questionByLanguage = mapOf("sl" to "Kako se počutiš?", "uk" to "Як ти почуваєшся?", "en" to "How do you feel?")),
         starter("care", "NEGA", "Potrebujem pomoč pri negi.", "care.root", "NEED", "care", listOf("nega", "pomoč"), placements = pageOne(18), opensSubicons = true, children = listOf("washing_help", "dressing_help", "clothing", "bed", "wheelchair", "blanket", "pillow", "change_position", "crutch", "body_position", "movement_pain", "wait", "help"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ?", "uk" to "Що тобі потрібно?", "en" to "What do you need?")),
@@ -190,29 +190,63 @@ object AacStarterContentV1 {
         starter("friend_2", "PRIJATELJ 2", "Prijatelj.", "person.friend_2", "PEOPLE", "people", listOf("prijatelj", "placeholder"), visibleUnderIds = listOf("friends_group"), imagePath = "patient/contacts/friend_2.jpg", iconSource = IconSource.PATIENT),
         starter("friend_3", "PRIJATELJ 3", "Prijatelj.", "person.friend_3", "PEOPLE", "people", listOf("prijatelj", "placeholder"), visibleUnderIds = listOf("friends_group"), imagePath = "patient/contacts/friend_3.jpg", iconSource = IconSource.PATIENT),
 
-        starter("water", "VODA", "Rada bi vodo.", "drink.water", "DRINK", "drink", listOf("voda", "piti"), placements = pageThree(6), visibleUnderIds = listOf("drink", "thirsty", "need"), opensSubicons = true, children = listOf("cold_water", "warm_water", "sparkling_water", "non_sparkling_water"), questionByLanguage = mapOf("sl" to "Kakšno vodo?"), imagePath = "custom/drinks/water.jpg", iconSource = IconSource.CUSTOM),
+        starter("water", "VODA", "Prosim, rada bi vodo.", "drink.water", "DRINK", "drink", listOf("voda", "piti"), placements = pageThree(6), visibleUnderIds = listOf("drink", "thirsty", "need"), opensSubicons = true, children = waterDrinkChildren(), questionByLanguage = mapOf("sl" to "Kakšno vodo?"), imagePath = "custom/drinks/water.jpg", iconSource = IconSource.CUSTOM),
         starter("water_detail", "VODA PODROBNO", "Kakšno vodo?", "drink.water.detail", "QUESTION", "drink", listOf("voda", "podrobno", "kakšna"), visibleUnderIds = listOf("drink", "thirsty")),
-        starter("cold_water", "MRZLA VODA", "Rada bi mrzlo vodo.", "drink.water.cold", "DRINK", "drink", listOf("mrzla", "voda"), visibleUnderIds = listOf("water", "water_detail"), addsToSentence = true),
-        starter("warm_water", "TOPLA VODA", "Rada bi toplo vodo.", "drink.water.warm", "DRINK", "drink", listOf("topla", "voda"), visibleUnderIds = listOf("water", "water_detail"), addsToSentence = true),
-        starter("non_sparkling_water", "VODA BREZ MEHURČKOV", "Rada bi vodo brez mehurčkov.", "drink.water.non_sparkling", "DRINK", "drink", listOf("brez_mehurčkov", "voda"), visibleUnderIds = listOf("water", "water_detail"), addsToSentence = true),
-        starter("sparkling_water", "VODA Z MEHURČKI", "Rada bi vodo z mehurčki.", "drink.water.sparkling", "DRINK", "drink", listOf("z_mehurčki", "voda"), visibleUnderIds = listOf("water", "water_detail"), addsToSentence = true),
-        starter("coffee", "KAVA", "Rada bi kavo.", "drink.coffee", "DRINK", "drink", listOf("kava", "piti"), placements = pageThree(7), visibleUnderIds = listOf("drink", "thirsty"), imagePath = "custom/drinks/coffee.jpg", iconSource = IconSource.CUSTOM),
-        starter("tea", "ČAJ", "Rada bi čaj.", "drink.tea", "DRINK", "drink", listOf("čaj", "piti"), placements = pageThree(8), visibleUnderIds = listOf("drink", "thirsty"), imagePath = "custom/drinks/tea.jpg", iconSource = IconSource.CUSTOM),
-        starter("juice", "SOK", "Rada bi sok.", "drink.juice", "DRINK", "drink", listOf("sok", "piti"), placements = pageThree(9), visibleUnderIds = listOf("drink", "thirsty"), imagePath = "custom/drinks/juice.jpg", iconSource = IconSource.CUSTOM),
-        starter("drink_fanta", "FANTA", "Rada bi Fanto.", "drink.fanta", "DRINK", "drink", listOf("fanta", "piti"), visibleUnderIds = listOf("drink", "thirsty"), imagePath = "custom/drinks/drink_fanta.jpg", iconSource = IconSource.CUSTOM),
-        starter("drink_coca_cola", "COCA COLA", "Rada bi Coca Colo.", "drink.coca_cola", "DRINK", "drink", listOf("coca_cola", "piti"), visibleUnderIds = listOf("drink", "thirsty"), imagePath = "custom/drinks/drink_coca_cola.jpg", iconSource = IconSource.CUSTOM),
-        starter("drink_pepsi", "PEPSI", "Rada bi Pepsi.", "drink.pepsi", "DRINK", "drink", listOf("pepsi", "piti"), visibleUnderIds = listOf("drink", "thirsty"), imagePath = "custom/drinks/drink_pepsi.jpg", iconSource = IconSource.CUSTOM),
-        starter("drink_milk", "MLEKO", "Rada bi mleko.", "drink.milk", "DRINK", "drink", listOf("mleko", "piti"), visibleUnderIds = listOf("drink", "thirsty"), imagePath = "custom/drinks/drink_milk.jpg", iconSource = IconSource.CUSTOM),
+        starter("cold_water", "HLADNA", "Prosim, rada bi hladno vodo.", "drink.water.cold", "DRINK", "drink", listOf("hladna", "voda"), visibleUnderIds = listOf("water"), addsToSentence = true),
+        starter("non_sparkling_water", "NAVADNA", "Prosim, rada bi navadno vodo.", "drink.water.plain", "DRINK", "drink", listOf("navadna", "voda"), visibleUnderIds = listOf("water"), addsToSentence = true),
+        starter("flavored_water", "VODA Z OKUSOM", "Prosim, rada bi vodo z okusom.", "drink.water.flavored", "DRINK", "drink", listOf("okus", "voda"), visibleUnderIds = listOf("water"), addsToSentence = true),
+        starter("mineral_water", "MINERALNA", "Prosim, rada bi mineralno vodo.", "drink.water.mineral", "DRINK", "drink", listOf("mineralna", "voda"), visibleUnderIds = listOf("water"), addsToSentence = true),
+        starter("sparkling_water", "VODA Z MEHURČKI", "Rada bi vodo z mehurčki.", "drink.water.sparkling", "DRINK", "drink", listOf("z_mehurčki", "voda"), visibleUnderIds = listOf("water_detail"), addsToSentence = true),
+        starter("coffee", "KAVA", "Prosim, rada bi kavo.", "drink.coffee", "DRINK", "drink", listOf("kava", "piti"), placements = pageThree(7), visibleUnderIds = listOf("drink", "thirsty"), opensSubicons = true, children = coffeeDrinkChildren(), questionByLanguage = mapOf("sl" to "Kakšno kavo?"), imagePath = "custom/drinks/coffee.jpg", iconSource = IconSource.CUSTOM),
+        starter("tea", "ČAJ", "Prosim, rada bi čaj.", "drink.tea", "DRINK", "drink", listOf("čaj", "piti"), placements = pageThree(8), visibleUnderIds = listOf("drink", "thirsty"), opensSubicons = true, children = teaDrinkChildren(), questionByLanguage = mapOf("sl" to "Kakšen čaj?"), imagePath = "custom/drinks/tea.jpg", iconSource = IconSource.CUSTOM),
+        starter("juice", "SOK", "Prosim, rada bi sok.", "drink.juice", "DRINK", "drink", listOf("sok", "piti"), placements = pageThree(9), visibleUnderIds = listOf("drink", "thirsty"), opensSubicons = true, children = juiceDrinkChildren(), questionByLanguage = mapOf("sl" to "Kakšen sok?"), imagePath = "custom/drinks/juice.jpg", iconSource = IconSource.CUSTOM),
+        starter("sparkling_drink", "GAZIRANA PIJAČA", "Prosim, rada bi gazirano pijačo.", "drink.sparkling.root", "DRINK", "drink", listOf("gazirana", "pijača"), visibleUnderIds = listOf("drink", "thirsty"), opensSubicons = true, children = sparklingDrinkChildren(), questionByLanguage = mapOf("sl" to "Katero gazirano pijačo?")),
+        starter("drink_fanta", "FANTA", "Prosim, rada bi Fanto.", "drink.fanta", "DRINK", "drink", listOf("fanta", "piti"), visibleUnderIds = listOf("sparkling_drink"), imagePath = "custom/drinks/drink_fanta.jpg", iconSource = IconSource.CUSTOM),
+        starter("drink_coca_cola", "COCA COLA", "Prosim, rada bi Coca-Colo.", "drink.coca_cola", "DRINK", "drink", listOf("coca_cola", "piti"), visibleUnderIds = listOf("sparkling_drink"), imagePath = "custom/drinks/drink_coca_cola.jpg", iconSource = IconSource.CUSTOM),
+        starter("drink_pepsi", "PEPSI", "Prosim, rada bi Pepsi.", "drink.pepsi", "DRINK", "drink", listOf("pepsi", "piti"), visibleUnderIds = listOf("sparkling_drink"), imagePath = "custom/drinks/drink_pepsi.jpg", iconSource = IconSource.CUSTOM),
+        starter("radenska", "RADENSKA", "Prosim, rada bi Radensko.", "drink.radenska", "DRINK", "drink", listOf("radenska", "piti"), visibleUnderIds = listOf("sparkling_drink")),
+        starter("milk_drinks", "MLEČNI NAPITKI", "Prosim, rada bi mlečni napitek.", "drink.milk_drinks", "DRINK", "drink", listOf("mlečni", "napitki"), visibleUnderIds = listOf("drink", "thirsty"), opensSubicons = true, children = milkDrinkChildren(), questionByLanguage = mapOf("sl" to "Kateri mlečni napitek?")),
+        starter("drink_yogurt", "JOGURT", "Prosim, rada bi jogurt.", "drink.yogurt", "DRINK", "drink", listOf("jogurt", "piti"), visibleUnderIds = listOf("milk_drinks")),
+        starter("cocoa_drink", "KAKAV", "Prosim, rada bi kakav.", "drink.cocoa", "DRINK", "drink", listOf("kakav", "piti"), visibleUnderIds = listOf("milk_drinks")),
+        starter("drink_milk", "MLEKO", "Prosim, rada bi mleko.", "drink.milk", "DRINK", "drink", listOf("mleko", "piti"), visibleUnderIds = listOf("milk_drinks"), imagePath = "custom/drinks/drink_milk.jpg", iconSource = IconSource.CUSTOM),
+        starter("chocolate_milk", "ČOKOLADNO MLEKO", "Prosim, rada bi čokoladno mleko.", "drink.chocolate_milk", "DRINK", "drink", listOf("čokoladno", "mleko", "piti"), visibleUnderIds = listOf("milk_drinks")),
         starter("drink_warm", "TOPLO", "Rada bi toplo pijačo.", "drink.warm", "DRINK", "drink", listOf("toplo", "piti"), visibleUnderIds = listOf("drink", "thirsty")),
         starter("drink_cold", "HLADNO", "Rada bi hladno pijačo.", "drink.cold", "DRINK", "drink", listOf("hladno", "piti"), visibleUnderIds = listOf("drink", "thirsty")),
         starter("drink_small", "MALO", "Samo malo, prosim.", "drink.small", "DRINK", "drink", listOf("malo", "piti"), visibleUnderIds = listOf("drink", "thirsty")),
         starter("drink_more", "VEČ", "Še malo, prosim.", "drink.more", "DRINK", "drink", listOf("več", "piti"), visibleUnderIds = listOf("drink", "thirsty")),
         starter("drink_no_additive", "BREZ DODATKA", "Rada bi brez dodatka.", "drink.no_additive", "DRINK", "drink", listOf("brez", "dodatek", "piti"), visibleUnderIds = listOf("drink_fanta")),
-        starter("coffee_plain", "NAVADNA", "Rada bi navadno kavo.", "drink.coffee.plain", "DRINK", "drink", listOf("navadna", "kava"), visibleUnderIds = listOf("coffee"), imagePath = "custom/drinks/detail/coffee_plain.jpg", iconSource = IconSource.CUSTOM),
-        starter("coffee_white", "BELA", "Rada bi belo kavo.", "drink.coffee.white", "DRINK", "drink", listOf("bela", "kava"), visibleUnderIds = listOf("coffee"), imagePath = "custom/drinks/detail/coffee_white.jpg", iconSource = IconSource.CUSTOM),
-        starter("coffee_cappuccino", "CAPPUCCINO", "Rada bi cappuccino.", "drink.coffee.cappuccino", "DRINK", "drink", listOf("cappuccino", "kava"), visibleUnderIds = listOf("coffee"), imagePath = "custom/drinks/detail/coffee_cappuccino.jpg", iconSource = IconSource.CUSTOM),
-        starter("tea_large", "VELIK ČAJ", "Rada bi velik čaj.", "drink.tea.large", "DRINK", "drink", listOf("velik", "čaj"), visibleUnderIds = listOf("tea"), imagePath = "custom/drinks/detail/tea_large.jpg", iconSource = IconSource.CUSTOM),
-        starter("tea_regular", "NAVADEN ČAJ", "Rada bi čaj.", "drink.tea.regular", "DRINK", "drink", listOf("navaden", "čaj"), visibleUnderIds = listOf("tea"), imagePath = "custom/drinks/detail/tea_regular.jpg", iconSource = IconSource.CUSTOM),
+        starter("coffee_plain", "NAVADNA", "Prosim, rada bi navadno kavo.", "drink.coffee.plain", "DRINK", "drink", listOf("navadna", "kava"), visibleUnderIds = listOf("coffee"), imagePath = "custom/drinks/detail/coffee_plain.jpg", iconSource = IconSource.CUSTOM),
+        starter("coffee_milk", "Z MLEKOM", "Prosim, rada bi kavo z mlekom.", "drink.coffee.milk", "DRINK", "drink", listOf("mleko", "kava"), visibleUnderIds = listOf("coffee"), imagePath = "custom/drinks/detail/coffee_milk.jpg", iconSource = IconSource.CUSTOM),
+        starter("coffee_no_sugar", "BREZ SLADKORJA", "Prosim, rada bi kavo brez sladkorja.", "drink.coffee.no_sugar", "DRINK", "drink", listOf("brez", "sladkor", "kava"), visibleUnderIds = listOf("coffee"), imagePath = "custom/drinks/detail/coffee_no_sugar.jpg", iconSource = IconSource.CUSTOM),
+        starter("tea_chamomile", "KAMILIČNI", "Prosim, rada bi kamilični čaj.", "drink.tea.chamomile", "DRINK", "drink", listOf("kamilični", "čaj"), visibleUnderIds = listOf("tea"), opensSubicons = true, children = teaAddonChildren("tea_chamomile"), questionByLanguage = mapOf("sl" to "Kaj dodaš v kamilični čaj?")),
+        starter("tea_chamomile_lemon", "Z LIMONO", "Prosim, rada bi kamilični čaj z limono.", "drink.tea.chamomile.lemon", "DRINK", "drink", listOf("limona", "kamilični", "čaj"), visibleUnderIds = listOf("tea_chamomile")),
+        starter("tea_chamomile_honey", "Z MEDOM", "Prosim, rada bi kamilični čaj z medom.", "drink.tea.chamomile.honey", "DRINK", "drink", listOf("med", "kamilični", "čaj"), visibleUnderIds = listOf("tea_chamomile")),
+        starter("tea_chamomile_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi kamilični čaj z medom in limono.", "drink.tea.chamomile.honey_lemon", "DRINK", "drink", listOf("med", "limona", "kamilični", "čaj"), visibleUnderIds = listOf("tea_chamomile")),
+        starter("tea_fruit", "SADNI", "Prosim, rada bi sadni čaj.", "drink.tea.fruit", "DRINK", "drink", listOf("sadni", "čaj"), visibleUnderIds = listOf("tea"), opensSubicons = true, children = teaAddonChildren("tea_fruit"), questionByLanguage = mapOf("sl" to "Kaj dodaš v sadni čaj?")),
+        starter("tea_fruit_lemon", "Z LIMONO", "Prosim, rada bi sadni čaj z limono.", "drink.tea.fruit.lemon", "DRINK", "drink", listOf("limona", "sadni", "čaj"), visibleUnderIds = listOf("tea_fruit")),
+        starter("tea_fruit_honey", "Z MEDOM", "Prosim, rada bi sadni čaj z medom.", "drink.tea.fruit.honey", "DRINK", "drink", listOf("med", "sadni", "čaj"), visibleUnderIds = listOf("tea_fruit")),
+        starter("tea_fruit_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi sadni čaj z medom in limono.", "drink.tea.fruit.honey_lemon", "DRINK", "drink", listOf("med", "limona", "sadni", "čaj"), visibleUnderIds = listOf("tea_fruit")),
+        starter("tea_green", "ZELENI", "Prosim, rada bi zeleni čaj.", "drink.tea.green", "DRINK", "drink", listOf("zeleni", "čaj"), visibleUnderIds = listOf("tea"), opensSubicons = true, children = teaAddonChildren("tea_green"), questionByLanguage = mapOf("sl" to "Kaj dodaš v zeleni čaj?")),
+        starter("tea_green_lemon", "Z LIMONO", "Prosim, rada bi zeleni čaj z limono.", "drink.tea.green.lemon", "DRINK", "drink", listOf("limona", "zeleni", "čaj"), visibleUnderIds = listOf("tea_green")),
+        starter("tea_green_honey", "Z MEDOM", "Prosim, rada bi zeleni čaj z medom.", "drink.tea.green.honey", "DRINK", "drink", listOf("med", "zeleni", "čaj"), visibleUnderIds = listOf("tea_green")),
+        starter("tea_green_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi zeleni čaj z medom in limono.", "drink.tea.green.honey_lemon", "DRINK", "drink", listOf("med", "limona", "zeleni", "čaj"), visibleUnderIds = listOf("tea_green")),
+        starter("tea_black", "ČRNI", "Prosim, rada bi črni čaj.", "drink.tea.black", "DRINK", "drink", listOf("črni", "čaj"), visibleUnderIds = listOf("tea"), opensSubicons = true, children = teaAddonChildren("tea_black"), questionByLanguage = mapOf("sl" to "Kaj dodaš v črni čaj?")),
+        starter("tea_black_lemon", "Z LIMONO", "Prosim, rada bi črni čaj z limono.", "drink.tea.black.lemon", "DRINK", "drink", listOf("limona", "črni", "čaj"), visibleUnderIds = listOf("tea_black")),
+        starter("tea_black_honey", "Z MEDOM", "Prosim, rada bi črni čaj z medom.", "drink.tea.black.honey", "DRINK", "drink", listOf("med", "črni", "čaj"), visibleUnderIds = listOf("tea_black")),
+        starter("tea_black_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi črni čaj z medom in limono.", "drink.tea.black.honey_lemon", "DRINK", "drink", listOf("med", "limona", "črni", "čaj"), visibleUnderIds = listOf("tea_black")),
+        starter("tea_mint", "METIN", "Prosim, rada bi metin čaj.", "drink.tea.mint", "DRINK", "drink", listOf("metin", "čaj"), visibleUnderIds = listOf("tea"), opensSubicons = true, children = teaAddonChildren("tea_mint"), questionByLanguage = mapOf("sl" to "Kaj dodaš v metin čaj?")),
+        starter("tea_mint_lemon", "Z LIMONO", "Prosim, rada bi metin čaj z limono.", "drink.tea.mint.lemon", "DRINK", "drink", listOf("limona", "metin", "čaj"), visibleUnderIds = listOf("tea_mint")),
+        starter("tea_mint_honey", "Z MEDOM", "Prosim, rada bi metin čaj z medom.", "drink.tea.mint.honey", "DRINK", "drink", listOf("med", "metin", "čaj"), visibleUnderIds = listOf("tea_mint")),
+        starter("tea_mint_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi metin čaj z medom in limono.", "drink.tea.mint.honey_lemon", "DRINK", "drink", listOf("med", "limona", "metin", "čaj"), visibleUnderIds = listOf("tea_mint")),
+        starter("tea_rosehip", "ŠIPKOV", "Prosim, rada bi šipkov čaj.", "drink.tea.rosehip", "DRINK", "drink", listOf("šipkov", "čaj"), visibleUnderIds = listOf("tea"), opensSubicons = true, children = teaAddonChildren("tea_rosehip"), questionByLanguage = mapOf("sl" to "Kaj dodaš v šipkov čaj?")),
+        starter("tea_rosehip_lemon", "Z LIMONO", "Prosim, rada bi šipkov čaj z limono.", "drink.tea.rosehip.lemon", "DRINK", "drink", listOf("limona", "šipkov", "čaj"), visibleUnderIds = listOf("tea_rosehip")),
+        starter("tea_rosehip_honey", "Z MEDOM", "Prosim, rada bi šipkov čaj z medom.", "drink.tea.rosehip.honey", "DRINK", "drink", listOf("med", "šipkov", "čaj"), visibleUnderIds = listOf("tea_rosehip")),
+        starter("tea_rosehip_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi šipkov čaj z medom in limono.", "drink.tea.rosehip.honey_lemon", "DRINK", "drink", listOf("med", "limona", "šipkov", "čaj"), visibleUnderIds = listOf("tea_rosehip")),
+        starter("orange_juice", "POMARANČNI", "Prosim, rada bi pomarančni sok.", "drink.juice.orange", "DRINK", "drink", listOf("pomarančni", "sok"), visibleUnderIds = listOf("juice")),
+        starter("apple_juice", "JABOLČNI", "Prosim, rada bi jabolčni sok.", "drink.juice.apple", "DRINK", "drink", listOf("jabolčni", "sok"), visibleUnderIds = listOf("juice")),
+        starter("blueberry_juice", "BOROVNIČEV", "Prosim, rada bi borovničev sok.", "drink.juice.blueberry", "DRINK", "drink", listOf("borovničev", "sok"), visibleUnderIds = listOf("juice")),
+        starter("strawberry_juice", "JAGODNI", "Prosim, rada bi jagodni sok.", "drink.juice.strawberry", "DRINK", "drink", listOf("jagodni", "sok"), visibleUnderIds = listOf("juice")),
+        starter("cedevita", "CEDEVITA", "Prosim, rada bi Cedevito.", "drink.juice.cedevita", "DRINK", "drink", listOf("cedevita", "sok"), visibleUnderIds = listOf("juice")),
         starter("not_thirsty", "NISEM ŽEJNA", "Nisem žejna.", "drink.not_thirsty", "DRINK", "drink", listOf("nisem_žejna", "piti"), visibleUnderIds = listOf("drink", "thirsty"), imagePath = "custom/state/not_thirsty.jpg", iconSource = IconSource.CUSTOM),
 
         starter("not_hungry", "NISEM LAČNA", "Nisem lačna.", "food.not_hungry", "FOOD", "food", listOf("nisem_lačna", "jesti"), visibleUnderIds = listOf("food", "hungry"), imagePath = "custom/state/not_hungry.jpg", iconSource = IconSource.CUSTOM),
@@ -620,6 +654,81 @@ object AacStarterContentV1 {
         )
     }
 
+    private fun drinkRootChildren(): List<String> {
+        return listOf(
+            "water",
+            "tea",
+            "coffee",
+            "juice",
+            "sparkling_drink",
+            "milk_drinks"
+        )
+    }
+
+    private fun waterDrinkChildren(): List<String> {
+        return listOf(
+            "non_sparkling_water",
+            "flavored_water",
+            "mineral_water",
+            "cold_water"
+        )
+    }
+
+    private fun teaDrinkChildren(): List<String> {
+        return listOf(
+            "tea_chamomile",
+            "tea_fruit",
+            "tea_green",
+            "tea_black",
+            "tea_mint",
+            "tea_rosehip"
+        )
+    }
+
+    private fun teaAddonChildren(teaId: String): List<String> {
+        return listOf(
+            "${teaId}_lemon",
+            "${teaId}_honey",
+            "${teaId}_honey_lemon"
+        )
+    }
+
+    private fun coffeeDrinkChildren(): List<String> {
+        return listOf(
+            "coffee_plain",
+            "coffee_milk",
+            "coffee_no_sugar"
+        )
+    }
+
+    private fun juiceDrinkChildren(): List<String> {
+        return listOf(
+            "orange_juice",
+            "apple_juice",
+            "blueberry_juice",
+            "strawberry_juice",
+            "cedevita"
+        )
+    }
+
+    private fun sparklingDrinkChildren(): List<String> {
+        return listOf(
+            "drink_fanta",
+            "drink_coca_cola",
+            "drink_pepsi",
+            "radenska"
+        )
+    }
+
+    private fun milkDrinkChildren(): List<String> {
+        return listOf(
+            "drink_yogurt",
+            "cocoa_drink",
+            "drink_milk",
+            "chocolate_milk"
+        )
+    }
+
     private fun Int?.orZero(): Int = this ?: 0
 
     private const val START_PRIORITY = 100
@@ -670,8 +779,19 @@ object AacStarterContentV1 {
         "sad", "contact_message", "contact_call", "contact_help", "back_to_main", "person_see", "person_come", "later",
         "person_dusan", "person_zana", "person_sergej", "person_julija", "person_oksana", "person_inna",
         "person_franc", "person_other", "person_where_is", "person_tell", "friend_1", "friend_2", "friend_3",
-        "water", "coffee", "tea", "juice", "drink_fanta", "drink_coca_cola", "drink_pepsi", "drink_milk",
-        "drink_warm", "drink_cold", "drink_small", "drink_more", "drink_no_additive", "coffee_plain", "coffee_white", "coffee_cappuccino",
+        "water", "tea", "coffee", "juice", "sparkling_drink", "milk_drinks",
+        "non_sparkling_water", "flavored_water", "mineral_water", "cold_water",
+        "tea_chamomile", "tea_chamomile_lemon", "tea_chamomile_honey", "tea_chamomile_honey_lemon",
+        "tea_fruit", "tea_fruit_lemon", "tea_fruit_honey", "tea_fruit_honey_lemon",
+        "tea_green", "tea_green_lemon", "tea_green_honey", "tea_green_honey_lemon",
+        "tea_black", "tea_black_lemon", "tea_black_honey", "tea_black_honey_lemon",
+        "tea_mint", "tea_mint_lemon", "tea_mint_honey", "tea_mint_honey_lemon",
+        "tea_rosehip", "tea_rosehip_lemon", "tea_rosehip_honey", "tea_rosehip_honey_lemon",
+        "coffee_plain", "coffee_milk", "coffee_no_sugar",
+        "orange_juice", "apple_juice", "blueberry_juice", "strawberry_juice", "cedevita",
+        "drink_fanta", "drink_coca_cola", "drink_pepsi", "radenska",
+        "drink_yogurt", "cocoa_drink", "drink_milk", "chocolate_milk",
+        "drink_warm", "drink_cold", "drink_small", "drink_more", "drink_no_additive", "coffee_white", "coffee_cappuccino",
         "soup", "bread", "fruit", "ice_cream", "potato", "rice", "meat", "sweet", "other_food", "food_yogurt", "food_banana",
         "food_apple", "food_lunch", "food_dinner", "food_little", "food_more", "food_enough", "food_later",
         "head", "arm", "leg", "back", "belly", "chest", "throat", "pain_left", "pain_right", "pain_both", "left_side", "right_side", "other_body",

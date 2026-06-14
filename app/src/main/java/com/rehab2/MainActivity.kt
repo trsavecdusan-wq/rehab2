@@ -173,6 +173,93 @@ class MainActivity : AppCompatActivity() {
         private const val MAIN_AAC_WATER_DETAIL_ID = "water_detail"
         private const val MAIN_AAC_WATER_TEMPERATURE_GROUP = "temperature"
         private const val MAIN_AAC_WATER_CARBONATION_GROUP = "carbonation"
+        private val AAC_DRINK_ROOT_CHILDREN = listOf(
+            "water",
+            "tea",
+            "coffee",
+            "juice",
+            "sparkling_drink",
+            "milk_drinks"
+        )
+        private val AAC_DRINK_WATER_CHILDREN = listOf(
+            "non_sparkling_water",
+            "flavored_water",
+            "mineral_water",
+            "cold_water"
+        )
+        private val AAC_DRINK_TEA_CHILDREN = listOf(
+            "tea_chamomile",
+            "tea_fruit",
+            "tea_green",
+            "tea_black",
+            "tea_mint",
+            "tea_rosehip"
+        )
+        private val AAC_DRINK_TEA_IDS = AAC_DRINK_TEA_CHILDREN.toSet()
+        private val AAC_DRINK_COFFEE_CHILDREN = listOf(
+            "coffee_plain",
+            "coffee_milk",
+            "coffee_no_sugar"
+        )
+        private val AAC_DRINK_JUICE_CHILDREN = listOf(
+            "orange_juice",
+            "apple_juice",
+            "blueberry_juice",
+            "strawberry_juice",
+            "cedevita"
+        )
+        private val AAC_DRINK_SPARKLING_CHILDREN = listOf(
+            "drink_fanta",
+            "drink_coca_cola",
+            "drink_pepsi",
+            "radenska"
+        )
+        private val AAC_DRINK_MILK_CHILDREN = listOf(
+            "drink_yogurt",
+            "cocoa_drink",
+            "drink_milk",
+            "chocolate_milk"
+        )
+        private val AAC_DRINK_TERMINAL_IDS = setOf(
+            "non_sparkling_water",
+            "flavored_water",
+            "mineral_water",
+            "cold_water",
+            "tea_chamomile_lemon",
+            "tea_chamomile_honey",
+            "tea_chamomile_honey_lemon",
+            "tea_fruit_lemon",
+            "tea_fruit_honey",
+            "tea_fruit_honey_lemon",
+            "tea_green_lemon",
+            "tea_green_honey",
+            "tea_green_honey_lemon",
+            "tea_black_lemon",
+            "tea_black_honey",
+            "tea_black_honey_lemon",
+            "tea_mint_lemon",
+            "tea_mint_honey",
+            "tea_mint_honey_lemon",
+            "tea_rosehip_lemon",
+            "tea_rosehip_honey",
+            "tea_rosehip_honey_lemon",
+            "coffee_plain",
+            "coffee_milk",
+            "coffee_no_sugar",
+            "orange_juice",
+            "apple_juice",
+            "blueberry_juice",
+            "strawberry_juice",
+            "cedevita",
+            "drink_fanta",
+            "drink_coca_cola",
+            "drink_pepsi",
+            "radenska",
+            "drink_yogurt",
+            "cocoa_drink",
+            "drink_milk",
+            "chocolate_milk"
+        )
         private const val PREFS_AUDIO_DIAGNOSTICS = "audio_diagnostics"
         private const val KEY_AUDIO_EVENTS = "audio_events"
         private const val AUDIO_EVENT_LIMIT = 20
@@ -2458,9 +2545,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacChildrenFor(item: AacItem): List<AacItem> {
-        if (normalizeMainAacKey(item.id) == "water") {
-            return emptyList()
-        }
         val explicitChildren = item.children.mapNotNull { childId -> mainAacItemsById[childId] }
         val visibleUnderChildren = mainAacItemsById.values
             .filter { child -> item.id in child.visibleUnderIds && child.id !in item.children }
@@ -2468,6 +2552,9 @@ class MainActivity : AppCompatActivity() {
         val existingChildren = explicitChildren + visibleUnderChildren
         if (item.id == "wc" || item.id == "nurse_help") {
             return existingChildren.distinctBy { child -> child.id }
+        }
+        drinkLockedChildrenFor(item)?.let { lockedChildIds ->
+            return lockedChildIds.mapNotNull { childId -> mainAacItemsById[childId] }
         }
         painLockedChildrenFor(item)?.let { lockedChildIds ->
             return lockedChildIds.mapNotNull { childId -> mainAacItemsById[childId] }
@@ -2482,6 +2569,31 @@ class MainActivity : AppCompatActivity() {
         } else {
             children
         }
+    }
+
+    private fun drinkLockedChildrenFor(parentItem: AacItem): List<String>? {
+        return when (normalizeMainAacKey(parentItem.id)) {
+            "thirsty",
+            "drink" -> AAC_DRINK_ROOT_CHILDREN
+            "water" -> AAC_DRINK_WATER_CHILDREN
+            "tea" -> AAC_DRINK_TEA_CHILDREN
+            in AAC_DRINK_TEA_IDS -> teaAddonChildrenFor(parentItem.id)
+            "coffee" -> AAC_DRINK_COFFEE_CHILDREN
+            "juice" -> AAC_DRINK_JUICE_CHILDREN
+            "sparkling_drink" -> AAC_DRINK_SPARKLING_CHILDREN
+            "milk_drinks" -> AAC_DRINK_MILK_CHILDREN
+            in AAC_DRINK_TERMINAL_IDS -> emptyList()
+            else -> null
+        }
+    }
+
+    private fun teaAddonChildrenFor(teaId: String): List<String> {
+        val normalizedTeaId = normalizeMainAacKey(teaId)
+        return listOf(
+            "${normalizedTeaId}_lemon",
+            "${normalizedTeaId}_honey",
+            "${normalizedTeaId}_honey_lemon"
+        )
     }
 
     private fun painLockedChildrenFor(parentItem: AacItem): List<String>? {
