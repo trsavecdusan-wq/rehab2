@@ -230,6 +230,91 @@ class MainActivity : AppCompatActivity() {
             "belly_upper",
             "belly_lower"
         )
+        private val AAC_PAIN_ROOT_BASE_CHILDREN = listOf(
+            "head",
+            "left_arm",
+            "right_arm",
+            "left_leg",
+            "right_leg",
+            "back",
+            "belly",
+            "chest"
+        )
+        private val AAC_PAIN_ROOT_EXTENDED_CHILDREN = listOf(
+            "neck",
+            "eye",
+            "ear",
+            "nose",
+            "mouth",
+            "tooth"
+        )
+        private val AAC_PAIN_STRENGTH_CHILDREN = listOf(
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong"
+        )
+        private val AAC_PAIN_TIME_CHILDREN = listOf(
+            "pain_since_today",
+            "pain_since_yesterday",
+            "pain_since_morning",
+            "pain_since_evening",
+            "pain_since_long"
+        )
+        private val AAC_PAIN_LEG_DETAIL_CHILDREN = listOf(
+            "leg_hip",
+            "leg_thigh",
+            "leg_knee",
+            "leg_shin",
+            "leg_ankle",
+            "leg_foot",
+            "leg_toes"
+        )
+        private val AAC_PAIN_ARM_DETAIL_CHILDREN = listOf(
+            "arm_shoulder",
+            "arm_upper",
+            "arm_elbow",
+            "arm_forearm",
+            "arm_wrist",
+            "arm_fingers"
+        )
+        private val AAC_PAIN_BACK_DETAIL_CHILDREN = listOf(
+            "back_upper",
+            "back_middle",
+            "back_lower"
+        )
+        private val AAC_PAIN_BELLY_DETAIL_CHILDREN = listOf(
+            "belly_left",
+            "belly_right",
+            "belly_upper",
+            "belly_lower"
+        )
+        private val AAC_PAIN_EYE_SIDE_CHILDREN = listOf("eye_left", "eye_right", "eye_both")
+        private val AAC_PAIN_EAR_SIDE_CHILDREN = listOf("ear_left", "ear_right", "ear_both")
+        private val AAC_PAIN_TOOTH_PART_CHILDREN = listOf("tooth_left", "tooth_right", "tooth_upper", "tooth_lower")
+        private val AAC_PAIN_CONTEXT_CHILDREN = listOf(
+            "pain_when_walking",
+            "pain_when_sitting",
+            "pain_when_standing"
+        )
+        private val AAC_PAIN_TIME_IDS = AAC_PAIN_TIME_CHILDREN.toSet()
+        private val AAC_PAIN_LEG_CONTEXT_IDS = setOf(
+            "left_leg",
+            "right_leg",
+            "leg_hip",
+            "leg_thigh",
+            "leg_knee",
+            "leg_shin",
+            "leg_ankle",
+            "leg_foot",
+            "leg_toes"
+        )
+        private val AAC_PAIN_BACK_CONTEXT_IDS = setOf(
+            "back",
+            "back_upper",
+            "back_middle",
+            "back_lower"
+        )
         private val CORE_V2_FIXED_TOP_ROW_POSITIONS = mapOf(
             "no" to 1,
             "dont_understand" to 2,
@@ -2384,6 +2469,9 @@ class MainActivity : AppCompatActivity() {
         if (item.id == "wc" || item.id == "nurse_help") {
             return existingChildren.distinctBy { child -> child.id }
         }
+        painLockedChildrenFor(item)?.let { lockedChildIds ->
+            return lockedChildIds.mapNotNull { childId -> mainAacItemsById[childId] }
+        }
         val guidedChildren = AacGuidedPromptEngine.childIdsFor(item).mapNotNull { childId -> mainAacItemsById[childId] }
         val children = filterPainExtendedChildren(
             parentItem = item,
@@ -2393,6 +2481,82 @@ class MainActivity : AppCompatActivity() {
             sortMainAacGuidedItemsByUsage(children)
         } else {
             children
+        }
+    }
+
+    private fun painLockedChildrenFor(parentItem: AacItem): List<String>? {
+        val parentId = normalizeMainAacKey(parentItem.id)
+        return when (parentId) {
+            "pain" -> if (isPainExtendedVersionEnabled()) {
+                AAC_PAIN_ROOT_BASE_CHILDREN + AAC_PAIN_ROOT_EXTENDED_CHILDREN
+            } else {
+                AAC_PAIN_ROOT_BASE_CHILDREN
+            }
+            "head",
+            "chest",
+            "neck",
+            "nose",
+            "mouth" -> AAC_PAIN_STRENGTH_CHILDREN
+            "left_arm",
+            "right_arm" -> if (isPainExtendedVersionEnabled()) {
+                AAC_PAIN_ARM_DETAIL_CHILDREN
+            } else {
+                AAC_PAIN_STRENGTH_CHILDREN
+            }
+            "left_leg",
+            "right_leg" -> AAC_PAIN_LEG_DETAIL_CHILDREN
+            "back" -> AAC_PAIN_BACK_DETAIL_CHILDREN
+            "belly" -> AAC_PAIN_BELLY_DETAIL_CHILDREN
+            "eye" -> AAC_PAIN_EYE_SIDE_CHILDREN
+            "ear" -> AAC_PAIN_EAR_SIDE_CHILDREN
+            "tooth" -> AAC_PAIN_TOOTH_PART_CHILDREN
+            "arm_shoulder",
+            "arm_upper",
+            "arm_elbow",
+            "arm_forearm",
+            "arm_wrist",
+            "arm_fingers",
+            "leg_hip",
+            "leg_thigh",
+            "leg_knee",
+            "leg_shin",
+            "leg_ankle",
+            "leg_foot",
+            "leg_toes",
+            "back_upper",
+            "back_middle",
+            "back_lower",
+            "belly_left",
+            "belly_right",
+            "belly_upper",
+            "belly_lower",
+            "eye_left",
+            "eye_right",
+            "eye_both",
+            "ear_left",
+            "ear_right",
+            "ear_both",
+            "tooth_left",
+            "tooth_right",
+            "tooth_upper",
+            "tooth_lower" -> AAC_PAIN_STRENGTH_CHILDREN
+            "pain_light",
+            "pain_medium",
+            "pain_strong",
+            "pain_very_strong" -> AAC_PAIN_TIME_CHILDREN
+            in AAC_PAIN_TIME_IDS -> if (shouldShowPainContextChildren()) {
+                AAC_PAIN_CONTEXT_CHILDREN
+            } else {
+                emptyList()
+            }
+            else -> null
+        }
+    }
+
+    private fun shouldShowPainContextChildren(): Boolean {
+        return currentMainAacConversationItems.any { item ->
+            val itemId = normalizeMainAacKey(item.id)
+            itemId in AAC_PAIN_LEG_CONTEXT_IDS || itemId in AAC_PAIN_BACK_CONTEXT_IDS
         }
     }
 

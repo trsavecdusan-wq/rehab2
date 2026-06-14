@@ -544,14 +544,7 @@ object AacStarterContentV1 {
             "arm_elbow",
             "arm_forearm",
             "arm_wrist",
-            "arm_fingers",
-            "pain_light",
-            "pain_medium",
-            "pain_strong",
-            "pain_very_strong",
-            "pain_when_moving",
-            "pain_when_lifting",
-            "pain_when_gripping"
+            "arm_fingers"
         )
     }
 
@@ -563,14 +556,7 @@ object AacStarterContentV1 {
             "leg_shin",
             "leg_ankle",
             "leg_foot",
-            "leg_toes",
-            "pain_light",
-            "pain_medium",
-            "pain_strong",
-            "pain_very_strong",
-            "pain_when_walking",
-            "pain_when_sitting",
-            "pain_when_standing"
+            "leg_toes"
         )
     }
 
@@ -578,14 +564,7 @@ object AacStarterContentV1 {
         return listOf(
             "back_upper",
             "back_middle",
-            "back_lower",
-            "pain_light",
-            "pain_medium",
-            "pain_strong",
-            "pain_very_strong",
-            "pain_when_walking",
-            "pain_when_sitting",
-            "pain_when_standing"
+            "back_lower"
         )
     }
 
@@ -594,11 +573,7 @@ object AacStarterContentV1 {
             "belly_left",
             "belly_right",
             "belly_upper",
-            "belly_lower",
-            "pain_light",
-            "pain_medium",
-            "pain_strong",
-            "pain_very_strong"
+            "belly_lower"
         )
     }
 

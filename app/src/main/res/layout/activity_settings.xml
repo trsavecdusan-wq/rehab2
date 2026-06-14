@@ -900,7 +900,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="ZaÄŤetna verzija prikaĹľe samo najpogostejĹˇe veje. RazĹˇirjena verzija doda oko, uho, nos, usta, zob, vrat in podrobnejĹˇe podveje."
+            android:text="Za&#269;etna verzija prika&#382;e samo najpogostej&#353;e veje. Raz&#353;irjena verzija doda oko, uho, nos, usta, zob, vrat in podrobnej&#353;e podveje."
             android:textColor="#C8D0D8"
             android:textSize="15sp" />
 
@@ -911,7 +911,7 @@
             android:layout_marginBottom="12dp"
             android:minHeight="56dp"
             android:paddingVertical="8dp"
-            android:text="BOLI ME â€” razĹˇirjena verzija"
+            android:text="BOLI ME &#8212; raz&#353;irjena verzija"
             android:textColor="#F4F7FA"
             android:textSize="16sp"
             android:textStyle="bold" />
