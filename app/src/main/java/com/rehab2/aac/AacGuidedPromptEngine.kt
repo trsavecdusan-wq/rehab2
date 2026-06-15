@@ -57,7 +57,7 @@ object AacGuidedPromptEngine {
                 childIds = listOf("head", "left_arm", "right_arm", "left_leg", "right_leg", "back", "belly", "chest")
             )
             "wc" -> AacGuidedPrompt(
-                questionSl = "Kaj potrebuje\u0161 glede WC?",
+                questionSl = "Izberi, kaj potrebuje\u0161.",
                 childIds = listOf("wc_now", "wc_soon", "wc_help", "dressing_help", "washing_help")
             )
             "real_world" -> AacGuidedPrompt(
