@@ -1104,6 +1104,7 @@ class MainActivity : AppCompatActivity() {
         if (currentMainAacConversationItems.size > 1) {
             currentMainAacConversationItems = currentMainAacConversationItems.dropLast(1)
             currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
+            selectedMainAacItemId = currentMainAacConversationItems.lastOrNull()?.id
             currentMainAacModifierItemsByGroup.clear()
             cancelMainAacGuidedAutoComplete()
             val parentItem = currentMainAacConversationParentItem
