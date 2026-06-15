@@ -40,7 +40,7 @@ object AacStarterContentV1 {
 
         starter("thirsty", "ŽEJNA SEM", "Izberi, kaj želiš piti.", "drink.thirsty", "DRINK", "drink", listOf("žejna", "piti"), placements = pageOne(4), opensSubicons = true, children = drinkRootChildren(), questionByLanguage = mapOf("sl" to "Izberi, kaj želiš piti.", "uk" to "Що ти хочеш пити?", "en" to "What do you want to drink?"), imagePath = "system/thirsty.png", iconSource = IconSource.SYSTEM),
         starter("hungry", "LAČNA SEM", "Lačna sem.", "food.hungry", "FOOD", "food", listOf("lačna", "jesti"), placements = pageOne(5), opensSubicons = true, children = listOf("soup", "bread", "fruit", "ice_cream", "potato", "rice", "food_yogurt", "food_banana", "food_apple", "food_lunch", "food_dinner", "sweet"), questionByLanguage = mapOf("sl" to "Kaj bi jedla?", "uk" to "Що ти хочеш їсти?", "en" to "What do you want to eat?"), imagePath = "system/hungry.png", iconSource = IconSource.SYSTEM),
-        starter("wc", "TOALETA", "Toaleta.", "care.wc", "NEED", "care", listOf("wc", "stranišče", "toaleta"), placements = pageOne(7), opensSubicons = true, children = listOf("wc_wet", "wc_dirty", "wc_wet_and_dirty", "nurse_help"), labelByLanguage = mapOf("uk" to "ТУАЛЕТ"), speechTextByLanguage = mapOf("uk" to "Туалет."), imagePath = "system/wc.png", iconSource = IconSource.SYSTEM),
+        starter("wc", "TOALETA", "Izberi, kaj potrebuješ.", "care.wc", "NEED", "care", listOf("wc", "stranišče", "toaleta"), placements = pageOne(7), opensSubicons = true, children = listOf("wc_wet", "wc_dirty", "wc_wet_and_dirty", "nurse_help"), questionByLanguage = mapOf("sl" to "Izberi, kaj potrebuješ."), labelByLanguage = mapOf("uk" to "ТУАЛЕТ"), speechTextByLanguage = mapOf("uk" to "Туалет."), imagePath = "system/wc.png", iconSource = IconSource.SYSTEM),
         starter("tired", "UTRUJENA", "Utrujena sem.", "feeling.tired", "FEELING", "feeling", listOf("utrujena", "počutje"), placements = pageOne(8), visibleUnderIds = listOf("feeling"), imagePath = "system/tired.png", iconSource = IconSource.SYSTEM),
 
         starter("what_root", "KAJ?", "Kaj?", "question.what", "QUESTION", "question", listOf("kaj", "vprašanje"), placements = pageOne(11), opensSubicons = true, children = listOf("activity_group", "what_do", "what_is_this", "what_is_happening", "what_next", "what_did_i_say"), questionByLanguage = mapOf("sl" to "Kaj želiš vprašati?"), imagePath = "system/what.png", iconSource = IconSource.SYSTEM),
@@ -332,6 +332,7 @@ object AacStarterContentV1 {
         starter("arm_elbow", "KOMOLEC", "Boli me komolec.", "pain.arm.elbow", "PAIN", "pain", listOf("komolec", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
         starter("arm_forearm", "PODLAHT", "Boli me podlaht.", "pain.arm.forearm", "PAIN", "pain", listOf("podlaht", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
         starter("arm_wrist", "ZAPESTJE", "Boli me zapestje.", "pain.arm.wrist", "PAIN", "pain", listOf("zapestje", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
+        starter("arm_palm", "DLAN", "dlan", "pain.arm.palm", "PAIN", "pain", listOf("dlan", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
         starter("arm_fingers", "PRSTI", "Bolijo me prsti na roki.", "pain.arm.fingers", "PAIN", "pain", listOf("prsti", "roka", "bolečina"), visibleUnderIds = listOf("left_arm", "right_arm"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
         starter("leg_hip", "KOLK", "Boli me kolk.", "pain.leg.hip", "PAIN", "pain", listOf("kolk", "noga", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
         starter("leg_thigh", "STEGNO", "Boli me stegno.", "pain.leg.thigh", "PAIN", "pain", listOf("stegno", "noga", "bolečina"), visibleUnderIds = listOf("left_leg", "right_leg"), opensSubicons = true, children = painStrengthChildren(), questionByLanguage = mapOf("sl" to "Kako močno boli?")),
@@ -578,6 +579,7 @@ object AacStarterContentV1 {
             "arm_elbow",
             "arm_forearm",
             "arm_wrist",
+            "arm_palm",
             "arm_fingers"
         )
     }

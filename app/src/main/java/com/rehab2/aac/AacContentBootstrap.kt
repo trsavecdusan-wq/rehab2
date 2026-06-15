@@ -500,8 +500,8 @@ object AacContentBootstrap {
 
         itemsById["wc"]?.let { item ->
             repaired += putIfDifferent(item, "labelSl", "TOALETA")
-            repaired += putIfDifferent(item, "speakTextSl", "Toaleta.")
-            repaired += putIfDifferent(item, "speechText", "Toaleta.")
+            repaired += putIfDifferent(item, "speakTextSl", "Izberi, kaj potrebuješ.")
+            repaired += putIfDifferent(item, "speechText", "Izberi, kaj potrebuješ.")
             repaired += putLanguageValue(item, "labelByLanguage", "uk", "Đ˘ĐŁĐĐ›Đ•Đ˘")
             repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Đ˘ŃĐ°Đ»ĐµŃ‚.")
             repaired += putIfDifferent(item, "actionType", "open_subicons")
@@ -509,6 +509,7 @@ object AacContentBootstrap {
             repaired += putIfDifferent(item, "speaksImmediately", false)
             repaired += replaceChildrenIfDifferent(item, TOALETA_V1_WC_CHILDREN)
             repaired += removeQuestionMetadata(item)
+            repaired += putLanguageValue(item, "questionByLanguage", "sl", "Izberi, kaj potrebuješ.")
         }
 
         itemsById["nurse_help"]?.let { item ->
@@ -545,7 +546,7 @@ object AacContentBootstrap {
                 speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ·Đ°ĐĽŃ–Đ˝Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐżŃ–Đ´ĐłŃĐ·ĐľĐş. ĐŻ ĐĽĐľĐşŃ€Đ° Ń– Đ±Ń€ŃĐ´Đ˝Đ°."
             ),
             "help_dressing" to ToaletaTerminalRepair(
-                labelSl = "OBLAÄŚENJE",
+                labelSl = "OBLAČENJE",
                 labelUk = "ĐžĐ”ĐŻĐ“",
                 speechSl = "Prosim, pomagajte mi, da se obleÄŤem.",
                 speechUk = "Đ”ĐľĐżĐľĐĽĐľĐ¶Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐľĐ´ŃŹĐłĐ˝ŃŃ‚Đ¸ŃŃŹ."
@@ -2270,6 +2271,7 @@ object AacContentBootstrap {
         Triple("arm_elbow", painStrengthChildren(), "Kako močno boli?"),
         Triple("arm_forearm", painStrengthChildren(), "Kako močno boli?"),
         Triple("arm_wrist", painStrengthChildren(), "Kako močno boli?"),
+        Triple("arm_palm", painStrengthChildren(), "Kako močno boli?"),
         Triple("arm_fingers", painStrengthChildren(), "Kako močno boli?"),
         Triple("leg_hip", painStrengthChildren(), "Kako močno boli?"),
         Triple("leg_thigh", painStrengthChildren(), "Kako močno boli?"),
@@ -2343,6 +2345,7 @@ object AacContentBootstrap {
             "arm_elbow",
             "arm_forearm",
             "arm_wrist",
+            "arm_palm",
             "arm_fingers"
         )
     }

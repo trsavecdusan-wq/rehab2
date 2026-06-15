@@ -301,6 +301,7 @@ class MainActivity : AppCompatActivity() {
             "arm_elbow",
             "arm_forearm",
             "arm_wrist",
+            "arm_palm",
             "arm_fingers",
             "leg_hip",
             "leg_thigh",
@@ -363,6 +364,7 @@ class MainActivity : AppCompatActivity() {
             "arm_elbow",
             "arm_forearm",
             "arm_wrist",
+            "arm_palm",
             "arm_fingers"
         )
         private val AAC_PAIN_BACK_DETAIL_CHILDREN = listOf(
@@ -411,6 +413,81 @@ class MainActivity : AppCompatActivity() {
             "head" to 22,
             "right_leg" to 23,
             "right_arm" to 24
+        )
+        private val AAC_DEFAULT_VISUAL_SLOTS_BY_PARENT_ID = mapOf(
+            "wc" to mapOf(
+                "nurse_help" to 12,
+                "wc_wet" to 20,
+                "wc_wet_and_dirty" to 22,
+                "wc_dirty" to 24
+            ),
+            "nurse_help" to mapOf(
+                "help_washing" to 11,
+                "help_showering" to 13,
+                "help_dressing" to 20,
+                "noticed_blood" to 24
+            ),
+            "pain" to AAC_PAIN_ROOT_VISUAL_SLOT_BY_ID,
+            "belly" to mapOf(
+                "belly_upper" to 13,
+                "belly_left" to 16,
+                "belly_right" to 18,
+                "belly_lower" to 22
+            ),
+            "back" to mapOf(
+                "back_upper" to 12,
+                "back_middle" to 17,
+                "back_lower" to 22
+            ),
+            "left_leg" to mapOf(
+                "leg_hip" to 10,
+                "leg_thigh" to 11,
+                "leg_knee" to 13,
+                "leg_shin" to 14,
+                "leg_ankle" to 20,
+                "leg_foot" to 22,
+                "leg_toes" to 24
+            ),
+            "right_leg" to mapOf(
+                "leg_hip" to 10,
+                "leg_thigh" to 11,
+                "leg_knee" to 13,
+                "leg_shin" to 14,
+                "leg_ankle" to 20,
+                "leg_foot" to 22,
+                "leg_toes" to 24
+            ),
+            "left_arm" to mapOf(
+                "arm_shoulder" to 10,
+                "arm_upper" to 11,
+                "arm_elbow" to 13,
+                "arm_forearm" to 14,
+                "arm_wrist" to 20,
+                "arm_palm" to 22,
+                "arm_fingers" to 24
+            ),
+            "right_arm" to mapOf(
+                "arm_shoulder" to 10,
+                "arm_upper" to 11,
+                "arm_elbow" to 13,
+                "arm_forearm" to 14,
+                "arm_wrist" to 20,
+                "arm_palm" to 22,
+                "arm_fingers" to 24
+            )
+        )
+        private val AAC_PAIN_STRENGTH_VISUAL_SLOT_BY_ID = mapOf(
+            "pain_very_strong" to 12,
+            "pain_light" to 20,
+            "pain_medium" to 22,
+            "pain_strong" to 24
+        )
+        private val AAC_PAIN_TIME_VISUAL_SLOT_BY_ID = mapOf(
+            "pain_since_yesterday" to 10,
+            "pain_since_long" to 14,
+            "pain_since_today" to 20,
+            "pain_since_morning" to 22,
+            "pain_since_evening" to 24
         )
         private val CORE_V2_FIXED_TOP_ROW_POSITIONS = mapOf(
             "no" to 1,
@@ -1202,7 +1279,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         val normalVisibleItems = visibleItems.filter { item -> item.id !in fixedIds }
-        if (applyPainRootVisualSlots(slots, normalVisibleItems, gridSize)) {
+        if (applyDefaultVisualSlots(slots, normalVisibleItems, gridSize)) {
             return slots
         }
         normalVisibleItems
@@ -1211,23 +1288,36 @@ class MainActivity : AppCompatActivity() {
         return slots
     }
 
-    private fun applyPainRootVisualSlots(
+    private fun applyDefaultVisualSlots(
         slots: MutableList<AacItem?>,
         items: List<AacItem>,
         gridSize: Int
     ): Boolean {
-        if (gridSize != 5 || normalizeMainAacKey(selectedMainAacItemId.orEmpty()) != "pain") {
+        if (gridSize != 5) {
             return false
         }
+        val parentId = normalizeMainAacKey(selectedMainAacItemId.orEmpty())
         val itemIds = items.map { item -> normalizeMainAacKey(item.id) }.toSet()
-        if (itemIds != AAC_PAIN_ROOT_VISUAL_SLOT_BY_ID.keys) {
+        val slotMap = AAC_DEFAULT_VISUAL_SLOTS_BY_PARENT_ID[parentId]
+            ?: painSequentialSlotMapFor(items)
+            ?: return false
+        if (itemIds != slotMap.keys) {
             return false
         }
         items.forEach { item ->
-            val slotIndex = AAC_PAIN_ROOT_VISUAL_SLOT_BY_ID[normalizeMainAacKey(item.id)] ?: return@forEach
+            val slotIndex = slotMap[normalizeMainAacKey(item.id)] ?: return@forEach
             slots[slotIndex] = item
         }
         return true
+    }
+
+    private fun painSequentialSlotMapFor(items: List<AacItem>): Map<String, Int>? {
+        val itemIds = items.map { item -> normalizeMainAacKey(item.id) }.toSet()
+        return when (itemIds) {
+            AAC_PAIN_STRENGTH_VISUAL_SLOT_BY_ID.keys -> AAC_PAIN_STRENGTH_VISUAL_SLOT_BY_ID
+            AAC_PAIN_TIME_VISUAL_SLOT_BY_ID.keys -> AAC_PAIN_TIME_VISUAL_SLOT_BY_ID
+            else -> null
+        }
     }
 
     private fun resetMainAacRoot() {
@@ -1374,7 +1464,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun prepareMainAacContextPrompt(item: AacItem) {
         clearMainAacSentenceState(clearConversationContext = false)
-        if (item.id == "wc" || item.id == "nurse_help") {
+        if (item.id == "nurse_help") {
             hideMainAacQuestion()
             return
         }
@@ -2659,6 +2749,7 @@ class MainActivity : AppCompatActivity() {
             "arm_elbow",
             "arm_forearm",
             "arm_wrist",
+            "arm_palm",
             "arm_fingers",
             "leg_hip",
             "leg_thigh",
