@@ -10,6 +10,8 @@ object AacSentenceBuilder {
             AacWcV1SentenceBuilder.buildSentence(items).takeIf { it.isNotBlank() }?.let { return it }
         }
 
+        hungryV1TerminalSentence(items)?.let { return it }
+
         simpleSentence(items)?.let { return it }
 
         val keys = items.flatMap(::itemKeys).toSet()
@@ -44,6 +46,11 @@ object AacSentenceBuilder {
             keys.any { it in WC_KEYS } -> "Moram na WC."
             else -> null
         }
+    }
+
+    private fun hungryV1TerminalSentence(items: List<AacItem>): String? {
+        // TODO: multi-item meal sentence builder in future version.
+        return HUNGRY_V1_TERMINAL_SENTENCES[items.lastOrNull()?.idKey()]
     }
 
     private fun buildPeopleActionSentence(items: List<AacItem>): String {
@@ -404,6 +411,49 @@ object AacSentenceBuilder {
     private val MISS_INTENSITIES = mapOf(
         "miss_little" to "little",
         "miss_very" to "very"
+    )
+
+    private val HUNGRY_V1_TERMINAL_SENTENCES = mapOf(
+        "hungry_beef_soup" to "Prosim, rada bi govejo juho.",
+        "hungry_chicken_soup" to "Prosim, rada bi kokošjo juho.",
+        "hungry_vegetable_soup" to "Prosim, rada bi zelenjavno juho.",
+        "hungry_pork" to "Prosim, rada bi svinjino.",
+        "hungry_chicken" to "Prosim, rada bi piščanca.",
+        "hungry_beef" to "Prosim, rada bi govedino.",
+        "hungry_veal" to "Prosim, rada bi teletino.",
+        "hungry_lamb" to "Prosim, rada bi jagnjetino.",
+        "hungry_kid_goat" to "Prosim, rada bi kozlička.",
+        "hungry_fish" to "Prosim, rada bi ribo.",
+        "hungry_pasta" to "Prosim, rada bi testenine.",
+        "hungry_rice" to "Prosim, rada bi riž.",
+        "hungry_vegetables" to "Prosim, rada bi zelenjavo.",
+        "hungry_roasted_potato" to "Prosim, rada bi pražen krompir.",
+        "hungry_fries" to "Prosim, rada bi pomfri.",
+        "hungry_mashed_potato" to "Prosim, rada bi pire krompir.",
+        "hungry_yogurt" to "Prosim, rada bi jogurt.",
+        "hungry_fruit_yogurt" to "Prosim, rada bi sadni jogurt.",
+        "hungry_chips" to "Prosim, rada bi čips.",
+        "hungry_crackers" to "Prosim, rada bi krekerje.",
+        "hungry_hamburger" to "Prosim, rada bi hamburger.",
+        "hungry_cevapcici" to "Prosim, rada bi čevapčiče.",
+        "hungry_pleskavica" to "Prosim, rada bi pleskavico.",
+        "hungry_hotdog" to "Prosim, rada bi hotdog.",
+        "hungry_pizza" to "Prosim, rada bi pico.",
+        "hungry_burek" to "Prosim, rada bi burek.",
+        "hungry_toast" to "Prosim, rada bi toast.",
+        "hungry_pancakes" to "Prosim, rada bi palačinke.",
+        "hungry_apple" to "Prosim, rada bi jabolko.",
+        "hungry_pear" to "Prosim, rada bi hruško.",
+        "hungry_banana" to "Prosim, rada bi banano.",
+        "hungry_grapes" to "Prosim, rada bi grozdje.",
+        "hungry_blueberries" to "Prosim, rada bi borovnice.",
+        "hungry_strawberries" to "Prosim, rada bi jagode.",
+        "hungry_kiwi" to "Prosim, rada bi kivi.",
+        "hungry_ice_cream" to "Prosim, rada bi sladoled.",
+        "hungry_cake" to "Prosim, rada bi torto.",
+        "hungry_cookies" to "Prosim, rada bi piškote.",
+        "hungry_doughnut" to "Prosim, rada bi krof.",
+        "hungry_kremsnita" to "Prosim, rada bi kremšnito."
     )
 
     private val NEED_TARGETS = mapOf(

@@ -187,6 +187,7 @@ object AacContentBootstrap {
         val mergedMissingSystemItems = mergeMissingSystemItems(itemsArray, fallbackItems + starterItems)
         val repairedStarterCategoryChildren = repairStarterCategoryChildren(itemsArray, starterItems)
         val repairedToaletaV1Tree = repairToaletaV1Tree(itemsArray)
+        val repairedHungryV1TestTree = repairHungryV1TestTree(itemsArray, starterItems)
         val repairedPeopleGroupChildren = repairPeopleGroupChildren(itemsArray)
         val repairedConversationTreeV3Metadata = repairConversationTreeV3Metadata(itemsArray, starterItems)
         val repairedRootSystemIcons = repairRootSystemIconMetadata(context, itemsArray)
@@ -240,6 +241,7 @@ object AacContentBootstrap {
             mergedMissingSystemItems > 0 ||
             repairedStarterCategoryChildren > 0 ||
             repairedToaletaV1Tree > 0 ||
+            repairedHungryV1TestTree > 0 ||
             repairedPeopleGroupChildren > 0 ||
             repairedConversationTreeV3Metadata > 0 ||
             repairedRootSystemIcons > 0 ||
@@ -490,6 +492,69 @@ object AacContentBootstrap {
         return repaired
     }
 
+    private fun repairHungryV1TestTree(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
+        val starterById = starterItems.associateBy { item -> item.id }
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+        var repaired = 0
+
+        HUNGRY_V1_TEST_IDS.forEach { id ->
+            val item = itemsById[id] ?: return@forEach
+            if (isProtectedLocalAacItem(item)) return@forEach
+            val starter = starterById[id] ?: return@forEach
+            repaired += putIfDifferent(item, "labelSl", starter.labelSl)
+            repaired += putIfDifferent(item, "speakTextSl", starter.speakTextSl.orEmpty())
+            repaired += putIfDifferent(item, "speechText", starter.speechText.orEmpty())
+            repaired += putIfDifferent(item, "actionType", starter.actionType)
+            repaired += putIfDifferent(item, "opensSubicons", starter.opensSubicons)
+            repaired += putIfDifferent(item, "speaksImmediately", starter.speaksImmediately)
+            if (starter.children.isEmpty()) {
+                repaired += removeChildrenIfPresent(item)
+            } else {
+                repaired += replaceChildrenIfDifferent(item, starter.children)
+            }
+            if (id != "hungry") {
+                repaired += ensureOnlyVisibleUnder(item, starter.visibleUnderIds)
+            }
+            if (starter.questionByLanguage.isNotEmpty()) {
+                starter.questionByLanguage.forEach { (languageCode, question) ->
+                    repaired += putLanguageValue(item, "questionByLanguage", languageCode, question)
+                }
+            } else {
+                repaired += removeQuestionMetadata(item)
+            }
+        }
+
+        HUNGRY_V1_TEST_LEGACY_CHILDREN.forEach { id ->
+            itemsById[id]?.let { item ->
+                if (isProtectedLocalAacItem(item)) return@let
+                repaired += removeVisibleUnderValue(item, "hungry")
+            }
+        }
+
+        return repaired
+    }
+
+    private fun isProtectedLocalAacItem(item: JSONObject): Boolean {
+        val source = item.optString("source")
+            .ifBlank { item.optString("iconSource") }
+            .trim()
+            .uppercase()
+        return item.optBoolean("lockedByUser", false) ||
+            item.optBoolean("modifiedByTherapist", false) ||
+            item.optBoolean("userEdited", false) ||
+            item.optBoolean("therapistEdited", false) ||
+            item.optBoolean("manualEdit", false) ||
+            item.optBoolean("manualOverride", false) ||
+            item.optBoolean("customized", false) ||
+            source == "CUSTOM" ||
+            source == "PATIENT" ||
+            source == "THERAPIST"
+    }
+
     private fun repairToaletaV1Tree(itemsArray: JSONArray): Int {
         val itemsById = itemObjects(itemsArray)
             .mapNotNull { item ->
@@ -667,6 +732,74 @@ object AacContentBootstrap {
         val labelUk: String,
         val speechSl: String,
         val speechUk: String
+    )
+
+    private val HUNGRY_V1_TEST_IDS = setOf(
+        "hungry",
+        "hungry_main_dish",
+        "hungry_snack",
+        "hungry_fast_food",
+        "hungry_fruit",
+        "hungry_dessert",
+        "hungry_soup",
+        "hungry_meat",
+        "hungry_side_dishes",
+        "hungry_potato",
+        "hungry_beef_soup",
+        "hungry_chicken_soup",
+        "hungry_vegetable_soup",
+        "hungry_pork",
+        "hungry_chicken",
+        "hungry_beef",
+        "hungry_veal",
+        "hungry_lamb",
+        "hungry_kid_goat",
+        "hungry_fish",
+        "hungry_pasta",
+        "hungry_rice",
+        "hungry_vegetables",
+        "hungry_roasted_potato",
+        "hungry_fries",
+        "hungry_mashed_potato",
+        "hungry_yogurt",
+        "hungry_fruit_yogurt",
+        "hungry_chips",
+        "hungry_crackers",
+        "hungry_hamburger",
+        "hungry_cevapcici",
+        "hungry_pleskavica",
+        "hungry_hotdog",
+        "hungry_pizza",
+        "hungry_burek",
+        "hungry_toast",
+        "hungry_pancakes",
+        "hungry_apple",
+        "hungry_pear",
+        "hungry_banana",
+        "hungry_grapes",
+        "hungry_blueberries",
+        "hungry_strawberries",
+        "hungry_kiwi",
+        "hungry_ice_cream",
+        "hungry_cake",
+        "hungry_cookies",
+        "hungry_doughnut",
+        "hungry_kremsnita"
+    )
+
+    private val HUNGRY_V1_TEST_LEGACY_CHILDREN = setOf(
+        "soup",
+        "bread",
+        "fruit",
+        "ice_cream",
+        "potato",
+        "rice",
+        "food_yogurt",
+        "food_banana",
+        "food_apple",
+        "food_lunch",
+        "food_dinner",
+        "sweet"
     )
 
     private fun repairPeopleGroupChildren(itemsArray: JSONArray): Int {

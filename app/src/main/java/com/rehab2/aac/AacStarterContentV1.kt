@@ -39,7 +39,7 @@ object AacStarterContentV1 {
         starter("call_my_therapist", "POKLIČI TERAPEVTA", PatientProfileSettings.EMPTY_FIELD_SENTENCE, "patient.call_my_therapist", "PEOPLE", "patient_profile", listOf("pokliči", "terapevt"), visibleUnderIds = listOf("about_me")),
 
         starter("thirsty", "ŽEJNA SEM", "Izberi, kaj želiš piti.", "drink.thirsty", "DRINK", "drink", listOf("žejna", "piti"), placements = pageOne(4), opensSubicons = true, children = drinkRootChildren(), questionByLanguage = mapOf("sl" to "Izberi, kaj želiš piti.", "uk" to "Що ти хочеш пити?", "en" to "What do you want to drink?"), imagePath = "system/thirsty.png", iconSource = IconSource.SYSTEM),
-        starter("hungry", "LAČNA SEM", "Lačna sem.", "food.hungry", "FOOD", "food", listOf("lačna", "jesti"), placements = pageOne(5), opensSubicons = true, children = listOf("soup", "bread", "fruit", "ice_cream", "potato", "rice", "food_yogurt", "food_banana", "food_apple", "food_lunch", "food_dinner", "sweet"), questionByLanguage = mapOf("sl" to "Kaj bi jedla?", "uk" to "Що ти хочеш їсти?", "en" to "What do you want to eat?"), imagePath = "system/hungry.png", iconSource = IconSource.SYSTEM),
+        starter("hungry", "LAČNA SEM", "Prosim, rada bi nekaj za jesti.", "food.hungry", "FOOD", "food", listOf("lačna", "jesti"), placements = pageOne(5), opensSubicons = true, children = hungryRootChildren(), questionByLanguage = mapOf("sl" to "Kaj bi jedla?", "uk" to "Що ти хочеш їсти?", "en" to "What do you want to eat?"), imagePath = "system/hungry.png", iconSource = IconSource.SYSTEM),
         starter("wc", "TOALETA", "Izberi, kaj potrebuješ.", "care.wc", "NEED", "care", listOf("wc", "stranišče", "toaleta"), placements = pageOne(7), opensSubicons = true, children = listOf("wc_wet", "wc_dirty", "wc_wet_and_dirty", "nurse_help"), questionByLanguage = mapOf("sl" to "Izberi, kaj potrebuješ."), labelByLanguage = mapOf("uk" to "ТУАЛЕТ"), speechTextByLanguage = mapOf("uk" to "Туалет."), imagePath = "system/wc.png", iconSource = IconSource.SYSTEM),
         starter("tired", "UTRUJENA", "Utrujena sem.", "feeling.tired", "FEELING", "feeling", listOf("utrujena", "počutje"), placements = pageOne(8), visibleUnderIds = listOf("feeling"), imagePath = "system/tired.png", iconSource = IconSource.SYSTEM),
 
@@ -250,6 +250,55 @@ object AacStarterContentV1 {
         starter("not_thirsty", "NISEM ŽEJNA", "Nisem žejna.", "drink.not_thirsty", "DRINK", "drink", listOf("nisem_žejna", "piti"), visibleUnderIds = listOf("drink", "thirsty"), imagePath = "custom/state/not_thirsty.jpg", iconSource = IconSource.CUSTOM),
 
         starter("not_hungry", "NISEM LAČNA", "Nisem lačna.", "food.not_hungry", "FOOD", "food", listOf("nisem_lačna", "jesti"), visibleUnderIds = listOf("food", "hungry"), imagePath = "custom/state/not_hungry.jpg", iconSource = IconSource.CUSTOM),
+        starter("hungry_main_dish", "GLAVNA JED", "Glavna jed.", "food.hungry.main_dish", "FOOD", "food", listOf("glavna_jed", "jesti"), visibleUnderIds = listOf("hungry"), opensSubicons = true, children = hungryMainDishChildren(), questionByLanguage = mapOf("sl" to "Izberi glavno jed.")),
+        starter("hungry_snack", "PRIGRIZEK", "Prigrizek.", "food.hungry.snack", "FOOD", "food", listOf("prigrizek", "jesti"), visibleUnderIds = listOf("hungry"), opensSubicons = true, children = hungrySnackChildren(), questionByLanguage = mapOf("sl" to "Izberi prigrizek.")),
+        starter("hungry_fast_food", "HITRA PREHRANA", "Hitra prehrana.", "food.hungry.fast_food", "FOOD", "food", listOf("hitra_prehrana", "jesti"), visibleUnderIds = listOf("hungry"), opensSubicons = true, children = hungryFastFoodChildren(), questionByLanguage = mapOf("sl" to "Izberi hitro prehrano.")),
+        starter("hungry_fruit", "SADJE", "Sadje.", "food.hungry.fruit", "FOOD", "food", listOf("sadje", "jesti"), visibleUnderIds = listOf("hungry"), opensSubicons = true, children = hungryFruitChildren(), questionByLanguage = mapOf("sl" to "Izberi sadje.")),
+        starter("hungry_dessert", "SLADICA", "Sladica.", "food.hungry.dessert", "FOOD", "food", listOf("sladica", "jesti"), visibleUnderIds = listOf("hungry"), opensSubicons = true, children = hungryDessertChildren(), questionByLanguage = mapOf("sl" to "Izberi sladico.")),
+        starter("hungry_soup", "JUHA", "Juha.", "food.hungry.soup", "FOOD", "food", listOf("juha", "jesti"), visibleUnderIds = listOf("hungry_main_dish"), opensSubicons = true, children = hungrySoupChildren(), questionByLanguage = mapOf("sl" to "Izberi juho.")),
+        starter("hungry_meat", "MESO", "Meso.", "food.hungry.meat", "FOOD", "food", listOf("meso", "jesti"), visibleUnderIds = listOf("hungry_main_dish"), opensSubicons = true, children = hungryMeatChildren(), questionByLanguage = mapOf("sl" to "Izberi meso.")),
+        starter("hungry_side_dishes", "PRILOGE", "Priloge.", "food.hungry.side_dishes", "FOOD", "food", listOf("priloge", "jesti"), visibleUnderIds = listOf("hungry_main_dish"), opensSubicons = true, children = hungrySideDishChildren(), questionByLanguage = mapOf("sl" to "Izberi prilogo.")),
+        starter("hungry_potato", "KROMPIR", "Krompir.", "food.hungry.potato", "FOOD", "food", listOf("krompir", "jesti"), visibleUnderIds = listOf("hungry_side_dishes"), opensSubicons = true, children = hungryPotatoChildren(), questionByLanguage = mapOf("sl" to "Izberi krompir.")),
+        starter("hungry_beef_soup", "GOVEJA", "Prosim, rada bi govejo juho.", "food.hungry.beef_soup", "FOOD", "food", listOf("goveja", "juha", "jesti"), visibleUnderIds = listOf("hungry_soup")),
+        starter("hungry_chicken_soup", "KOKOŠJA", "Prosim, rada bi kokošjo juho.", "food.hungry.chicken_soup", "FOOD", "food", listOf("kokošja", "juha", "jesti"), visibleUnderIds = listOf("hungry_soup")),
+        starter("hungry_vegetable_soup", "ZELENJAVNA", "Prosim, rada bi zelenjavno juho.", "food.hungry.vegetable_soup", "FOOD", "food", listOf("zelenjavna", "juha", "jesti"), visibleUnderIds = listOf("hungry_soup")),
+        starter("hungry_pork", "SVINJINA", "Prosim, rada bi svinjino.", "food.hungry.pork", "FOOD", "food", listOf("svinjina", "jesti"), visibleUnderIds = listOf("hungry_meat")),
+        starter("hungry_chicken", "PIŠČANEC", "Prosim, rada bi piščanca.", "food.hungry.chicken", "FOOD", "food", listOf("piščanec", "jesti"), visibleUnderIds = listOf("hungry_meat")),
+        starter("hungry_beef", "GOVEDINA", "Prosim, rada bi govedino.", "food.hungry.beef", "FOOD", "food", listOf("govedina", "jesti"), visibleUnderIds = listOf("hungry_meat")),
+        starter("hungry_veal", "TELETINA", "Prosim, rada bi teletino.", "food.hungry.veal", "FOOD", "food", listOf("teletina", "jesti"), visibleUnderIds = listOf("hungry_meat")),
+        starter("hungry_lamb", "JAGNJETINA", "Prosim, rada bi jagnjetino.", "food.hungry.lamb", "FOOD", "food", listOf("jagnjetina", "jesti"), visibleUnderIds = listOf("hungry_meat")),
+        starter("hungry_kid_goat", "KOZLIČEK", "Prosim, rada bi kozlička.", "food.hungry.kid_goat", "FOOD", "food", listOf("kozliček", "jesti"), visibleUnderIds = listOf("hungry_meat")),
+        starter("hungry_fish", "RIBA", "Prosim, rada bi ribo.", "food.hungry.fish", "FOOD", "food", listOf("riba", "jesti"), visibleUnderIds = listOf("hungry_meat")),
+        starter("hungry_pasta", "TESTENINE", "Prosim, rada bi testenine.", "food.hungry.pasta", "FOOD", "food", listOf("testenine", "jesti"), visibleUnderIds = listOf("hungry_side_dishes")),
+        starter("hungry_rice", "RIŽ", "Prosim, rada bi riž.", "food.hungry.rice", "FOOD", "food", listOf("riž", "jesti"), visibleUnderIds = listOf("hungry_side_dishes")),
+        starter("hungry_vegetables", "ZELENJAVA", "Prosim, rada bi zelenjavo.", "food.hungry.vegetables", "FOOD", "food", listOf("zelenjava", "jesti"), visibleUnderIds = listOf("hungry_side_dishes")),
+        starter("hungry_roasted_potato", "PRAŽEN KROMPIR", "Prosim, rada bi pražen krompir.", "food.hungry.roasted_potato", "FOOD", "food", listOf("pražen_krompir", "jesti"), visibleUnderIds = listOf("hungry_potato")),
+        starter("hungry_fries", "POMFRI", "Prosim, rada bi pomfri.", "food.hungry.fries", "FOOD", "food", listOf("pomfri", "jesti"), visibleUnderIds = listOf("hungry_potato")),
+        starter("hungry_mashed_potato", "PIRE", "Prosim, rada bi pire krompir.", "food.hungry.mashed_potato", "FOOD", "food", listOf("pire", "krompir", "jesti"), visibleUnderIds = listOf("hungry_potato")),
+        starter("hungry_yogurt", "JOGURT", "Prosim, rada bi jogurt.", "food.hungry.yogurt", "FOOD", "food", listOf("jogurt", "jesti"), visibleUnderIds = listOf("hungry_snack")),
+        starter("hungry_fruit_yogurt", "SADNI JOGURT", "Prosim, rada bi sadni jogurt.", "food.hungry.fruit_yogurt", "FOOD", "food", listOf("sadni_jogurt", "jesti"), visibleUnderIds = listOf("hungry_snack")),
+        starter("hungry_chips", "ČIPS", "Prosim, rada bi čips.", "food.hungry.chips", "FOOD", "food", listOf("čips", "jesti"), visibleUnderIds = listOf("hungry_snack")),
+        starter("hungry_crackers", "KREKERJI", "Prosim, rada bi krekerje.", "food.hungry.crackers", "FOOD", "food", listOf("krekerji", "jesti"), visibleUnderIds = listOf("hungry_snack")),
+        starter("hungry_hamburger", "HAMBURGER", "Prosim, rada bi hamburger.", "food.hungry.hamburger", "FOOD", "food", listOf("hamburger", "jesti"), visibleUnderIds = listOf("hungry_fast_food")),
+        starter("hungry_cevapcici", "ČEVAPČIČI", "Prosim, rada bi čevapčiče.", "food.hungry.cevapcici", "FOOD", "food", listOf("čevapčiči", "jesti"), visibleUnderIds = listOf("hungry_fast_food")),
+        starter("hungry_pleskavica", "PLESKAVICA", "Prosim, rada bi pleskavico.", "food.hungry.pleskavica", "FOOD", "food", listOf("pleskavica", "jesti"), visibleUnderIds = listOf("hungry_fast_food")),
+        starter("hungry_hotdog", "HOTDOG", "Prosim, rada bi hotdog.", "food.hungry.hotdog", "FOOD", "food", listOf("hotdog", "jesti"), visibleUnderIds = listOf("hungry_fast_food")),
+        starter("hungry_pizza", "PICA", "Prosim, rada bi pico.", "food.hungry.pizza", "FOOD", "food", listOf("pica", "jesti"), visibleUnderIds = listOf("hungry_fast_food")),
+        starter("hungry_burek", "BUREK", "Prosim, rada bi burek.", "food.hungry.burek", "FOOD", "food", listOf("burek", "jesti"), visibleUnderIds = listOf("hungry_fast_food")),
+        starter("hungry_toast", "TOAST", "Prosim, rada bi toast.", "food.hungry.toast", "FOOD", "food", listOf("toast", "jesti"), visibleUnderIds = listOf("hungry_fast_food")),
+        starter("hungry_pancakes", "PALAČINKE", "Prosim, rada bi palačinke.", "food.hungry.pancakes", "FOOD", "food", listOf("palačinke", "jesti"), visibleUnderIds = listOf("hungry_fast_food")),
+        starter("hungry_apple", "JABOLKO", "Prosim, rada bi jabolko.", "food.hungry.apple", "FOOD", "food", listOf("jabolko", "jesti"), visibleUnderIds = listOf("hungry_fruit")),
+        starter("hungry_pear", "HRUŠKA", "Prosim, rada bi hruško.", "food.hungry.pear", "FOOD", "food", listOf("hruška", "jesti"), visibleUnderIds = listOf("hungry_fruit")),
+        starter("hungry_banana", "BANANA", "Prosim, rada bi banano.", "food.hungry.banana", "FOOD", "food", listOf("banana", "jesti"), visibleUnderIds = listOf("hungry_fruit")),
+        starter("hungry_grapes", "GROZDJE", "Prosim, rada bi grozdje.", "food.hungry.grapes", "FOOD", "food", listOf("grozdje", "jesti"), visibleUnderIds = listOf("hungry_fruit")),
+        starter("hungry_blueberries", "BOROVNICE", "Prosim, rada bi borovnice.", "food.hungry.blueberries", "FOOD", "food", listOf("borovnice", "jesti"), visibleUnderIds = listOf("hungry_fruit")),
+        starter("hungry_strawberries", "JAGODE", "Prosim, rada bi jagode.", "food.hungry.strawberries", "FOOD", "food", listOf("jagode", "jesti"), visibleUnderIds = listOf("hungry_fruit")),
+        starter("hungry_kiwi", "KIVI", "Prosim, rada bi kivi.", "food.hungry.kiwi", "FOOD", "food", listOf("kivi", "jesti"), visibleUnderIds = listOf("hungry_fruit")),
+        starter("hungry_ice_cream", "SLADOLED", "Prosim, rada bi sladoled.", "food.hungry.ice_cream", "FOOD", "food", listOf("sladoled", "jesti"), visibleUnderIds = listOf("hungry_dessert")),
+        starter("hungry_cake", "TORTA", "Prosim, rada bi torto.", "food.hungry.cake", "FOOD", "food", listOf("torta", "jesti"), visibleUnderIds = listOf("hungry_dessert")),
+        starter("hungry_cookies", "PIŠKOTI", "Prosim, rada bi piškote.", "food.hungry.cookies", "FOOD", "food", listOf("piškoti", "jesti"), visibleUnderIds = listOf("hungry_dessert")),
+        starter("hungry_doughnut", "KROF", "Prosim, rada bi krof.", "food.hungry.doughnut", "FOOD", "food", listOf("krof", "jesti"), visibleUnderIds = listOf("hungry_dessert")),
+        starter("hungry_kremsnita", "KREMŠNITA", "Prosim, rada bi kremšnito.", "food.hungry.kremsnita", "FOOD", "food", listOf("kremšnita", "jesti"), visibleUnderIds = listOf("hungry_dessert")),
         starter("soup", "JUHA", "Rada bi jedla juho.", "food.soup", "FOOD", "food", listOf("juha", "jesti"), placements = pageThree(10), imagePath = "custom/food/soup.jpg", iconSource = IconSource.CUSTOM),
         starter("bread", "KRUH", "Rada bi jedla kruh.", "food.bread", "FOOD", "food", listOf("kruh", "jesti"), placements = pageThree(11), imagePath = "custom/food/bread.jpg", iconSource = IconSource.CUSTOM),
         starter("fruit", "SADJE", "Rada bi jedla sadje.", "food.fruit", "FOOD", "food", listOf("sadje", "jesti"), placements = pageThree(12)),
@@ -731,6 +780,46 @@ object AacStarterContentV1 {
         )
     }
 
+    private fun hungryRootChildren(): List<String> {
+        return listOf("hungry_main_dish", "hungry_snack", "hungry_fast_food", "hungry_fruit", "hungry_dessert")
+    }
+
+    private fun hungryMainDishChildren(): List<String> {
+        return listOf("hungry_soup", "hungry_meat", "hungry_side_dishes")
+    }
+
+    private fun hungrySoupChildren(): List<String> {
+        return listOf("hungry_beef_soup", "hungry_chicken_soup", "hungry_vegetable_soup")
+    }
+
+    private fun hungryMeatChildren(): List<String> {
+        return listOf("hungry_pork", "hungry_chicken", "hungry_beef", "hungry_veal", "hungry_lamb", "hungry_kid_goat", "hungry_fish")
+    }
+
+    private fun hungrySideDishChildren(): List<String> {
+        return listOf("hungry_potato", "hungry_pasta", "hungry_rice", "hungry_vegetables")
+    }
+
+    private fun hungryPotatoChildren(): List<String> {
+        return listOf("hungry_roasted_potato", "hungry_fries", "hungry_mashed_potato")
+    }
+
+    private fun hungrySnackChildren(): List<String> {
+        return listOf("hungry_yogurt", "hungry_fruit_yogurt", "hungry_chips", "hungry_crackers")
+    }
+
+    private fun hungryFastFoodChildren(): List<String> {
+        return listOf("hungry_hamburger", "hungry_cevapcici", "hungry_pleskavica", "hungry_hotdog", "hungry_pizza", "hungry_burek", "hungry_toast", "hungry_pancakes")
+    }
+
+    private fun hungryFruitChildren(): List<String> {
+        return listOf("hungry_apple", "hungry_pear", "hungry_banana", "hungry_grapes", "hungry_blueberries", "hungry_strawberries", "hungry_kiwi")
+    }
+
+    private fun hungryDessertChildren(): List<String> {
+        return listOf("hungry_ice_cream", "hungry_cake", "hungry_cookies", "hungry_doughnut", "hungry_kremsnita")
+    }
+
     private fun Int?.orZero(): Int = this ?: 0
 
     private const val START_PRIORITY = 100
@@ -794,6 +883,15 @@ object AacStarterContentV1 {
         "drink_fanta", "drink_coca_cola", "drink_pepsi", "radenska",
         "drink_yogurt", "cocoa_drink", "drink_milk", "chocolate_milk",
         "drink_warm", "drink_cold", "drink_small", "drink_more", "drink_no_additive", "coffee_white", "coffee_cappuccino",
+        "hungry_main_dish", "hungry_snack", "hungry_fast_food", "hungry_fruit", "hungry_dessert",
+        "hungry_soup", "hungry_meat", "hungry_side_dishes", "hungry_potato",
+        "hungry_beef_soup", "hungry_chicken_soup", "hungry_vegetable_soup",
+        "hungry_pork", "hungry_chicken", "hungry_beef", "hungry_veal", "hungry_lamb", "hungry_kid_goat", "hungry_fish",
+        "hungry_pasta", "hungry_rice", "hungry_vegetables", "hungry_roasted_potato", "hungry_fries", "hungry_mashed_potato",
+        "hungry_yogurt", "hungry_fruit_yogurt", "hungry_chips", "hungry_crackers",
+        "hungry_hamburger", "hungry_cevapcici", "hungry_pleskavica", "hungry_hotdog", "hungry_pizza", "hungry_burek", "hungry_toast", "hungry_pancakes",
+        "hungry_apple", "hungry_pear", "hungry_banana", "hungry_grapes", "hungry_blueberries", "hungry_strawberries", "hungry_kiwi",
+        "hungry_ice_cream", "hungry_cake", "hungry_cookies", "hungry_doughnut", "hungry_kremsnita",
         "soup", "bread", "fruit", "ice_cream", "potato", "rice", "meat", "sweet", "other_food", "food_yogurt", "food_banana",
         "food_apple", "food_lunch", "food_dinner", "food_little", "food_more", "food_enough", "food_later",
         "head", "arm", "leg", "back", "belly", "chest", "throat", "pain_left", "pain_right", "pain_both", "left_side", "right_side", "other_body",

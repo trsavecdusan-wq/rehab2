@@ -427,6 +427,75 @@ class MainActivity : AppCompatActivity() {
                 "help_dressing" to 20,
                 "noticed_blood" to 24
             ),
+            "hungry" to mapOf(
+                "hungry_main_dish" to 10,
+                "hungry_snack" to 12,
+                "hungry_fast_food" to 14,
+                "hungry_fruit" to 22,
+                "hungry_dessert" to 24
+            ),
+            "hungry_main_dish" to mapOf(
+                "hungry_soup" to 15,
+                "hungry_meat" to 17,
+                "hungry_side_dishes" to 19
+            ),
+            "hungry_soup" to mapOf(
+                "hungry_beef_soup" to 15,
+                "hungry_chicken_soup" to 17,
+                "hungry_vegetable_soup" to 19
+            ),
+            "hungry_meat" to mapOf(
+                "hungry_pork" to 15,
+                "hungry_chicken" to 16,
+                "hungry_beef" to 18,
+                "hungry_veal" to 19,
+                "hungry_lamb" to 20,
+                "hungry_kid_goat" to 22,
+                "hungry_fish" to 24
+            ),
+            "hungry_side_dishes" to mapOf(
+                "hungry_potato" to 15,
+                "hungry_pasta" to 16,
+                "hungry_rice" to 18,
+                "hungry_vegetables" to 19
+            ),
+            "hungry_potato" to mapOf(
+                "hungry_roasted_potato" to 15,
+                "hungry_fries" to 17,
+                "hungry_mashed_potato" to 19
+            ),
+            "hungry_snack" to mapOf(
+                "hungry_yogurt" to 15,
+                "hungry_fruit_yogurt" to 17,
+                "hungry_chips" to 18,
+                "hungry_crackers" to 19
+            ),
+            "hungry_fast_food" to mapOf(
+                "hungry_hamburger" to 15,
+                "hungry_cevapcici" to 16,
+                "hungry_pleskavica" to 18,
+                "hungry_hotdog" to 19,
+                "hungry_pizza" to 20,
+                "hungry_burek" to 21,
+                "hungry_toast" to 23,
+                "hungry_pancakes" to 24
+            ),
+            "hungry_fruit" to mapOf(
+                "hungry_apple" to 15,
+                "hungry_pear" to 16,
+                "hungry_banana" to 18,
+                "hungry_grapes" to 19,
+                "hungry_blueberries" to 20,
+                "hungry_strawberries" to 22,
+                "hungry_kiwi" to 24
+            ),
+            "hungry_dessert" to mapOf(
+                "hungry_ice_cream" to 15,
+                "hungry_cake" to 17,
+                "hungry_cookies" to 19,
+                "hungry_doughnut" to 21,
+                "hungry_kremsnita" to 23
+            ),
             "pain" to AAC_PAIN_ROOT_VISUAL_SLOT_BY_ID,
             "belly" to mapOf(
                 "belly_upper" to 13,
@@ -2971,7 +3040,7 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Я хочу їсти",
                 speechTextEn = "I am hungry",
                 opensSubicons = true,
-                children = listOf("soup", "bread", "food_yogurt", "food_banana", "food_apple", "food_lunch", "food_dinner", "sweet"),
+                children = listOf("hungry_main_dish", "hungry_snack", "hungry_fast_food", "hungry_fruit", "hungry_dessert"),
                 questionByLanguage = mapOf(
                     "sl" to "Kaj bi jedla?",
                     "uk" to "Що ти хочеш їсти?",
