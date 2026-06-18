@@ -647,7 +647,10 @@ class MainActivity : AppCompatActivity() {
         val nextQuestionText: String,
         val finalSpeechText: String,
         val nextPageItems: List<AacItem>,
-        val delayBeforeQuestionMs: Long
+        val targetPageId: String,
+        val delayBeforeQuestionMs: Long,
+        val isTerminalSelection: Boolean,
+        val nextPageSnapshot: MainAacHistoryEntry? = null
     )
 
     private lateinit var radioTiles: List<TextView>
@@ -739,6 +742,7 @@ class MainActivity : AppCompatActivity() {
         speakPendingMainAacGuidedAutoCompleteSentence()
     }
     private var mainAacVoiceAssistantQuestionRunnable: Runnable? = null
+    private var pendingMainAacVoiceAssistantStep: MainAacVoiceAssistantStep? = null
     private val mainAacInputUnlockRunnable = Runnable {
         completeMainAacSpeechLock()
     }
@@ -1151,8 +1155,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun currentMainAacPageSnapshot(selectedItemId: String?): MainAacHistoryEntry {
-        val questionText = if (::mainAacQuestionText.isInitialized && mainAacQuestionText.visibility == View.VISIBLE) {
+    private fun currentMainAacPageSnapshot(
+        selectedItemId: String?,
+        questionTextOverride: String? = null
+    ): MainAacHistoryEntry {
+        val questionText = questionTextOverride ?: if (
+            ::mainAacQuestionText.isInitialized &&
+            mainAacQuestionText.visibility == View.VISIBLE
+        ) {
             mainAacQuestionText.text?.toString().orEmpty()
         } else {
             ""
@@ -1558,6 +1568,7 @@ class MainActivity : AppCompatActivity() {
             mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
             currentMainAacPageDebugId = item.targetPageId
             showMainAacItems(targetPageItems)
+            captureMainAacVoiceAssistantNextPageSnapshot()
             return
         }
 
@@ -1576,6 +1587,7 @@ class MainActivity : AppCompatActivity() {
                 currentMainAacPageDebugId = "children:${item.id}"
                 updateMainAacGridSelectionDebug(currentMainAacPageDebugId, childItems)
                 showMainAacItems(childItems)
+                captureMainAacVoiceAssistantNextPageSnapshot()
             }
             return
         }
@@ -1827,15 +1839,19 @@ class MainActivity : AppCompatActivity() {
             recordMainAacUsage(item)
             if (isMainAacTerminalChild(item)) {
                 cancelMainAacGuidedAutoComplete()
-                val terminalSpeechText = mainAacVoiceAssistantSentenceBuilderSpeech(item, languageCode)
-                    .ifBlank { resolvedSpeechText }
-                if (terminalSpeechText.isNotBlank()) {
+                val terminalStep = mainAacVoiceAssistantTerminalStep(
+                    item = item,
+                    languageCode = languageCode,
+                    resolvedLabel = resolvedLabel,
+                    resolvedSpeechText = resolvedSpeechText
+                )
+                if (terminalStep.finalSpeechText.isNotBlank()) {
                     shouldLockMainAacInputOnSpeechStart = true
                     lockMainAacInput()
                     speakMainAacTextOnce(
                         source = "terminal_child",
                         itemId = item.id,
-                        text = terminalSpeechText,
+                        text = terminalStep.finalSpeechText,
                         languageCode = languageCode
                     )
                     shouldResetMainAacRootAfterSpeech = true
@@ -2102,14 +2118,26 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    private fun captureMainAacVoiceAssistantNextPageSnapshot() {
+        val pendingStep = pendingMainAacVoiceAssistantStep ?: return
+        if (pendingStep.nextPageItems.isEmpty()) {
+            return
+        }
+        pendingMainAacVoiceAssistantStep = pendingStep.copy(
+            nextPageSnapshot = currentMainAacPageSnapshot(
+                selectedItemId = selectedMainAacItemId,
+                questionTextOverride = pendingStep.nextQuestionText
+            )
+        )
+    }
+
     private fun mainAacVoiceAssistantStep(prompt: String, languageCode: String): MainAacVoiceAssistantStep? {
         val partialSpeech = mainAacVoiceAssistantPartialSpeech(null, languageCode)
         if (partialSpeech.isBlank()) {
             return null
         }
-        val nextPageItems = currentMainAacConversationItems.lastOrNull()
-            ?.let(::mainAacVoiceAssistantNextPageItems)
-            .orEmpty()
+        val selectedItem = currentMainAacConversationItems.lastOrNull()
+        val nextPageItems = selectedItem?.let(::mainAacVoiceAssistantNextPageItems).orEmpty()
         val nextQuestion = prompt.trim()
         if (nextQuestion.isBlank() && nextPageItems.isEmpty()) {
             return null
@@ -2119,7 +2147,29 @@ class MainActivity : AppCompatActivity() {
             nextQuestionText = nextQuestion,
             finalSpeechText = "",
             nextPageItems = nextPageItems,
-            delayBeforeQuestionMs = mainAacGuidedAutoCompleteTimeoutMs()
+            targetPageId = selectedItem?.targetPageId.orEmpty(),
+            delayBeforeQuestionMs = mainAacGuidedAutoCompleteTimeoutMs(),
+            isTerminalSelection = false
+        )
+    }
+
+    private fun mainAacVoiceAssistantTerminalStep(
+        item: AacItem,
+        languageCode: String,
+        resolvedLabel: String,
+        resolvedSpeechText: String
+    ): MainAacVoiceAssistantStep {
+        val finalSpeech = mainAacVoiceAssistantSentenceBuilderSpeech(item, languageCode)
+            .ifBlank { resolvedSpeechText.ifBlank { resolvedLabel } }
+            .trim()
+        return MainAacVoiceAssistantStep(
+            partialSpeechText = "",
+            nextQuestionText = "",
+            finalSpeechText = finalSpeech,
+            nextPageItems = emptyList(),
+            targetPageId = item.targetPageId,
+            delayBeforeQuestionMs = 0L,
+            isTerminalSelection = true
         )
     }
 
@@ -2134,13 +2184,20 @@ class MainActivity : AppCompatActivity() {
             return
         }
         cancelMainAacVoiceAssistantQuestion()
+        pendingMainAacVoiceAssistantStep = step
         val runnable = Runnable {
+            val activeStep = pendingMainAacVoiceAssistantStep ?: step
             mainAacVoiceAssistantQuestionRunnable = null
-            if (step.nextPageItems.isNotEmpty()) {
-                showMainAacItems(step.nextPageItems)
+            pendingMainAacVoiceAssistantStep = null
+            val snapshot = activeStep.nextPageSnapshot
+            if (snapshot != null) {
+                restoreMainAacPageSnapshot(snapshot)
+            } else if (activeStep.nextPageItems.isEmpty()) {
+                showMainAacQuestion(safeQuestion)
+            } else {
+                recordLastAudioEvent("AAC voice assistant missing next page snapshot target=${activeStep.targetPageId}")
             }
             shouldLockMainAacInputOnSpeechStart = false
-            showMainAacQuestion(safeQuestion)
             aacAudioPlayer.speakText(safeQuestion, languageCode)
         }
         mainAacVoiceAssistantQuestionRunnable = runnable
@@ -2155,6 +2212,7 @@ class MainActivity : AppCompatActivity() {
     private fun cancelMainAacVoiceAssistantQuestion() {
         mainAacVoiceAssistantQuestionRunnable?.let(mainHandler::removeCallbacks)
         mainAacVoiceAssistantQuestionRunnable = null
+        pendingMainAacVoiceAssistantStep = null
     }
 
     private fun mainAacNaturalConversationSpeech(
@@ -3109,13 +3167,26 @@ class MainActivity : AppCompatActivity() {
         languageCode: String,
         topSuggestionItemId: String?
     ): String {
-        val label = AacLocalizedTextResolver.resolveLabel(item, languageCode)
-            .uppercase(Locale.ROOT)
-        return if (item.id == topSuggestionItemId) {
+        val resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode).trim()
+        val safeLabel = if (isLikelyCorruptAacDisplayText(resolvedLabel)) {
+            item.labelSl.trim().takeUnless(::isLikelyCorruptAacDisplayText).orEmpty()
+        } else {
+            resolvedLabel
+        }.uppercase(Locale.ROOT)
+        return if (item.id == topSuggestionItemId && safeLabel.isNotBlank()) {
+            val label = safeLabel
             "\u2b50 $label"
         } else {
-            label
+            safeLabel
         }
+    }
+
+    private fun isLikelyCorruptAacDisplayText(text: String): Boolean {
+        val normalizedText = text.trim()
+        if (normalizedText.isBlank()) {
+            return false
+        }
+        return listOf("Đ", "Ń", "Ĺ", "Â", "â", "�").any(normalizedText::contains)
     }
 
     private fun scheduleMainAacSentenceSpeech(itemSpeaksImmediately: Boolean) {
