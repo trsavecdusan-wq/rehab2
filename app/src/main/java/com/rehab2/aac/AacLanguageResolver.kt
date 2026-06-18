@@ -18,9 +18,22 @@ object AacLanguageResolver {
         val code = value?.trim()?.lowercase(Locale.ROOT).orEmpty()
         return when {
             code.isBlank() -> DEFAULT_LANGUAGE_CODE
-            code == "ua" || code == "uk-ua" || code == "ua-ua" || code.startsWith("ua_") -> "uk"
-            code.startsWith("uk_") -> "uk"
+            code == "ua" ||
+                code == "uk" ||
+                code == "uk-ua" ||
+                code == "ua-ua" ||
+                code.startsWith("ua_") ||
+                code.startsWith("ua-") ||
+                code.startsWith("uk_") ||
+                code.startsWith("uk-") -> "uk"
             else -> code
+        }
+    }
+
+    fun ttsLanguageTag(value: String?): String {
+        return when (normalize(value)) {
+            "uk" -> "uk-UA"
+            else -> normalize(value)
         }
     }
 }

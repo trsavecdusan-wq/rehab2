@@ -9,7 +9,14 @@ class AacSpeechCache(private val context: Context) {
 
     fun getCacheWavFile(itemId: String): File? = getCacheFile(itemId, "wav")
 
-    fun getExistingCacheFile(itemId: String): File? {
+    fun getExistingCacheFile(
+        itemId: String,
+        languageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
+    ): File? {
+        if (AacLanguageResolver.normalize(languageCode) != AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            return null
+        }
+
         val mp3File = getCacheMp3File(itemId)
         if (mp3File != null && mp3File.exists() && mp3File.isFile) {
             return mp3File

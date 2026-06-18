@@ -106,31 +106,43 @@ class AacAudioPlayer(
         traceAudio("playOrSpeak itemId=${item.id} label=${item.labelSl}")
         stopPlayback(notifyCancellation = false)
         val requestSerial = nextSpeechRequestSerial()
-        val fallbackText = resolveTileSpeechText(item, languageCode)
+        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
+        val resolvedSpeech = resolveTileSpeechText(item, languageCode)
+        val fallbackText = resolvedSpeech.text
+        val speechLanguageCode = resolvedSpeech.languageCode
         traceAudio("playOrSpeak resolvedText='${fallbackText.take(80)}'")
+        if (fallbackText.isBlank()) {
+            traceAudio("playOrSpeak missing speech text itemId=${item.id} language=$normalizedLanguage")
+            notifySpeechError()
+            return
+        }
 
         playGeneratedSpeechOrFallback(
             text = fallbackText,
-            languageCode = languageCode,
+            languageCode = speechLanguageCode,
             requestSerial = requestSerial,
             generatedLog = "AUDIO GENERATED: ${item.id}"
         ) {
-            val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
-            if (playAudioFileIfAvailable(directAudioFile)) {
-                traceAudio("selected path=direct audio file=${directAudioFile?.absolutePath}")
-                Toast.makeText(context, "AUDIO DIRECT: ${item.id}", Toast.LENGTH_SHORT).show()
-                return@playGeneratedSpeechOrFallback
-            }
+            if (AacLanguageResolver.normalize(speechLanguageCode) == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+                val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
+                if (playAudioFileIfAvailable(directAudioFile)) {
+                    traceAudio("selected path=direct audio file=${directAudioFile?.absolutePath}")
+                    Toast.makeText(context, "AUDIO DIRECT: ${item.id}", Toast.LENGTH_SHORT).show()
+                    return@playGeneratedSpeechOrFallback
+                }
 
-            val cachedAudioFile = speechCache.getExistingCacheFile(item.id)
-            if (playAudioFileIfAvailable(cachedAudioFile)) {
-                traceAudio("selected path=cached audio file=${cachedAudioFile?.absolutePath}")
-                Toast.makeText(context, "AUDIO CACHE: ${item.id}", Toast.LENGTH_SHORT).show()
-                return@playGeneratedSpeechOrFallback
+                val cachedAudioFile = speechCache.getExistingCacheFile(item.id, speechLanguageCode)
+                if (playAudioFileIfAvailable(cachedAudioFile)) {
+                    traceAudio("selected path=cached audio file=${cachedAudioFile?.absolutePath}")
+                    Toast.makeText(context, "AUDIO CACHE: ${item.id}", Toast.LENGTH_SHORT).show()
+                    return@playGeneratedSpeechOrFallback
+                }
+            } else {
+                traceAudio("skip sl item audio cache for language=$speechLanguageCode itemId=${item.id}")
             }
 
             traceAudio("selected path=Android TTS fallback itemId=${item.id}")
-            speakAndroidFallback(fallbackText, languageCode)
+            speakAndroidFallback(fallbackText, speechLanguageCode)
         }
     }
 
@@ -237,8 +249,12 @@ class AacAudioPlayer(
     }
 
     private fun speakAndroidFallback(text: String, languageCode: String) {
-        if (isTtsReady) {
-            configureTtsLanguage(languageCode)
+        if (isTtsReady && !configureTtsLanguage(languageCode)) {
+            val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
+            traceAudio("Android TTS fallback unavailable language=$normalizedLanguage")
+            Toast.makeText(context, "TTS jezik ni na voljo: $normalizedLanguage", Toast.LENGTH_SHORT).show()
+            notifySpeechError()
+            return
         }
         speak(text, languageCode)
     }
@@ -285,12 +301,18 @@ class AacAudioPlayer(
     private fun configureTtsLanguage(languageCode: String): Boolean {
         val tts = textToSpeech ?: return false
         val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
-        val selectedResult = tts.setLanguage(Locale.forLanguageTag(normalizedLanguage))
-        Log.d(TAG, "TTS language selected=$normalizedLanguage result=$selectedResult")
-        traceAudio("TTS language selected=$normalizedLanguage result=$selectedResult")
+        val ttsLanguageTag = AacLanguageResolver.ttsLanguageTag(languageCode)
+        val selectedResult = tts.setLanguage(Locale.forLanguageTag(ttsLanguageTag))
+        Log.d(TAG, "TTS language selected=$normalizedLanguage tag=$ttsLanguageTag result=$selectedResult")
+        traceAudio("TTS language selected=$normalizedLanguage tag=$ttsLanguageTag result=$selectedResult")
         traceAudio("TTS voice selected=${tts.voice?.name ?: "unknown"} locale=${tts.voice?.locale?.toLanguageTag() ?: "unknown"}")
         if (isLanguageUsable(selectedResult)) {
             return true
+        }
+        if (normalizedLanguage == "uk") {
+            Log.w(TAG, "Ukrainian TTS locale unsupported tag=$ttsLanguageTag result=$selectedResult")
+            traceAudio("WARNING Ukrainian TTS locale unsupported tag=$ttsLanguageTag result=$selectedResult")
+            return false
         }
 
         val slovenianResult = tts.setLanguage(Locale("sl"))
@@ -379,13 +401,20 @@ class AacAudioPlayer(
         traceAudio("audio focus abandoned")
     }
 
-    private fun resolveTileSpeechText(item: AacItem, languageCode: String): String {
-        val resolvedText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+    private fun resolveTileSpeechText(
+        item: AacItem,
+        languageCode: String
+    ): AacLocalizedTextResolver.ResolvedSpeechText {
+        val resolvedSpeech = AacLocalizedTextResolver.resolveSpeakTextResult(item, languageCode)
+        val resolvedText = resolvedSpeech.text
+        if (resolvedSpeech.usedLanguageFallback) {
+            traceAudio("speech language fallback itemId=${item.id} language=${resolvedSpeech.languageCode}")
+        }
         if (AacLanguageResolver.normalize(languageCode) != AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
-            return resolvedText
+            return resolvedSpeech
         }
 
-        return when (resolvedText.trim().uppercase(Locale.ROOT)) {
+        val slText = when (resolvedText.trim().uppercase(Locale.ROOT)) {
             "VODA" -> "Želim piti vodo."
             "MRZLA VODA" -> "Želim piti mrzlo vodo."
             "TOPLA VODA" -> "Želim piti toplo vodo."
@@ -398,6 +427,7 @@ class AacAudioPlayer(
             "LIMONADA" -> "Želim piti limonado."
             else -> resolvedText
         }
+        return resolvedSpeech.copy(text = slText)
     }
 
     fun release() {

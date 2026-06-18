@@ -2335,11 +2335,12 @@ class MainActivity : AppCompatActivity() {
                     pendingMainAacTranslationKeys.remove(translationKey)
                 }
                 if (translation == null) {
+                    val resolvedSpeech = AacLocalizedTextResolver.resolveSpeakTextResult(item, normalizedLanguage)
                     handleMainAacResolvedSpeech(
                         item = item,
-                        languageCode = normalizedLanguage,
+                        languageCode = resolvedSpeech.languageCode,
                         resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, normalizedLanguage),
-                        resolvedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, normalizedLanguage),
+                        resolvedSpeechText = resolvedSpeech.text,
                         inContextFlow = mainAacHistory.isNotEmpty()
                     )
                     return@post
