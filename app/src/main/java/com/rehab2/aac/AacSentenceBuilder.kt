@@ -233,8 +233,8 @@ object AacSentenceBuilder {
         }
         return when (intensity) {
             "light" -> "Malo me $verb $target."
-            "medium" -> "Srednje moÄŤno me $verb $target."
-            "strong" -> "MoÄŤno me $verb $target."
+            "medium" -> "Srednje močno me $verb $target."
+            "strong" -> "Močno me $verb $target."
             "very", "very_strong" -> "Zelo me $verb $target."
             else -> "${verb.replaceFirstChar { it.titlecase(Locale("sl", "SI")) }} me $target."
         }
@@ -926,7 +926,7 @@ object AacSentenceBuilder {
         "pain_today" to "Od danes",
         "pain_many_days" to "Ve\u010d dni",
         "pain_since_today" to "Od danes",
-        "pain_since_yesterday" to "Od vÄŤeraj",
+        "pain_since_yesterday" to "Od včeraj",
         "pain_since_morning" to "Od jutra",
         "pain_since_evening" to "Od večera",
         "pain_since_long" to "Že dolgo"

@@ -730,6 +730,7 @@ class MainActivity : AppCompatActivity() {
     private val mainAacGuidedAutoCompleteRunnable = Runnable {
         speakPendingMainAacGuidedAutoCompleteSentence()
     }
+    private var mainAacPainNextQuestionRunnable: Runnable? = null
     private val mainAacInputUnlockRunnable = Runnable {
         completeMainAacSpeechLock()
     }
@@ -1526,6 +1527,7 @@ class MainActivity : AppCompatActivity() {
             recordLastAudioEvent("AAC action ignored locked itemId=${item.id}")
             return
         }
+        cancelMainAacPainNextQuestion()
         if (handleMainAacSilentNoNavigation(item)) {
             return
         }
@@ -1604,6 +1606,7 @@ class MainActivity : AppCompatActivity() {
             recordLastAudioEvent("AAC NE silent navigateBack page=$currentMainAacPageDebugId")
             selectedMainAacItemId = null
             isMainAacTerminalSelectionAccepted = false
+            cancelMainAacPainNextQuestion()
             showPreviousMainAacItems()
             return true
         }
@@ -1611,6 +1614,7 @@ class MainActivity : AppCompatActivity() {
             recordLastAudioEvent("AAC NE silent dismissSelection page=$currentMainAacPageDebugId")
             selectedMainAacItemId = null
             isMainAacTerminalSelectionAccepted = false
+            cancelMainAacPainNextQuestion()
             clearMainAacSentenceState()
             refreshMainAacInputLockVisualState()
             return true
@@ -1635,6 +1639,9 @@ class MainActivity : AppCompatActivity() {
         val prompt = guidedPrompt.ifBlank { localizedPrompt }
             .trim()
             .ifBlank { mainAacQuestionFallback(item, languageCode) }
+        if (speakMainAacPainPartialThenPrompt(prompt, languageCode)) {
+            return
+        }
         if (prompt.isNotBlank()) {
             showMainAacQuestion(prompt)
             shouldLockMainAacInputOnSpeechStart = false
@@ -1812,13 +1819,15 @@ class MainActivity : AppCompatActivity() {
             recordMainAacUsage(item)
             if (isMainAacTerminalChild(item)) {
                 cancelMainAacGuidedAutoComplete()
-                if (resolvedSpeechText.isNotBlank()) {
+                val terminalSpeechText = mainAacPainSentenceBuilderSpeech(item, languageCode)
+                    .ifBlank { resolvedSpeechText }
+                if (terminalSpeechText.isNotBlank()) {
                     shouldLockMainAacInputOnSpeechStart = true
                     lockMainAacInput()
                     speakMainAacTextOnce(
                         source = "terminal_child",
                         itemId = item.id,
-                        text = resolvedSpeechText,
+                        text = terminalSpeechText,
                         languageCode = languageCode
                     )
                     shouldResetMainAacRootAfterSpeech = true
@@ -2069,6 +2078,54 @@ class MainActivity : AppCompatActivity() {
         pendingMainAacGuidedAutoCompleteLanguageCode = ""
     }
 
+    private fun speakMainAacPainPartialThenPrompt(prompt: String, languageCode: String): Boolean {
+        if (languageCode.trim().lowercase(Locale.ROOT) != "sl") {
+            return false
+        }
+        val partialSpeech = mainAacPainSentenceBuilderSpeech(null, languageCode)
+        if (partialSpeech.isBlank() || partialSpeech == "Boli me.") {
+            return false
+        }
+        hideMainAacQuestion()
+        shouldLockMainAacInputOnSpeechStart = false
+        speakMainAacTextOnce(
+            source = "pain_partial",
+            itemId = currentMainAacConversationItems.lastOrNull()?.id ?: "(none)",
+            text = partialSpeech,
+            languageCode = languageCode
+        )
+        if (prompt.isNotBlank()) {
+            scheduleMainAacPainNextQuestion(prompt, languageCode)
+        }
+        return true
+    }
+
+    private fun scheduleMainAacPainNextQuestion(question: String, languageCode: String) {
+        val safeQuestion = question.trim()
+        if (safeQuestion.isBlank()) {
+            return
+        }
+        cancelMainAacPainNextQuestion()
+        val runnable = Runnable {
+            mainAacPainNextQuestionRunnable = null
+            showMainAacQuestion(safeQuestion)
+            shouldLockMainAacInputOnSpeechStart = false
+            aacAudioPlayer.speakText(safeQuestion, languageCode)
+        }
+        mainAacPainNextQuestionRunnable = runnable
+        val timeoutMs = mainAacGuidedAutoCompleteTimeoutMs()
+        if (timeoutMs <= 0L) {
+            mainHandler.post(runnable)
+        } else {
+            mainHandler.postDelayed(runnable, timeoutMs)
+        }
+    }
+
+    private fun cancelMainAacPainNextQuestion() {
+        mainAacPainNextQuestionRunnable?.let(mainHandler::removeCallbacks)
+        mainAacPainNextQuestionRunnable = null
+    }
+
     private fun mainAacNaturalConversationSpeech(
         item: AacItem,
         languageCode: String,
@@ -2102,6 +2159,21 @@ class MainActivity : AppCompatActivity() {
         if (languageCode.trim().lowercase(Locale.ROOT) != "sl") return ""
         val builderItems = currentMainAacConversationItems + item
         return AacSentenceBuilder.buildSlovenianSentence(builderItems).trim()
+    }
+
+    private fun mainAacPainSentenceBuilderSpeech(item: AacItem?, languageCode: String): String {
+        if (languageCode.trim().lowercase(Locale.ROOT) != "sl") return ""
+        val builderItems = currentMainAacConversationItems + listOfNotNull(item)
+        if (!isMainAacPainConversation(builderItems)) return ""
+        return AacSentenceBuilder.buildSlovenianSentence(builderItems).trim()
+    }
+
+    private fun isMainAacPainConversation(items: List<AacItem>): Boolean {
+        return items.any { item ->
+            normalizeMainAacKey(item.id) == "pain" ||
+                normalizeMainAacKey(item.categoryId) == "pain" ||
+                normalizeMainAacKey(item.meaningGroup) == "pain"
+        }
     }
 
     private fun mainAacConversationTokens(parentItem: AacItem, childItem: AacItem?): List<String> {
@@ -3053,6 +3125,7 @@ class MainActivity : AppCompatActivity() {
         currentMainAacConversationItems = emptyList()
         currentMainAacModifierItemsByGroup.clear()
         cancelMainAacGuidedAutoComplete()
+        cancelMainAacPainNextQuestion()
         resetMainAacRoot()
     }
 
@@ -3064,6 +3137,7 @@ class MainActivity : AppCompatActivity() {
             currentMainAacModifierItemsByGroup.clear()
         }
         cancelMainAacGuidedAutoComplete()
+        cancelMainAacPainNextQuestion()
         mainAacAutoSentenceMaySpeakSingle = false
         mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
         mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
