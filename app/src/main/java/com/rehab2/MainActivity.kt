@@ -635,7 +635,9 @@ class MainActivity : AppCompatActivity() {
     private data class MainAacHistoryEntry(
         val items: List<AacItem>,
         val selectedItemId: String?,
-        val pageDebugId: String
+        val pageDebugId: String,
+        val questionText: String,
+        val displaySlots: List<AacItem?>
     )
 
     private lateinit var radioTiles: List<TextView>
@@ -1130,6 +1132,88 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun currentMainAacPageSnapshot(selectedItemId: String?): MainAacHistoryEntry {
+        val questionText = if (::mainAacQuestionText.isInitialized && mainAacQuestionText.visibility == View.VISIBLE) {
+            mainAacQuestionText.text?.toString().orEmpty()
+        } else {
+            ""
+        }
+        val displaySlots = if (::mainAacTileBindings.isInitialized) {
+            mainAacTileBindings.map { binding -> binding.item }
+        } else {
+            emptyList()
+        }
+        return MainAacHistoryEntry(
+            items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
+            selectedItemId = selectedItemId,
+            pageDebugId = currentMainAacPageDebugId,
+            questionText = questionText,
+            displaySlots = displaySlots
+        )
+    }
+
+    private fun restoreMainAacPageSnapshot(page: MainAacHistoryEntry) {
+        ensureMainAacGridBindings()
+        currentMainAacPageDebugId = page.pageDebugId
+        selectedMainAacItemId = page.selectedItemId
+        currentMainAacOrderedItems = page.items
+        currentMainAacItems = page.displaySlots.filterNotNull()
+        lastMainAacFinalItemCountAfterCap = currentMainAacItems.size
+        val languageCode = getActiveSpeechLanguage()
+        lastMainAacRenderedLanguage = languageCode
+        val topSuggestionItemId = mainAacTopSuggestionItemId(currentMainAacItems)
+        mainAacTileBindings.forEachIndexed { index, binding ->
+            val item = page.displaySlots.getOrNull(index)
+            binding.item = item
+            binding.view.visibility = View.VISIBLE
+            item?.let {
+                binding.view.background = mainAacTileBackgroundFor(it)
+                binding.view.isEnabled = !isMainAacInputLocked
+                binding.label.text = mainAacDisplayLabel(it, languageCode, topSuggestionItemId)
+                bindMainAacIcon(binding, it)
+                binding.view.setOnClickListener(null)
+                binding.view.setOnTouchListener { _, event ->
+                    handleMainAacTileTouch(event, item)
+                }
+            } ?: run {
+                binding.view.background = mainAacTileBackgroundFor(null)
+                binding.view.isEnabled = false
+                binding.view.alpha = 0.45f
+                binding.view.scaleX = 1f
+                binding.view.scaleY = 1f
+                binding.label.text = ""
+                binding.icon?.apply {
+                    setCompoundDrawables(null, null, null, null)
+                    text = ""
+                }
+                binding.view.setOnClickListener(null)
+                binding.view.setOnTouchListener(null)
+            }
+        }
+        mainAacQuestionRevealRunnable?.let(mainHandler::removeCallbacks)
+        mainAacQuestionRevealRunnable = null
+        if (::mainAacQuestionText.isInitialized) {
+            if (page.questionText.isBlank()) {
+                mainAacQuestionText.text = ""
+                mainAacQuestionText.visibility = View.GONE
+            } else {
+                mainAacQuestionText.text = page.questionText
+                mainAacQuestionText.visibility = View.VISIBLE
+            }
+        }
+        refreshMainAacInputLockVisualState()
+        logMainAacGridDebug(
+            boundItemCount = currentMainAacItems.size,
+            visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
+        )
+        mainAacGridContainer.post {
+            logMainAacGridDebug(
+                boundItemCount = currentMainAacItems.size,
+                visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
+            )
+        }
+    }
+
     private fun lockMainAacInput() {
         recordLastAudioEvent("AAC input locked")
         isMainAacInputLocked = true
@@ -1177,52 +1261,20 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val previousPage = mainAacHistory.removeLast()
-        val previousItems = previousPage.items
-        currentMainAacPageDebugId = previousPage.pageDebugId
         if (currentMainAacConversationItems.size > 1) {
             currentMainAacConversationItems = currentMainAacConversationItems.dropLast(1)
             currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
             selectedMainAacItemId = currentMainAacConversationItems.lastOrNull()?.id ?: previousPage.selectedItemId
             currentMainAacModifierItemsByGroup.clear()
             cancelMainAacGuidedAutoComplete()
-            val parentItem = currentMainAacConversationParentItem
-            val languageCode = getActiveSpeechLanguage()
-            val prompt = parentItem?.let { item ->
-                if (languageCode.trim().lowercase(Locale.ROOT) == "sl") {
-                    AacGuidedPromptEngine.questionFor(item)
-                } else {
-                    AacLocalizedTextResolver.resolveQuestion(item, languageCode).orEmpty()
-                }
-            }.orEmpty()
-            if (prompt.isNotBlank()) {
-                showMainAacQuestion(prompt)
-            } else {
-                hideMainAacQuestion()
-            }
-            showMainAacItems(previousItems)
+            restoreMainAacPageSnapshot(previousPage)
             return
         }
-        hideMainAacQuestion()
         currentMainAacConversationParentItem = null
         currentMainAacConversationItems = emptyList()
         currentMainAacModifierItemsByGroup.clear()
         cancelMainAacGuidedAutoComplete()
-        selectedMainAacItemId = previousPage.selectedItemId
-        val parentItem = previousPage.selectedItemId?.let { itemId -> mainAacItemsById[itemId] }
-        val prompt = parentItem?.takeIf { item -> normalizeMainAacKey(item.id) == "pain" }?.let { item ->
-            val languageCode = getActiveSpeechLanguage()
-            if (languageCode.trim().lowercase(Locale.ROOT) == "sl") {
-                AacGuidedPromptEngine.questionFor(item)
-            } else {
-                AacLocalizedTextResolver.resolveQuestion(item, languageCode).orEmpty()
-            }
-        }.orEmpty()
-        if (prompt.isNotBlank()) {
-            showMainAacQuestion(prompt)
-        } else {
-            hideMainAacQuestion()
-        }
-        showMainAacItems(previousItems)
+        restoreMainAacPageSnapshot(previousPage)
     }
 
     private fun showPreviousMainAacGridPage() {
@@ -1483,13 +1535,7 @@ class MainActivity : AppCompatActivity() {
             selectedMainAacItemId = item.id
             updateMainAacConversationContextForBranch(item)
             prepareMainAacContextPrompt(item)
-            mainAacHistory.addLast(
-                MainAacHistoryEntry(
-                    items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
-                    selectedItemId = selectedMainAacItemIdBeforeTap,
-                    pageDebugId = currentMainAacPageDebugId
-                )
-            )
+            mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
             currentMainAacPageDebugId = item.targetPageId
             showMainAacItems(targetPageItems)
             return
@@ -1506,13 +1552,7 @@ class MainActivity : AppCompatActivity() {
                 selectedMainAacItemId = item.id
                 updateMainAacConversationContextForBranch(item)
                 prepareMainAacContextPrompt(item)
-                mainAacHistory.addLast(
-                    MainAacHistoryEntry(
-                        items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
-                        selectedItemId = selectedMainAacItemIdBeforeTap,
-                        pageDebugId = currentMainAacPageDebugId
-                    )
-                )
+                mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
                 currentMainAacPageDebugId = "children:${item.id}"
                 updateMainAacGridSelectionDebug(currentMainAacPageDebugId, childItems)
                 showMainAacItems(childItems)
@@ -1924,13 +1964,7 @@ class MainActivity : AppCompatActivity() {
         currentMainAacConversationItems = currentMainAacConversationItems + item
         currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
         cancelMainAacGuidedAutoComplete()
-        mainAacHistory.addLast(
-            MainAacHistoryEntry(
-                items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
-                selectedItemId = selectedMainAacItemIdBeforeTap,
-                pageDebugId = currentMainAacPageDebugId
-            )
-        )
+        mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
         currentMainAacPageDebugId = "guided:${item.id}"
         updateMainAacGridSelectionDebug(currentMainAacPageDebugId, followUpItems)
         showMainAacQuestion(followUp.questionSl)
@@ -2258,7 +2292,10 @@ class MainActivity : AppCompatActivity() {
             if (item.id == updatedItem.id) updatedItem else item
         }
         val remappedHistory = mainAacHistory.map { page ->
-            page.copy(items = page.items.map { item -> if (item.id == updatedItem.id) updatedItem else item })
+            page.copy(
+                items = page.items.map { item -> if (item.id == updatedItem.id) updatedItem else item },
+                displaySlots = page.displaySlots.map { item -> item?.let { if (it.id == updatedItem.id) updatedItem else it } }
+            )
         }
         mainAacHistory.clear()
         remappedHistory.forEach { mainAacHistory.addLast(it) }
@@ -2319,7 +2356,10 @@ class MainActivity : AppCompatActivity() {
             currentMainAacItems = currentMainAacItems.map { item -> mergedItemsById[item.id] ?: item }
             currentMainAacOrderedItems = currentMainAacOrderedItems.map { item -> mergedItemsById[item.id] ?: item }
             val remappedHistory = mainAacHistory.map { page ->
-                page.copy(items = page.items.map { item -> mergedItemsById[item.id] ?: item })
+                page.copy(
+                    items = page.items.map { item -> mergedItemsById[item.id] ?: item },
+                    displaySlots = page.displaySlots.map { item -> item?.let { mergedItemsById[it.id] ?: it } }
+                )
             }
             mainAacHistory.clear()
             remappedHistory.forEach { mainAacHistory.addLast(it) }
