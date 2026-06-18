@@ -632,6 +632,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private data class MainAacHistoryEntry(
+        val items: List<AacItem>,
+        val selectedItemId: String?
+    )
+
     private lateinit var radioTiles: List<TextView>
     private lateinit var fallbackRadioLabels: List<CharSequence>
     private lateinit var seekVolume: SeekBar
@@ -688,7 +693,7 @@ class MainActivity : AppCompatActivity() {
     private var lastMainAacNormalItemCount = 0
     private var lastMainAacFinalOrderedItemCount = 0
     private var lastMainAacFinalItemCountAfterCap = 0
-    private val mainAacHistory = ArrayDeque<List<AacItem>>()
+    private val mainAacHistory = ArrayDeque<MainAacHistoryEntry>()
     private val pendingMainAacTranslationKeys = mutableSetOf<String>()
     private val pendingMainAacPretranslationLanguages = mutableSetOf<String>()
     private var mainAacAutoSentenceMaySpeakSingle = false
@@ -697,6 +702,7 @@ class MainActivity : AppCompatActivity() {
     private var isMainAacTerminalSelectionAccepted = false
     private var shouldResetMainAacRootAfterSpeech = false
     private var selectedMainAacItemId: String? = null
+    private var selectedMainAacItemIdBeforeTap: String? = null
     private var mainAacTapId = 0L
     private var mainAacSpeakCallNumberForTap = 0
     private var hadMainAacSelectionBeforeTap = false
@@ -1169,11 +1175,12 @@ class MainActivity : AppCompatActivity() {
         if (mainAacHistory.isEmpty()) {
             return
         }
-        val previousItems = mainAacHistory.removeLast()
+        val previousPage = mainAacHistory.removeLast()
+        val previousItems = previousPage.items
         if (currentMainAacConversationItems.size > 1) {
             currentMainAacConversationItems = currentMainAacConversationItems.dropLast(1)
             currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
-            selectedMainAacItemId = currentMainAacConversationItems.lastOrNull()?.id
+            selectedMainAacItemId = currentMainAacConversationItems.lastOrNull()?.id ?: previousPage.selectedItemId
             currentMainAacModifierItemsByGroup.clear()
             cancelMainAacGuidedAutoComplete()
             val parentItem = currentMainAacConversationParentItem
@@ -1198,6 +1205,7 @@ class MainActivity : AppCompatActivity() {
         currentMainAacConversationItems = emptyList()
         currentMainAacModifierItemsByGroup.clear()
         cancelMainAacGuidedAutoComplete()
+        selectedMainAacItemId = previousPage.selectedItemId
         showMainAacItems(previousItems)
     }
 
@@ -1257,6 +1265,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 mainAacTapId += 1
                 mainAacSpeakCallNumberForTap = 0
+                selectedMainAacItemIdBeforeTap = selectedMainAacItemId
                 hadMainAacSelectionBeforeTap = selectedMainAacItemId != null ||
                     currentMainAacConversationItems.isNotEmpty()
                 selectedMainAacItemId = item.id
@@ -1458,7 +1467,12 @@ class MainActivity : AppCompatActivity() {
             selectedMainAacItemId = item.id
             updateMainAacConversationContextForBranch(item)
             prepareMainAacContextPrompt(item)
-            mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
+            mainAacHistory.addLast(
+                MainAacHistoryEntry(
+                    items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
+                    selectedItemId = selectedMainAacItemIdBeforeTap
+                )
+            )
             currentMainAacPageDebugId = item.targetPageId
             showMainAacItems(targetPageItems)
             return
@@ -1475,7 +1489,12 @@ class MainActivity : AppCompatActivity() {
                 selectedMainAacItemId = item.id
                 updateMainAacConversationContextForBranch(item)
                 prepareMainAacContextPrompt(item)
-                mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
+                mainAacHistory.addLast(
+                    MainAacHistoryEntry(
+                        items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
+                        selectedItemId = selectedMainAacItemIdBeforeTap
+                    )
+                )
                 currentMainAacPageDebugId = "children:${item.id}"
                 updateMainAacGridSelectionDebug(currentMainAacPageDebugId, childItems)
                 showMainAacItems(childItems)
@@ -1887,7 +1906,12 @@ class MainActivity : AppCompatActivity() {
         currentMainAacConversationItems = currentMainAacConversationItems + item
         currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
         cancelMainAacGuidedAutoComplete()
-        mainAacHistory.addLast(currentMainAacOrderedItems.ifEmpty { currentMainAacItems })
+        mainAacHistory.addLast(
+            MainAacHistoryEntry(
+                items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
+                selectedItemId = selectedMainAacItemIdBeforeTap
+            )
+        )
         currentMainAacPageDebugId = "guided:${item.id}"
         updateMainAacGridSelectionDebug(currentMainAacPageDebugId, followUpItems)
         showMainAacQuestion(followUp.questionSl)
@@ -2214,8 +2238,8 @@ class MainActivity : AppCompatActivity() {
         currentMainAacOrderedItems = currentMainAacOrderedItems.map { item ->
             if (item.id == updatedItem.id) updatedItem else item
         }
-        val remappedHistory = mainAacHistory.map { pageItems ->
-            pageItems.map { item -> if (item.id == updatedItem.id) updatedItem else item }
+        val remappedHistory = mainAacHistory.map { page ->
+            page.copy(items = page.items.map { item -> if (item.id == updatedItem.id) updatedItem else item })
         }
         mainAacHistory.clear()
         remappedHistory.forEach { mainAacHistory.addLast(it) }
@@ -2275,8 +2299,8 @@ class MainActivity : AppCompatActivity() {
             mainAacItemsById = mergedItemsById
             currentMainAacItems = currentMainAacItems.map { item -> mergedItemsById[item.id] ?: item }
             currentMainAacOrderedItems = currentMainAacOrderedItems.map { item -> mergedItemsById[item.id] ?: item }
-            val remappedHistory = mainAacHistory.map { pageItems ->
-                pageItems.map { item -> mergedItemsById[item.id] ?: item }
+            val remappedHistory = mainAacHistory.map { page ->
+                page.copy(items = page.items.map { item -> mergedItemsById[item.id] ?: item })
             }
             mainAacHistory.clear()
             remappedHistory.forEach { mainAacHistory.addLast(it) }
