@@ -12,7 +12,8 @@ object AacLocalizedTextResolver {
     fun resolveLabel(item: AacItem, languageCode: String): String {
         val localizedTexts = item.toLocalizedTexts()
         return resolveText(localizedTexts, languageCode) { it.label }
-            ?: item.labelSl.takeIf { it.isNotBlank() }
+            ?: resolveText(localizedTexts, languageCode) { it.speakText }
+            ?: safeMissingTextFallback(item, languageCode)
             ?: item.id
     }
 
@@ -32,24 +33,18 @@ object AacLocalizedTextResolver {
                 Log.w(TAG, "Missing uk speechText itemId=${item.id}; using uk label fallback")
                 return ResolvedSpeechText(text, selectedCode, usedLanguageFallback = true)
             }
-            localizedTexts[AacLanguageResolver.DEFAULT_LANGUAGE_CODE]?.speakText.clean()?.let { text ->
-                Log.w(TAG, "Missing uk speechText itemId=${item.id}; using sl speech fallback")
-                return ResolvedSpeechText(
-                    text,
-                    AacLanguageResolver.DEFAULT_LANGUAGE_CODE,
-                    usedLanguageFallback = true
-                )
-            }
-            localizedTexts[AacLanguageResolver.DEFAULT_LANGUAGE_CODE]?.label.clean()?.let { text ->
-                Log.w(TAG, "Missing uk speechText itemId=${item.id}; using sl label fallback")
-                return ResolvedSpeechText(
-                    text,
-                    AacLanguageResolver.DEFAULT_LANGUAGE_CODE,
-                    usedLanguageFallback = true
-                )
-            }
             Log.w(TAG, "Missing uk speechText itemId=${item.id}; no fallback text available")
             return ResolvedSpeechText("", selectedCode, usedLanguageFallback = true)
+        }
+
+        if (selectedCode != AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            val selectedText = resolveText(localizedTexts, selectedCode) { it.speakText }
+                ?: resolveText(localizedTexts, selectedCode) { it.label }
+            return ResolvedSpeechText(
+                text = selectedText.orEmpty(),
+                languageCode = selectedCode,
+                usedLanguageFallback = selectedText.isNullOrBlank()
+            )
         }
 
         return ResolvedSpeechText(
@@ -75,6 +70,11 @@ object AacLocalizedTextResolver {
         return item.toLocalizedTexts()[selectedCode]?.speakText.clean() != null
     }
 
+    fun hasStoredQuestionForLanguage(item: AacItem, languageCode: String): Boolean {
+        val selectedCode = AacLanguageResolver.normalize(languageCode)
+        return item.toLocalizedTexts()[selectedCode]?.question.clean() != null
+    }
+
     private fun resolveText(
         localizedTexts: Map<String, AacLocalizedText>,
         languageCode: String,
@@ -85,8 +85,18 @@ object AacLocalizedTextResolver {
             return localizedTexts[AacLanguageResolver.DEFAULT_LANGUAGE_CODE]?.let(selector).clean()
         }
         return localizedTexts[selectedCode]?.let(selector).clean()
-            ?: localizedTexts[AacLanguageResolver.DEFAULT_LANGUAGE_CODE]?.let(selector).clean()
-            ?: localizedTexts.values.firstNotNullOfOrNull { selector(it).clean() }
+    }
+
+    private fun safeMissingTextFallback(item: AacItem, languageCode: String): String? {
+        val selectedCode = AacLanguageResolver.normalize(languageCode)
+        if (selectedCode == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            return item.labelSl.takeIf { it.isNotBlank() }
+        }
+        return item.id
+            .trim()
+            .replace('_', ' ')
+            .uppercase()
+            .takeIf { it.isNotBlank() }
     }
 
     private fun AacItem.toLocalizedTexts(): Map<String, AacLocalizedText> {

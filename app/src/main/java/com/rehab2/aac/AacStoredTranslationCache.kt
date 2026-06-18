@@ -16,6 +16,7 @@ object AacStoredTranslationCache {
     data class Translation(
         val label: String,
         val speechText: String,
+        val questionText: String? = null,
         val cacheEntry: AacTranslationCacheEntry? = null
     )
 
@@ -38,11 +39,14 @@ object AacStoredTranslationCache {
 
         val hasStoredLabel = AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage)
         val hasStoredSpeechText = AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
+        val hasStoredQuestion = AacLocalizedTextResolver.hasStoredQuestionForLanguage(item, normalizedLanguage)
         val storedLabel = AacLocalizedTextResolver.resolveLabel(item, normalizedLanguage)
         val storedSpeechText = AacLocalizedTextResolver.resolveSpeakText(item, normalizedLanguage)
+        val storedQuestion = AacLocalizedTextResolver.resolveQuestion(item, normalizedLanguage)
+        val sourceQuestion = sourceQuestionFor(item)
         val refreshNeeded = needsTranslationRefresh(item, normalizedLanguage)
-        if (hasStoredLabel && hasStoredSpeechText && !refreshNeeded) {
-            return Translation(storedLabel, storedSpeechText, item.translationCacheMeta[normalizedLanguage])
+        if (hasStoredLabel && hasStoredSpeechText && (sourceQuestion.isBlank() || hasStoredQuestion) && !refreshNeeded) {
+            return Translation(storedLabel, storedSpeechText, storedQuestion, item.translationCacheMeta[normalizedLanguage])
         }
 
         val generated = generateTranslation(context, item, normalizedLanguage) ?: return null
@@ -50,6 +54,7 @@ object AacStoredTranslationCache {
             Translation(
                 label = if (hasStoredLabel && !refreshNeeded) storedLabel else generated.label,
                 speechText = if (hasStoredSpeechText && !refreshNeeded) storedSpeechText else generated.speechText,
+                questionText = if (hasStoredQuestion && !refreshNeeded) storedQuestion else generated.questionText,
                 cacheEntry = generated.cacheEntry
             )
         } else {
@@ -65,7 +70,8 @@ object AacStoredTranslationCache {
 
         val hasStoredLabel = AacLocalizedTextResolver.hasStoredLabelForLanguage(item, normalizedLanguage)
         val hasStoredSpeechText = AacLocalizedTextResolver.hasStoredSpeakTextForLanguage(item, normalizedLanguage)
-        if (!hasStoredLabel || !hasStoredSpeechText) {
+        val hasStoredQuestion = AacLocalizedTextResolver.hasStoredQuestionForLanguage(item, normalizedLanguage)
+        if (!hasStoredLabel || !hasStoredSpeechText || (sourceQuestionFor(item).isNotBlank() && !hasStoredQuestion)) {
             return true
         }
         if (item.translationManualOverride) {
@@ -142,6 +148,7 @@ object AacStoredTranslationCache {
             ?.takeIf { it.isNotBlank() }
             ?: item.speechText?.trim()?.takeIf { it.isNotBlank() }
             ?: sourceLabel
+        val sourceQuestion = sourceQuestionFor(item)
         val sourceText = sourceTextFor(item)
         val sourceLanguage = AacLanguageResolver.normalize(item.baseLanguage).ifBlank {
             AacLanguageResolver.DEFAULT_LANGUAGE_CODE
@@ -157,14 +164,14 @@ object AacStoredTranslationCache {
                         put("role", "system")
                         put(
                             "content",
-                            "Translate AAC patient button text. Return only compact JSON with keys label and speechText. Keep meaning simple and patient-safe."
+                            "Translate AAC patient button text. Return only compact JSON with keys label, speechText, and questionText. Keep meaning simple and patient-safe. If Question is empty, return questionText as an empty string."
                         )
                     })
                     put(JSONObject().apply {
                         put("role", "user")
                         put(
                             "content",
-                            "Target language: ${languageName(languageCode)} ($languageCode)\nLabel: $sourceLabel\nSpeech text: $sourceSpeech"
+                            "Target language: ${languageName(languageCode)} ($languageCode)\nLabel: $sourceLabel\nSpeech text: $sourceSpeech\nQuestion: $sourceQuestion"
                         )
                     })
                 })
@@ -230,6 +237,7 @@ object AacStoredTranslationCache {
             val item = findItemById(itemsArray, sourceItem.id) ?: sourceItem.toJson().also { itemsArray.put(it) }
             val labelByLanguage = item.optJSONObject("labelByLanguage") ?: JSONObject()
             val speechTextByLanguage = item.optJSONObject("speechTextByLanguage") ?: JSONObject()
+            val questionByLanguage = item.optJSONObject("questionByLanguage") ?: JSONObject()
             val existingMeta = parseCacheEntry(item.optJSONObject("translationCacheMeta")?.optJSONObject(languageCode))
             val stale = existingMeta?.sourceTextHash != sourceTextHash(sourceItem)
             val generatedLegacyTranslation = sourceItem.translationGenerated || sourceItem.translationSource == "ai"
@@ -241,8 +249,14 @@ object AacStoredTranslationCache {
             if (speechTextByLanguage.optString(languageCode).trim().isBlank() || mayOverwrite) {
                 speechTextByLanguage.put(languageCode, translation.speechText)
             }
+            translation.questionText?.trim()?.takeIf { it.isNotBlank() }?.let { questionText ->
+                if (questionByLanguage.optString(languageCode).trim().isBlank() || mayOverwrite) {
+                    questionByLanguage.put(languageCode, questionText)
+                }
+            }
             item.put("labelByLanguage", labelByLanguage)
             item.put("speechTextByLanguage", speechTextByLanguage)
+            item.put("questionByLanguage", questionByLanguage)
             val translationCacheMeta = item.optJSONObject("translationCacheMeta") ?: JSONObject()
             translation.cacheEntry?.let { cacheEntry ->
                 translationCacheMeta.put(languageCode, cacheEntry.toJson(sourceItem.id))
@@ -355,7 +369,8 @@ object AacStoredTranslationCache {
             val json = JSONObject(jsonText)
             val label = json.optString("label").trim()
             val speechText = json.optString("speechText").trim().ifBlank { label }
-            if (label.isBlank()) null else Translation(label = label, speechText = speechText)
+            val questionText = json.optString("questionText").trim().takeIf { it.isNotBlank() }
+            if (label.isBlank()) null else Translation(label = label, speechText = speechText, questionText = questionText)
         } catch (_: Exception) {
             val clean = jsonText.lineSequence().firstOrNull()?.trim().orEmpty()
             if (clean.isBlank()) null else Translation(label = clean, speechText = clean)
@@ -396,7 +411,15 @@ object AacStoredTranslationCache {
             ?.takeIf { it.isNotBlank() }
             ?: item.speechText?.trim()?.takeIf { it.isNotBlank() }
             ?: label
-        return "label=$label\nspeech=$speech"
+        val question = sourceQuestionFor(item)
+        return "label=$label\nspeech=$speech\nquestion=$question"
+    }
+
+    private fun sourceQuestionFor(item: AacItem): String {
+        return item.questionByLanguage[AacLanguageResolver.DEFAULT_LANGUAGE_CODE]?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?: item.questionSl?.trim()?.takeIf { it.isNotBlank() }
+            ?: ""
     }
 
     private fun sourceTextHash(item: AacItem): String {

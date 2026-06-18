@@ -1659,6 +1659,11 @@ class MainActivity : AppCompatActivity() {
         val prompt = guidedPrompt.ifBlank { localizedPrompt }
             .trim()
             .ifBlank { mainAacQuestionFallback(item, languageCode) }
+        if (prompt.isBlank() && requestMainAacQuestionTranslation(item, languageCode)) {
+            speakMainAacVoiceAssistantPartialThenPrompt("", languageCode)
+            hideMainAacQuestion()
+            return
+        }
         if (speakMainAacVoiceAssistantPartialThenPrompt(prompt, languageCode)) {
             return
         }
@@ -1949,6 +1954,56 @@ class MainActivity : AppCompatActivity() {
             return ""
         }
         return AacQuestionEngine.nextQuestion(mainAacConversationTokens(item, null)).orEmpty()
+    }
+
+    private fun requestMainAacQuestionTranslation(item: AacItem, languageCode: String): Boolean {
+        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
+        if (normalizedLanguage.isBlank() || normalizedLanguage == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            return false
+        }
+        if (!AacStoredTranslationCache.needsTranslationRefresh(item, normalizedLanguage)) {
+            return false
+        }
+        val translationKey = "${item.id}:$normalizedLanguage:question"
+        synchronized(pendingMainAacTranslationKeys) {
+            if (!pendingMainAacTranslationKeys.add(translationKey)) {
+                return true
+            }
+        }
+        Thread {
+            val translation = AacStoredTranslationCache.ensureTranslation(
+                context = applicationContext,
+                item = item,
+                languageCode = normalizedLanguage
+            )
+            mainHandler.post {
+                synchronized(pendingMainAacTranslationKeys) {
+                    pendingMainAacTranslationKeys.remove(translationKey)
+                }
+                val questionText = translation?.questionText?.trim().orEmpty()
+                if (translation == null || questionText.isBlank()) {
+                    recordLastAudioEvent("AAC missing translated question itemId=${item.id} language=$normalizedLanguage")
+                    return@post
+                }
+                val updatedItem = item.copy(
+                    labelByLanguage = item.labelByLanguage + (normalizedLanguage to translation.label),
+                    speechTextByLanguage = item.speechTextByLanguage + (normalizedLanguage to translation.speechText),
+                    questionByLanguage = item.questionByLanguage + (normalizedLanguage to questionText),
+                    translationCacheMeta = translation.cacheEntry?.let { cacheEntry ->
+                        item.translationCacheMeta + (normalizedLanguage to cacheEntry)
+                    } ?: item.translationCacheMeta,
+                    translationGenerated = true,
+                    translationSource = "ai"
+                )
+                replaceMainAacItem(updatedItem)
+                if (selectedMainAacItemId == item.id) {
+                    showMainAacQuestion(questionText)
+                    shouldLockMainAacInputOnSpeechStart = false
+                    aacAudioPlayer.speakText(questionText, normalizedLanguage)
+                }
+            }
+        }.start()
+        return true
     }
 
     private fun handleMainAacWaterModifierSelection(item: AacItem, languageCode: String): Boolean {
@@ -2440,6 +2495,9 @@ class MainActivity : AppCompatActivity() {
                 val updatedItem = item.copy(
                     labelByLanguage = item.labelByLanguage + (normalizedLanguage to translation.label),
                     speechTextByLanguage = item.speechTextByLanguage + (normalizedLanguage to translation.speechText),
+                    questionByLanguage = translation.questionText?.trim()?.takeIf { it.isNotBlank() }?.let { questionText ->
+                        item.questionByLanguage + (normalizedLanguage to questionText)
+                    } ?: item.questionByLanguage,
                     translationCacheMeta = translation.cacheEntry?.let { cacheEntry ->
                         item.translationCacheMeta + (normalizedLanguage to cacheEntry)
                     } ?: item.translationCacheMeta,
