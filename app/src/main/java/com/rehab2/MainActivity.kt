@@ -2171,8 +2171,8 @@ class MainActivity : AppCompatActivity() {
     private fun isMainAacPainConversation(items: List<AacItem>): Boolean {
         return items.any { item ->
             normalizeMainAacKey(item.id) == "pain" ||
-                normalizeMainAacKey(item.categoryId) == "pain" ||
-                normalizeMainAacKey(item.meaningGroup) == "pain"
+                normalizeMainAacKey(item.categoryId.orEmpty()) == "pain" ||
+                normalizeMainAacKey(item.meaningGroup.orEmpty()) == "pain"
         }
     }
 
