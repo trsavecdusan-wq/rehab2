@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
+import android.text.TextUtils
 import android.text.method.PasswordTransformationMethod
 import android.util.Log
 import android.util.TypedValue
@@ -47,6 +48,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.widget.TextViewCompat
 import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacContentBootstrap
 import com.rehab2.aac.AacItem
@@ -1070,9 +1072,17 @@ class MainActivity : AppCompatActivity() {
                 )
                 gravity = android.view.Gravity.CENTER
                 includeFontPadding = false
-                maxLines = 2
+                ellipsize = TextUtils.TruncateAt.END
+                maxLines = 1
                 setTextColor(0xFFF4F7FA.toInt())
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, labelTextSize)
+                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    this,
+                    7,
+                    labelTextSize.toInt(),
+                    1,
+                    TypedValue.COMPLEX_UNIT_SP
+                )
                 setTypeface(typeface, Typeface.BOLD)
             })
         }

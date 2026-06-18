@@ -623,7 +623,7 @@ object AacContentBootstrap {
                 speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ´ĐľĐżĐľĐĽĐľĐ¶Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– Đ˛ĐĽĐ¸Ń‚Đ¸ŃŃŹ."
             ),
             "help_showering" to ToaletaTerminalRepair(
-                labelSl = "TUĹ ",
+                labelSl = "TUŠ",
                 labelUk = "Đ”ĐŁĐ¨",
                 speechSl = "Prosim, pomagajte mi pri tuĹˇiranju.",
                 speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ´ĐľĐżĐľĐĽĐľĐ¶Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐżŃ€Đ¸ĐąĐ˝ŃŹŃ‚Đ¸ Đ´ŃŃ."
