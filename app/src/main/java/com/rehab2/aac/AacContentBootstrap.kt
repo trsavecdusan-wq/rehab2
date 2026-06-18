@@ -1251,7 +1251,7 @@ object AacContentBootstrap {
             repaired++
         }
         val questionByLanguage = item.optJSONObject("questionByLanguage") ?: JSONObject()
-        if (questionByLanguage.optString("sl").isBlank()) {
+        if (questionByLanguage.optString("sl") != questionSl) {
             questionByLanguage.put("sl", questionSl)
             item.put("questionByLanguage", questionByLanguage)
             repaired++
@@ -2390,8 +2390,8 @@ object AacContentBootstrap {
         Triple("right_arm", painArmDetailChildren(), "Kje na desni roki?"),
         Triple("left_leg", painLegDetailChildren(), "Kje na levi nogi?"),
         Triple("right_leg", painLegDetailChildren(), "Kje na desni nogi?"),
-        Triple("back", painBackDetailChildren(), "Kje na hrbtu?"),
-        Triple("belly", painBellyDetailChildren(), "Kje v trebuhu?"),
+        Triple("back", painBackDetailChildren(), "Kje boli?"),
+        Triple("belly", painBellyDetailChildren(), "Kje boli?"),
         Triple("chest", painStrengthChildren(), "Kako močno boli?"),
         Triple("neck", painStrengthChildren(), "Kako močno boli?"),
         Triple("eye", listOf("eye_left", "eye_right", "eye_both"), "Katero oko?"),

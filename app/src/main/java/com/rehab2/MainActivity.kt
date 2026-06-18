@@ -634,7 +634,8 @@ class MainActivity : AppCompatActivity() {
 
     private data class MainAacHistoryEntry(
         val items: List<AacItem>,
-        val selectedItemId: String?
+        val selectedItemId: String?,
+        val pageDebugId: String
     )
 
     private lateinit var radioTiles: List<TextView>
@@ -1177,6 +1178,7 @@ class MainActivity : AppCompatActivity() {
         }
         val previousPage = mainAacHistory.removeLast()
         val previousItems = previousPage.items
+        currentMainAacPageDebugId = previousPage.pageDebugId
         if (currentMainAacConversationItems.size > 1) {
             currentMainAacConversationItems = currentMainAacConversationItems.dropLast(1)
             currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
@@ -1206,6 +1208,20 @@ class MainActivity : AppCompatActivity() {
         currentMainAacModifierItemsByGroup.clear()
         cancelMainAacGuidedAutoComplete()
         selectedMainAacItemId = previousPage.selectedItemId
+        val parentItem = previousPage.selectedItemId?.let { itemId -> mainAacItemsById[itemId] }
+        val prompt = parentItem?.takeIf { item -> normalizeMainAacKey(item.id) == "pain" }?.let { item ->
+            val languageCode = getActiveSpeechLanguage()
+            if (languageCode.trim().lowercase(Locale.ROOT) == "sl") {
+                AacGuidedPromptEngine.questionFor(item)
+            } else {
+                AacLocalizedTextResolver.resolveQuestion(item, languageCode).orEmpty()
+            }
+        }.orEmpty()
+        if (prompt.isNotBlank()) {
+            showMainAacQuestion(prompt)
+        } else {
+            hideMainAacQuestion()
+        }
         showMainAacItems(previousItems)
     }
 
@@ -1470,7 +1486,8 @@ class MainActivity : AppCompatActivity() {
             mainAacHistory.addLast(
                 MainAacHistoryEntry(
                     items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
-                    selectedItemId = selectedMainAacItemIdBeforeTap
+                    selectedItemId = selectedMainAacItemIdBeforeTap,
+                    pageDebugId = currentMainAacPageDebugId
                 )
             )
             currentMainAacPageDebugId = item.targetPageId
@@ -1492,7 +1509,8 @@ class MainActivity : AppCompatActivity() {
                 mainAacHistory.addLast(
                     MainAacHistoryEntry(
                         items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
-                        selectedItemId = selectedMainAacItemIdBeforeTap
+                        selectedItemId = selectedMainAacItemIdBeforeTap,
+                        pageDebugId = currentMainAacPageDebugId
                     )
                 )
                 currentMainAacPageDebugId = "children:${item.id}"
@@ -1909,7 +1927,8 @@ class MainActivity : AppCompatActivity() {
         mainAacHistory.addLast(
             MainAacHistoryEntry(
                 items = currentMainAacOrderedItems.ifEmpty { currentMainAacItems },
-                selectedItemId = selectedMainAacItemIdBeforeTap
+                selectedItemId = selectedMainAacItemIdBeforeTap,
+                pageDebugId = currentMainAacPageDebugId
             )
         )
         currentMainAacPageDebugId = "guided:${item.id}"
@@ -2826,11 +2845,7 @@ class MainActivity : AppCompatActivity() {
             "nose",
             "mouth" -> AAC_PAIN_STRENGTH_CHILDREN
             "left_arm",
-            "right_arm" -> if (isPainExtendedVersionEnabled()) {
-                AAC_PAIN_ARM_DETAIL_CHILDREN
-            } else {
-                AAC_PAIN_STRENGTH_CHILDREN
-            }
+            "right_arm" -> AAC_PAIN_ARM_DETAIL_CHILDREN
             "left_leg",
             "right_leg" -> AAC_PAIN_LEG_DETAIL_CHILDREN
             "back" -> AAC_PAIN_BACK_DETAIL_CHILDREN
