@@ -519,10 +519,17 @@ object AacStarterContentV1 {
                 meaningGroup = meaningGroup
             )
         )
+        val effectiveImagePath = safeStarterSystemIconPath(
+            id = id,
+            meaningType = meaningType,
+            meaningGroup = meaningGroup,
+            imagePath = imagePath,
+            iconSource = iconSource
+        )
         return AacItem(
             id = id,
             labelSl = label,
-            imagePath = imagePath,
+            imagePath = effectiveImagePath,
             actionType = when {
                 targetPageId.isNotBlank() -> "open_page"
                 opensSubicons -> "open_subicons"
@@ -531,8 +538,8 @@ object AacStarterContentV1 {
             targetPageId = targetPageId,
             speakTextSl = speech,
             speechText = speech,
-            iconSource = iconSource,
-            suggestedIconPath = suggestedIconPath(iconSource, imagePath),
+            iconSource = IconSource.SYSTEM,
+            suggestedIconPath = suggestedIconPath(IconSource.SYSTEM, effectiveImagePath),
             isRootItem = visibleUnderIds.isEmpty(),
             isHiddenUntilParent = false,
             visibleUnderIds = visibleUnderIds,
@@ -582,6 +589,142 @@ object AacStarterContentV1 {
             else -> if (meaningGroup == "pain") "У мене болить $spokenLabel." else "$labelUk."
         }
     }
+
+    private fun safeStarterSystemIconPath(
+        id: String,
+        meaningType: String,
+        meaningGroup: String,
+        imagePath: String,
+        iconSource: IconSource
+    ): String {
+        val normalizedPath = imagePath.trim().replace('\\', '/').removePrefix("/")
+        if (iconSource == IconSource.SYSTEM && normalizedPath in SAFE_SYSTEM_ICON_PATHS) {
+            return normalizedPath
+        }
+        return SYSTEM_ICON_BY_STARTER_ID[id]
+            ?: SYSTEM_ICON_BY_MEANING_GROUP[meaningGroup.trim().lowercase()]
+            ?: SYSTEM_ICON_BY_MEANING_TYPE[meaningType.trim().uppercase()]
+            ?: "system/other.png"
+    }
+
+    private val SAFE_SYSTEM_ICON_PATHS = setOf(
+        "system/come_to_me.png",
+        "system/dont_understand.png",
+        "system/help.png",
+        "system/home.png",
+        "system/hungry.png",
+        "system/miss_someone.png",
+        "system/need.png",
+        "system/no.png",
+        "system/other.png",
+        "system/pain.png",
+        "system/people.png",
+        "system/please.png",
+        "system/problem.png",
+        "system/real_world.png",
+        "system/repeat.png",
+        "system/rest.png",
+        "system/slower.png",
+        "system/sorry.png",
+        "system/thank_you.png",
+        "system/thirsty.png",
+        "system/tired.png",
+        "system/wait.png",
+        "system/wc.png",
+        "system/what.png",
+        "system/when.png",
+        "system/where.png",
+        "system/yes.png"
+    )
+
+    private val SYSTEM_ICON_BY_STARTER_ID = mapOf(
+        "call" to "system/come_to_me.png",
+        "come_to_me" to "system/come_to_me.png",
+        "contact_call" to "system/come_to_me.png",
+        "dont_understand" to "system/dont_understand.png",
+        "no_understand" to "system/dont_understand.png",
+        "help" to "system/help.png",
+        "home" to "system/home.png",
+        "hungry" to "system/hungry.png",
+        "food" to "system/hungry.png",
+        "miss_someone" to "system/miss_someone.png",
+        "miss_you" to "system/miss_someone.png",
+        "need" to "system/need.png",
+        "no" to "system/no.png",
+        "other" to "system/other.png",
+        "pain" to "system/pain.png",
+        "people" to "system/people.png",
+        "person_other" to "system/people.png",
+        "please" to "system/please.png",
+        "problem" to "system/problem.png",
+        "real_world" to "system/real_world.png",
+        "repeat" to "system/repeat.png",
+        "repeat_question" to "system/repeat.png",
+        "repeat_last_sentence" to "system/repeat.png",
+        "repeat_slower" to "system/repeat.png",
+        "rest" to "system/rest.png",
+        "need_rest" to "system/rest.png",
+        "slower" to "system/slower.png",
+        "slower_little" to "system/slower.png",
+        "slower_much" to "system/slower.png",
+        "sorry" to "system/sorry.png",
+        "thank_you" to "system/thank_you.png",
+        "thirsty" to "system/thirsty.png",
+        "water" to "system/thirsty.png",
+        "drink_water" to "system/thirsty.png",
+        "tired" to "system/tired.png",
+        "sleepy" to "system/tired.png",
+        "wc" to "system/wc.png",
+        "toilet" to "system/wc.png",
+        "what_root" to "system/what.png",
+        "where_root" to "system/where.png",
+        "when_root" to "system/when.png",
+        "yes" to "system/yes.png"
+    )
+
+    private val SYSTEM_ICON_BY_MEANING_GROUP = mapOf(
+        "care" to "system/help.png",
+        "core" to "system/other.png",
+        "drink" to "system/thirsty.png",
+        "environment" to "system/home.png",
+        "feeling" to "system/tired.png",
+        "food" to "system/hungry.png",
+        "health" to "system/problem.png",
+        "mobility" to "system/help.png",
+        "need" to "system/need.png",
+        "pain" to "system/pain.png",
+        "patient_profile" to "system/people.png",
+        "people" to "system/people.png",
+        "place" to "system/where.png",
+        "problem" to "system/problem.png",
+        "question" to "system/what.png",
+        "scenario" to "system/real_world.png",
+        "social" to "system/people.png",
+        "time" to "system/when.png",
+        "wc" to "system/wc.png"
+    )
+
+    private val SYSTEM_ICON_BY_MEANING_TYPE = mapOf(
+        "ACTION" to "system/other.png",
+        "ACTIVITY" to "system/other.png",
+        "CONFIRMATION" to "system/yes.png",
+        "CORE_ACTION" to "system/other.png",
+        "DRINK" to "system/thirsty.png",
+        "ENVIRONMENT" to "system/home.png",
+        "FEELING" to "system/tired.png",
+        "FOOD" to "system/hungry.png",
+        "HELPER" to "system/help.png",
+        "MODIFIER" to "system/other.png",
+        "NEED" to "system/need.png",
+        "PAIN" to "system/pain.png",
+        "PEOPLE" to "system/people.png",
+        "PLACE" to "system/where.png",
+        "PROBLEM" to "system/problem.png",
+        "QUESTION" to "system/what.png",
+        "SCENARIO" to "system/real_world.png",
+        "STATE" to "system/other.png",
+        "TIME" to "system/when.png"
+    )
 
     private val UK_QUESTION_BY_SL = mapOf(
         "Česa ne moreš?" to "Що ти не можеш зробити?",
