@@ -193,6 +193,7 @@ object AacContentBootstrap {
         val repairedRootSystemIcons = repairRootSystemIconMetadata(context, itemsArray)
         val repairedFixedRowSystemIcons = repairFixedRowSystemIconMetadata(context, itemsArray)
         val repairedPersonPhotoMetadata = repairPersonPhotoMetadata(context, itemsArray)
+        val repairedStarterUkrainianContent = repairStarterUkrainianContent(itemsArray, starterItems)
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
             return Result(
@@ -252,7 +253,8 @@ object AacContentBootstrap {
             repairedNoUnderstandLabels > 0 ||
             repairedDrinkSpeechItems > 0 ||
             repairedFoodSpeechItems > 0 ||
-            repairedPainSpeechItems > 0
+            repairedPainSpeechItems > 0 ||
+            repairedStarterUkrainianContent > 0
         ) {
             saveItemsJson(itemsFile, rawItems, itemsArray)
         } else if (itemsFile?.exists() != true && rawItems.createdFromFallback) {
@@ -283,7 +285,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren toaletaV1TreeRepaired=$repairedToaletaV1Tree peopleGroupChildrenRepaired=$repairedPeopleGroupChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren toaletaV1TreeRepaired=$repairedToaletaV1Tree peopleGroupChildrenRepaired=$repairedPeopleGroupChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata starterUkrainianContentRepaired=$repairedStarterUkrainianContent fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -463,6 +465,29 @@ object AacContentBootstrap {
         return merged
     }
 
+    private fun repairStarterUkrainianContent(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
+        val starterById = starterItems.associateBy { item -> item.id }
+        var repaired = 0
+        itemObjects(itemsArray).forEach { item ->
+            val starter = starterById[item.optString("id").trim()] ?: return@forEach
+            if (isProtectedStarterContentItem(item)) return@forEach
+            repaired += putLanguageValueIfBlank(item, "labelByLanguage", "uk", starter.labelByLanguage["uk"].orEmpty())
+            repaired += putLanguageValueIfBlank(
+                item,
+                "speechTextByLanguage",
+                "uk",
+                starter.speechTextByLanguage["uk"].orEmpty()
+            )
+            repaired += putLanguageValueIfBlank(
+                item,
+                "questionByLanguage",
+                "uk",
+                starter.questionByLanguage["uk"].orEmpty()
+            )
+        }
+        return repaired
+    }
+
     private fun repairStarterCategoryChildren(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
         val itemsById = itemObjects(itemsArray)
             .mapNotNull { item ->
@@ -550,6 +575,21 @@ object AacContentBootstrap {
             item.optBoolean("manualEdit", false) ||
             item.optBoolean("manualOverride", false) ||
             item.optBoolean("customized", false) ||
+            source == "CUSTOM" ||
+            source == "PATIENT" ||
+            source == "THERAPIST"
+    }
+
+    private fun isProtectedStarterContentItem(item: JSONObject): Boolean {
+        val source = item.optString("source").trim().uppercase()
+        return item.optBoolean("lockedByUser", false) ||
+            item.optBoolean("modifiedByTherapist", false) ||
+            item.optBoolean("userEdited", false) ||
+            item.optBoolean("therapistEdited", false) ||
+            item.optBoolean("manualEdit", false) ||
+            item.optBoolean("manualOverride", false) ||
+            item.optBoolean("customized", false) ||
+            item.optBoolean("locked", false) ||
             source == "CUSTOM" ||
             source == "PATIENT" ||
             source == "THERAPIST"
@@ -711,6 +751,21 @@ object AacContentBootstrap {
             return 0
         }
         languageObject.put(languageCode, value)
+        item.put(objectKey, languageObject)
+        return 1
+    }
+
+    private fun putLanguageValueIfBlank(
+        item: JSONObject,
+        objectKey: String,
+        languageCode: String,
+        value: String
+    ): Int {
+        val cleaned = value.trim()
+        if (cleaned.isBlank()) return 0
+        val languageObject = item.optJSONObject(objectKey) ?: JSONObject()
+        if (languageObject.optString(languageCode).trim().isNotBlank()) return 0
+        languageObject.put(languageCode, cleaned)
         item.put(objectKey, languageObject)
         return 1
     }
