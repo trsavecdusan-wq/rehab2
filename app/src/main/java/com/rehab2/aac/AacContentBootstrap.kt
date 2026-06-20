@@ -92,6 +92,53 @@ object AacContentBootstrap {
         "cedevita"
     )
 
+    private val QUICK_PATIENT_SYSTEM_ICON_IDS = setOf(
+        "help_washing",
+        "help_showering",
+        "help_dressing",
+        "noticed_blood",
+        "nurse_help",
+        "wc_help",
+        "wc_now",
+        "wc_soon",
+        "wc_wet",
+        "wc_dirty",
+        "wc_wet_and_dirty",
+        "water",
+        "tea",
+        "coffee",
+        "juice",
+        "sparkling_drink",
+        "milk_drinks",
+        "drink_fanta",
+        "drink_coca_cola",
+        "drink_pepsi",
+        "drink_radenska",
+        "non_sparkling_water",
+        "mineral_water",
+        "cold_water",
+        "back",
+        "belly",
+        "chest",
+        "head",
+        "left_arm",
+        "right_arm",
+        "left_leg",
+        "right_leg",
+        "arm_shoulder",
+        "arm_elbow",
+        "arm_wrist",
+        "arm_palm",
+        "leg_hip",
+        "leg_knee",
+        "leg_ankle",
+        "leg_foot",
+        "pain_light",
+        "pain_medium",
+        "pain_strong",
+        "pain_very_strong"
+    )
+
     private val BUNDLED_SYSTEM_ICON_FILES = listOf(
         "aac_drink_coffee.png",
         "aac_drink_cola.png",
@@ -569,12 +616,17 @@ object AacContentBootstrap {
         val starterById = starterItems.associateBy { item -> item.id }
         var repaired = 0
         itemObjects(itemsArray).forEach { item ->
-            val starter = starterById[item.optString("id").trim()] ?: return@forEach
-            if (isProtectedStarterContentItem(item)) return@forEach
-            if (hasUsableLocalIcon(context, item)) return@forEach
+            val itemId = item.optString("id").trim()
+            val starter = starterById[itemId] ?: return@forEach
+            val isQuickPatientSystemIcon = itemId in QUICK_PATIENT_SYSTEM_ICON_IDS
+            if (isProtectedStarterSystemRepairItem(item)) return@forEach
+            if (!isQuickPatientSystemIcon && hasUsableLocalIcon(context, item)) return@forEach
 
             val desiredImagePath = starter.imagePath.trim()
             if (desiredImagePath.isBlank()) return@forEach
+            if (isQuickPatientSystemIcon && !desiredImagePath.startsWith("system/aac_", ignoreCase = true)) {
+                return@forEach
+            }
             if (AacStoragePaths.resolveIconFile(context, desiredImagePath, IconSource.SYSTEM)?.isFile != true) {
                 return@forEach
             }
@@ -596,7 +648,7 @@ object AacContentBootstrap {
         AAC_SPEECH_QUALITY_REPAIR_IDS.forEach { id ->
             val starter = starterById[id] ?: return@forEach
             val item = itemsById[id] ?: return@forEach
-            if (isProtectedStarterContentItem(item)) return@forEach
+            if (isProtectedStarterSystemRepairItem(item)) return@forEach
             repaired += putIfDifferent(item, "labelSl", starter.labelSl)
             repaired += putIfDifferent(item, "speakTextSl", starter.speakTextSl.orEmpty())
             repaired += putIfDifferent(item, "speechText", starter.speechText.orEmpty())
@@ -723,6 +775,21 @@ object AacContentBootstrap {
             source == "THERAPIST"
     }
 
+    private fun isProtectedStarterSystemRepairItem(item: JSONObject): Boolean {
+        val source = item.optString("source").trim().uppercase()
+        return item.optBoolean("lockedByUser", false) ||
+            item.optBoolean("modifiedByTherapist", false) ||
+            item.optBoolean("userEdited", false) ||
+            item.optBoolean("therapistEdited", false) ||
+            item.optBoolean("manualEdit", false) ||
+            item.optBoolean("manualOverride", false) ||
+            item.optBoolean("customized", false) ||
+            item.optBoolean("locked", false) ||
+            source == "CUSTOM" ||
+            source == "PATIENT" ||
+            source == "THERAPIST"
+    }
+
     private fun hasUsableLocalIcon(context: Context, item: JSONObject): Boolean {
         val imagePath = item.optString("imagePath").trim()
         if (imagePath.isBlank()) return false
@@ -761,7 +828,7 @@ object AacContentBootstrap {
         }
 
         itemsById["nurse_help"]?.let { item ->
-            if (isProtectedLocalAacItem(item)) return@let
+            if (isProtectedStarterSystemRepairItem(item)) return@let
             repaired += putIfDifferent(item, "labelSl", "SESTRA")
             repaired += putIfDifferent(item, "speakTextSl", "Potrebujem medicinsko sestro.")
             repaired += putIfDifferent(item, "speechText", "Potrebujem medicinsko sestro.")
@@ -2504,7 +2571,7 @@ object AacContentBootstrap {
         DrinkSpeechRepair("coffee_no_sugar", "BREZ SLADKORJA", "Prosim, rada bi kavo brez sladkorja.", "coffee"),
         DrinkSpeechRepair("orange_juice", "POMARANČNI", "Rada bi pomarančni sok.", "juice", "АПЕЛЬСИНОВИЙ СІК", "Я хочу апельсиновий сік."),
         DrinkSpeechRepair("apple_juice", "JABOLČNI", "Rada bi jabolčni sok.", "juice", "ЯБЛУЧНИЙ СІК", "Я хочу яблучний сік."),
-        DrinkSpeechRepair("blueberry_juice", "BOROVNIČEV", "Rada bi borovničev sok.", "juice", "ЧОРНИЧНИЙ СІК", "Я хочу чорничний сік."),
+        DrinkSpeechRepair("blueberry_juice", "BOROVNIČEV", "Rada bi sok iz borovnic.", "juice", "ЧОРНИЧНИЙ СІК", "Я хочу чорничний сік."),
         DrinkSpeechRepair("strawberry_juice", "JAGODNI", "Rada bi jagodni sok.", "juice", "ПОЛУНИЧНИЙ СІК", "Я хочу полуничний сік."),
         DrinkSpeechRepair("cedevita", "CEDEVITA", "Rada bi Cedevito.", "juice", "ЦЕДЕВІТА", "Я хочу Цедевіту."),
         DrinkSpeechRepair("drink_fanta", "FANTA", "Prosim, rada bi Fanto.", "sparkling_drink"),

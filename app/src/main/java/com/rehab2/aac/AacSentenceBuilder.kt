@@ -156,7 +156,7 @@ object AacSentenceBuilder {
             items.hasId("radenska") -> "Rada bi Radensko."
             items.hasId("orange_juice") -> "Rada bi pomarančni sok."
             items.hasId("apple_juice") -> "Rada bi jabolčni sok."
-            items.hasId("blueberry_juice") -> "Rada bi borovničev sok."
+            items.hasId("blueberry_juice") -> "Rada bi sok iz borovnic."
             items.hasId("strawberry_juice") -> "Rada bi jagodni sok."
             items.hasId("cedevita") -> "Rada bi Cedevito."
             items.hasId("tea") && items.hasId("yes") -> "Rada bi velik \u010daj."
