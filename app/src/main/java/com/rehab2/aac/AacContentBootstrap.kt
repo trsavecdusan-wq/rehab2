@@ -67,6 +67,28 @@ object AacContentBootstrap {
         "wc_call_nurse"
     )
 
+    private val AAC_SPEECH_QUALITY_REPAIR_IDS = setOf(
+        "pain",
+        "wc",
+        "nurse_help",
+        "help_dressing",
+        "help_washing",
+        "help_showering",
+        "noticed_blood",
+        "water",
+        "cold_water",
+        "non_sparkling_water",
+        "flavored_water",
+        "mineral_water",
+        "radenska",
+        "juice",
+        "orange_juice",
+        "apple_juice",
+        "blueberry_juice",
+        "strawberry_juice",
+        "cedevita"
+    )
+
     private val BUNDLED_SYSTEM_ICON_FILES = listOf(
         "come_to_me.png",
         "dont_understand.png",
@@ -194,6 +216,7 @@ object AacContentBootstrap {
         val repairedFixedRowSystemIcons = repairFixedRowSystemIconMetadata(context, itemsArray)
         val repairedPersonPhotoMetadata = repairPersonPhotoMetadata(context, itemsArray)
         val repairedStarterUkrainianContent = repairStarterUkrainianContent(itemsArray, starterItems)
+        val repairedStarterSpeechQualityContent = repairStarterSpeechQualityContent(itemsArray, starterItems)
         val repairedStarterSystemIcons = repairStarterSystemIconContent(context, itemsArray, starterItems)
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
@@ -256,6 +279,7 @@ object AacContentBootstrap {
             repairedFoodSpeechItems > 0 ||
             repairedPainSpeechItems > 0 ||
             repairedStarterUkrainianContent > 0 ||
+            repairedStarterSpeechQualityContent > 0 ||
             repairedStarterSystemIcons > 0
         ) {
             saveItemsJson(itemsFile, rawItems, itemsArray)
@@ -287,7 +311,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren toaletaV1TreeRepaired=$repairedToaletaV1Tree peopleGroupChildrenRepaired=$repairedPeopleGroupChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata starterUkrainianContentRepaired=$repairedStarterUkrainianContent starterSystemIconsRepaired=$repairedStarterSystemIcons fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren toaletaV1TreeRepaired=$repairedToaletaV1Tree peopleGroupChildrenRepaired=$repairedPeopleGroupChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata starterUkrainianContentRepaired=$repairedStarterUkrainianContent starterSpeechQualityContentRepaired=$repairedStarterSpeechQualityContent starterSystemIconsRepaired=$repairedStarterSystemIcons fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -514,6 +538,34 @@ object AacContentBootstrap {
         return repaired
     }
 
+    private fun repairStarterSpeechQualityContent(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
+        val starterById = starterItems.associateBy { item -> item.id }
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+        var repaired = 0
+        AAC_SPEECH_QUALITY_REPAIR_IDS.forEach { id ->
+            val starter = starterById[id] ?: return@forEach
+            val item = itemsById[id] ?: return@forEach
+            if (isProtectedStarterContentItem(item)) return@forEach
+            repaired += putIfDifferent(item, "labelSl", starter.labelSl)
+            repaired += putIfDifferent(item, "speakTextSl", starter.speakTextSl.orEmpty())
+            repaired += putIfDifferent(item, "speechText", starter.speechText.orEmpty())
+            starter.labelByLanguage.forEach { (languageCode, label) ->
+                repaired += putLanguageValue(item, "labelByLanguage", languageCode, label)
+            }
+            starter.speechTextByLanguage.forEach { (languageCode, speechText) ->
+                repaired += putLanguageValue(item, "speechTextByLanguage", languageCode, speechText)
+            }
+            starter.questionByLanguage.forEach { (languageCode, question) ->
+                repaired += putLanguageValue(item, "questionByLanguage", languageCode, question)
+            }
+        }
+        return repaired
+    }
+
     private fun repairStarterCategoryChildren(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
         val itemsById = itemObjects(itemsArray)
             .mapNotNull { item ->
@@ -647,11 +699,12 @@ object AacContentBootstrap {
         var repaired = 0
 
         itemsById["wc"]?.let { item ->
+            if (isProtectedLocalAacItem(item)) return@let
             repaired += putIfDifferent(item, "labelSl", "TOALETA")
-            repaired += putIfDifferent(item, "speakTextSl", "Izberi, kaj potrebuješ.")
-            repaired += putIfDifferent(item, "speechText", "Izberi, kaj potrebuješ.")
+            repaired += putIfDifferent(item, "speakTextSl", "Moram v toaleto.")
+            repaired += putIfDifferent(item, "speechText", "Moram v toaleto.")
             repaired += putLanguageValue(item, "labelByLanguage", "uk", "Đ˘ĐŁĐĐ›Đ•Đ˘")
-            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Đ˘ŃĐ°Đ»ĐµŃ‚.")
+            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Мені потрібно в туалет.")
             repaired += putIfDifferent(item, "actionType", "open_subicons")
             repaired += putIfDifferent(item, "opensSubicons", true)
             repaired += putIfDifferent(item, "speaksImmediately", false)
@@ -661,17 +714,20 @@ object AacContentBootstrap {
         }
 
         itemsById["nurse_help"]?.let { item ->
-            repaired += putIfDifferent(item, "labelSl", "MEDICINSKA SESTRA")
-            repaired += putIfDifferent(item, "speakTextSl", "Medicinska sestra.")
-            repaired += putIfDifferent(item, "speechText", "Medicinska sestra.")
-            repaired += putLanguageValue(item, "labelByLanguage", "uk", "ĐˇĐ•ĐˇĐ˘Đ Đ")
-            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "ĐśĐµĐ´Đ¸Ń‡Đ˝Đ° ŃĐµŃŃ‚Ń€Đ°.")
+            if (isProtectedLocalAacItem(item)) return@let
+            repaired += putIfDifferent(item, "labelSl", "SESTRA")
+            repaired += putIfDifferent(item, "speakTextSl", "Prosim, pokličite medicinsko sestro.")
+            repaired += putIfDifferent(item, "speechText", "Prosim, pokličite medicinsko sestro.")
+            repaired += putLanguageValue(item, "labelByLanguage", "uk", "МЕДСЕСТРА")
+            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Будь ласка, покличте медсестру.")
             repaired += putIfDifferent(item, "actionType", "open_subicons")
             repaired += putIfDifferent(item, "opensSubicons", true)
             repaired += putIfDifferent(item, "speaksImmediately", false)
             repaired += replaceChildrenIfDifferent(item, TOALETA_V1_NURSE_CHILDREN)
             repaired += ensureOnlyVisibleUnder(item, listOf("wc"))
             repaired += removeQuestionMetadata(item)
+            repaired += putLanguageValue(item, "questionByLanguage", "sl", "Kako naj mi sestra pomaga?")
+            repaired += putLanguageValue(item, "questionByLanguage", "uk", "Як медсестра може мені допомогти?")
         }
 
         val terminalRepairs = mapOf(
@@ -695,31 +751,32 @@ object AacContentBootstrap {
             ),
             "help_dressing" to ToaletaTerminalRepair(
                 labelSl = "OBLAČENJE",
-                labelUk = "ĐžĐ”ĐŻĐ“",
-                speechSl = "Prosim, pomagajte mi, da se obleÄŤem.",
-                speechUk = "Đ”ĐľĐżĐľĐĽĐľĐ¶Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐľĐ´ŃŹĐłĐ˝ŃŃ‚Đ¸ŃŃŹ."
+                labelUk = "ОДЯГАННЯ",
+                speechSl = "Rabim pomoč pri oblačenju.",
+                speechUk = "Мені потрібна допомога з одяганням."
             ),
             "help_washing" to ToaletaTerminalRepair(
                 labelSl = "UMIVANJE",
-                labelUk = "ĐśĐĐ˘Đ˘ĐŻ",
-                speechSl = "Prosim, pomagajte mi pri umivanju.",
-                speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ´ĐľĐżĐľĐĽĐľĐ¶Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– Đ˛ĐĽĐ¸Ń‚Đ¸ŃŃŹ."
+                labelUk = "МИТТЯ",
+                speechSl = "Rabim pomoč pri umivanju.",
+                speechUk = "Мені потрібна допомога з миттям."
             ),
             "help_showering" to ToaletaTerminalRepair(
                 labelSl = "TUŠ",
-                labelUk = "Đ”ĐŁĐ¨",
-                speechSl = "Prosim, pomagajte mi pri tuĹˇiranju.",
-                speechUk = "Đ‘ŃĐ´ŃŚ Đ»Đ°ŃĐşĐ°, Đ´ĐľĐżĐľĐĽĐľĐ¶Ń–Ń‚ŃŚ ĐĽĐµĐ˝Ń– ĐżŃ€Đ¸ĐąĐ˝ŃŹŃ‚Đ¸ Đ´ŃŃ."
+                labelUk = "ДУШ",
+                speechSl = "Rabim pomoč pri tuširanju.",
+                speechUk = "Мені потрібна допомога з душем."
             ),
             "noticed_blood" to ToaletaTerminalRepair(
                 labelSl = "KRI",
-                labelUk = "ĐšĐ ĐžĐ’",
-                speechSl = "Opazila sem kri.",
-                speechUk = "ĐŻ ĐżĐľĐĽŃ–Ń‚Đ¸Đ»Đ° ĐşŃ€ĐľĐ˛."
+                labelUk = "КРОВ",
+                speechSl = "Opazila sem kri pri negi. Prosim, pokličite medicinsko sestro.",
+                speechUk = "Я помітила кров під час догляду. Будь ласка, покличте медсестру."
             )
         )
         terminalRepairs.forEach { (id, repair) ->
             val item = itemsById[id] ?: return@forEach
+            if (isProtectedLocalAacItem(item)) return@forEach
             val parentId = if (id in TOALETA_V1_WC_CHILDREN) "wc" else "nurse_help"
             repaired += putIfDifferent(item, "labelSl", repair.labelSl)
             repaired += putIfDifferent(item, "speakTextSl", repair.speechSl)
@@ -736,6 +793,7 @@ object AacContentBootstrap {
 
         TOALETA_V1_EXCLUDED_WC_CHILDREN.forEach { id ->
             itemsById[id]?.let { item ->
+                if (isProtectedLocalAacItem(item)) return@let
                 repaired += removeVisibleUnderValue(item, "wc")
             }
         }

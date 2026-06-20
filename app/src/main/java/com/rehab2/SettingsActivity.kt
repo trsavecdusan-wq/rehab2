@@ -202,6 +202,16 @@ class SettingsActivity : AppCompatActivity() {
             "4000 ms" to 4000L,
             "5000 ms" to 5000L
         )
+        private val VOICE_ASSISTANT_QUESTION_DELAY_OPTIONS = arrayOf(
+            "500 ms" to 500L,
+            "1000 ms" to 1000L,
+            "1500 ms" to 1500L,
+            "2000 ms" to 2000L,
+            "2500 ms" to 2500L,
+            "3000 ms" to 3000L
+        )
+        private const val PREF_VOICE_ASSISTANT_QUESTION_DELAY_MS = "aac_voice_assistant_question_delay_ms"
+        private const val DEFAULT_VOICE_ASSISTANT_QUESTION_DELAY_MS = 1500L
         private val PARTIAL_SENTENCE_AUTO_RETURN_OPTIONS = arrayOf(
             "5s" to 5000L,
             "10s" to 10000L,
@@ -411,6 +421,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var switchFastCompositionSkipLastIcon: SwitchCompat
     private lateinit var switchAutoSentenceSpeech: SwitchCompat
     private lateinit var editAutoSentenceDelay: EditText
+    private lateinit var editVoiceAssistantQuestionDelay: EditText
     private lateinit var switchReturnToRootAfterSentence: SwitchCompat
     private lateinit var switchClearSentenceAfterSentence: SwitchCompat
     private lateinit var switchPartialSentenceAutoReturn: SwitchCompat
@@ -522,6 +533,7 @@ class SettingsActivity : AppCompatActivity() {
         switchFastCompositionSkipLastIcon = findViewById(R.id.switchFastCompositionSkipLastIcon)
         switchAutoSentenceSpeech = findViewById(R.id.switchAutoSentenceSpeech)
         editAutoSentenceDelay = findViewById(R.id.editAutoSentenceDelay)
+        editVoiceAssistantQuestionDelay = findViewById(R.id.editVoiceAssistantQuestionDelay)
         switchReturnToRootAfterSentence = findViewById(R.id.switchReturnToRootAfterSentence)
         switchClearSentenceAfterSentence = findViewById(R.id.switchClearSentenceAfterSentence)
         switchPartialSentenceAutoReturn = findViewById(R.id.switchPartialSentenceAutoReturn)
@@ -739,6 +751,9 @@ class SettingsActivity : AppCompatActivity() {
         }
         editAutoSentenceDelay.setOnClickListener {
             showAutoSentenceDelayPicker()
+        }
+        editVoiceAssistantQuestionDelay.setOnClickListener {
+            showVoiceAssistantQuestionDelayPicker()
         }
         editPartialSentenceAutoReturnDelay.setOnClickListener {
             showPartialSentenceAutoReturnDelayPicker()
@@ -1401,10 +1416,12 @@ class SettingsActivity : AppCompatActivity() {
                 "OFF"
             }
         )
+        editVoiceAssistantQuestionDelay.setText("${voiceAssistantQuestionDelayMs()} ms")
         editPartialSentenceAutoReturnDelay.setText("${settings.partialSentenceAutoReturnMs / 1000L}s")
         editSingleIconDelay.isEnabled = settings.speakSingleIconEnabled
         editSubIconDelay.isEnabled = settings.speakSingleIconEnabled
         editAutoSentenceDelay.isEnabled = settings.autoSpeakSentenceEnabled
+        editVoiceAssistantQuestionDelay.isEnabled = true
         editPartialSentenceAutoReturnDelay.isEnabled = settings.partialSentenceAutoReturnEnabled
         bindSpeechTimingSwitchListeners()
     }
@@ -2676,6 +2693,35 @@ class SettingsActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             .show()
+    }
+
+    private fun showVoiceAssistantQuestionDelayPicker() {
+        val labels = VOICE_ASSISTANT_QUESTION_DELAY_OPTIONS.map { it.first }.toTypedArray()
+        val selectedIndex = VOICE_ASSISTANT_QUESTION_DELAY_OPTIONS
+            .indexOfFirst { it.second == voiceAssistantQuestionDelayMs() }
+            .coerceAtLeast(2)
+        AlertDialog.Builder(this)
+            .setTitle("Pavza pred vprašanjem")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val delayMs = VOICE_ASSISTANT_QUESTION_DELAY_OPTIONS[which].second
+                prefs.edit()
+                    .putLong(PREF_VOICE_ASSISTANT_QUESTION_DELAY_MS, delayMs)
+                    .apply()
+                refreshSpeechTimingSection()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun voiceAssistantQuestionDelayMs(): Long {
+        val storedDelay = prefs.getLong(
+            PREF_VOICE_ASSISTANT_QUESTION_DELAY_MS,
+            DEFAULT_VOICE_ASSISTANT_QUESTION_DELAY_MS
+        )
+        return VOICE_ASSISTANT_QUESTION_DELAY_OPTIONS
+            .map { it.second }
+            .firstOrNull { it == storedDelay }
+            ?: DEFAULT_VOICE_ASSISTANT_QUESTION_DELAY_MS
     }
 
     private fun showAacProfilePicker() {

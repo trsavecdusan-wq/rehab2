@@ -111,12 +111,14 @@ class MainActivity : AppCompatActivity() {
         private const val KEY_SHOW_SUBICONS_ON_MAIN_PAGES = "show_subicons_on_main_pages"
         private const val KEY_AAC_GUIDED_PROMPT_DISPLAY_MODE = "aac_guided_prompt_display_mode"
         private const val KEY_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS = "aac_guided_auto_complete_timeout_ms"
+        private const val KEY_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = "aac_voice_assistant_question_delay_ms"
         private const val AAC_GUIDED_PROMPT_OFF = "OFF"
         private const val AAC_GUIDED_PROMPT_FULL_TEXT = "FULL_TEXT"
         private const val AAC_GUIDED_PROMPT_WORD_BY_WORD = "WORD_BY_WORD"
         private const val AAC_GUIDED_PROMPT_LETTER_BY_LETTER = "LETTER_BY_LETTER"
         private const val DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE = AAC_GUIDED_PROMPT_FULL_TEXT
         private const val DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS = 2_000L
+        private const val DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = 1_500L
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
@@ -1645,10 +1647,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun prepareMainAacContextPrompt(item: AacItem) {
         clearMainAacSentenceState(clearConversationContext = false)
-        if (item.id == "nurse_help") {
-            hideMainAacQuestion()
-            return
-        }
         val languageCode = getActiveSpeechLanguage()
         val guidedPrompt = if (languageCode.trim().lowercase(Locale.ROOT) == "sl") {
             AacGuidedPromptEngine.questionFor(item)
@@ -1672,7 +1670,18 @@ class MainActivity : AppCompatActivity() {
             shouldLockMainAacInputOnSpeechStart = false
             aacAudioPlayer.speakText(prompt, languageCode)
         } else {
-            hideMainAacQuestion()
+            val speechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode).trim()
+            if (speechText.isNotBlank()) {
+                shouldLockMainAacInputOnSpeechStart = false
+                speakMainAacTextOnce(
+                    source = "submenu_speech",
+                    itemId = item.id,
+                    text = speechText,
+                    languageCode = languageCode
+                )
+            } else {
+                hideMainAacQuestion()
+            }
         }
     }
 
@@ -1823,6 +1832,23 @@ class MainActivity : AppCompatActivity() {
             3_000L,
             5_000L -> timeoutMs
             else -> DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS
+        }
+    }
+
+    private fun mainAacVoiceAssistantQuestionDelayMs(): Long {
+        val delayMs = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
+            .getLong(
+                KEY_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS,
+                DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS
+            )
+        return when (delayMs) {
+            500L,
+            1_000L,
+            1_500L,
+            2_000L,
+            2_500L,
+            3_000L -> delayMs
+            else -> DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS
         }
     }
 
@@ -2203,7 +2229,7 @@ class MainActivity : AppCompatActivity() {
             finalSpeechText = "",
             nextPageItems = nextPageItems,
             targetPageId = selectedItem?.targetPageId.orEmpty(),
-            delayBeforeQuestionMs = mainAacGuidedAutoCompleteTimeoutMs(),
+            delayBeforeQuestionMs = mainAacVoiceAssistantQuestionDelayMs(),
             isTerminalSelection = false
         )
     }
