@@ -204,6 +204,7 @@ class SettingsActivity : AppCompatActivity() {
         )
         private val VOICE_ASSISTANT_QUESTION_DELAY_OPTIONS = arrayOf(
             "500 ms" to 500L,
+            "750 ms" to 750L,
             "1000 ms" to 1000L,
             "1500 ms" to 1500L,
             "2000 ms" to 2000L,
@@ -211,7 +212,7 @@ class SettingsActivity : AppCompatActivity() {
             "3000 ms" to 3000L
         )
         private const val PREF_VOICE_ASSISTANT_QUESTION_DELAY_MS = "aac_voice_assistant_question_delay_ms"
-        private const val DEFAULT_VOICE_ASSISTANT_QUESTION_DELAY_MS = 1000L
+        private const val DEFAULT_VOICE_ASSISTANT_QUESTION_DELAY_MS = 750L
         private val PARTIAL_SENTENCE_AUTO_RETURN_OPTIONS = arrayOf(
             "5s" to 5000L,
             "10s" to 10000L,

@@ -130,12 +130,14 @@ object AacLocalJsonLoader {
             actionType = actionType,
             targetPageId = json.optString("targetPageId"),
             speakTextSl = json.optNullableString("speakTextSl")
+                ?: json.optNullableString("speechTextSl")
                 ?: json.optNullableString("speechText")
                 ?: json.optNullableString("text"),
             speakTextUk = json.optNullableString("speakTextUk"),
             labelUk = json.optNullableString("labelUk"),
             labelEn = json.optNullableString("labelEn"),
-            speechText = json.optNullableString("speechText"),
+            speechText = json.optNullableString("speechText")
+                ?: json.optNullableString("speechTextSl"),
             speechTextEn = json.optNullableString("speechTextEn")
                 ?: json.optNullableString("speakTextEn"),
             baseLanguage = normalizeLanguageCode(

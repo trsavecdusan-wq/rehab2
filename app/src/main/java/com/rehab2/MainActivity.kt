@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         private const val AAC_GUIDED_PROMPT_LETTER_BY_LETTER = "LETTER_BY_LETTER"
         private const val DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE = AAC_GUIDED_PROMPT_FULL_TEXT
         private const val DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS = 2_000L
-        private const val DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = 1_000L
+        private const val DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = 750L
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
@@ -1370,11 +1370,21 @@ class MainActivity : AppCompatActivity() {
                     currentMainAacConversationItems.isNotEmpty()
                 selectedMainAacItemId = item.id
                 val languageCode = getActiveSpeechLanguage()
-                val speechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+                val resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode)
+                val resolvedSpeech = AacLocalizedTextResolver.resolveSpeakTextResult(item, languageCode)
+                val speechText = resolvedSpeech.text
                 recordLastAudioEvent(
                     "AAC click tapId=$mainAacTapId itemId=${item.id} label=${item.labelSl} speech='${speechText.take(60)}' language=$languageCode speaksImmediately=${item.speaksImmediately}"
                 )
-                recordToaletaSpeechSourceDiagnostics(item, speechText, "click")
+                recordMainAacSpeechDiagnostics(
+                    item = item,
+                    languageCode = languageCode,
+                    resolvedLabel = resolvedLabel,
+                    resolvedSpeechText = speechText,
+                    finalSpeechText = speechText,
+                    phase = "click",
+                    sourcePath = mainAacResolverSourcePath(item, languageCode, speechText, resolvedLabel)
+                )
                 refreshMainAacInputLockVisualState()
                 handleMainAacItemAction(item)
                 return true
@@ -1846,6 +1856,7 @@ class MainActivity : AppCompatActivity() {
         }
         return when (delayMs) {
             500L,
+            750L,
             1_000L,
             1_500L,
             2_000L,
@@ -1867,7 +1878,15 @@ class MainActivity : AppCompatActivity() {
         recordLastAudioEvent(
             "AAC resolved tapId=$mainAacTapId itemId=${item.id} speech='${resolvedSpeechText.take(60)}' language=$languageCode inContext=$inContextFlow"
         )
-        recordToaletaSpeechSourceDiagnostics(item, resolvedSpeechText, "resolved")
+        recordMainAacSpeechDiagnostics(
+            item = item,
+            languageCode = languageCode,
+            resolvedLabel = resolvedLabel,
+            resolvedSpeechText = resolvedSpeechText,
+            finalSpeechText = resolvedSpeechText,
+            phase = "resolved",
+            sourcePath = mainAacResolverSourcePath(item, languageCode, resolvedSpeechText, resolvedLabel)
+        )
         if (inContextFlow && (item.addsToSentence || AacGuidedPromptEngine.isFollowUpAnswer(item))) {
             selectedMainAacItemId = item.id
             recordMainAacUsage(item)
@@ -1880,6 +1899,21 @@ class MainActivity : AppCompatActivity() {
                     resolvedSpeechText = resolvedSpeechText
                 )
                 if (terminalStep.finalSpeechText.isNotBlank()) {
+                    recordMainAacSpeechDiagnostics(
+                        item = item,
+                        languageCode = languageCode,
+                        resolvedLabel = resolvedLabel,
+                        resolvedSpeechText = resolvedSpeechText,
+                        finalSpeechText = terminalStep.finalSpeechText,
+                        phase = "terminal",
+                        sourcePath = mainAacFinalSpeechSourcePath(
+                            item = item,
+                            languageCode = languageCode,
+                            resolvedLabel = resolvedLabel,
+                            resolvedSpeechText = resolvedSpeechText,
+                            finalSpeechText = terminalStep.finalSpeechText
+                        )
+                    )
                     shouldLockMainAacInputOnSpeechStart = true
                     lockMainAacInput()
                     speakMainAacTextOnce(
@@ -1904,6 +1938,21 @@ class MainActivity : AppCompatActivity() {
             val finalSpeechText = resolvedSpeechText
                 .ifBlank { mainAacSentenceBuilderSpeech(item, languageCode) }
                 .ifBlank { speechText.ifBlank { resolvedLabel } }
+            recordMainAacSpeechDiagnostics(
+                item = item,
+                languageCode = languageCode,
+                resolvedLabel = resolvedLabel,
+                resolvedSpeechText = resolvedSpeechText,
+                finalSpeechText = finalSpeechText,
+                phase = "context",
+                sourcePath = mainAacFinalSpeechSourcePath(
+                    item = item,
+                    languageCode = languageCode,
+                    resolvedLabel = resolvedLabel,
+                    resolvedSpeechText = resolvedSpeechText,
+                    finalSpeechText = finalSpeechText
+                )
+            )
             if (!scheduleMainAacGuidedAutoComplete(finalSpeechText, languageCode) &&
                 mainAacGuidedAutoCompleteTimeoutMs() > 0L
             ) {
@@ -1912,6 +1961,15 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (resolvedSpeechText.isNotBlank()) {
+            recordMainAacSpeechDiagnostics(
+                item = item,
+                languageCode = languageCode,
+                resolvedLabel = resolvedLabel,
+                resolvedSpeechText = resolvedSpeechText,
+                finalSpeechText = resolvedSpeechText,
+                phase = "direct",
+                sourcePath = mainAacResolverSourcePath(item, languageCode, resolvedSpeechText, resolvedLabel)
+            )
             selectedMainAacItemId = item.id
             recordMainAacUsage(item)
             shouldLockMainAacInputOnSpeechStart = true
@@ -1950,23 +2008,65 @@ class MainActivity : AppCompatActivity() {
         aacAudioPlayer.speakText(text, languageCode)
     }
 
-    private fun recordToaletaSpeechSourceDiagnostics(
+    private fun recordMainAacSpeechDiagnostics(
         item: AacItem,
-        finalText: String,
-        phase: String
+        languageCode: String,
+        resolvedLabel: String,
+        resolvedSpeechText: String,
+        finalSpeechText: String,
+        phase: String,
+        sourcePath: String
     ) {
-        if (item.id != "help_dressing" && item.id != "help_washing") {
-            return
+        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
+        recordLastAudioEvent(
+            "AAC speech diag phase=$phase itemId=${item.id} labelSl='${item.labelSl}' speechTextSl='${item.speakTextSl.orEmpty().take(70)}' speechText='${item.speechText.orEmpty().take(70)}' resolved='${resolvedSpeechText.take(70)}'"
+        )
+        recordLastAudioEvent(
+            "AAC speech diag itemId=${item.id} final='${finalSpeechText.take(70)}' sourcePath=$sourcePath language=$normalizedLanguage labelResolved='${resolvedLabel.take(50)}' imagePath='${item.imagePath}' iconSource=${item.iconSource}"
+        )
+    }
+
+    private fun mainAacFinalSpeechSourcePath(
+        item: AacItem,
+        languageCode: String,
+        resolvedLabel: String,
+        resolvedSpeechText: String,
+        finalSpeechText: String
+    ): String {
+        val finalText = finalSpeechText.trim()
+        val resolvedText = resolvedSpeechText.trim()
+        if (finalText.isBlank()) return "fallback blank"
+        if (resolvedText.isNotBlank() && finalText == resolvedText) {
+            return mainAacResolverSourcePath(item, languageCode, resolvedText, resolvedLabel)
         }
-        val rawLanguage = getRawActiveSpeechLanguage().orEmpty()
-        val normalizedLanguage = AacLanguageResolver.normalize(rawLanguage)
-        val resolvedSpeech = AacLocalizedTextResolver.resolveSpeakText(item, rawLanguage)
-        recordLastAudioEvent(
-            "AAC TOALETA diag phase=$phase itemId=${item.id} rawLang=$rawLanguage normalizedLang=$normalizedLanguage labelSl='${item.labelSl}' labelUk='${item.labelByLanguage["uk"].orEmpty()}' speechText='${item.speechText.orEmpty().take(40)}'"
-        )
-        recordLastAudioEvent(
-            "AAC TOALETA diag itemId=${item.id} speechUk='${item.speechTextByLanguage["uk"].orEmpty().take(70)}' resolved='${resolvedSpeech.take(70)}' finalTts='${finalText.take(70)}' ttsLang=$normalizedLanguage"
-        )
+        val sentenceBuilderSpeech = mainAacSentenceBuilderSpeech(item, languageCode)
+        if (sentenceBuilderSpeech.isNotBlank() && finalText == sentenceBuilderSpeech) {
+            return "sentenceBuilder"
+        }
+        if (finalText == resolvedLabel.trim()) {
+            return "fallback label"
+        }
+        return "resolver/naturalConversation"
+    }
+
+    private fun mainAacResolverSourcePath(
+        item: AacItem,
+        languageCode: String,
+        resolvedSpeechText: String,
+        resolvedLabel: String
+    ): String {
+        val resolvedText = resolvedSpeechText.trim()
+        if (resolvedText.isBlank()) return "resolver blank"
+        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
+        fun matches(value: String?): Boolean = value?.trim()?.takeIf { it.isNotBlank() } == resolvedText
+        return when {
+            matches(item.speechTextByLanguage[normalizedLanguage]) -> "resolver speechTextByLanguage[$normalizedLanguage]"
+            normalizedLanguage == AacLanguageResolver.DEFAULT_LANGUAGE_CODE && matches(item.speakTextSl) -> "resolver speakTextSl"
+            normalizedLanguage == AacLanguageResolver.DEFAULT_LANGUAGE_CODE && matches(item.speechText) -> "resolver speechText"
+            normalizedLanguage == "uk" && matches(item.speakTextUk) -> "resolver speakTextUk"
+            matches(resolvedLabel) -> "fallback label"
+            else -> "resolver"
+        }
     }
 
     private fun mainAacQuestionFallback(item: AacItem, languageCode: String): String {

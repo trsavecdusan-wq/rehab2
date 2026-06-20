@@ -139,6 +139,56 @@ object AacContentBootstrap {
         "pain_very_strong"
     )
 
+    private val PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID = mapOf(
+        "wc" to "system/toilet_general.png",
+        "nurse_help" to "system/toilet_nurse.png",
+        "help_washing" to "system/toilet_wash.png",
+        "help_showering" to "system/toilet_shower.png",
+        "help_dressing" to "system/toilet_dress.png",
+        "noticed_blood" to "system/toilet_blood.png",
+        "wc_wet" to "system/toilet_wet.png",
+        "wc_dirty" to "system/toilet_dirty.png",
+        "wc_wet_and_dirty" to "system/toilet_both.png",
+        "pain" to "system/pain_general.png",
+        "back" to "system/pain_back.png",
+        "chest" to "system/pain_chest.png",
+        "belly" to "system/pain_belly.png",
+        "head" to "system/pain_head.png",
+        "left_arm" to "system/pain_left_arm.png",
+        "right_arm" to "system/pain_right_arm.png",
+        "left_leg" to "system/pain_left_leg.png",
+        "right_leg" to "system/pain_right_leg.png",
+        "arm_shoulder" to "system/pain_shoulder.png",
+        "arm_elbow" to "system/pain_elbow.png",
+        "arm_wrist" to "system/pain_wrist.png",
+        "arm_palm" to "system/pain_hand.png",
+        "leg_hip" to "system/pain_hip.png",
+        "leg_knee" to "system/pain_knee.png",
+        "leg_ankle" to "system/pain_ankle.png",
+        "leg_foot" to "system/pain_foot.png",
+        "pain_light" to "system/pain_mild.png",
+        "pain_medium" to "system/pain_medium.png",
+        "pain_strong" to "system/pain_strong.png",
+        "pain_very_strong" to "system/pain_very_strong.png",
+        "water" to "system/drink_water.png",
+        "cold_water" to "system/drink_water_cold.png",
+        "non_sparkling_water" to "system/drink_water_still.png",
+        "mineral_water" to "system/drink_water_mineral.png",
+        "radenska" to "system/drink_radenska.png",
+        "tea" to "system/drink_tea.png",
+        "coffee" to "system/drink_coffee.png",
+        "juice" to "system/drink_juice.png",
+        "orange_juice" to "system/drink_juice_orange.png",
+        "apple_juice" to "system/drink_juice_apple.png",
+        "blueberry_juice" to "system/drink_juice_blueberry.png",
+        "strawberry_juice" to "system/drink_juice_strawberry.png",
+        "cedevita" to "system/drink_cedevita.png"
+    )
+
+    private val PROFESSIONAL_SYSTEM_ICON_FILES = PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID.values
+        .map { path -> path.substringAfterLast('/') }
+        .distinct()
+
     private val BUNDLED_SYSTEM_ICON_FILES = listOf(
         "aac_drink_coffee.png",
         "aac_drink_cola.png",
@@ -212,6 +262,8 @@ object AacContentBootstrap {
         "where.png",
         "yes.png"
     )
+        .plus(PROFESSIONAL_SYSTEM_ICON_FILES)
+        .distinct()
 
     private val ROOT_SYSTEM_ICON_REPAIRS = mapOf(
         "people" to "system/people.png",
@@ -312,6 +364,7 @@ object AacContentBootstrap {
         val repairedStarterUkrainianContent = repairStarterUkrainianContent(itemsArray, starterItems)
         val repairedStarterSpeechQualityContent = repairStarterSpeechQualityContent(itemsArray, starterItems)
         val repairedStarterSystemIcons = repairStarterSystemIconContent(context, itemsArray, starterItems)
+        logProfessionalSystemIconAudit(context, itemsArray)
         val itemCount = itemsArray.length()
         if (itemCount == 0) {
             return Result(
@@ -415,7 +468,9 @@ object AacContentBootstrap {
         if (!systemDir.exists() && !systemDir.mkdirs()) return 0
 
         var seeded = 0
+        val availableAssets = availableBundledSystemIconFiles(context)
         BUNDLED_SYSTEM_ICON_FILES.forEach { fileName ->
+            if (fileName !in availableAssets) return@forEach
             val targetFile = File(systemDir, fileName)
             val assetPath = "$SYSTEM_ICON_ASSET_DIR/$fileName"
             try {
@@ -619,12 +674,16 @@ object AacContentBootstrap {
             val itemId = item.optString("id").trim()
             val starter = starterById[itemId] ?: return@forEach
             val isQuickPatientSystemIcon = itemId in QUICK_PATIENT_SYSTEM_ICON_IDS
+            val isProfessionalSystemIcon = itemId in PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID
             if (isProtectedStarterSystemRepairItem(item)) return@forEach
-            if (!isQuickPatientSystemIcon && hasUsableLocalIcon(context, item)) return@forEach
+            if (!isQuickPatientSystemIcon && !isProfessionalSystemIcon && hasUsableLocalIcon(context, item)) return@forEach
 
-            val desiredImagePath = starter.imagePath.trim()
+            val desiredImagePath = preferredStarterSystemIconPath(context, itemId, starter.imagePath.trim())
             if (desiredImagePath.isBlank()) return@forEach
-            if (isQuickPatientSystemIcon && !desiredImagePath.startsWith("system/aac_", ignoreCase = true)) {
+            if (isQuickPatientSystemIcon &&
+                !desiredImagePath.startsWith("system/aac_", ignoreCase = true) &&
+                desiredImagePath != PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID[itemId]
+            ) {
                 return@forEach
             }
             if (AacStoragePaths.resolveIconFile(context, desiredImagePath, IconSource.SYSTEM)?.isFile != true) {
@@ -635,6 +694,50 @@ object AacContentBootstrap {
             repaired += putIfDifferent(item, "iconSource", IconSource.SYSTEM.name)
         }
         return repaired
+    }
+
+    private fun preferredStarterSystemIconPath(context: Context, itemId: String, fallbackImagePath: String): String {
+        val professionalPath = PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID[itemId].orEmpty()
+        if (professionalPath.isNotBlank() &&
+            AacStoragePaths.resolveIconFile(context, professionalPath, IconSource.SYSTEM)?.isFile == true
+        ) {
+            return professionalPath
+        }
+        return fallbackImagePath
+    }
+
+    private fun logProfessionalSystemIconAudit(context: Context, itemsArray: JSONArray) {
+        val availableAssets = availableBundledSystemIconFiles(context)
+        val existingProfessionalFiles = PROFESSIONAL_SYSTEM_ICON_FILES.filter { fileName -> fileName in availableAssets }
+        val missingProfessionalFiles = PROFESSIONAL_SYSTEM_ICON_FILES.filterNot { fileName -> fileName in availableAssets }
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+        val fallbackIds = PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID
+            .filter { (_, professionalPath) ->
+                AacStoragePaths.resolveIconFile(context, professionalPath, IconSource.SYSTEM)?.isFile != true
+            }
+            .keys
+        val professionalLocalJsonIds = PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID
+            .filter { (id, professionalPath) ->
+                itemsById[id]?.optString("imagePath")?.trim() == professionalPath &&
+                    itemsById[id]?.optString("iconSource")?.trim()?.uppercase() == IconSource.SYSTEM.name
+            }
+            .keys
+        Log.d(
+            TAG,
+            "AAC_PRO_ICON_AUDIT mappings=${PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID.size} existingAssets=${existingProfessionalFiles.size} missingAssets=${missingProfessionalFiles.size} missingFiles=${missingProfessionalFiles.joinToString(",")} fallbackIds=${fallbackIds.joinToString(",")} localJsonProfessional=${professionalLocalJsonIds.joinToString(",")}"
+        )
+    }
+
+    private fun availableBundledSystemIconFiles(context: Context): Set<String> {
+        return try {
+            context.assets.list(SYSTEM_ICON_ASSET_DIR)?.toSet().orEmpty()
+        } catch (_: Exception) {
+            emptySet()
+        }
     }
 
     private fun repairStarterSpeechQualityContent(itemsArray: JSONArray, starterItems: List<AacItem>): Int {
@@ -831,9 +934,11 @@ object AacContentBootstrap {
             if (isProtectedStarterSystemRepairItem(item)) return@let
             repaired += putIfDifferent(item, "labelSl", "SESTRA")
             repaired += putIfDifferent(item, "speakTextSl", "Potrebujem medicinsko sestro.")
+            repaired += putIfDifferent(item, "speechTextSl", "Potrebujem medicinsko sestro.")
             repaired += putIfDifferent(item, "speechText", "Potrebujem medicinsko sestro.")
             repaired += putLanguageValue(item, "speechTextByLanguage", "sl", "Potrebujem medicinsko sestro.")
             repaired += putLanguageValue(item, "labelByLanguage", "uk", "МЕДСЕСТРА")
+            repaired += putIfDifferent(item, "speakTextUk", "Мені потрібна медсестра.")
             repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Мені потрібна медсестра.")
             repaired += putIfDifferent(item, "imagePath", "system/aac_nurse.png")
             repaired += putIfDifferent(item, "iconSource", IconSource.SYSTEM.name)
