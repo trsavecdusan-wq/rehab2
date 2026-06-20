@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         private const val AAC_GUIDED_PROMPT_LETTER_BY_LETTER = "LETTER_BY_LETTER"
         private const val DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE = AAC_GUIDED_PROMPT_FULL_TEXT
         private const val DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS = 2_000L
-        private const val DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = 1_500L
+        private const val DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = 2_000L
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
@@ -1836,18 +1836,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacVoiceAssistantQuestionDelayMs(): Long {
-        val delayMs = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
-            .getLong(
-                KEY_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS,
-                DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS
-            )
+        val rawValue = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
+            .all[KEY_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS]
+        val delayMs = when (rawValue) {
+            is Number -> rawValue.toLong()
+            is String -> rawValue.trim().toLongOrNull()
+            else -> DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS
+        }
         return when (delayMs) {
-            500L,
             1_000L,
             1_500L,
             2_000L,
             2_500L,
-            3_000L -> delayMs
+            3_000L,
+            4_000L -> delayMs
             else -> DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS
         }
     }
@@ -2289,12 +2291,8 @@ class MainActivity : AppCompatActivity() {
             aacAudioPlayer.speakText(safeQuestion, languageCode)
         }
         mainAacVoiceAssistantQuestionRunnable = runnable
-        val timeoutMs = step.delayBeforeQuestionMs
-        if (timeoutMs <= 0L) {
-            mainHandler.post(runnable)
-        } else {
-            mainHandler.postDelayed(runnable, timeoutMs)
-        }
+        val timeoutMs = step.delayBeforeQuestionMs.coerceIn(1_000L, 4_000L)
+        mainHandler.postDelayed(runnable, timeoutMs)
     }
 
     private fun cancelMainAacVoiceAssistantQuestion() {

@@ -2233,7 +2233,9 @@ object AacContentBootstrap {
         val id: String,
         val labelSl: String,
         val speechTextSl: String,
-        val parentId: String
+        val parentId: String,
+        val labelUk: String = "",
+        val speechTextUk: String = ""
     ) {
         fun toJson(): JSONObject {
             return JSONObject()
@@ -2243,7 +2245,14 @@ object AacContentBootstrap {
                 .put("baseText", labelSl)
                 .put("speechText", speechTextSl)
                 .put("speakTextSl", speechTextSl)
-                .put("speechTextByLanguage", JSONObject().put("sl", speechTextSl))
+                .put(
+                    "speechTextByLanguage",
+                    JSONObject()
+                        .put("sl", speechTextSl)
+                        .apply {
+                            if (speechTextUk.isNotBlank()) put("uk", speechTextUk)
+                        }
+                )
                 .put("imagePath", "")
                 .put("iconSource", IconSource.SYSTEM.name)
                 .put("actionType", "speak")
@@ -2261,11 +2270,32 @@ object AacContentBootstrap {
         fun applyTo(item: JSONObject): Int {
             var repaired = 0
             val legacySpeechSlValues = legacyValues(labelSl, "", id, speechTextSl)
+            repaired += putIfBlankOrLegacy(item, "labelSl", labelSl, legacyValues(labelSl, "", id, labelSl))
+            repaired += putIfBlankOrLegacy(item, "text", labelSl, legacyValues(labelSl, "", id, labelSl))
+            repaired += putIfBlankOrLegacy(item, "baseText", labelSl, legacyValues(labelSl, "", id, labelSl))
             repaired += putIfBlankOrLegacy(item, "speechText", speechTextSl, legacySpeechSlValues)
             repaired += putIfBlankOrLegacy(item, "speakTextSl", speechTextSl, legacySpeechSlValues)
             val speechTextByLanguage = item.optJSONObject("speechTextByLanguage") ?: JSONObject()
             repaired += putLanguageIfBlankOrLegacy(speechTextByLanguage, "sl", speechTextSl, legacySpeechSlValues)
+            if (speechTextUk.isNotBlank()) {
+                repaired += putLanguageIfBlankOrLegacy(
+                    speechTextByLanguage,
+                    "uk",
+                    speechTextUk,
+                    legacyValues(labelUk, "", id, speechTextUk)
+                )
+            }
             item.put("speechTextByLanguage", speechTextByLanguage)
+            if (labelUk.isNotBlank()) {
+                val labelByLanguage = item.optJSONObject("labelByLanguage") ?: JSONObject()
+                repaired += putLanguageIfBlankOrLegacy(
+                    labelByLanguage,
+                    "uk",
+                    labelUk,
+                    legacyValues(labelUk, "", id, labelUk)
+                )
+                item.put("labelByLanguage", labelByLanguage)
+            }
             repaired += putIfBlank(item, "parentId", parentId)
             if (!hasJsonArrayValue(item.optJSONArray("visibleUnderIds"), parentId)) {
                 val visibleUnderIds = item.optJSONArray("visibleUnderIds") ?: JSONArray()
@@ -2400,10 +2430,10 @@ object AacContentBootstrap {
     )
 
     private val DRINK_SPEECH_REPAIRS = listOf(
-        DrinkSpeechRepair("non_sparkling_water", "NAVADNA", "Prosim, rada bi navadno vodo.", "water"),
-        DrinkSpeechRepair("flavored_water", "VODA Z OKUSOM", "Prosim, rada bi vodo z okusom.", "water"),
-        DrinkSpeechRepair("mineral_water", "MINERALNA", "Prosim, rada bi mineralno vodo.", "water"),
-        DrinkSpeechRepair("cold_water", "HLADNA", "Prosim, rada bi hladno vodo.", "water"),
+        DrinkSpeechRepair("non_sparkling_water", "NAVADNA", "Rada bi negazirano vodo.", "water", "НЕГАЗОВАНА ВОДА", "Я хочу негазованої води."),
+        DrinkSpeechRepair("flavored_water", "VODA Z OKUSOM", "Rada bi vodo z okusom.", "water", "ВОДА ЗІ СМАКОМ", "Я хочу воду зі смаком."),
+        DrinkSpeechRepair("mineral_water", "MINERALNA", "Rada bi mineralno vodo.", "water", "ГАЗОВАНА ВОДА", "Я хочу газованої води."),
+        DrinkSpeechRepair("cold_water", "HLADNA", "Rada bi mrzlo vodo.", "water", "ХОЛОДНА ВОДА", "Я хочу холодної води."),
         DrinkSpeechRepair("tea_chamomile_lemon", "Z LIMONO", "Prosim, rada bi kamilični čaj z limono.", "tea_chamomile"),
         DrinkSpeechRepair("tea_chamomile_honey", "Z MEDOM", "Prosim, rada bi kamilični čaj z medom.", "tea_chamomile"),
         DrinkSpeechRepair("tea_chamomile_honey_lemon", "Z MEDOM IN LIMONO", "Prosim, rada bi kamilični čaj z medom in limono.", "tea_chamomile"),
@@ -2425,15 +2455,15 @@ object AacContentBootstrap {
         DrinkSpeechRepair("coffee_plain", "NAVADNA", "Prosim, rada bi navadno kavo.", "coffee"),
         DrinkSpeechRepair("coffee_milk", "Z MLEKOM", "Prosim, rada bi kavo z mlekom.", "coffee"),
         DrinkSpeechRepair("coffee_no_sugar", "BREZ SLADKORJA", "Prosim, rada bi kavo brez sladkorja.", "coffee"),
-        DrinkSpeechRepair("orange_juice", "POMARANČNI", "Prosim, rada bi pomarančni sok.", "juice"),
-        DrinkSpeechRepair("apple_juice", "JABOLČNI", "Prosim, rada bi jabolčni sok.", "juice"),
-        DrinkSpeechRepair("blueberry_juice", "BOROVNIČEV", "Prosim, rada bi borovničev sok.", "juice"),
-        DrinkSpeechRepair("strawberry_juice", "JAGODNI", "Prosim, rada bi jagodni sok.", "juice"),
-        DrinkSpeechRepair("cedevita", "CEDEVITA", "Prosim, rada bi Cedevito.", "juice"),
+        DrinkSpeechRepair("orange_juice", "POMARANČNI", "Rada bi pomarančni sok.", "juice", "АПЕЛЬСИНОВИЙ СІК", "Я хочу апельсиновий сік."),
+        DrinkSpeechRepair("apple_juice", "JABOLČNI", "Rada bi jabolčni sok.", "juice", "ЯБЛУЧНИЙ СІК", "Я хочу яблучний сік."),
+        DrinkSpeechRepair("blueberry_juice", "BOROVNIČEV", "Rada bi borovničev sok.", "juice", "ЧОРНИЧНИЙ СІК", "Я хочу чорничний сік."),
+        DrinkSpeechRepair("strawberry_juice", "JAGODNI", "Rada bi jagodni sok.", "juice", "ПОЛУНИЧНИЙ СІК", "Я хочу полуничний сік."),
+        DrinkSpeechRepair("cedevita", "CEDEVITA", "Rada bi Cedevito.", "juice", "ЦЕДЕВІТА", "Я хочу Цедевіту."),
         DrinkSpeechRepair("drink_fanta", "FANTA", "Prosim, rada bi Fanto.", "sparkling_drink"),
         DrinkSpeechRepair("drink_coca_cola", "COCA COLA", "Prosim, rada bi Coca-Colo.", "sparkling_drink"),
         DrinkSpeechRepair("drink_pepsi", "PEPSI", "Prosim, rada bi Pepsi.", "sparkling_drink"),
-        DrinkSpeechRepair("radenska", "RADENSKA", "Prosim, rada bi Radensko.", "sparkling_drink"),
+        DrinkSpeechRepair("radenska", "RADENSKA", "Rada bi Radensko.", "sparkling_drink", "РАДЕНСЬКА", "Я хочу Раденську."),
         DrinkSpeechRepair("drink_yogurt", "JOGURT", "Prosim, rada bi jogurt.", "milk_drinks"),
         DrinkSpeechRepair("cocoa_drink", "KAKAV", "Prosim, rada bi kakav.", "milk_drinks"),
         DrinkSpeechRepair("drink_milk", "MLEKO", "Prosim, rada bi mleko.", "milk_drinks"),

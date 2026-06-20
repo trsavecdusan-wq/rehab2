@@ -149,6 +149,16 @@ object AacSentenceBuilder {
 
     private fun buildDrinkDetailSentence(items: List<AacItem>): String? {
         return when {
+            items.hasId("cold_water") -> "Rada bi mrzlo vodo."
+            items.hasId("non_sparkling_water") -> "Rada bi negazirano vodo."
+            items.hasId("mineral_water") -> "Rada bi mineralno vodo."
+            items.hasId("flavored_water") -> "Rada bi vodo z okusom."
+            items.hasId("radenska") -> "Rada bi Radensko."
+            items.hasId("orange_juice") -> "Rada bi pomarančni sok."
+            items.hasId("apple_juice") -> "Rada bi jabolčni sok."
+            items.hasId("blueberry_juice") -> "Rada bi borovničev sok."
+            items.hasId("strawberry_juice") -> "Rada bi jagodni sok."
+            items.hasId("cedevita") -> "Rada bi Cedevito."
             items.hasId("tea") && items.hasId("yes") -> "Rada bi velik \u010daj."
             items.hasId("tea") && items.hasId("no") -> "Rada bi \u010daj."
             items.hasId("tea_large") -> "Rada bi velik \u010daj."
