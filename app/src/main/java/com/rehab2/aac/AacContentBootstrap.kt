@@ -93,6 +93,50 @@ object AacContentBootstrap {
     )
 
     private val BUNDLED_SYSTEM_ICON_FILES = listOf(
+        "aac_drink_coffee.png",
+        "aac_drink_cola.png",
+        "aac_drink_cold_water.png",
+        "aac_drink_fanta.png",
+        "aac_drink_juice.png",
+        "aac_drink_milk.png",
+        "aac_drink_pepsi.png",
+        "aac_drink_radenska.png",
+        "aac_drink_soda.png",
+        "aac_drink_sparkling_water.png",
+        "aac_drink_still_water.png",
+        "aac_drink_tea.png",
+        "aac_drink_water.png",
+        "aac_help.png",
+        "aac_now.png",
+        "aac_nurse.png",
+        "aac_pain_ankle.png",
+        "aac_pain_back.png",
+        "aac_pain_belly.png",
+        "aac_pain_chest.png",
+        "aac_pain_elbow.png",
+        "aac_pain_foot.png",
+        "aac_pain_head.png",
+        "aac_pain_hip.png",
+        "aac_pain_knee.png",
+        "aac_pain_left_arm.png",
+        "aac_pain_left_leg.png",
+        "aac_pain_light.png",
+        "aac_pain_medium.png",
+        "aac_pain_palm.png",
+        "aac_pain_right_arm.png",
+        "aac_pain_right_leg.png",
+        "aac_pain_shoulder.png",
+        "aac_pain_strong.png",
+        "aac_pain_very_strong.png",
+        "aac_pain_wrist.png",
+        "aac_soon.png",
+        "aac_toilet_blood.png",
+        "aac_toilet_dressing.png",
+        "aac_toilet_shower.png",
+        "aac_toilet_washing.png",
+        "aac_wc_both.png",
+        "aac_wc_dirty.png",
+        "aac_wc_wet.png",
         "come_to_me.png",
         "dont_understand.png",
         "help.png",
@@ -721,8 +765,11 @@ object AacContentBootstrap {
             repaired += putIfDifferent(item, "labelSl", "SESTRA")
             repaired += putIfDifferent(item, "speakTextSl", "Potrebujem medicinsko sestro.")
             repaired += putIfDifferent(item, "speechText", "Potrebujem medicinsko sestro.")
+            repaired += putLanguageValue(item, "speechTextByLanguage", "sl", "Potrebujem medicinsko sestro.")
             repaired += putLanguageValue(item, "labelByLanguage", "uk", "МЕДСЕСТРА")
             repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Мені потрібна медсестра.")
+            repaired += putIfDifferent(item, "imagePath", "system/aac_nurse.png")
+            repaired += putIfDifferent(item, "iconSource", IconSource.SYSTEM.name)
             repaired += putIfDifferent(item, "actionType", "open_subicons")
             repaired += putIfDifferent(item, "opensSubicons", true)
             repaired += putIfDifferent(item, "speaksImmediately", false)
