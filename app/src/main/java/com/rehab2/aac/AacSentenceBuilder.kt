@@ -246,7 +246,19 @@ object AacSentenceBuilder {
             "medium" -> "Srednje močno me $verb $target."
             "strong" -> "Močno me $verb $target."
             "very", "very_strong" -> "Zelo me $verb $target."
+            null -> naturalPainBodySentence(bodyKey) ?: "${verb.replaceFirstChar { it.titlecase(Locale("sl", "SI")) }} me $target."
             else -> "${verb.replaceFirstChar { it.titlecase(Locale("sl", "SI")) }} me $target."
+        }
+    }
+
+    private fun naturalPainBodySentence(bodyKey: String): String? {
+        return when (bodyKey) {
+            "left_arm" -> "Leva roka me boli."
+            "right_arm" -> "Desna roka me boli."
+            "left_leg" -> "Leva noga me boli."
+            "right_leg" -> "Desna noga me boli."
+            "arm_palm" -> "Dlan me boli."
+            else -> null
         }
     }
 
@@ -838,6 +850,7 @@ object AacSentenceBuilder {
         "arm_elbow" to "komolec",
         "arm_forearm" to "podlaht",
         "arm_wrist" to "zapestje",
+        "arm_palm" to "dlan",
         "arm_fingers" to "prsti na roki",
         "leg_hip" to "kolk",
         "leg_thigh" to "stegno",
@@ -893,6 +906,7 @@ object AacSentenceBuilder {
         "arm_elbow" to PainBodyForm(singular = "komolec", left = "levi komolec", right = "desni komolec"),
         "arm_forearm" to PainBodyForm(singular = "podlaht", left = "leva podlaht", right = "desna podlaht"),
         "arm_wrist" to PainBodyForm(singular = "zapestje", left = "levo zapestje", right = "desno zapestje"),
+        "arm_palm" to PainBodyForm(singular = "dlan", left = "leva dlan", right = "desna dlan"),
         "arm_fingers" to PainBodyForm(singular = "prsti na roki", left = "prsti na levi roki", right = "prsti na desni roki"),
         "leg_hip" to PainBodyForm(singular = "kolk", left = "levi kolk", right = "desni kolk"),
         "leg_thigh" to PainBodyForm(singular = "stegno", left = "levo stegno", right = "desno stegno"),

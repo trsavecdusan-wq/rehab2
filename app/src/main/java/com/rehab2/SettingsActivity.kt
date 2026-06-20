@@ -212,13 +212,13 @@ class SettingsActivity : AppCompatActivity() {
             "3000 ms" to 3000L
         )
         private const val PREF_VOICE_ASSISTANT_QUESTION_DELAY_MS = "aac_voice_assistant_question_delay_ms"
-        private const val DEFAULT_VOICE_ASSISTANT_QUESTION_DELAY_MS = 750L
+        private const val DEFAULT_VOICE_ASSISTANT_QUESTION_DELAY_MS = 500L
         private val PARTIAL_SENTENCE_AUTO_RETURN_OPTIONS = arrayOf(
+            "3s" to 3000L,
             "5s" to 5000L,
+            "7s" to 7000L,
             "10s" to 10000L,
-            "15s" to 15000L,
-            "20s" to 20000L,
-            "30s" to 30000L
+            "15s" to 15000L
         )
         private const val PREF_AAC_GRID_SIZE = "aac_grid_size"
         private const val DEFAULT_AAC_GRID_SIZE = 3
@@ -2684,7 +2684,7 @@ class SettingsActivity : AppCompatActivity() {
             .indexOfFirst { it.second == settings.partialSentenceAutoReturnMs }
             .coerceAtLeast(1)
         AlertDialog.Builder(this)
-            .setTitle("Čas povratka po delnem stavku")
+            .setTitle("Povratek po delnem stavku")
             .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
                 val delayMs = PARTIAL_SENTENCE_AUTO_RETURN_OPTIONS[which].second
                 prefs.edit()
@@ -2700,7 +2700,7 @@ class SettingsActivity : AppCompatActivity() {
         val labels = VOICE_ASSISTANT_QUESTION_DELAY_OPTIONS.map { it.first }.toTypedArray()
         val selectedIndex = VOICE_ASSISTANT_QUESTION_DELAY_OPTIONS
             .indexOfFirst { it.second == voiceAssistantQuestionDelayMs() }
-            .coerceAtLeast(2)
+            .coerceAtLeast(0)
         AlertDialog.Builder(this)
             .setTitle("Pavza pred vprašanjem")
             .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->

@@ -89,7 +89,12 @@ object AacContentBootstrap {
         "apple_juice",
         "blueberry_juice",
         "strawberry_juice",
-        "cedevita"
+        "cedevita",
+        "left_arm",
+        "right_arm",
+        "left_leg",
+        "right_leg",
+        "arm_palm"
     )
 
     private val QUICK_PATIENT_SYSTEM_ICON_IDS = setOf(
@@ -754,7 +759,9 @@ object AacContentBootstrap {
             if (isProtectedStarterSystemRepairItem(item)) return@forEach
             repaired += putIfDifferent(item, "labelSl", starter.labelSl)
             repaired += putIfDifferent(item, "speakTextSl", starter.speakTextSl.orEmpty())
+            repaired += putIfDifferent(item, "speechTextSl", starter.speakTextSl.orEmpty())
             repaired += putIfDifferent(item, "speechText", starter.speechText.orEmpty())
+            repaired += putLanguageValue(item, "speechTextByLanguage", "sl", starter.speakTextSl.orEmpty())
             starter.labelByLanguage.forEach { (languageCode, label) ->
                 repaired += putLanguageValue(item, "labelByLanguage", languageCode, label)
             }

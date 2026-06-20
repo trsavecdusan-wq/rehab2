@@ -62,6 +62,7 @@ import com.rehab2.aac.AacQuestionEngine
 import com.rehab2.aac.AacSentenceItem
 import com.rehab2.aac.AacSentenceBuilder
 import com.rehab2.aac.AacSentenceStateManager
+import com.rehab2.aac.AacSpeechTimingSettings
 import com.rehab2.aac.AacStarterContentV1
 import com.rehab2.aac.AacStoragePaths
 import com.rehab2.aac.AacStoredTranslationCache
@@ -118,7 +119,7 @@ class MainActivity : AppCompatActivity() {
         private const val AAC_GUIDED_PROMPT_LETTER_BY_LETTER = "LETTER_BY_LETTER"
         private const val DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE = AAC_GUIDED_PROMPT_FULL_TEXT
         private const val DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS = 2_000L
-        private const val DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = 750L
+        private const val DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = 500L
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
@@ -991,6 +992,82 @@ class MainActivity : AppCompatActivity() {
             else -> fallbackRootItems
         }
         showMainAacItems(displayItems)
+        recordMainAacRuntimeAudit()
+    }
+
+    private fun recordMainAacRuntimeAudit() {
+        recordMainAacSpeechSourceAudit()
+        recordMainAacTimingAudit()
+        recordMainAacAutoReturnAudit()
+    }
+
+    private fun recordMainAacSpeechSourceAudit() {
+        val auditIds = listOf(
+            "left_arm",
+            "right_arm",
+            "left_leg",
+            "right_leg",
+            "arm_shoulder",
+            "arm_elbow",
+            "arm_wrist",
+            "arm_palm",
+            "leg_hip",
+            "leg_knee",
+            "leg_ankle",
+            "leg_foot"
+        )
+        auditIds.forEach { itemId ->
+            val item = mainAacItemsById[itemId]
+            if (item == null) {
+                Log.d(TAG, "AAC_SPEECH_SOURCE_AUDIT id=$itemId missing=true")
+                return@forEach
+            }
+            val resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, "sl")
+            val resolvedSpeech = AacLocalizedTextResolver.resolveSpeakText(item, "sl")
+            val builderSpeech = AacSentenceBuilder.buildSlovenianSentence(listOf(item)).trim()
+            Log.d(
+                TAG,
+                "AAC_SPEECH_SOURCE_AUDIT id=${item.id} label='$resolvedLabel' " +
+                    "speechText='${item.speakTextSl.orEmpty().ifBlank { item.speechText.orEmpty() }}' " +
+                    "sentenceBuilder='$builderSpeech' resolved='$resolvedSpeech'"
+            )
+        }
+    }
+
+    private fun recordMainAacTimingAudit() {
+        val questionDelayRaw = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
+            .all[KEY_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS]
+        val questionDelayMs = mainAacVoiceAssistantQuestionDelayMs()
+        Log.d(
+            TAG,
+            "AAC_TIMING_AUDIT questionDelayKey=$KEY_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS " +
+                "raw=$questionDelayRaw runtimeMs=$questionDelayMs defaultMs=$DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS " +
+                "usedBy=schedulePendingMainAacVoiceAssistantQuestionAfterSpeech"
+        )
+    }
+
+    private fun recordMainAacAutoReturnAudit() {
+        val guidedPrefs = getSharedPreferences(PREFS_AAC_GRID_SETTINGS, MODE_PRIVATE)
+        val speechPrefs = getSharedPreferences(AacSpeechTimingSettings.PREFS_FILE, MODE_PRIVATE)
+        val timingSettings = AacSpeechTimingSettings.read(this)
+        Log.d(
+            TAG,
+            "AAC_AUTO_RETURN_AUDIT guidedKey=$KEY_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS " +
+                "guidedRaw=${guidedPrefs.all[KEY_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS]} " +
+                "guidedRuntimeMs=${mainAacGuidedAutoCompleteTimeoutMs()} " +
+                "guidedDefaultMs=$DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS"
+        )
+        Log.d(
+            TAG,
+            "AAC_AUTO_RETURN_AUDIT partialEnabledKey=${AacSpeechTimingSettings.PREF_PARTIAL_SENTENCE_AUTO_RETURN_ENABLED} " +
+                "partialEnabled=${timingSettings.partialSentenceAutoReturnEnabled} " +
+                "partialDelayKey=${AacSpeechTimingSettings.PREF_PARTIAL_SENTENCE_AUTO_RETURN_MS} " +
+                "partialRaw=${speechPrefs.all[AacSpeechTimingSettings.PREF_PARTIAL_SENTENCE_AUTO_RETURN_MS]} " +
+                "partialRuntimeMs=${timingSettings.partialSentenceAutoReturnMs} " +
+                "partialDefaultMs=${AacSpeechTimingSettings.DEFAULT_PARTIAL_SENTENCE_AUTO_RETURN_MS} " +
+                "returnToRootKey=${AacSpeechTimingSettings.PREF_RETURN_TO_ROOT_AFTER_SENTENCE_ENABLED} " +
+                "returnToRoot=${timingSettings.returnToRootAfterSentenceEnabled}"
+        )
     }
 
     private fun ensureMainAacGridBindings() {

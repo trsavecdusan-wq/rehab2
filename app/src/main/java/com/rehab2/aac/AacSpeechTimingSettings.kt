@@ -14,7 +14,7 @@ data class AacSpeechTimingSettings(
     val returnToRootAfterSentenceEnabled: Boolean = true,
     val clearSentenceAfterSentenceEnabled: Boolean = true,
     val partialSentenceAutoReturnEnabled: Boolean = true,
-    val partialSentenceAutoReturnMs: Long = 10000L
+    val partialSentenceAutoReturnMs: Long = 5000L
 ) {
     companion object {
         const val PREFS_FILE = "rehab2_prefs"
@@ -34,12 +34,12 @@ data class AacSpeechTimingSettings(
         const val DEFAULT_MAIN_ICON_SPEAK_DELAY_MS = 250L
         const val DEFAULT_SUB_ICON_SPEAK_DELAY_MS = 700L
         const val DEFAULT_AUTO_SPEAK_SENTENCE_DELAY_MS = 3000L
-        const val DEFAULT_PARTIAL_SENTENCE_AUTO_RETURN_MS = 10000L
+        const val DEFAULT_PARTIAL_SENTENCE_AUTO_RETURN_MS = 5000L
 
         private val ALLOWED_MAIN_ICON_DELAYS_MS = setOf(0L, 100L, 200L, 300L, 500L, 700L, 1000L)
         private val ALLOWED_SUB_ICON_DELAYS_MS = setOf(0L, 100L, 200L, 300L, 500L, 700L, 1000L, 1500L, 2000L)
         private val ALLOWED_DELAYS_MS = setOf(1000L, 1500L, 2000L, 3000L, 4000L, 5000L)
-        private val ALLOWED_PARTIAL_SENTENCE_AUTO_RETURN_MS = setOf(5000L, 10000L, 15000L, 20000L, 30000L)
+        private val ALLOWED_PARTIAL_SENTENCE_AUTO_RETURN_MS = setOf(3000L, 5000L, 7000L, 10000L, 15000L)
 
         fun read(context: Context): AacSpeechTimingSettings {
             val prefs = context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)

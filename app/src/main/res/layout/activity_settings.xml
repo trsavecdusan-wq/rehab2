@@ -703,7 +703,7 @@
             android:layout_marginBottom="8dp"
             android:minHeight="56dp"
             android:paddingVertical="8dp"
-            android:text="Samodejni povratek po delnem stavku"
+            android:text="Povratek po delnem stavku"
             android:textColor="#F4F7FA"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -717,7 +717,7 @@
             android:clickable="true"
             android:focusable="false"
             android:gravity="center_vertical"
-            android:hint="Čas povratka po delnem stavku"
+            android:hint="Povratek na prvo stran"
             android:inputType="none"
             android:maxLines="2"
             android:minHeight="60dp"
