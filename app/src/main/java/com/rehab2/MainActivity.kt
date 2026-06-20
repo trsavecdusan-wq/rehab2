@@ -812,6 +812,7 @@ class MainActivity : AppCompatActivity() {
                 recordLastAudioEvent("AAC callback onSpeechCompleted")
                 shouldLockMainAacInputOnSpeechStart = true
                 completeMainAacSpeechLock()
+                schedulePendingMainAacVoiceAssistantQuestionAfterSpeech()
             }
 
             override fun onSpeechCancelled() {
@@ -1900,8 +1901,9 @@ class MainActivity : AppCompatActivity() {
                 resolvedLabel = resolvedLabel,
                 resolvedSpeechText = resolvedSpeechText
             )
-            val finalSpeechText = mainAacSentenceBuilderSpeech(item, languageCode)
-                .ifBlank { speechText.ifBlank { resolvedSpeechText.ifBlank { resolvedLabel } } }
+            val finalSpeechText = resolvedSpeechText
+                .ifBlank { mainAacSentenceBuilderSpeech(item, languageCode) }
+                .ifBlank { speechText.ifBlank { resolvedLabel } }
             if (!scheduleMainAacGuidedAutoComplete(finalSpeechText, languageCode) &&
                 mainAacGuidedAutoCompleteTimeoutMs() > 0L
             ) {
@@ -2249,8 +2251,9 @@ class MainActivity : AppCompatActivity() {
         resolvedLabel: String,
         resolvedSpeechText: String
     ): MainAacVoiceAssistantStep {
-        val finalSpeech = mainAacVoiceAssistantSentenceBuilderSpeech(item, languageCode)
-            .ifBlank { resolvedSpeechText.ifBlank { resolvedLabel } }
+        val finalSpeech = resolvedSpeechText
+            .ifBlank { mainAacVoiceAssistantSentenceBuilderSpeech(item, languageCode) }
+            .ifBlank { resolvedLabel }
             .trim()
         return MainAacVoiceAssistantStep(
             partialSpeechText = "",
@@ -2291,7 +2294,17 @@ class MainActivity : AppCompatActivity() {
             aacAudioPlayer.speakText(safeQuestion, languageCode)
         }
         mainAacVoiceAssistantQuestionRunnable = runnable
+        recordLastAudioEvent(
+            "AAC voice assistant question pending after speech itemTarget=${step.targetPageId} delayMs=${step.delayBeforeQuestionMs}"
+        )
+    }
+
+    private fun schedulePendingMainAacVoiceAssistantQuestionAfterSpeech() {
+        val step = pendingMainAacVoiceAssistantStep ?: return
+        val runnable = mainAacVoiceAssistantQuestionRunnable ?: return
         val timeoutMs = step.delayBeforeQuestionMs.coerceIn(1_000L, 4_000L)
+        mainHandler.removeCallbacks(runnable)
+        recordLastAudioEvent("AAC voice assistant question scheduled after speech delayMs=$timeoutMs")
         mainHandler.postDelayed(runnable, timeoutMs)
     }
 
