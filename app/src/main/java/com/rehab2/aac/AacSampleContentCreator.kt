@@ -287,7 +287,7 @@ object AacSampleContentCreator {
                         label = "WC",
                         labelUk = "ТУАЛЕТ",
                         labelEn = "TOILET",
-                        speechSl = "moram na WC",
+                        speechSl = "moram v toaleto",
                         speechUk = "Мені потрібно в туалет",
                         speechEn = "I need the toilet",
                         imagePath = "",

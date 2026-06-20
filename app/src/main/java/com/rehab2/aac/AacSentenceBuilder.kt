@@ -43,7 +43,7 @@ object AacSentenceBuilder {
             keys.any { it in NO_KEYS } -> "Ne."
             keys.any { it in TIRED_KEYS } -> "Utrujena sem."
             keys.any { it in REST_KEYS } -> "Rada bi poÄŤivala."
-            keys.any { it in WC_KEYS } -> "Moram na WC."
+            keys.any { it in WC_KEYS } -> "Moram v toaleto."
             else -> null
         }
     }
@@ -180,12 +180,12 @@ object AacSentenceBuilder {
 
     private fun buildWcSentence(items: List<AacItem>): String {
         return when {
-            items.hasId("wc_now") -> "Moram takoj na WC."
-            items.hasId("wc_soon") -> "Kmalu moram na WC."
-            items.hasId("wc_help") -> "Potrebujem pomo\u010d za WC."
+            items.hasId("wc_now") -> "Takoj moram v toaleto."
+            items.hasId("wc_soon") -> "Kmalu moram v toaleto."
+            items.hasId("wc_help") -> "Potrebujem pomo\u010d pri toaleti."
             items.hasId("dressing_help") -> "Prosim, preoblecite me."
             items.hasId("washing_help") -> "Potrebujem umivanje."
-            else -> "Moram na WC."
+            else -> "Moram v toaleto."
         }
     }
 
@@ -719,7 +719,7 @@ object AacSentenceBuilder {
         "food_dinner" to "ve\u010derjo",
         "sweet" to "nekaj sladkega",
         "rest" to "poÄŤivala",
-        "wc" to "na WC",
+        "wc" to "v toaleto",
         "music" to "posluĹˇala glasbo",
         "tv" to "gledala televizijo",
         "walk" to "Ĺˇla na sprehod s spremstvom",
