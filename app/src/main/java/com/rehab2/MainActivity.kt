@@ -1658,11 +1658,11 @@ class MainActivity : AppCompatActivity() {
             .trim()
             .ifBlank { mainAacQuestionFallback(item, languageCode) }
         if (prompt.isBlank() && requestMainAacQuestionTranslation(item, languageCode)) {
-            speakMainAacVoiceAssistantPartialThenPrompt("", languageCode)
+            speakMainAacVoiceAssistantPartialThenPrompt("", languageCode, item)
             hideMainAacQuestion()
             return
         }
-        if (speakMainAacVoiceAssistantPartialThenPrompt(prompt, languageCode)) {
+        if (speakMainAacVoiceAssistantPartialThenPrompt(prompt, languageCode, item)) {
             return
         }
         if (prompt.isNotBlank()) {
@@ -2183,13 +2183,17 @@ class MainActivity : AppCompatActivity() {
         pendingMainAacGuidedAutoCompleteLanguageCode = ""
     }
 
-    private fun speakMainAacVoiceAssistantPartialThenPrompt(prompt: String, languageCode: String): Boolean {
-        val step = mainAacVoiceAssistantStep(prompt, languageCode) ?: return false
+    private fun speakMainAacVoiceAssistantPartialThenPrompt(
+        prompt: String,
+        languageCode: String,
+        clickedItem: AacItem
+    ): Boolean {
+        val step = mainAacVoiceAssistantStep(clickedItem, prompt, languageCode) ?: return false
         hideMainAacQuestion()
         shouldLockMainAacInputOnSpeechStart = false
         speakMainAacTextOnce(
             source = "voice_assistant_partial",
-            itemId = currentMainAacConversationItems.lastOrNull()?.id ?: "(none)",
+            itemId = clickedItem.id,
             text = step.partialSpeechText,
             languageCode = languageCode
         )
@@ -2212,13 +2216,16 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun mainAacVoiceAssistantStep(prompt: String, languageCode: String): MainAacVoiceAssistantStep? {
-        val partialSpeech = mainAacVoiceAssistantPartialSpeech(null, languageCode)
+    private fun mainAacVoiceAssistantStep(
+        clickedItem: AacItem,
+        prompt: String,
+        languageCode: String
+    ): MainAacVoiceAssistantStep? {
+        val partialSpeech = mainAacVoiceAssistantPartialSpeech(clickedItem, languageCode)
         if (partialSpeech.isBlank()) {
             return null
         }
-        val selectedItem = currentMainAacConversationItems.lastOrNull()
-        val nextPageItems = selectedItem?.let(::mainAacVoiceAssistantNextPageItems).orEmpty()
+        val nextPageItems = mainAacVoiceAssistantNextPageItems(clickedItem)
         val nextQuestion = prompt.trim()
         if (nextQuestion.isBlank() && nextPageItems.isEmpty()) {
             return null
@@ -2228,7 +2235,7 @@ class MainActivity : AppCompatActivity() {
             nextQuestionText = nextQuestion,
             finalSpeechText = "",
             nextPageItems = nextPageItems,
-            targetPageId = selectedItem?.targetPageId.orEmpty(),
+            targetPageId = clickedItem.targetPageId,
             delayBeforeQuestionMs = mainAacVoiceAssistantQuestionDelayMs(),
             isTerminalSelection = false
         )
@@ -2332,6 +2339,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacVoiceAssistantPartialSpeech(item: AacItem?, languageCode: String): String {
+        if (item != null) {
+            AacLocalizedTextResolver.resolveSpeakText(item, languageCode).trim()
+                .takeIf { it.isNotBlank() }
+                ?.let { return it }
+        }
         val sentenceBuilderSpeech = mainAacVoiceAssistantSentenceBuilderSpeech(item, languageCode)
         if (sentenceBuilderSpeech.isNotBlank()) {
             return sentenceBuilderSpeech

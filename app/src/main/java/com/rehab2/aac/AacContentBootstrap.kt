@@ -719,18 +719,18 @@ object AacContentBootstrap {
         itemsById["nurse_help"]?.let { item ->
             if (isProtectedLocalAacItem(item)) return@let
             repaired += putIfDifferent(item, "labelSl", "SESTRA")
-            repaired += putIfDifferent(item, "speakTextSl", "Prosim, pokličite medicinsko sestro.")
-            repaired += putIfDifferent(item, "speechText", "Prosim, pokličite medicinsko sestro.")
+            repaired += putIfDifferent(item, "speakTextSl", "Potrebujem medicinsko sestro.")
+            repaired += putIfDifferent(item, "speechText", "Potrebujem medicinsko sestro.")
             repaired += putLanguageValue(item, "labelByLanguage", "uk", "МЕДСЕСТРА")
-            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Будь ласка, покличте медсестру.")
+            repaired += putLanguageValue(item, "speechTextByLanguage", "uk", "Мені потрібна медсестра.")
             repaired += putIfDifferent(item, "actionType", "open_subicons")
             repaired += putIfDifferent(item, "opensSubicons", true)
             repaired += putIfDifferent(item, "speaksImmediately", false)
             repaired += replaceChildrenIfDifferent(item, TOALETA_V1_NURSE_CHILDREN)
             repaired += ensureOnlyVisibleUnder(item, listOf("wc"))
             repaired += removeQuestionMetadata(item)
-            repaired += putLanguageValue(item, "questionByLanguage", "sl", "Kako naj mi sestra pomaga?")
-            repaired += putLanguageValue(item, "questionByLanguage", "uk", "Як медсестра може мені допомогти?")
+            repaired += putLanguageValue(item, "questionByLanguage", "sl", "Kaj naj naredi sestra?")
+            repaired += putLanguageValue(item, "questionByLanguage", "uk", "Що має зробити медсестра?")
         }
 
         val terminalRepairs = mapOf(
