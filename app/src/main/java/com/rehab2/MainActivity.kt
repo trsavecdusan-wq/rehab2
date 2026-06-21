@@ -37,6 +37,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -1122,7 +1123,7 @@ class MainActivity : AppCompatActivity() {
         mainAacTileBindings = bindings
     }
 
-    private fun createMainAacTileView(gridSize: Int): LinearLayout {
+    private fun createMainAacTileView(gridSize: Int): FrameLayout {
         val iconTextSize = when (gridSize) {
             3 -> 46f
             4 -> 42f
@@ -1135,7 +1136,7 @@ class MainActivity : AppCompatActivity() {
             5 -> 10f
             else -> 7f
         }
-        return LinearLayout(this).apply {
+        return FrameLayout(this).apply {
             background = GradientDrawable().apply {
                 setColor(0xFF34414D.toInt())
                 cornerRadius = 0f
@@ -1143,15 +1144,12 @@ class MainActivity : AppCompatActivity() {
             minimumHeight = 0
             isClickable = true
             isFocusable = true
-            gravity = android.view.Gravity.CENTER
-            orientation = LinearLayout.VERTICAL
             setPadding(dp(1), dp(1), dp(1), dp(1))
             addView(TextView(context).apply {
                 minimumHeight = 0
-                layoutParams = LinearLayout.LayoutParams(
+                layoutParams = FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    0,
-                    1f
+                    ViewGroup.LayoutParams.MATCH_PARENT
                 )
                 gravity = android.view.Gravity.CENTER
                 includeFontPadding = false
@@ -1160,15 +1158,20 @@ class MainActivity : AppCompatActivity() {
             })
             addView(TextView(context).apply {
                 minimumHeight = 0
-                layoutParams = LinearLayout.LayoutParams(
+                layoutParams = FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
-                )
+                ).apply {
+                    gravity = android.view.Gravity.BOTTOM
+                }
                 gravity = android.view.Gravity.CENTER
+                setBackgroundColor(android.graphics.Color.TRANSPARENT)
                 includeFontPadding = false
                 ellipsize = TextUtils.TruncateAt.END
                 maxLines = 1
-                setTextColor(0xFFF4F7FA.toInt())
+                setPadding(dp(1), 0, dp(1), dp(1))
+                setShadowLayer(3f, 0f, 1f, 0xFF000000.toInt())
+                setTextColor(0xFFFFF56A.toInt())
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, labelTextSize)
                 TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
                     this,
@@ -1202,7 +1205,7 @@ class MainActivity : AppCompatActivity() {
             item?.let {
                 binding.view.background = mainAacTileBackgroundFor(it)
                 binding.view.isEnabled = !isMainAacInputLocked
-                binding.label.text = mainAacDisplayLabel(it, languageCode, topSuggestionItemId)
+                bindMainAacOverlayLabel(binding.label, mainAacDisplayLabel(it, languageCode, topSuggestionItemId))
                 bindMainAacIcon(binding, it)
                 binding.view.setOnClickListener(null)
                 binding.view.setOnTouchListener { _, event ->
@@ -1214,7 +1217,7 @@ class MainActivity : AppCompatActivity() {
                 binding.view.alpha = 0.45f
                 binding.view.scaleX = 1f
                 binding.view.scaleY = 1f
-                binding.label.text = ""
+                bindMainAacOverlayLabel(binding.label, "")
                 binding.icon?.apply {
                     setCompoundDrawables(null, null, null, null)
                     text = ""
@@ -1234,6 +1237,12 @@ class MainActivity : AppCompatActivity() {
                 visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
             )
         }
+    }
+
+    private fun bindMainAacOverlayLabel(labelView: TextView, label: CharSequence) {
+        val value = label.toString().trim()
+        labelView.text = value
+        labelView.visibility = if (value.isBlank()) View.GONE else View.VISIBLE
     }
 
     private fun currentMainAacPageSnapshot(
@@ -1279,7 +1288,7 @@ class MainActivity : AppCompatActivity() {
             item?.let {
                 binding.view.background = mainAacTileBackgroundFor(it)
                 binding.view.isEnabled = !isMainAacInputLocked
-                binding.label.text = mainAacDisplayLabel(it, languageCode, topSuggestionItemId)
+                bindMainAacOverlayLabel(binding.label, mainAacDisplayLabel(it, languageCode, topSuggestionItemId))
                 bindMainAacIcon(binding, it)
                 binding.view.setOnClickListener(null)
                 binding.view.setOnTouchListener { _, event ->
@@ -1291,7 +1300,7 @@ class MainActivity : AppCompatActivity() {
                 binding.view.alpha = 0.45f
                 binding.view.scaleX = 1f
                 binding.view.scaleY = 1f
-                binding.label.text = ""
+                bindMainAacOverlayLabel(binding.label, "")
                 binding.icon?.apply {
                     setCompoundDrawables(null, null, null, null)
                     text = ""
@@ -3126,7 +3135,7 @@ class MainActivity : AppCompatActivity() {
             }
             return
         }
-        val size = (maxSize * 0.96f).toInt().coerceAtLeast(dp(24))
+        val size = (maxSize * 1.00f).toInt().coerceAtLeast(dp(24))
         val drawable = BitmapDrawable(resources, bitmap).apply {
             setBounds(0, 0, size, size)
         }
