@@ -222,7 +222,7 @@ class SettingsActivity : AppCompatActivity() {
         )
         private const val PREF_AAC_GRID_SIZE = "aac_grid_size"
         private const val DEFAULT_AAC_GRID_SIZE = 3
-        private val AAC_GRID_SIZE_OPTIONS = arrayOf(3, 4, 5)
+        private val AAC_GRID_SIZE_OPTIONS = arrayOf(3, 4, 5, 6)
         private const val PREF_AAC_PERSISTENT_TOP_ROW_ENABLED = "aac_persistent_top_row_enabled"
         private const val PREF_AAC_PERSISTENT_TOP_ROW_COUNT = "aac_persistent_top_row_count"
         private const val PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = "aac_persistent_top_row_item_ids"
@@ -3010,7 +3010,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun normalizeAacGridSize(value: Int): Int {
         return when (value) {
-            3, 4, 5 -> value
+            3, 4, 5, 6 -> value
             else -> DEFAULT_AAC_GRID_SIZE
         }
     }

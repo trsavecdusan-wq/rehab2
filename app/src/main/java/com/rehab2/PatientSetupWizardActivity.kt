@@ -33,7 +33,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         private const val DEFAULT_AAC_GRID_SIZE = 5
         private const val DEFAULT_TOP_ROW_COUNT = 5
         private const val REQUEST_PICK_PATIENT_PHOTO = 4301
-        private val GRID_OPTIONS = listOf(3, 4, 5)
+        private val GRID_OPTIONS = listOf(3, 4, 5, 6)
     }
 
     private lateinit var prefs: SharedPreferences
@@ -65,7 +65,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         patientName = profile.firstName
         patientGender = PatientProfileSettings.normalizeGender(profile.gender)
         mainLanguage = profile.mainLanguage
-        gridSize = prefs.getInt(PREF_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE).coerceIn(3, 5)
+        gridSize = prefs.getInt(PREF_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE).coerceIn(3, 6)
         selectedPhotoFile = existingPatientPhotoFile()
     }
 

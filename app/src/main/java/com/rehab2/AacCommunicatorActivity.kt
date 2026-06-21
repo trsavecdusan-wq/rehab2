@@ -336,6 +336,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         )
         recycler.adapter = AacAdapter(
             items = displayedItems,
+            gridSize = getAacGridSize(),
             labelMode = labelMode,
             languageCode = languageCode,
             suggestionIds = currentContextSuggestionIds.toSet(),
@@ -947,7 +948,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun normalizeAacGridSize(value: Int): Int {
         return when (value) {
-            3, 4, 5 -> value
+            3, 4, 5, 6 -> value
             else -> DEFAULT_AAC_GRID_SIZE
         }
     }
@@ -1559,6 +1560,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private class AacAdapter(
         private val items: List<AacItem>,
+        private val gridSize: Int,
         private val labelMode: AacLabelMode,
         private val languageCode: String,
         private val suggestionIds: Set<String>,
@@ -1601,7 +1603,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): AacViewHolder {
             val view = android.view.LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_aac_tile, parent, false)
-            return AacViewHolder(view, labelMode, languageCode, suggestionIds, onItemClick, onWaterBindTrace)
+            return AacViewHolder(view, gridSize, labelMode, languageCode, suggestionIds, onItemClick, onWaterBindTrace)
         }
 
         override fun onBindViewHolder(holder: AacViewHolder, position: Int) {
@@ -1612,6 +1614,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
         class AacViewHolder(
             itemView: View,
+            private val gridSize: Int,
             private val labelMode: AacLabelMode,
             private val languageCode: String,
             private val suggestionIds: Set<String>,
@@ -1631,10 +1634,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
             private val image: ImageView = itemView.findViewById(R.id.imgAacTile)
             private val label: TextView = itemView.findViewById(R.id.txtAacTileLabel)
             private val context: android.content.Context = itemView.context
-            private val defaultImagePaddingPx: Int = (4 * context.resources.displayMetrics.density).toInt()
+            private val defaultImagePaddingPx: Int = (1 * context.resources.displayMetrics.density).toInt()
             private var tileColor: Int = TILE_DEFAULT_COLOR
 
             fun bind(item: AacItem) {
+                applyGridTileHeight(allowRetry = true)
                 tileColor = tileColorFor(item)
                 itemView.setBackgroundColor(tileColor)
                 image.setBackgroundColor(TILE_DEFAULT_COLOR)
@@ -1657,6 +1661,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 label.text = if (item.id in suggestionIds) "\u2B50 $resolvedLabel" else resolvedLabel
                 label.gravity = Gravity.CENTER
                 label.setTypeface(label.typeface, Typeface.BOLD)
+                label.maxLines = 1
                 image.setImageBitmap(null)
                 bindImage(item)
                 applyLabelMode()
@@ -1673,6 +1678,29 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 itemView.postDelayed({
                     itemView.setBackgroundColor(tileColor)
                 }, TILE_PRESS_FEEDBACK_MS)
+            }
+
+            private fun applyGridTileHeight(allowRetry: Boolean) {
+                val recyclerView = itemView.parent as? RecyclerView
+                val availableHeight = recyclerView?.let { parent ->
+                    parent.height - parent.paddingTop - parent.paddingBottom
+                } ?: 0
+                if (availableHeight <= 0) {
+                    if (allowRetry) {
+                        itemView.post { applyGridTileHeight(allowRetry = false) }
+                    }
+                    return
+                }
+
+                val margins = (itemView.layoutParams as? android.view.ViewGroup.MarginLayoutParams)
+                val verticalMargins = (margins?.topMargin ?: 0) + (margins?.bottomMargin ?: 0)
+                val targetHeight = ((availableHeight / gridSize.coerceIn(3, 6)) - verticalMargins)
+                    .coerceAtLeast((64 * context.resources.displayMetrics.density).toInt())
+                val layoutParams = itemView.layoutParams
+                if (layoutParams.height != targetHeight) {
+                    layoutParams.height = targetHeight
+                    itemView.layoutParams = layoutParams
+                }
             }
 
             private fun tileColorFor(item: AacItem): Int {
@@ -1762,8 +1790,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 image.setImageDrawable(null)
                 if (labelMode == AacLabelMode.HIDDEN) {
                     label.visibility = View.VISIBLE
-                    label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                    label.maxLines = 2
+                    label.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelTextSizeSp())
+                    label.maxLines = 1
                 }
             }
 
@@ -1774,19 +1802,29 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     }
                     AacLabelMode.SMALL -> {
                         label.visibility = View.VISIBLE
-                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, (labelTextSizeSp() - 2f).coerceAtLeast(10f))
                         label.maxLines = 1
                     }
                     AacLabelMode.NORMAL -> {
                         label.visibility = View.VISIBLE
-                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                        label.maxLines = 2
+                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelTextSizeSp())
+                        label.maxLines = 1
                     }
                     AacLabelMode.LARGE -> {
                         label.visibility = View.VISIBLE
-                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                        label.maxLines = 2
+                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, (labelTextSizeSp() + 2f).coerceAtMost(18f))
+                        label.maxLines = 1
                     }
+                }
+            }
+
+            private fun labelTextSizeSp(): Float {
+                return when (gridSize) {
+                    3 -> 18f
+                    4 -> 16f
+                    5 -> 14f
+                    6 -> 12f
+                    else -> 16f
                 }
             }
         }
