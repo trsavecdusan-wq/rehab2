@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
@@ -3100,6 +3101,7 @@ class MainActivity : AppCompatActivity() {
     private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
         val iconView = binding.icon ?: return
         iconView.setTextColor(mainAacIconTextColorFor(item))
+        iconView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mainAacFallbackIconTextSizeSp())
         val iconFile = AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
         if (iconFile?.isFile != true) {
             restoreMainAacFallbackIcon(binding, item)
@@ -3110,11 +3112,24 @@ class MainActivity : AppCompatActivity() {
             restoreMainAacFallbackIcon(binding, item)
             return
         }
+        iconView.text = ""
+        bindMainAacBitmapDrawable(iconView, bitmap)
+    }
+
+    private fun bindMainAacBitmapDrawable(iconView: TextView, bitmap: Bitmap) {
+        val availableWidth = (iconView.width - iconView.paddingLeft - iconView.paddingRight).coerceAtLeast(0)
+        val availableHeight = (iconView.height - iconView.paddingTop - iconView.paddingBottom).coerceAtLeast(0)
+        val maxSize = minOf(availableWidth, availableHeight)
+        if (maxSize <= 0) {
+            iconView.post {
+                bindMainAacBitmapDrawable(iconView, bitmap)
+            }
+            return
+        }
+        val size = (maxSize * 0.96f).toInt().coerceAtLeast(dp(24))
         val drawable = BitmapDrawable(resources, bitmap).apply {
-            val size = dp(mainAacIconBitmapSizeDp(item))
             setBounds(0, 0, size, size)
         }
-        iconView.text = ""
         iconView.setCompoundDrawables(null, drawable, null, null)
     }
 
@@ -3130,20 +3145,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun mainAacIconBitmapSizeDp(item: AacItem? = null): Int {
-        if (isMainAacYesNoVisualItem(item)) {
-            return when (mainAacSelectedGridSize()) {
-                3 -> 96
-                4 -> 80
-                5 -> 64
-                else -> 44
-            }
-        }
+    private fun mainAacFallbackIconTextSizeSp(): Float {
         return when (mainAacSelectedGridSize()) {
-            3 -> 76
-            4 -> 62
-            5 -> 46
-            else -> 30
+            3 -> 52f
+            4 -> 44f
+            5 -> 34f
+            else -> 24f
         }
     }
 
