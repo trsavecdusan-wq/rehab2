@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         private const val AAC_GUIDED_PROMPT_LETTER_BY_LETTER = "LETTER_BY_LETTER"
         private const val DEFAULT_AAC_GUIDED_PROMPT_DISPLAY_MODE = AAC_GUIDED_PROMPT_FULL_TEXT
         private const val DEFAULT_AAC_GUIDED_AUTO_COMPLETE_TIMEOUT_MS = 2_000L
-        private const val DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = 500L
+        private const val DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS = 0L
         private const val DEFAULT_AAC_GRID_SIZE = 4
         private const val MAIN_AAC_FIXED_TOP_ROW_MAX = 5
         private const val STATUS_REFRESH_INTERVAL_MS = 1000L
@@ -412,9 +412,9 @@ class MainActivity : AppCompatActivity() {
             "back_lower"
         )
         private val AAC_PAIN_ROOT_VISUAL_SLOT_BY_ID = mapOf(
-            "back" to 16,
-            "belly" to 17,
-            "chest" to 18,
+            "back" to 11,
+            "belly" to 12,
+            "chest" to 13,
             "left_arm" to 20,
             "left_leg" to 21,
             "head" to 22,
@@ -503,6 +503,60 @@ class MainActivity : AppCompatActivity() {
                 "hungry_doughnut" to 21,
                 "hungry_kremsnita" to 23
             ),
+            "thirsty" to mapOf(
+                "water" to 20,
+                "tea" to 12,
+                "coffee" to 14,
+                "juice" to 23,
+                "sparkling_drink" to 24,
+                "milk_drinks" to 10
+            ),
+            "drink" to mapOf(
+                "water" to 20,
+                "tea" to 12,
+                "coffee" to 14,
+                "juice" to 23,
+                "sparkling_drink" to 24,
+                "milk_drinks" to 10
+            ),
+            "water" to mapOf(
+                "non_sparkling_water" to 20,
+                "flavored_water" to 24,
+                "mineral_water" to 22,
+                "cold_water" to 12
+            ),
+            "tea" to mapOf(
+                "tea_chamomile" to 20,
+                "tea_fruit" to 12,
+                "tea_green" to 22,
+                "tea_black" to 14,
+                "tea_mint" to 24,
+                "tea_rosehip" to 10
+            ),
+            "tea_chamomile" to teaAddonVisualSlots("tea_chamomile"),
+            "tea_fruit" to teaAddonVisualSlots("tea_fruit"),
+            "tea_green" to teaAddonVisualSlots("tea_green"),
+            "tea_black" to teaAddonVisualSlots("tea_black"),
+            "tea_mint" to teaAddonVisualSlots("tea_mint"),
+            "tea_rosehip" to teaAddonVisualSlots("tea_rosehip"),
+            "coffee" to mapOf(
+                "coffee_plain" to 15,
+                "coffee_milk" to 17,
+                "coffee_no_sugar" to 19
+            ),
+            "juice" to mapOf(
+                "orange_juice" to 20,
+                "apple_juice" to 16,
+                "blueberry_juice" to 22,
+                "strawberry_juice" to 23,
+                "cedevita" to 24
+            ),
+            "sparkling_drink" to mapOf(
+                "drink_fanta" to 20,
+                "drink_coca_cola" to 16,
+                "drink_pepsi" to 18,
+                "radenska" to 24
+            ),
             "pain" to AAC_PAIN_ROOT_VISUAL_SLOT_BY_ID,
             "belly" to mapOf(
                 "belly_upper" to 13,
@@ -565,6 +619,14 @@ class MainActivity : AppCompatActivity() {
             "pain_since_morning" to 22,
             "pain_since_evening" to 24
         )
+
+        private fun teaAddonVisualSlots(teaId: String): Map<String, Int> {
+            return mapOf(
+                "${teaId}_lemon" to 15,
+                "${teaId}_honey" to 19,
+                "${teaId}_honey_lemon" to 17
+            )
+        }
         private val CORE_V2_FIXED_TOP_ROW_POSITIONS = mapOf(
             "no" to 1,
             "dont_understand" to 2,
@@ -1942,6 +2004,7 @@ class MainActivity : AppCompatActivity() {
             else -> DEFAULT_AAC_VOICE_ASSISTANT_QUESTION_DELAY_MS
         }
         return when (delayMs) {
+            0L,
             500L,
             750L,
             1_000L,
@@ -2489,10 +2552,14 @@ class MainActivity : AppCompatActivity() {
     private fun schedulePendingMainAacVoiceAssistantQuestionAfterSpeech() {
         val step = pendingMainAacVoiceAssistantStep ?: return
         val runnable = mainAacVoiceAssistantQuestionRunnable ?: return
-        val timeoutMs = step.delayBeforeQuestionMs.coerceIn(500L, 3_000L)
+        val timeoutMs = step.delayBeforeQuestionMs.coerceIn(0L, 3_000L)
         mainHandler.removeCallbacks(runnable)
         recordLastAudioEvent("AAC voice assistant question scheduled after speech delayMs=$timeoutMs")
-        mainHandler.postDelayed(runnable, timeoutMs)
+        if (timeoutMs == 0L) {
+            mainHandler.post(runnable)
+        } else {
+            mainHandler.postDelayed(runnable, timeoutMs)
+        }
     }
 
     private fun cancelMainAacVoiceAssistantQuestion() {
