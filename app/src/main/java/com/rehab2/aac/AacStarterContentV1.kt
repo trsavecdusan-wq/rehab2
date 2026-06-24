@@ -38,7 +38,7 @@ object AacStarterContentV1 {
         starter("call_my_caregiver", "POKLIČI SKRBNIKA", PatientProfileSettings.EMPTY_FIELD_SENTENCE, "patient.call_my_caregiver", "PEOPLE", "patient_profile", listOf("pokliči", "skrbnik"), visibleUnderIds = listOf("about_me")),
         starter("call_my_therapist", "POKLIČI TERAPEVTA", PatientProfileSettings.EMPTY_FIELD_SENTENCE, "patient.call_my_therapist", "PEOPLE", "patient_profile", listOf("pokliči", "terapevt"), visibleUnderIds = listOf("about_me")),
 
-        starter("thirsty", "ŽEJNA SEM", "Izberi, kaj želiš piti.", "drink.thirsty", "DRINK", "drink", listOf("žejna", "piti"), placements = pageOne(4), opensSubicons = true, children = drinkRootChildren(), questionByLanguage = mapOf("sl" to "Izberi, kaj želiš piti.", "uk" to "Що ти хочеш пити?", "en" to "What do you want to drink?"), imagePath = "system/thirsty.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "Я ХОЧУ ПИТИ"), speechTextByLanguage = mapOf("uk" to "Я хочу пити.")),
+        starter("thirsty", "ŽEJNA SEM", "Izberi, kaj želiš piti.", "drink.thirsty", "DRINK", "drink", listOf("žejna", "piti"), placements = pageOne(4), opensSubicons = true, children = drinkRootChildren(), questionByLanguage = mapOf("sl" to "Izberi, kaj želiš piti.", "uk" to "Що ти хочеш пити?", "en" to "What do you want to drink?"), imagePath = "system/drink_thirsty.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "Я ХОЧУ ПИТИ"), speechTextByLanguage = mapOf("uk" to "Я хочу пити.")),
         starter("hungry", "LAČNA SEM", "Prosim, rada bi nekaj za jesti.", "food.hungry", "FOOD", "food", listOf("lačna", "jesti"), placements = pageOne(5), opensSubicons = true, children = hungryRootChildren(), questionByLanguage = mapOf("sl" to "Kaj bi jedla?", "uk" to "Що ти хочеш їсти?", "en" to "What do you want to eat?"), imagePath = "system/hungry.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "Я ГОЛОДНА"), speechTextByLanguage = mapOf("uk" to "Будь ласка, я хотіла б щось поїсти.")),
         starter("wc", "TOALETA", "Moram v toaleto.", "care.wc", "NEED", "care", listOf("wc", "stranišče", "toaleta"), placements = pageOne(7), opensSubicons = true, children = listOf("wc_wet", "wc_dirty", "wc_wet_and_dirty", "nurse_help"), questionByLanguage = mapOf("sl" to "Izberi, kaj potrebuješ.", "uk" to "Що тобі потрібно?"), labelByLanguage = mapOf("uk" to "ТУАЛЕТ"), speechTextByLanguage = mapOf("uk" to "Мені потрібно в туалет."), imagePath = "system/wc.png", iconSource = IconSource.SYSTEM),
         starter("tired", "UTRUJENA", "Utrujena sem.", "feeling.tired", "FEELING", "feeling", listOf("utrujena", "počutje"), placements = pageOne(8), visibleUnderIds = listOf("feeling"), imagePath = "system/tired.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "Я ВТОМИЛАСЯ"), speechTextByLanguage = mapOf("uk" to "Я втомилася.")),
@@ -810,7 +810,7 @@ object AacStarterContentV1 {
         "slower_much" to "system/slower.png",
         "sorry" to "system/sorry.png",
         "thank_you" to "system/thank_you.png",
-        "thirsty" to "system/thirsty.png",
+        "thirsty" to "system/drink_thirsty.png",
         "drink_water" to "system/thirsty.png",
         "tired" to "system/tired.png",
         "sleepy" to "system/tired.png",

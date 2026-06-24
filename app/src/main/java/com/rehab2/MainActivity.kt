@@ -507,7 +507,7 @@ class MainActivity : AppCompatActivity() {
                 "water" to 20,
                 "tea" to 12,
                 "coffee" to 14,
-                "juice" to 23,
+                "juice" to 22,
                 "sparkling_drink" to 24,
                 "milk_drinks" to 10
             ),
@@ -515,7 +515,7 @@ class MainActivity : AppCompatActivity() {
                 "water" to 20,
                 "tea" to 12,
                 "coffee" to 14,
-                "juice" to 23,
+                "juice" to 22,
                 "sparkling_drink" to 24,
                 "milk_drinks" to 10
             ),
@@ -547,8 +547,8 @@ class MainActivity : AppCompatActivity() {
             "juice" to mapOf(
                 "orange_juice" to 20,
                 "apple_juice" to 16,
-                "blueberry_juice" to 22,
-                "strawberry_juice" to 23,
+                "blueberry_juice" to 12,
+                "strawberry_juice" to 18,
                 "cedevita" to 24
             ),
             "sparkling_drink" to mapOf(

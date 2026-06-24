@@ -157,6 +157,7 @@ object AacContentBootstrap {
         "wc_wet" to "system/toilet_wet.png",
         "wc_dirty" to "system/toilet_dirty.png",
         "wc_wet_and_dirty" to "system/toilet_both.png",
+        "thirsty" to "system/drink_thirsty.png",
         "pain" to "system/pain_general.png",
         "back" to "system/pain_back.png",
         "chest" to "system/pain_chest.png",
