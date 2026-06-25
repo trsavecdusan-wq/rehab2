@@ -14,9 +14,9 @@ object AacContentBootstrap {
     private const val PATIENT_PAGE_SEPARATOR = "\u001E"
     private const val PATIENT_PAGE_FIELD_SEPARATOR = "\u001F"
     private const val CORE_V2_REPAIR_PREFS_NAME = "aac_core_v2_home_repair"
-    private const val KEY_CORE_V2_HOME_REPAIR_DONE = "aac_core_v2_home_repair_done"
+    private const val KEY_CORE_V2_HOME_REPAIR_DONE = "aac_first_patient_page_cleanup_v1_done"
     private const val KEY_AAC_HOME_LAYOUT_VERSION = "aac_home_layout_version"
-    private const val CORE_V2_HOME_LAYOUT_VERSION = "core_v2"
+    private const val CORE_V2_HOME_LAYOUT_VERSION = "first_patient_page_cleanup_v1"
     private const val DEFAULT_PAGE_ID = "page_1"
     private const val DEFAULT_PAGE_TITLE = "STRAN 1"
     private const val DOM_PROFILE_ID = "dom"
@@ -414,19 +414,15 @@ object AacContentBootstrap {
     )
 
     private val PEOPLE_GROUP_CHILD_REPAIRS = mapOf(
-        "family_group" to listOf("person_zana", "person_sergej", "miss_you", "love_you", "contact_call"),
+        "family_group" to listOf("person_zana", "person_sergej"),
         "friends_group" to listOf(
             "person_dusan",
             "person_franc",
             "person_inna",
             "person_julija",
-            "person_oksana",
-            "contact_message",
-            "contact_call",
-            "miss_you",
-            "when_come",
-            "come_to_me"
-        )
+            "person_oksana"
+        ),
+        "acquaintances_group" to listOf("doctor", "nurse", "therapist", "person_other")
     )
 
     private val CRITICAL_SYSTEM_ICON_FILES = setOf(
@@ -1453,9 +1449,9 @@ object AacContentBootstrap {
             "dont_understand" to 2,
             "yes" to 3,
             "thank_you" to 4,
-            "sorry" to 5
+            "help" to 5
         )
-        val legacyFixedRowIds = setOf("help", "pain", "stop", "no_understand")
+        val legacyFixedRowIds = setOf("sorry", "pain", "stop", "no_understand")
         var repaired = 0
         itemObjects(itemsArray).forEach { item ->
             if (isUserProtected(item)) return@forEach
@@ -1482,45 +1478,54 @@ object AacContentBootstrap {
             return 0
         }
         val desiredPositions = mapOf(
-            "people" to 1,
-            "need" to 2,
-            "problem" to 3,
-            "thirsty" to 4,
-            "hungry" to 5,
-            "pain" to 6,
-            "wc" to 7,
-            "tired" to 8,
-            "rest" to 9,
-            "please" to 10,
-            "what_root" to 11,
-            "where_root" to 12,
-            "when_root" to 13,
-            "i_want" to 14,
-            "other" to 15,
-            "place_group" to 16,
-            "feeling" to 17,
-            "care" to 18,
-            "health" to 19,
-            "repeat" to 20,
-            "wait" to 21,
-            "come_to_me" to 22,
-            "cannot" to 23,
-            "cold_hot" to 24,
-            "uncomfortable" to 25
+            "wc" to 6,
+            "pain" to 7,
+            "thirsty" to 8,
+            "hungry" to 9,
+            "tired" to 10,
+            "nurse" to 11,
+            "doctor" to 12,
+            "medicine" to 13,
+            "feeling" to 14,
+            "change_position" to 15,
+            "wait" to 16,
+            "repeat" to 17,
+            "slower" to 18,
+            "understand" to 19,
+            "about_me" to 20,
+            "family_group" to 21,
+            "friends_group" to 22,
+            "acquaintances_group" to 23,
+            "call" to 24,
+            "place_group" to 25
         )
         val legacyNonRootIds = setOf(
             "help",
-            "family_group",
-            "friends_group",
-            "call",
             "message",
             "miss_someone",
             "what_do",
+            "what_root",
             "where_go",
+            "where_root",
             "when_come",
-            "dont_want",
+            "when_root",
             "drink",
-            "food"
+            "food",
+            "problem",
+            "rest",
+            "please",
+            "other",
+            "come_to_me",
+            "cannot",
+            "cold_hot",
+            "uncomfortable",
+            "need",
+            "dont_want",
+            "care",
+            "people",
+            "health",
+            "give_me_time",
+            "i_want"
         )
         var repaired = 0
         itemObjects(itemsArray).forEach { item ->
@@ -1576,7 +1581,7 @@ object AacContentBootstrap {
             "dont_understand" to 2,
             "yes" to 3,
             "thank_you" to 4,
-            "sorry" to 5
+            "help" to 5
         )
         val expectedPagePositions = mapOf(
             "wc" to 6,
@@ -1584,21 +1589,21 @@ object AacContentBootstrap {
             "thirsty" to 8,
             "hungry" to 9,
             "tired" to 10,
-            "i_want" to 11,
-            "need" to 12,
-            "people" to 13,
-            "miss_someone" to 14,
-            "call" to 15,
-            "feeling" to 16,
-            "place_group" to 17,
-            "care" to 18,
-            "health" to 19,
-            "dont_want" to 20,
-            "please" to 21,
-            "wait" to 22,
-            "repeat" to 23,
-            "pogovor" to 24,
-            "activity_group" to 25
+            "nurse" to 11,
+            "doctor" to 12,
+            "medicine" to 13,
+            "feeling" to 14,
+            "change_position" to 15,
+            "wait" to 16,
+            "repeat" to 17,
+            "slower" to 18,
+            "understand" to 19,
+            "about_me" to 20,
+            "family_group" to 21,
+            "friends_group" to 22,
+            "acquaintances_group" to 23,
+            "call" to 24,
+            "place_group" to 25
         )
         val itemsById = itemObjects(itemsArray)
             .mapNotNull { item ->
