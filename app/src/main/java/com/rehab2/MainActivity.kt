@@ -2128,7 +2128,12 @@ class MainActivity : AppCompatActivity() {
                 source = "direct_terminal",
                 itemId = item.id,
                 text = resolvedSpeechText,
-                languageCode = languageCode
+                languageCode = languageCode,
+                delayMs = if (item.fixedTopRowPosition != null) {
+                    AacSpeechTimingSettings.read(this).fixedTopRowSpeakDelayMs
+                } else {
+                    0L
+                }
             )
             shouldResetMainAacRootAfterSpeech = true
         } else {
@@ -2149,12 +2154,19 @@ class MainActivity : AppCompatActivity() {
         source: String,
         itemId: String,
         text: String,
-        languageCode: String
+        languageCode: String,
+        delayMs: Long = 0L
     ) {
         mainAacSpeakCallNumberForTap += 1
         recordLastAudioEvent(
-            "AAC speakCall #$mainAacSpeakCallNumberForTap tapId=$mainAacTapId source=$source itemId=$itemId resolvedSpeechText='${text.take(80)}' language=$languageCode"
+            "AAC speakCall #$mainAacSpeakCallNumberForTap tapId=$mainAacTapId source=$source itemId=$itemId delayMs=$delayMs resolvedSpeechText='${text.take(80)}' language=$languageCode"
         )
+        if (delayMs > 0L) {
+            mainHandler.postDelayed({
+                aacAudioPlayer.speakText(text, languageCode)
+            }, delayMs)
+            return
+        }
         aacAudioPlayer.speakText(text, languageCode)
     }
 
