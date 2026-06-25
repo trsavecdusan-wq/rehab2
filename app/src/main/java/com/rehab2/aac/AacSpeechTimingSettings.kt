@@ -6,6 +6,7 @@ data class AacSpeechTimingSettings(
     val speakSingleIconEnabled: Boolean = true,
     val delayedSingleIconSpeakEnabled: Boolean = true,
     val singleIconSpeakDelayMs: Long = 700L,
+    val fixedTopRowSpeakDelayMs: Long = 0L,
     val mainIconSpeakDelayMs: Long = 250L,
     val subIconSpeakDelayMs: Long = 700L,
     val fastCompositionSkipLastIconEnabled: Boolean = true,
@@ -21,6 +22,7 @@ data class AacSpeechTimingSettings(
         const val PREF_SPEAK_SINGLE_ICON_ENABLED = "aac_speak_single_icon_enabled"
         const val PREF_DELAYED_SINGLE_ICON_SPEAK_ENABLED = "aac_delayed_single_icon_speak_enabled"
         const val PREF_SINGLE_ICON_SPEAK_DELAY_MS = "aac_single_icon_speak_delay_ms"
+        const val PREF_FIXED_TOP_ROW_SPEAK_DELAY_MS = "aac_fixed_top_row_speak_delay_ms"
         const val PREF_MAIN_ICON_SPEAK_DELAY_MS = "aac_main_icon_speak_delay_ms"
         const val PREF_SUB_ICON_SPEAK_DELAY_MS = "aac_sub_icon_speak_delay_ms"
         const val PREF_FAST_COMPOSITION_SKIP_LAST_ICON_ENABLED = "aac_fast_composition_skip_last_icon_enabled"
@@ -31,12 +33,14 @@ data class AacSpeechTimingSettings(
         const val PREF_PARTIAL_SENTENCE_AUTO_RETURN_ENABLED = "aac_partial_sentence_auto_return_enabled"
         const val PREF_PARTIAL_SENTENCE_AUTO_RETURN_MS = "aac_partial_sentence_auto_return_ms"
         const val DEFAULT_SINGLE_ICON_SPEAK_DELAY_MS = 700L
+        const val DEFAULT_FIXED_TOP_ROW_SPEAK_DELAY_MS = 0L
         const val DEFAULT_MAIN_ICON_SPEAK_DELAY_MS = 250L
         const val DEFAULT_SUB_ICON_SPEAK_DELAY_MS = 700L
         const val DEFAULT_AUTO_SPEAK_SENTENCE_DELAY_MS = 3000L
         const val DEFAULT_PARTIAL_SENTENCE_AUTO_RETURN_MS = 5000L
 
         private val ALLOWED_MAIN_ICON_DELAYS_MS = setOf(0L, 100L, 200L, 300L, 500L, 700L, 1000L)
+        private val ALLOWED_FIXED_TOP_ROW_DELAYS_MS = setOf(0L, 100L, 200L, 300L, 500L, 700L, 1000L)
         private val ALLOWED_SUB_ICON_DELAYS_MS = setOf(0L, 100L, 200L, 300L, 500L, 700L, 1000L, 1500L, 2000L)
         private val ALLOWED_DELAYS_MS = setOf(1000L, 1500L, 2000L, 3000L, 4000L, 5000L)
         private val ALLOWED_PARTIAL_SENTENCE_AUTO_RETURN_MS = setOf(3000L, 5000L, 7000L, 10000L, 15000L)
@@ -54,6 +58,9 @@ data class AacSpeechTimingSettings(
                 speakSingleIconEnabled = prefs.getBoolean(PREF_SPEAK_SINGLE_ICON_ENABLED, true),
                 delayedSingleIconSpeakEnabled = prefs.getBoolean(PREF_DELAYED_SINGLE_ICON_SPEAK_ENABLED, true),
                 singleIconSpeakDelayMs = subIconDelay,
+                fixedTopRowSpeakDelayMs = normalizeFixedTopRowDelay(
+                    prefs.getLong(PREF_FIXED_TOP_ROW_SPEAK_DELAY_MS, DEFAULT_FIXED_TOP_ROW_SPEAK_DELAY_MS)
+                ),
                 mainIconSpeakDelayMs = normalizeMainIconDelay(
                     prefs.getLong(PREF_MAIN_ICON_SPEAK_DELAY_MS, DEFAULT_MAIN_ICON_SPEAK_DELAY_MS)
                 ),
@@ -96,6 +103,10 @@ data class AacSpeechTimingSettings(
             } else {
                 DEFAULT_MAIN_ICON_SPEAK_DELAY_MS
             }
+        }
+
+        private fun normalizeFixedTopRowDelay(value: Long): Long {
+            return if (value in ALLOWED_FIXED_TOP_ROW_DELAYS_MS) value else DEFAULT_FIXED_TOP_ROW_SPEAK_DELAY_MS
         }
 
         private fun normalizeSubIconDelay(value: Long): Long {

@@ -557,6 +557,34 @@
             android:textStyle="bold" />
 
         <EditText
+            android:id="@+id/editFixedTopRowDelay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:clickable="true"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:hint="Pavza po prvi vrstici"
+            android:inputType="none"
+            android:maxLines="2"
+            android:minHeight="60dp"
+            android:padding="16dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnTestFixedTopRowDelay"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#2F80ED"
+            android:text="TEST PRVE VRSTICE"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <EditText
             android:id="@+id/editSingleIconDelay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

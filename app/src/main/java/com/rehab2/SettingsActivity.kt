@@ -182,6 +182,7 @@ class SettingsActivity : AppCompatActivity() {
             "700 ms" to 700L,
             "1000 ms" to 1000L
         )
+        private val FIXED_TOP_ROW_DELAY_OPTIONS = MAIN_ICON_DELAY_OPTIONS
         private val SUB_ICON_DELAY_OPTIONS = arrayOf(
             "0 ms" to 0L,
             "100 ms" to 100L,
@@ -418,6 +419,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var editSpeechApiVoice: EditText
     private lateinit var editSpeechApiSpeed: EditText
     private lateinit var switchSingleIconSpeech: SwitchCompat
+    private lateinit var editFixedTopRowDelay: EditText
     private lateinit var editSingleIconDelay: EditText
     private lateinit var editSubIconDelay: EditText
     private lateinit var switchFastCompositionSkipLastIcon: SwitchCompat
@@ -482,6 +484,9 @@ class SettingsActivity : AppCompatActivity() {
     private var speechApiTestPlayer: MediaPlayer? = null
     private var audioDuckingTestPlayer: AacAudioPlayer? = null
     private var speechLoudnessTestPlayer: AacAudioPlayer? = null
+    private var fixedTopRowDelayTestPlayer: AacAudioPlayer? = null
+    private val fixedTopRowDelayTestHandler = Handler(Looper.getMainLooper())
+    private var fixedTopRowDelayTestRunnable: Runnable? = null
     private var settingsDisplayMode = SettingsDisplayMode.THERAPIST
     private var latestBatteryPercent: Int? = null
     private var latestPluggedIn = false
@@ -530,6 +535,7 @@ class SettingsActivity : AppCompatActivity() {
         editSpeechApiVoice = findViewById(R.id.editSpeechApiVoice)
         editSpeechApiSpeed = findViewById(R.id.editSpeechApiSpeed)
         switchSingleIconSpeech = findViewById(R.id.switchSingleIconSpeech)
+        editFixedTopRowDelay = findViewById(R.id.editFixedTopRowDelay)
         editSingleIconDelay = findViewById(R.id.editSingleIconDelay)
         editSubIconDelay = findViewById(R.id.editSubIconDelay)
         switchFastCompositionSkipLastIcon = findViewById(R.id.switchFastCompositionSkipLastIcon)
@@ -741,6 +747,12 @@ class SettingsActivity : AppCompatActivity() {
         }
         editSpeechApiSpeed.setOnClickListener {
             showSpeechSpeedPicker()
+        }
+        editFixedTopRowDelay.setOnClickListener {
+            showFixedTopRowDelayPicker()
+        }
+        findViewById<Button>(R.id.btnTestFixedTopRowDelay).setOnClickListener {
+            testFixedTopRowDelay()
         }
         editSingleIconDelay.setOnClickListener {
             showMainIconDelayPicker()
@@ -1298,6 +1310,7 @@ class SettingsActivity : AppCompatActivity() {
         releaseSpeechApiTestPlayer()
         releaseAudioDuckingTestPlayer()
         releaseSpeechLoudnessTestPlayer()
+        releaseFixedTopRowDelayTestPlayer()
         super.onDestroy()
     }
 
@@ -1409,6 +1422,7 @@ class SettingsActivity : AppCompatActivity() {
         switchReturnToRootAfterSentence.isChecked = settings.returnToRootAfterSentenceEnabled
         switchClearSentenceAfterSentence.isChecked = settings.clearSentenceAfterSentenceEnabled
         switchPartialSentenceAutoReturn.isChecked = settings.partialSentenceAutoReturnEnabled
+        editFixedTopRowDelay.setText("${settings.fixedTopRowSpeakDelayMs} ms")
         editSingleIconDelay.setText("${settings.mainIconSpeakDelayMs} ms")
         editSubIconDelay.setText("${settings.subIconSpeakDelayMs} ms")
         editAutoSentenceDelay.setText(
@@ -1420,6 +1434,7 @@ class SettingsActivity : AppCompatActivity() {
         )
         editVoiceAssistantQuestionDelay.setText("${voiceAssistantQuestionDelayMs()} ms")
         editPartialSentenceAutoReturnDelay.setText("${settings.partialSentenceAutoReturnMs / 1000L}s")
+        editFixedTopRowDelay.isEnabled = settings.speakSingleIconEnabled
         editSingleIconDelay.isEnabled = settings.speakSingleIconEnabled
         editSubIconDelay.isEnabled = settings.speakSingleIconEnabled
         editAutoSentenceDelay.isEnabled = settings.autoSpeakSentenceEnabled
@@ -2116,6 +2131,39 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun testFixedTopRowDelay() {
+        releaseFixedTopRowDelayTestPlayer()
+        val delayMs = AacSpeechTimingSettings.read(this).fixedTopRowSpeakDelayMs
+        Toast.makeText(this, "Test prve vrstice: ${delayMs} ms", Toast.LENGTH_SHORT).show()
+        val runnable = Runnable {
+            fixedTopRowDelayTestRunnable = null
+            fixedTopRowDelayTestPlayer = AacAudioPlayer(this).apply {
+                setSpeechListener(object : AacAudioPlayer.SpeechListener {
+                    override fun onSpeechStarted() = Unit
+
+                    override fun onSpeechCompleted() {
+                        releaseFixedTopRowDelayTestPlayer()
+                    }
+
+                    override fun onSpeechCancelled() {
+                        releaseFixedTopRowDelayTestPlayer()
+                    }
+
+                    override fun onSpeechError() {
+                        releaseFixedTopRowDelayTestPlayer()
+                    }
+                })
+                speakText("To je test prve vrstice.")
+            }
+        }
+        if (delayMs <= 0L) {
+            runnable.run()
+        } else {
+            fixedTopRowDelayTestRunnable = runnable
+            fixedTopRowDelayTestHandler.postDelayed(runnable, delayMs)
+        }
+    }
+
     private fun testAudioDucking() {
         releaseAudioDuckingTestPlayer()
         audioDuckingTestPlayer = AacAudioPlayer(this).apply {
@@ -2609,6 +2657,25 @@ class SettingsActivity : AppCompatActivity() {
                 val delayMs = MAIN_ICON_DELAY_OPTIONS[which].second
                 prefs.edit()
                     .putLong(AacSpeechTimingSettings.PREF_MAIN_ICON_SPEAK_DELAY_MS, delayMs)
+                    .apply()
+                refreshSpeechTimingSection()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun showFixedTopRowDelayPicker() {
+        val settings = AacSpeechTimingSettings.read(this)
+        val labels = FIXED_TOP_ROW_DELAY_OPTIONS.map { it.first }.toTypedArray()
+        val selectedIndex = FIXED_TOP_ROW_DELAY_OPTIONS
+            .indexOfFirst { it.second == settings.fixedTopRowSpeakDelayMs }
+            .coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle("Pavza po prvi vrstici")
+            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
+                val delayMs = FIXED_TOP_ROW_DELAY_OPTIONS[which].second
+                prefs.edit()
+                    .putLong(AacSpeechTimingSettings.PREF_FIXED_TOP_ROW_SPEAK_DELAY_MS, delayMs)
                     .apply()
                 refreshSpeechTimingSection()
                 dialog.dismiss()
@@ -3176,6 +3243,14 @@ class SettingsActivity : AppCompatActivity() {
         speechLoudnessTestPlayer?.setSpeechListener(null)
         speechLoudnessTestPlayer?.release()
         speechLoudnessTestPlayer = null
+    }
+
+    private fun releaseFixedTopRowDelayTestPlayer() {
+        fixedTopRowDelayTestRunnable?.let(fixedTopRowDelayTestHandler::removeCallbacks)
+        fixedTopRowDelayTestRunnable = null
+        fixedTopRowDelayTestPlayer?.setSpeechListener(null)
+        fixedTopRowDelayTestPlayer?.release()
+        fixedTopRowDelayTestPlayer = null
     }
 
     private fun updateModeButtonStyles(powerMode: String) {

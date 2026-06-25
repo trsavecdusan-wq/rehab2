@@ -488,7 +488,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             if (childItems.isNotEmpty()) {
                 val allowParentAutoSentence = shouldAllowParentAutoSentence(item)
                 if (!(allowParentAutoSentence && speechTimingSettings.autoSpeakSentenceEnabled)) {
-                    speakSingleIconIfEnabled(singleIconText, speechRequestId, isSubIconTap)
+                    speakSingleIconIfEnabled(singleIconText, speechRequestId, item, isSubIconTap)
                 }
                 scheduleAutoSpeakSentenceIfEnabled(
                     speechRequestId,
@@ -502,7 +502,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             } else {
                 clearPromptText()
             }
-            speakSingleIconIfEnabled(singleIconText, speechRequestId, isSubIconTap)
+            speakSingleIconIfEnabled(singleIconText, speechRequestId, item, isSubIconTap)
             scheduleAutoSpeakSentenceIfEnabled(speechRequestId)
             return
         }
@@ -969,7 +969,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         btnClearSentence.isEnabled = hasSentence
     }
 
-    private fun speakSingleIconIfEnabled(text: String, requestId: Int, isSubIconTap: Boolean) {
+    private fun speakSingleIconIfEnabled(text: String, requestId: Int, item: AacItem, isSubIconTap: Boolean) {
         cancelPendingSingleIconRunnable()
         if (!speechTimingSettings.speakSingleIconEnabled) {
             return
@@ -981,7 +981,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
 
         val delayMs = if (speechTimingSettings.delayedSingleIconSpeakEnabled) {
-            selectedIconSpeakDelayMs(isSubIconTap)
+            selectedIconSpeakDelayMs(item, isSubIconTap)
         } else {
             0L
         }
@@ -1189,7 +1189,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
     }
 
-    private fun selectedIconSpeakDelayMs(isSubIconTap: Boolean): Long {
+    private fun selectedIconSpeakDelayMs(item: AacItem, isSubIconTap: Boolean): Long {
+        if (item.fixedTopRowPosition != null) {
+            return speechTimingSettings.fixedTopRowSpeakDelayMs
+        }
         return if (isSubIconTap) {
             speechTimingSettings.subIconSpeakDelayMs
         } else {
