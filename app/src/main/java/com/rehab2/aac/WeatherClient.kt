@@ -10,7 +10,10 @@ object WeatherClient {
     private const val TIMEOUT_MS = 1800
     private const val TAG = "WeatherClient"
 
-    fun fetchOrientationSentence(sourceUrl: String): String? {
+    fun fetchOrientationSentence(
+        sourceUrl: String,
+        languageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
+    ): String? {
         Log.d(TAG, "STATUS_ORIENTATION weatherUrl=$sourceUrl")
         if (sourceUrl.isBlank()) {
             logWeatherFailure()
@@ -33,7 +36,7 @@ object WeatherClient {
             }
 
             val body = activeConnection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
-            parseOpenMeteo(body).also { sentence ->
+            parseOpenMeteo(body, languageCode).also { sentence ->
                 Log.d(TAG, "STATUS_ORIENTATION weatherFetchOk=${sentence != null}")
             }
         } catch (_: Exception) {
@@ -71,7 +74,7 @@ object WeatherClient {
         }
     }
 
-    private fun parseOpenMeteo(body: String): String? {
+    private fun parseOpenMeteo(body: String, languageCode: String): String? {
         val root = JSONObject(body)
         val current = root.optJSONObject("current")
             ?: root.optJSONObject("current_weather")
@@ -98,26 +101,53 @@ object WeatherClient {
         }
         Log.d(TAG, "STATUS_ORIENTATION temperature=${temperature.roundToInt()}")
         Log.d(TAG, "STATUS_ORIENTATION weatherCode=$weatherCode")
-        val weatherText = weatherCode?.let { weatherDescriptionSl(it) }
-        return buildString {
-            append("Zunaj je približno ${temperature.roundToInt()} stopinj")
-            if (!weatherText.isNullOrBlank()) {
-                append(", ")
-                append(weatherText)
+        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
+        val weatherText = weatherCode?.let {
+            if (normalizedLanguage == "uk") weatherDescriptionUk(it) else weatherDescriptionSl(it)
+        }
+        return if (normalizedLanguage == "uk") {
+            buildString {
+                append("Надворі приблизно ${temperature.roundToInt()} градусів")
+                if (!weatherText.isNullOrBlank()) {
+                    append(", ")
+                    append(weatherText)
+                }
+                append(".")
             }
-            append(".")
+        } else {
+            buildString {
+                append("Zunaj je približno ${temperature.roundToInt()} stopinj")
+                if (!weatherText.isNullOrBlank()) {
+                    append(", ")
+                    append(weatherText)
+                }
+                append(".")
+            }
         }
     }
 
     private fun weatherDescriptionSl(code: Int): String {
         return when (code) {
             0 -> "jasno"
-            1, 2, 3 -> "delno obla\u010dno"
+            1, 2, 3 -> "delno oblačno"
             45, 48 -> "megla"
             51, 53, 55 -> "rosenje"
-            61, 63, 65 -> "de\u017e"
+            61, 63, 65 -> "dež"
             71, 73, 75 -> "sneg"
             95 -> "je nevihta"
+            else -> ""
+        }
+    }
+
+    private fun weatherDescriptionUk(code: Int): String {
+        return when (code) {
+            0 -> "ясно"
+            1, 2, 3 -> "мінлива хмарність"
+            45, 48 -> "туман"
+            51, 53, 55 -> "мряка"
+            61, 63, 65 -> "дощ"
+            71, 73, 75 -> "сніг"
+            95 -> "гроза"
             else -> ""
         }
     }

@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         private const val MAX_REASONABLE_DISTANCE_METERS = 250f
         private const val MAX_REASONABLE_ACCURACY_METERS = 30f
         private const val MIN_REASONABLE_DISTANCE_METERS = 3f
-        private const val MAX_REASONABLE_SPEED_KMH = 10f
+        private const val MAX_REASONABLE_SPEED_KMH = 9f
         private const val GPS_SIGNAL_GOOD = "GOOD"
         private const val GPS_SIGNAL_WEAK = "WEAK"
         private const val GPS_REASON_NONE = "NONE"
@@ -4608,7 +4608,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun speakStatusOrientation() {
         val settings = StatusOrientationSettings.load(this)
-        val speechText = StatusOrientationSpeaker.buildBaseSpeechText(this)
+        val languageCode = getActiveSpeechLanguage()
+        val speechText = StatusOrientationSpeaker.buildBaseSpeechText(this, languageCode = languageCode)
         Log.d(TAG, "STATUS_ORIENTATION weatherEnabled=${settings.speakWeather}")
         Log.d(TAG, "STATUS_ORIENTATION weatherUrl=${settings.weatherSourceUrl}")
         if (speechText.isBlank()) {
@@ -4618,7 +4619,7 @@ class MainActivity : AppCompatActivity() {
         if (!settings.speakWeather || settings.weatherSourceUrl.isBlank()) {
             Log.d(TAG, "STATUS_ORIENTATION weatherFetchOk=false")
             Log.d(TAG, "STATUS_ORIENTATION spokenText=$speechText")
-            aacAudioPlayer.speakText(speechText, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
+            aacAudioPlayer.speakText(speechText, languageCode)
             return
         }
 
@@ -4629,18 +4630,22 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "STATUS_ORIENTATION spokenText=$speechText")
                 aacAudioPlayer.speakText(
                     speechText,
-                    AacLanguageResolver.DEFAULT_LANGUAGE_CODE
+                    languageCode
                 )
             }
         }, 1800L)
         Thread {
-            val weatherSentence = WeatherClient.fetchOrientationSentence(settings.weatherSourceUrl)
-            val fullSpeechText = StatusOrientationSpeaker.buildSpeechText(this, weatherSentence = weatherSentence)
+            val weatherSentence = WeatherClient.fetchOrientationSentence(settings.weatherSourceUrl, languageCode)
+            val fullSpeechText = StatusOrientationSpeaker.buildSpeechText(
+                this,
+                weatherSentence = weatherSentence,
+                languageCode = languageCode
+            )
             Log.d(TAG, "STATUS_ORIENTATION weatherFetchOk=${weatherSentence != null}")
             Log.d(TAG, "STATUS_ORIENTATION spokenText=$fullSpeechText")
             runOnUiThread {
                 if (speechHandled.compareAndSet(false, true)) {
-                    aacAudioPlayer.speakText(fullSpeechText, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
+                    aacAudioPlayer.speakText(fullSpeechText, languageCode)
                 }
             }
         }.start()
@@ -4883,6 +4888,10 @@ class MainActivity : AppCompatActivity() {
         if (consumePendingGpsBaselineReset()) {
             previousTrackedLocation = null
         }
+        if (!isValidTrackedLocation(location)) {
+            updateGpsDiagnostics(location, GPS_SIGNAL_WEAK, GPS_REASON_INVALID_TIME)
+            return
+        }
         if (!location.hasAccuracy()) {
             updateGpsDiagnostics(location, GPS_SIGNAL_WEAK, GPS_REASON_NO_ACCURACY)
             return
@@ -4900,6 +4909,7 @@ class MainActivity : AppCompatActivity() {
 
         val distanceMeters = previousLocation.distanceTo(location)
         if (!isReasonableDistance(previousLocation, location, distanceMeters)) {
+            previousTrackedLocation = location
             return
         }
 
@@ -4917,7 +4927,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isReasonableDistance(previousLocation: Location, location: Location, distanceMeters: Float): Boolean {
-        if (distanceMeters <= 0f) {
+        if (!isValidTrackedLocation(previousLocation) || !isValidTrackedLocation(location)) {
+            updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME, distanceMeters)
+            return false
+        }
+        if (!distanceMeters.isFinite() || distanceMeters <= 0f) {
             updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME, distanceMeters)
             return false
         }
@@ -4930,12 +4944,12 @@ class MainActivity : AppCompatActivity() {
             return false
         }
         val elapsedSeconds = (location.time - previousLocation.time) / 1000f
-        if (elapsedSeconds <= 0f) {
+        if (!elapsedSeconds.isFinite() || elapsedSeconds <= 0f) {
             updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_INVALID_TIME, distanceMeters)
             return false
         }
         val speedKmh = resolveCalculatedSpeedKmh(distanceMeters, elapsedSeconds)
-        if (speedKmh > MAX_REASONABLE_SPEED_KMH) {
+        if (!speedKmh.isFinite() || speedKmh > MAX_REASONABLE_SPEED_KMH) {
             updateGpsDiagnostics(location, gpsSignalForAccuracy(location), GPS_REASON_TOO_FAST, distanceMeters)
             return false
         }
@@ -4967,7 +4981,7 @@ class MainActivity : AppCompatActivity() {
         }
         if (location.hasSpeed()) {
             val speedKmh = location.speed * 3.6f
-            return if (speedKmh <= MAX_REASONABLE_SPEED_KMH) {
+            return if (speedKmh.isFinite() && speedKmh <= MAX_REASONABLE_SPEED_KMH) {
                 speedKmh.coerceAtLeast(0f)
             } else {
                 0f
@@ -4976,16 +4990,19 @@ class MainActivity : AppCompatActivity() {
         if (previousLocation == null || !previousLocation.hasAccuracy() || previousLocation.accuracy > MAX_REASONABLE_ACCURACY_METERS) {
             return 0f
         }
+        if (!isValidTrackedLocation(previousLocation) || !isValidTrackedLocation(location)) {
+            return 0f
+        }
         val distanceMeters = previousLocation.distanceTo(location)
-        if (distanceMeters < MIN_REASONABLE_DISTANCE_METERS || distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
+        if (!distanceMeters.isFinite() || distanceMeters < MIN_REASONABLE_DISTANCE_METERS || distanceMeters > MAX_REASONABLE_DISTANCE_METERS) {
             return 0f
         }
         val elapsedSeconds = (location.time - previousLocation.time) / 1000f
-        if (elapsedSeconds <= 0f) {
+        if (!elapsedSeconds.isFinite() || elapsedSeconds <= 0f) {
             return 0f
         }
         val speedKmh = resolveCalculatedSpeedKmh(distanceMeters, elapsedSeconds)
-        return if (speedKmh <= MAX_REASONABLE_SPEED_KMH) {
+        return if (speedKmh.isFinite() && speedKmh <= MAX_REASONABLE_SPEED_KMH) {
             speedKmh.coerceAtLeast(0f)
         } else {
             0f
@@ -4994,6 +5011,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun resolveCalculatedSpeedKmh(distanceMeters: Float, elapsedSeconds: Float): Float {
         return (distanceMeters / elapsedSeconds) * 3.6f
+    }
+
+    private fun isValidTrackedLocation(location: Location): Boolean {
+        return location.time > 0L &&
+            location.latitude.isFinite() &&
+            location.longitude.isFinite() &&
+            location.latitude in -90.0..90.0 &&
+            location.longitude in -180.0..180.0
     }
 
     private fun hasUsableSpeedLocation(location: Location): Boolean {
