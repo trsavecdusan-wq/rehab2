@@ -3,13 +3,7 @@ package com.rehab2.aac
 import android.content.Context
 
 object AacContextSuggestions {
-    private val FIXED_TOP_ROW_IDS = setOf(
-        "no",
-        "yes",
-        "dont_understand",
-        "thank_you",
-        "sorry"
-    )
+    private val FIXED_TOP_ROW_IDS = AacFixedTopRow.ids.toSet()
 
     fun suggest(
         context: Context,

@@ -1,5 +1,7 @@
 ﻿package com.rehab2
 
+import com.rehab2.aac.AacFixedTopRow
+
 import android.Manifest
 import android.app.AlertDialog
 import android.content.BroadcastReceiver
@@ -627,13 +629,7 @@ class MainActivity : AppCompatActivity() {
                 "${teaId}_honey_lemon" to 17
             )
         }
-        private val CORE_V2_FIXED_TOP_ROW_POSITIONS = mapOf(
-            "no" to 1,
-            "dont_understand" to 2,
-            "yes" to 3,
-            "thank_you" to 4,
-            "sorry" to 5
-        )
+        private val CORE_V2_FIXED_TOP_ROW_POSITIONS = AacFixedTopRow.positions
         private val CORE_V2_HOME_PAGE_POSITIONS = mapOf(
             "wc" to 6,
             "pain" to 7,
@@ -2928,6 +2924,7 @@ class MainActivity : AppCompatActivity() {
             } ?: fallbackItem
         }
         val extraLoadedItems = loadedItems.filter { it.id !in fallbackIds }
+            .map { it.copy(fixedTopRowPosition = AacFixedTopRow.positions[it.id]) }
         return mergedFallbackItems + extraLoadedItems
     }
 
@@ -2974,7 +2971,7 @@ class MainActivity : AppCompatActivity() {
             placements = mergedPlacements,
             isRootItem = storedItem.isRootItem,
             isHiddenUntilParent = storedItem.isHiddenUntilParent,
-            fixedTopRowPosition = storedItem.fixedTopRowPosition ?: fallbackItem.fixedTopRowPosition,
+            fixedTopRowPosition = AacFixedTopRow.positions[storedItem.id],
             addsToSentence = storedItem.addsToSentence,
             speaksImmediately = storedItem.speaksImmediately,
             opensSubicons = storedItem.opensSubicons,
@@ -3207,16 +3204,20 @@ class MainActivity : AppCompatActivity() {
     private fun bindMainAacBitmapDrawable(iconView: TextView, bitmap: Bitmap) {
         val availableWidth = (iconView.width - iconView.paddingLeft - iconView.paddingRight).coerceAtLeast(0)
         val availableHeight = (iconView.height - iconView.paddingTop - iconView.paddingBottom).coerceAtLeast(0)
-        val maxSize = minOf(availableWidth, availableHeight)
-        if (maxSize <= 0) {
+        if (availableWidth <= 0 || availableHeight <= 0) {
             iconView.post {
                 bindMainAacBitmapDrawable(iconView, bitmap)
             }
             return
         }
-        val size = (maxSize * 1.00f).toInt().coerceAtLeast(dp(24))
+        val scale = minOf(
+            availableWidth.toFloat() / bitmap.width,
+            availableHeight.toFloat() / bitmap.height
+        )
+        val resultWidth = (bitmap.width * scale).toInt().coerceAtLeast(1)
+        val resultHeight = (bitmap.height * scale).toInt().coerceAtLeast(1)
         val drawable = BitmapDrawable(resources, bitmap).apply {
-            setBounds(0, 0, size, size)
+            setBounds(0, 0, resultWidth, resultHeight)
         }
         iconView.setCompoundDrawables(null, drawable, null, null)
     }
@@ -3731,6 +3732,7 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "HELP",
                 speakTextUk = "Допоможіть мені",
                 speechTextEn = "Help me",
+                fixedTopRowPosition = AacFixedTopRow.positions["help"],
                 isRootItem = false,
                 visibleUnderIds = listOf("need", "please", "care"),
                 opensSubicons = true,
@@ -3745,7 +3747,7 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "YES",
                 speakTextUk = "так",
                 speechTextEn = "yes",
-                fixedTopRowPosition = 2
+                fixedTopRowPosition = AacFixedTopRow.positions["yes"]
             ),
             mainAacItem(
                 "thank_you",
@@ -3755,7 +3757,7 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "THANK YOU",
                 speakTextUk = "дякую",
                 speechTextEn = "thank you",
-                fixedTopRowPosition = 4
+                fixedTopRowPosition = AacFixedTopRow.positions["thank_you"]
             ),
             mainAacItem(
                 "sorry",
@@ -3765,7 +3767,7 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "SORRY",
                 speakTextUk = "вибачте",
                 speechTextEn = "sorry",
-                fixedTopRowPosition = 5
+                fixedTopRowPosition = null
             ),
             mainAacItem(
                 "wc",
@@ -4023,11 +4025,11 @@ class MainActivity : AppCompatActivity() {
                 "dont_understand",
                 "NE RAZUMEM",
                 "ne razumem",
-                labelUk = "Я НЕ РОЗУМІЮ",
+                labelUk = "НЕ РОЗУМІЮ",
                 labelEn = "I DON'T UNDERSTAND",
-                speakTextUk = "Я не розумію",
+                speakTextUk = "Я не розумію.",
                 speechTextEn = "I don't understand",
-                fixedTopRowPosition = 3
+                fixedTopRowPosition = AacFixedTopRow.positions["dont_understand"]
             ),
             mainAacItem(
                 "no",
@@ -4037,7 +4039,7 @@ class MainActivity : AppCompatActivity() {
                 labelEn = "NO",
                 speakTextUk = "ні",
                 speechTextEn = "no",
-                fixedTopRowPosition = 1
+                fixedTopRowPosition = AacFixedTopRow.positions["no"]
             ),
             mainAacItem(
                 "sleep",

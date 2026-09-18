@@ -95,26 +95,26 @@ object AacSampleContentCreator {
                         imagePath = "",
                         isRootItem = true,
                         priority = 0,
-                        fixedTopRowPosition = 2
+                        fixedTopRowPosition = AacFixedTopRow.positions["yes"]
                     )
                 )
                 .put(
                     sampleItem(
                         id = "dont_understand",
                         label = "NE RAZUMEM",
-                        labelUk = "Я НЕ РОЗУМІЮ",
+                        labelUk = "НЕ РОЗУМІЮ",
                         labelEn = "I DON'T UNDERSTAND",
                         speechSl = "ne razumem",
-                        speechUk = "Я не розумію",
+                        speechUk = "Я не розумію.",
                         speechEn = "I don't understand",
                         imagePath = "",
                         conceptId = "dont_understand",
                         isRootItem = true,
                         priority = 1,
-                        fixedTopRowPosition = 3
+                        fixedTopRowPosition = AacFixedTopRow.positions["dont_understand"]
                     )
-                        .put("labelUk", "Я НЕ РОЗУМІЮ")
-                        .put("speakTextUk", "Я не розумію")
+                        .put("labelUk", "НЕ РОЗУМІЮ")
+                        .put("speakTextUk", "Я не розумію.")
                 )
                 .put(
                     sampleItem(
@@ -128,7 +128,7 @@ object AacSampleContentCreator {
                         imagePath = "",
                         isRootItem = true,
                         priority = 2,
-                        fixedTopRowPosition = 1
+                        fixedTopRowPosition = AacFixedTopRow.positions["no"]
                     )
                 )
                 .put(
@@ -139,7 +139,7 @@ object AacSampleContentCreator {
                         conceptId = "thank_you",
                         isRootItem = true,
                         priority = 3,
-                        fixedTopRowPosition = 4
+                        fixedTopRowPosition = AacFixedTopRow.positions["thank_you"]
                     )
                 )
                 .put(
@@ -150,12 +150,13 @@ object AacSampleContentCreator {
                         conceptId = "sorry",
                         isRootItem = true,
                         priority = 4,
-                        fixedTopRowPosition = 5
+                        fixedTopRowPosition = null
                     )
                 )
                 .put(
                     sampleItem(
                         id = "help",
+                        fixedTopRowPosition = AacFixedTopRow.positions["help"],
                         label = "POMOČ",
                         imagePath = "",
                         isRootItem = true,

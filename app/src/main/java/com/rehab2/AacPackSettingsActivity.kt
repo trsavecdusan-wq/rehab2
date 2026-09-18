@@ -3541,7 +3541,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             setPadding(0, 0, 0, 4.dp())
         })
         card.addView(TextView(this).apply {
-            text = "Prihodnje prilagajanje: uporaba, zadnja uporaba in AI predlogi lahko pomagajo pri vrstnem redu, vendar ne smejo premakniti fiksne vrstice ali roÄŤno zaklenjenih mest."
+            text = "Prihodnje prilagajanje: uporaba, zadnja uporaba in AI predlogi lahko pomagajo pri vrstnem redu, vendar ne smejo premakniti fiksne vrstice ali ročno zaklenjenih mest."
             textSize = 14f
             setTextColor(0xFF9CA8B5.toInt())
             setPadding(0, 2.dp(), 0, 4.dp())

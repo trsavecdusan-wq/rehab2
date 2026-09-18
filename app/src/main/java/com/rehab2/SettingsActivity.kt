@@ -1,5 +1,7 @@
 package com.rehab2
 
+import com.rehab2.aac.AacFixedTopRow
+
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.IntentFilter
@@ -232,7 +234,7 @@ class SettingsActivity : AppCompatActivity() {
         private const val KEY_AAC_PAIN_EXTENDED_VERSION_ENABLED = "aac_pain_extended_version_enabled"
         private const val DEFAULT_AAC_PERSISTENT_TOP_ROW_COUNT = 5
         private val AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS = arrayOf(3, 4, 5)
-        private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "dont_understand", "yes", "thank_you", "sorry")
+        private val DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS = AacFixedTopRow.ids
         private val CORE_AAC_AUDIT_ITEMS = listOf(
             CoreAacAuditItem("da", "DA", "#4CAF50", "✅", "Da.", "core_yes.png", setOf("yes", "quick_yes", "da"), setOf("DA"), setOf("yes")),
             CoreAacAuditItem("ne", "NE", "#F44336", "❌", "Ne.", "core_no.png", setOf("no", "quick_no", "ne"), setOf("NE"), setOf("no")),
@@ -3045,17 +3047,7 @@ class SettingsActivity : AppCompatActivity() {
         ).let { normalizePersistentTopRowCount(it, gridSize) }
     }
 
-    private fun getPersistentTopRowItemIds(): List<String> {
-        return prefs.getString(
-            PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS,
-            DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS.joinToString(",")
-        )
-            .orEmpty()
-            .split(",")
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .ifEmpty { DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS }
-    }
+    private fun getPersistentTopRowItemIds(): List<String> = AacFixedTopRow.ids
 
     private fun persistentTopRowLabel(itemId: String): String {
         return when (itemId) {

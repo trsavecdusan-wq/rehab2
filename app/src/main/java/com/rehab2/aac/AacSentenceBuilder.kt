@@ -42,7 +42,7 @@ object AacSentenceBuilder {
             keys.any { it in YES_KEYS } -> "Da."
             keys.any { it in NO_KEYS } -> "Ne."
             keys.any { it in TIRED_KEYS } -> "Utrujena sem."
-            keys.any { it in REST_KEYS } -> "Rada bi poÄŤivala."
+            keys.any { it in REST_KEYS } -> "Rada bi počivala."
             keys.any { it in WC_KEYS } -> "Moram v toaleto."
             else -> null
         }
@@ -58,15 +58,15 @@ object AacSentenceBuilder {
         return when {
             items.hasId("miss_someone") || items.hasId("miss_you") -> {
                 when (items.firstNotNullOfOrNull { item -> MISS_INTENSITIES[item.idKey()] }) {
-                    "little" -> "Malo pogreĹˇam ${person.accusative}."
-                    "very" -> "Zelo pogreĹˇam ${person.accusative}."
-                    else -> "PogreĹˇam ${person.accusative}."
+                    "little" -> "Malo pogrešam ${person.accusative}."
+                    "very" -> "Zelo pogrešam ${person.accusative}."
+                    else -> "Pogrešam ${person.accusative}."
                 }
             }
             items.hasId("person_see") -> "Rada bi videla ${person.accusative}."
             items.hasId("person_come") -> "Rada bi, da pride ${person.nominative}."
-            items.hasId("contact_call") -> "Prosim, pokliÄŤite ${person.accusative}${personLaterSuffix(items)}."
-            items.hasId("contact_message") || items.hasId("message") -> "Rada bi poslala sporoÄŤilo ${person.dative}${personLaterSuffix(items)}."
+            items.hasId("contact_call") -> "Prosim, pokličite ${person.accusative}${personLaterSuffix(items)}."
+            items.hasId("contact_message") || items.hasId("message") -> "Rada bi poslala sporočilo ${person.dative}${personLaterSuffix(items)}."
             items.hasId("i_want") || items.hasId("rada_bi") -> "Rada bi govorila z ${person.instrumental}."
             items.hasId("person_where_is") -> "Kje je ${person.nominative}?"
             items.hasId("come_to_me") -> "Naj pride ${person.nominative}."
@@ -83,7 +83,7 @@ object AacSentenceBuilder {
     private fun buildNeedSentence(items: List<AacItem>): String {
         if (items.hasId("help")) {
             val helpTarget = items.firstNotNullOfOrNull { item -> NEED_HELP_TARGETS[item.idKey()] }
-            if (helpTarget != null) return "Potrebujem pomoÄŤ pri $helpTarget."
+            if (helpTarget != null) return "Potrebujem pomoč pri $helpTarget."
         }
         val target = items.firstNotNullOfOrNull { item -> NEED_TARGETS[item.idKey()] } ?: return ""
         return "Potrebujem $target."
@@ -139,7 +139,7 @@ object AacSentenceBuilder {
                 "cold" -> "Rada bi ${target.coldPhrase}."
                 "warm" -> "Rada bi ${target.warmPhrase}."
                 "small" -> "Rada bi malo ${target.genitive}."
-                "more" -> "Rada bi veÄŤ ${target.genitive}."
+                "more" -> "Rada bi več ${target.genitive}."
                 else -> "Rada bi ${target.accusative}."
             }
         }
@@ -201,19 +201,19 @@ object AacSentenceBuilder {
 
     private fun buildCareSentence(items: List<AacItem>): String {
         return items.firstNotNullOfOrNull { item -> CARE_SENTENCES[item.idKey()] }
-            ?: if (items.hasId("care")) "Potrebujem pomoÄŤ pri negi." else ""
+            ?: if (items.hasId("care")) "Potrebujem pomoč pri negi." else ""
     }
 
     private fun buildDontWantSentence(items: List<AacItem>): String {
         val target = items.firstNotNullOfOrNull { item -> DONT_WANT_TARGETS[item.idKey()] }
             ?: return ""
-        return "NoÄŤem $target."
+        return "Nočem $target."
     }
 
     private fun buildMissSentence(items: List<AacItem>): String {
         val target = items.firstNotNullOfOrNull { item -> MISS_TARGETS[item.idKey()] }
             ?: return ""
-        return "PogreĹˇam $target."
+        return "Pogrešam $target."
     }
 
     private fun buildPainSentence(items: List<AacItem>): String {
@@ -274,7 +274,7 @@ object AacSentenceBuilder {
         return when (intensity) {
             "light" -> "malo"
             "medium" -> "srednje"
-            "strong" -> "moÄŤno"
+            "strong" -> "močno"
             "very", "very_strong" -> "zelo"
             else -> ""
         }
@@ -336,6 +336,8 @@ object AacSentenceBuilder {
     private fun normalize(value: String): String {
         return value.trim()
             .lowercase(Locale("sl", "SI"))
+            .replace("č", "c").replace("š", "s").replace("ž", "z")
+            .replace("ć", "c").replace("đ", "d")
             .replace("ÄŤ", "c")
             .replace("Ĺˇ", "s")
             .replace("Ĺľ", "z")
@@ -414,10 +416,10 @@ object AacSentenceBuilder {
     )
 
     private val PERSON_TARGETS = mapOf(
-        "person_dusan" to PersonTarget("DuĹˇan", "DuĹˇana", "DuĹˇanu", "DuĹˇanom"),
-        "dusan" to PersonTarget("DuĹˇan", "DuĹˇana", "DuĹˇanu", "DuĹˇanom"),
-        "person_zana" to PersonTarget("Ĺ˝ana", "Ĺ˝ano", "Ĺ˝ani", "Ĺ˝ano"),
-        "sister_zana" to PersonTarget("Ĺ˝ana", "Ĺ˝ano", "Ĺ˝ani", "Ĺ˝ano"),
+        "person_dusan" to PersonTarget("Dušan", "Dušana", "Dušanu", "Dušanom"),
+        "dusan" to PersonTarget("Dušan", "Dušana", "Dušanu", "Dušanom"),
+        "person_zana" to PersonTarget("Žana", "Žano", "Žani", "Žano"),
+        "sister_zana" to PersonTarget("Žana", "Žano", "Žani", "Žano"),
         "person_sergej" to PersonTarget("Sergej", "Sergeja", "Sergeju", "Sergejem"),
         "grandfather_sergej" to PersonTarget("Sergej", "Sergeja", "Sergeju", "Sergejem"),
         "person_julija" to PersonTarget("Julija", "Julijo", "Juliji", "Julijo"),
@@ -479,12 +481,12 @@ object AacSentenceBuilder {
     )
 
     private val NEED_TARGETS = mapOf(
-        "help" to "pomoÄŤ",
+        "help" to "pomoč",
         "water" to "vodo",
         "food" to "hrano",
         "wc" to "WC",
         "blanket" to "odejo",
-        "wheelchair" to "voziÄŤek",
+        "wheelchair" to "voziček",
         "crutch" to "berglo",
         "doctor" to "zdravnika",
         "nurse" to "medicinsko sestro",
@@ -495,11 +497,11 @@ object AacSentenceBuilder {
         "wc" to "WC",
         "help_drinking" to "pitju",
         "help_feeding" to "hranjenju",
-        "dressing" to "oblaÄŤenju",
-        "dressing_help" to "oblaÄŤenju",
+        "dressing" to "oblačenju",
+        "dressing_help" to "oblačenju",
         "washing_help" to "umivanju",
-        "position" to "poloĹľaju",
-        "body_position" to "poloĹľaju",
+        "position" to "položaju",
+        "body_position" to "položaju",
         "bed" to "postelji",
         "water" to "vodi",
         "food" to "hrani"
@@ -509,7 +511,7 @@ object AacSentenceBuilder {
         "pain" to "Boli me.",
         "cannot" to "Ne morem.",
         "cold" to "Mraz mi je.",
-        "hot" to "VroÄŤe mi je.",
+        "hot" to "Vroče mi je.",
         "afraid" to "Strah me je.",
         "bad" to "Slabo mi je.",
         "uncomfortable" to "Neudobno mi je.",
@@ -526,23 +528,23 @@ object AacSentenceBuilder {
     )
 
     private val UNCOMFORTABLE_SENTENCES = mapOf(
-        "position" to "Neudoben je poloĹľaj.",
+        "position" to "Neudoben je položaj.",
         "bed" to "Neudobna je postelja.",
         "blanket" to "Neudobna je odeja.",
-        "wheelchair" to "Neudoben je voziÄŤek.",
-        "clothing" to "Neudobno je oblaÄŤilo."
+        "wheelchair" to "Neudoben je voziček.",
+        "clothing" to "Neudobno je oblačilo."
     )
 
     private val TEMPERATURE_SENTENCES = mapOf(
         "cold" to "Mraz mi je.",
-        "hot" to "VroÄŤe mi je."
+        "hot" to "Vroče mi je."
     )
 
     private val PLEASE_TARGETS = mapOf(
         "help" to "pomagaj mi",
-        "wait" to "poÄŤakaj",
+        "wait" to "počakaj",
         "repeat" to "ponovi",
-        "slower" to "govori poÄŤasneje",
+        "slower" to "govori počasneje",
         "come_to_me" to "pridi k meni",
         "look_at_me" to "poglej me",
         "turn_me" to "obrni me",
@@ -553,25 +555,25 @@ object AacSentenceBuilder {
         "wc" to "WC",
         "help_drinking" to "pitju",
         "help_feeding" to "hranjenju",
-        "dressing" to "oblaÄŤenju",
-        "dressing_help" to "oblaÄŤenju",
+        "dressing" to "oblačenju",
+        "dressing_help" to "oblačenju",
         "washing_help" to "umivanju",
-        "position" to "poloĹľaju",
-        "body_position" to "poloĹľaju",
-        "drink" to "pijaÄŤi",
-        "water" to "pijaÄŤi",
+        "position" to "položaju",
+        "body_position" to "položaju",
+        "drink" to "pijači",
+        "water" to "pijači",
         "food" to "hrani"
     )
 
     private val REPEAT_SENTENCES = mapOf(
-        "repeat_question" to "Prosim, ponovi vpraĹˇanje.",
+        "repeat_question" to "Prosim, ponovi vprašanje.",
         "repeat_last_sentence" to "Prosim, ponovi zadnji stavek.",
-        "repeat_slower" to "Prosim, ponovi poÄŤasneje."
+        "repeat_slower" to "Prosim, ponovi počasneje."
     )
 
     private val SLOWER_SENTENCES = mapOf(
-        "slower_little" to "Prosim, govori malo poÄŤasneje.",
-        "slower_much" to "Prosim, govori zelo poÄŤasneje."
+        "slower_little" to "Prosim, govori malo počasneje.",
+        "slower_much" to "Prosim, govori zelo počasneje."
     )
 
     private val TURN_DIRECTIONS = mapOf(
@@ -584,19 +586,19 @@ object AacSentenceBuilder {
     private val CARE_ROOT_IDS = setOf("care", "care_group", "change_position")
 
     private val CARE_SENTENCES = mapOf(
-        "care" to "Potrebujem pomoÄŤ pri negi.",
-        "care_group" to "Potrebujem pomoÄŤ pri negi.",
-        "washing_help" to "Potrebujem pomoÄŤ pri umivanju.",
-        "dressing_help" to "Potrebujem pomoÄŤ pri preoblaÄŤenju.",
+        "care" to "Potrebujem pomoč pri negi.",
+        "care_group" to "Potrebujem pomoč pri negi.",
+        "washing_help" to "Potrebujem pomoč pri umivanju.",
+        "dressing_help" to "Potrebujem pomoč pri preoblačenju.",
         "bed" to "Prosim, pomagajte mi v posteljo.",
-        "wheelchair" to "Prosim, pomagajte mi v voziÄŤek.",
+        "wheelchair" to "Prosim, pomagajte mi v voziček.",
         "blanket" to "Potrebujem odejo.",
         "pillow" to "Potrebujem blazino.",
-        "change_position" to "Prosim, pomagajte mi spremeniti poloĹľaj.",
+        "change_position" to "Prosim, pomagajte mi spremeniti položaj.",
         "turn_left" to "Prosim, obrnite me na levo.",
         "turn_right" to "Prosim, obrnite me na desno.",
         "sit_up" to "Prosim, dvignite me.",
-        "lie_down" to "Prosim, poloĹľite me."
+        "lie_down" to "Prosim, položite me."
     )
 
     private val TURN_SENTENCES = mapOf(
@@ -609,7 +611,7 @@ object AacSentenceBuilder {
     private val SIMPLE_SENTENCES_BY_ID = mapOf(
         "cannot" to "Ne morem.",
         "cold" to "Mraz mi je.",
-        "hot" to "VroÄŤe mi je.",
+        "hot" to "Vroče mi je.",
         "afraid" to "Strah me je.",
         "bad" to "Slabo mi je.",
         "uncomfortable" to "Neudobno mi je.",
@@ -620,44 +622,44 @@ object AacSentenceBuilder {
         "what_next" to "Kaj bo potem?",
         "what_did_i_say" to "Kaj sem rekla?",
         "activity_group" to "Izberite dejavnost.",
-        "music" to "Rada bi posluĹˇala glasbo.",
+        "music" to "Rada bi poslušala glasbo.",
         "tv" to "Rada bi gledala televizijo.",
-        "environment_group" to "Izberite pomoÄŤ v prostoru.",
-        "turn_on_tv" to "Prosim, priĹľgite televizijo.",
+        "environment_group" to "Izberite pomoč v prostoru.",
+        "turn_on_tv" to "Prosim, prižgite televizijo.",
         "turn_off_tv" to "Prosim, ugasnite televizijo.",
-        "turn_on_light" to "Prosim, priĹľgite luÄŤ.",
-        "turn_off_light" to "Prosim, ugasnite luÄŤ.",
+        "turn_on_light" to "Prosim, prižgite luč.",
+        "turn_off_light" to "Prosim, ugasnite luč.",
         "open_window" to "Prosim, odprite okno.",
         "close_window" to "Prosim, zaprite okno.",
-        "walk" to "Rada bi Ĺˇla na sprehod s spremstvom.",
+        "walk" to "Rada bi šla na sprehod s spremstvom.",
         "visit" to "Rada bi obisk.",
-        "where_zana" to "Kje je Ĺ˝ana?",
-        "where_dusan" to "Kje je DuĹˇan?",
+        "where_zana" to "Kje je Žana?",
+        "where_dusan" to "Kje je Dušan?",
         "where_are_we" to "Kje smo?",
         "where_phone" to "Kje je telefon?",
-        "where_wheelchair" to "Kje je voziÄŤek?",
+        "where_wheelchair" to "Kje je voziček?",
         "when_come" to "Kdaj pride?",
         "when_go" to "Kdaj gremo?",
         "when_therapy" to "Kdaj bo terapija?",
         "when_home" to "Kdaj gremo domov?",
         "when_eat" to "Kdaj jemo?",
-        "time_group" to "Izberite ÄŤas.",
+        "time_group" to "Izberite čas.",
         "today" to "Danes.",
         "tomorrow" to "Jutri.",
-        "yesterday" to "VÄŤeraj.",
+        "yesterday" to "Včeraj.",
         "now" to "Zdaj.",
         "later" to "Kasneje.",
         "morning" to "Zjutraj.",
         "afternoon" to "Popoldne.",
-        "evening" to "ZveÄŤer.",
-        "night" to "PonoÄŤi.",
-        "miss_little" to "Malo pogreĹˇam.",
-        "miss_very" to "Zelo pogreĹˇam.",
-        "repeat_question" to "Prosim, ponovi vpraĹˇanje.",
+        "evening" to "Zvečer.",
+        "night" to "Ponoči.",
+        "miss_little" to "Malo pogrešam.",
+        "miss_very" to "Zelo pogrešam.",
+        "repeat_question" to "Prosim, ponovi vprašanje.",
         "repeat_last_sentence" to "Prosim, ponovi zadnji stavek.",
-        "repeat_slower" to "Prosim, ponovi poÄŤasneje.",
-        "slower_little" to "Prosim, govori malo poÄŤasneje.",
-        "slower_much" to "Prosim, govori zelo poÄŤasneje.",
+        "repeat_slower" to "Prosim, ponovi počasneje.",
+        "slower_little" to "Prosim, govori malo počasneje.",
+        "slower_much" to "Prosim, govori zelo počasneje.",
         "turn_left" to "Prosim, obrnite me na levo.",
         "turn_right" to "Prosim, obrnite me na desno.",
         "turn_back" to "Prosim, obrnite me na hrbet.",
@@ -669,15 +671,15 @@ object AacSentenceBuilder {
         "cannot_move" to "Ne morem se premakniti.",
         "cannot_understand" to "Ne morem razumeti.",
         "cold_feeling" to "Mrzlo mi je.",
-        "hot_feeling" to "VroÄŤe mi je.",
+        "hot_feeling" to "Vroče mi je.",
         "sleepy" to "Spi se mi.",
-        "need_rest" to "Rabim poÄŤitek.",
+        "need_rest" to "Rabim počitek.",
         "help_drinking" to "Potrebujem pomo\u010d pri pitju.",
         "help_feeding" to "Potrebujem pomo\u010d pri hranjenju.",
         "dressing" to "Potrebujem pomo\u010d pri obla\u010denju.",
-        "change_position" to "Prosim, pomagajte mi spremeniti poloĹľaj.",
+        "change_position" to "Prosim, pomagajte mi spremeniti položaj.",
         "sit_up" to "Prosim, dvignite me.",
-        "lie_down" to "Prosim, poloĹľite me.",
+        "lie_down" to "Prosim, položite me.",
         "tea_large" to "Rada bi velik \u010daj.",
         "tea_regular" to "Rada bi \u010daj.",
         "coffee_plain" to "Rada bi navadno kavo.",
@@ -709,7 +711,7 @@ object AacSentenceBuilder {
         "peace" to "Rada bi mir.",
         "fix_me" to "Prosim, popravi me.",
         "body_position" to "Prosim, popravite moj polo\u017eaj.",
-        "clothing" to "Neudobno je oblaÄŤilo."
+        "clothing" to "Neudobno je oblačilo."
     )
 
     private val DRINK_TARGETS = mapOf(
@@ -718,8 +720,8 @@ object AacSentenceBuilder {
         "drink_pepsi" to DrinkTarget("Pepsi", "Pepsija", "hladen Pepsi", "topel Pepsi"),
         "drink_water" to DrinkTarget("vodo", "vode", "hladno vodo", "toplo vodo"),
         "water" to DrinkTarget("vodo", "vode", "hladno vodo", "toplo vodo"),
-        "drink_tea" to DrinkTarget("ÄŤaj", "ÄŤaja", "hladen ÄŤaj", "topel ÄŤaj"),
-        "tea" to DrinkTarget("ÄŤaj", "ÄŤaja", "hladen ÄŤaj", "topel ÄŤaj"),
+        "drink_tea" to DrinkTarget("čaj", "čaja", "hladen čaj", "topel čaj"),
+        "tea" to DrinkTarget("čaj", "čaja", "hladen čaj", "topel čaj"),
         "drink_coffee" to DrinkTarget("kavo", "kave", "hladno kavo", "toplo kavo"),
         "coffee" to DrinkTarget("kavo", "kave", "hladno kavo", "toplo kavo"),
         "juice" to DrinkTarget("sok", "soka", "hladen sok", "topel sok"),
@@ -733,18 +735,18 @@ object AacSentenceBuilder {
         "fruit" to "sadje",
         "ice_cream" to "sladoled",
         "potato" to "krompir",
-        "rice" to "riĹľ",
+        "rice" to "riž",
         "food_yogurt" to "jogurt",
         "food_banana" to "banano",
         "food_apple" to "jabolko",
         "food_lunch" to "kosilo",
         "food_dinner" to "ve\u010derjo",
         "sweet" to "nekaj sladkega",
-        "rest" to "poÄŤivala",
+        "rest" to "počivala",
         "wc" to "v toaleto",
-        "music" to "posluĹˇala glasbo",
+        "music" to "poslušala glasbo",
         "tv" to "gledala televizijo",
-        "walk" to "Ĺˇla na sprehod s spremstvom",
+        "walk" to "šla na sprehod s spremstvom",
         "visit" to "obisk",
         "room" to "v sobo",
         "terrace" to "na teraso",
@@ -763,7 +765,7 @@ object AacSentenceBuilder {
         "fruit" to "sadje",
         "ice_cream" to "sladoled",
         "potato" to "krompir",
-        "rice" to "riĹľ",
+        "rice" to "riž",
         "food_yogurt" to "jogurt",
         "food_banana" to "banano",
         "food_apple" to "jabolko",
@@ -779,7 +781,7 @@ object AacSentenceBuilder {
         "fruit" to "sadja",
         "ice_cream" to "sladoleda",
         "potato" to "krompirja",
-        "rice" to "riĹľa",
+        "rice" to "riža",
         "food_yogurt" to "jogurta",
         "food_banana" to "banane",
         "food_apple" to "jabolka",
@@ -794,8 +796,8 @@ object AacSentenceBuilder {
         "drink_pepsi" to "Pepsija",
         "drink_water" to "vode",
         "water" to "vode",
-        "drink_tea" to "ÄŤaja",
-        "tea" to "ÄŤaja",
+        "drink_tea" to "čaja",
+        "tea" to "čaja",
         "drink_coffee" to "kave",
         "coffee" to "kave",
         "juice" to "soka",
@@ -806,7 +808,7 @@ object AacSentenceBuilder {
         "fruit" to "sadja",
         "ice_cream" to "sladoleda",
         "potato" to "krompirja",
-        "rice" to "riĹľa",
+        "rice" to "riža",
         "food_yogurt" to "jogurta",
         "food_banana" to "banane",
         "food_apple" to "jabolka",
@@ -814,10 +816,10 @@ object AacSentenceBuilder {
     )
 
     private val MISS_TARGETS = mapOf(
-        "person_zana" to "Ĺ˝ano",
-        "sister_zana" to "Ĺ˝ano",
-        "person_dusan" to "DuĹˇana",
-        "dusan" to "DuĹˇana",
+        "person_zana" to "Žano",
+        "sister_zana" to "Žano",
+        "person_dusan" to "Dušana",
+        "dusan" to "Dušana",
         "person_sergej" to "Sergeja",
         "grandfather_sergej" to "Sergeja",
         "person_julija" to "Julijo",
@@ -856,7 +858,7 @@ object AacSentenceBuilder {
         "leg_thigh" to "stegno",
         "leg_knee" to "koleno",
         "leg_shin" to "golen",
-        "leg_ankle" to "gleĹľenj",
+        "leg_ankle" to "gleženj",
         "leg_foot" to "stopalo",
         "leg_toes" to "prsti na nogi",
         "back_upper" to "zgornji del hrbta",
@@ -869,11 +871,11 @@ object AacSentenceBuilder {
         "eye" to "oko",
         "eye_left" to "levo oko",
         "eye_right" to "desno oko",
-        "eye_both" to "obe oÄŤesi",
+        "eye_both" to "obe očesi",
         "ear" to "uho",
         "ear_left" to "levo uho",
         "ear_right" to "desno uho",
-        "ear_both" to "obe uĹˇesi",
+        "ear_both" to "obe ušesi",
         "tooth" to "zob",
         "tooth_left" to "levi zob",
         "tooth_right" to "desni zob",

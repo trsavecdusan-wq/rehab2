@@ -1,5 +1,7 @@
 package com.rehab2
 
+import com.rehab2.aac.AacFixedTopRow
+
 import android.app.AlertDialog
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -880,15 +882,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         if (persistentTopRowCount != rawTopRowCount) {
             prefs.edit().putInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, persistentTopRowCount).apply()
         }
-        persistentTopRowItemIds = prefs.getString(
-            PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS,
-            DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS.joinToString(",")
-        )
-            .orEmpty()
-            .split(",")
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .ifEmpty { DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS }
+        persistentTopRowItemIds = AacFixedTopRow.ids
     }
 
     private fun getPersistentTopRowCount(): Int {
@@ -899,24 +893,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
         if (!persistentTopRowEnabled) return emptyList()
 
         val homeItems = repository.loadPage("home")?.items.orEmpty()
-        val metadataTopRowItems = (homeItems + items)
-            .distinctBy { it.id }
-            .filter { it.fixedTopRowPosition != null }
-            .sortedWith(
-                compareBy<AacItem> { it.fixedTopRowPosition ?: MAX_PERSISTENT_TOP_ROW_COUNT + 1 }
-                    .thenBy { it.priority }
-            )
-        if (metadataTopRowItems.isNotEmpty()) {
-            return metadataTopRowItems
-                .take(MAX_PERSISTENT_TOP_ROW_COUNT)
-                .map(::asPersistentTopRowItem)
-        }
-
-        val homeItemsById = homeItems.associateBy { it.id }
-        return persistentTopRowItemIds
-            .take(MAX_PERSISTENT_TOP_ROW_COUNT)
-            .mapNotNull { id -> homeItemsById[id] }
-            .map(::asPersistentTopRowItem)
+        val itemsById = (homeItems + items).distinctBy { it.id }.associateBy { it.id }
+        return AacFixedTopRow.ids.mapNotNull { id -> itemsById[id] }
+            .map { item -> asPersistentTopRowItem(item.copy(fixedTopRowPosition = AacFixedTopRow.positions[item.id])) }
     }
 
     private fun mergePersistentTopRowWithCurrentMenuItems(items: List<AacItem>): List<AacItem> {
@@ -1861,7 +1840,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         // Future therapist settings/content metadata may provide positions 1..5.
         // Runtime fixes only the first grid-width items; remaining configured items flow normally.
         const val DEFAULT_PERSISTENT_TOP_ROW_COUNT = 5
-        val DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS = listOf("no", "yes", "dont_understand", "thank_you", "sorry")
+        val DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS = AacFixedTopRow.ids
         val PAIN_SIDE_ITEM_IDS = setOf("pain_left", "pain_right", "pain_both")
         val PAIN_FOLLOW_UP_ITEM_IDS = setOf("pain_light", "pain_medium", "pain_strong")
         val PAIN_TIME_ITEM_IDS = setOf(

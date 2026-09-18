@@ -21,12 +21,7 @@ object AacCoreV2HomeRepair {
     private const val KEY_AAC_HOME_LAYOUT_VERSION = "aac_home_layout_version"
     private const val CORE_V2_HOME_LAYOUT_VERSION = "core_v2"
 
-    private val lockedIds = listOf(
-        "no",
-        "dont_understand",
-        "yes",
-        "thank_you",
-        "sorry",
+    private val lockedIds = AacFixedTopRow.ids + listOf(
         "wc",
         "pain",
         "thirsty",
@@ -49,13 +44,7 @@ object AacCoreV2HomeRepair {
         "activity_group"
     )
 
-    private val fixedPositions = mapOf(
-        "no" to 1,
-        "dont_understand" to 2,
-        "yes" to 3,
-        "thank_you" to 4,
-        "sorry" to 5
-    )
+    private val fixedPositions = AacFixedTopRow.positions
 
     private val mainPositions = mapOf(
         "wc" to 6,
@@ -190,6 +179,10 @@ object AacCoreV2HomeRepair {
         var placementsUpdatedCount = 0
         itemObjects(parsedItems.itemsArray).forEach { item ->
             val id = item.optString("id").trim()
+            if (item.has("fixed_top_row_position")) {
+                item.remove("fixed_top_row_position")
+                fixedRowUpdatedCount++
+            }
             val fixedPosition = fixedPositions[id]
             if (fixedPosition != null) {
                 if (item.optInt("fixedTopRowPosition", 0) != fixedPosition) {
@@ -217,7 +210,7 @@ object AacCoreV2HomeRepair {
                     item.put("isHiddenUntilParent", false)
                     placementsUpdatedCount++
                 }
-            } else if (id !in fixedPositions.keys) {
+            } else {
                 val nextPlacements = placementsWithoutHomePages(item)
                 if (placementsChanged(item.optJSONArray("placements"), nextPlacements)) {
                     if (nextPlacements.length() > 0) {
