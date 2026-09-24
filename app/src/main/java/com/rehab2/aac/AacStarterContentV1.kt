@@ -2,6 +2,11 @@ package com.rehab2.aac
 
 object AacStarterContentV1 {
     fun items(): List<AacItem> = listOf(
+        starter("vest", "BREZROKAVNIK", "Potrebujem brezrokavnik.", "care.vest", "NEED", "care", listOf("body:upper", "sleeves:none"), visibleUnderIds = listOf("clothing"), labelByLanguage = mapOf("sl" to "BREZROKAVNIK", "uk" to "ЖИЛЕТ"), speechTextByLanguage = mapOf("sl" to "Potrebujem brezrokavnik.", "uk" to "Мені потрібен жилет.")),
+        starter("choose_myself", "SAMA BOM IZBRALA", "Želim iti v trgovino. Tam bom sama izbrala, kaj potrebujem.", "conversation.choose_myself", "CORE_ACTION", "conversation", listOf("choice", "shopping"), visibleUnderIds = listOf("i_want", "need"), labelByLanguage = mapOf("sl" to "SAMA BOM IZBRALA", "uk" to "Я САМА ВИБЕРУ"), speechTextByLanguage = mapOf("sl" to "Želim iti v trgovino. Tam bom sama izbrala, kaj potrebujem.", "uk" to "Я хочу піти до магазину. Там я сама виберу, що мені потрібно.")),
+        starter("show_you", "POKAŽEM TI", "Prosim poglej, pokazala ti bom.", "conversation.show_you", "CORE_ACTION", "conversation", listOf("show_you"), visibleUnderIds = listOf("pogovor"), labelByLanguage = mapOf("sl" to "POKAŽEM TI", "uk" to "ПОКАЖУ ТОБІ"), speechTextByLanguage = mapOf("sl" to "Prosim poglej, pokazala ti bom.", "uk" to "Будь ласка, подивись, я тобі покажу.")),
+        starter("not_here", "NI TUKAJ", "Tukaj ni tega, kar želim povedati.", "conversation.not_here", "CORE_ACTION", "conversation", listOf("not_here"), visibleUnderIds = listOf("pogovor"), labelByLanguage = mapOf("sl" to "NI TUKAJ", "uk" to "ТУТ ЦЬОГО НЕМАЄ"), speechTextByLanguage = mapOf("sl" to "Tukaj ni tega, kar želim povedati.", "uk" to "Тут немає того, що я хочу сказати.")),
+        starter("not_this", "NI TO", "Ne, to ni tisto, kar mislim.", "conversation.not_this", "CORE_ACTION", "conversation", listOf("not_this"), visibleUnderIds = listOf("pogovor"), labelByLanguage = mapOf("sl" to "NI TO", "uk" to "НЕ ТЕ"), speechTextByLanguage = mapOf("sl" to "Ne, to ni tisto, kar mislim.", "uk" to "Ні, це не те, що я маю на увазі.")),
         starter("no", "NE", "Ne.", "core.no", "CONFIRMATION", "core", listOf("ne", "zavrnitev"), fixedTopRowPosition = AacFixedTopRow.positions["no"], imagePath = "system/no.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "НІ"), speechTextByLanguage = mapOf("uk" to "Ні.")),
         starter("yes", "DA", "Da.", "core.yes", "CONFIRMATION", "core", listOf("da", "potrditev"), fixedTopRowPosition = AacFixedTopRow.positions["yes"], imagePath = "system/yes.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "ТАК"), speechTextByLanguage = mapOf("uk" to "Так.")),
         starter("dont_understand", "NE RAZUMEM", "Ne razumem.", "core.dont_understand", "CONFIRMATION", "core", listOf("razumevanje", "ne_razumem"), fixedTopRowPosition = AacFixedTopRow.positions["dont_understand"], imagePath = "system/dont_understand.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "НЕ РОЗУМІЮ"), speechTextByLanguage = mapOf("uk" to "Я не розумію.")),
@@ -12,7 +17,7 @@ object AacStarterContentV1 {
         starter("slower", "POČASNEJE", "Prosim, govorite počasneje.", "core.slower", "CORE_ACTION", "core", listOf("počasneje", "razumevanje"), placements = pageOne(18), visibleUnderIds = listOf("please"), opensSubicons = true, children = listOf("slower_little", "slower_much"), questionByLanguage = mapOf("sl" to "Kako počasi?", "uk" to "Наскільки повільно?"), imagePath = "system/slower.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "ПОВІЛЬНІШЕ"), speechTextByLanguage = mapOf("uk" to "Будь ласка, говоріть повільніше.")),
         starter("understand", "RAZUMEM", "Razumem.", "core.understand", "CONFIRMATION", "core", listOf("razumem", "potrditev"), placements = pageOne(19), imagePath = "system/yes.png", iconSource = IconSource.SYSTEM),
         starter("people", "LJUDJE", "Ljudje.", "people.root", "PEOPLE", "people", listOf("ljudje", "osebe"), opensSubicons = true, children = listOf("about_me", "socialno", "miss_someone", "person_dusan", "person_zana", "person_sergej", "person_julija", "person_oksana", "person_inna", "person_franc", "person_other"), questionByLanguage = mapOf("sl" to "O kom želiš govoriti?", "uk" to "Про кого ти хочеш говорити?"), imagePath = "system/people.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "ЛЮДИ"), speechTextByLanguage = mapOf("uk" to "Люди.")),
-        starter("need", "POTREBUJEM", "Potrebujem pomoč.", "need.root", "NEED", "need", listOf("potrebujem", "pomoč"), opensSubicons = true, children = listOf("help", "water", "food", "wc", "blanket", "wheelchair", "crutch", "doctor", "nurse", "therapy"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ?", "uk" to "Що тобі потрібно?"), imagePath = "system/need.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "ПОТРІБНО"), speechTextByLanguage = mapOf("uk" to "Мені потрібна допомога.")),
+        starter("need", "POTREBUJEM", "Potrebujem pomoč.", "need.root", "NEED", "need", listOf("potrebujem", "pomoč"), opensSubicons = true, children = listOf("choose_myself", "help", "water", "food", "wc", "blanket", "wheelchair", "crutch", "doctor", "nurse", "therapy"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ?", "uk" to "Що тобі потрібно?"), imagePath = "system/need.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "ПОТРІБНО"), speechTextByLanguage = mapOf("uk" to "Мені потрібна допомога.")),
         starter("problem", "TEŽAVA", "Imam težavo.", "problem.root", "NEED", "problem", listOf("težava", "problem"), opensSubicons = true, children = listOf("pain", "cannot", "cold", "hot", "afraid", "bad", "uncomfortable", "dont_know_problem"), questionByLanguage = mapOf("sl" to "Kaj je narobe?"), imagePath = "system/problem.png", iconSource = IconSource.SYSTEM),
         starter("family_group", "DRUŽINA", "Družina.", "people.family_group", "PEOPLE", "people", listOf("družina", "ljudje"), visibleUnderIds = listOf("people", "call"), placements = pageOne(21), opensSubicons = true, children = listOf("person_zana", "person_sergej"), questionByLanguage = mapOf("sl" to "Koga iz družine?", "uk" to "Кого з родини?", "en" to "Which family member?")),
         starter("friends_group", "PRIJATELJI", "Prijatelji.", "people.friends_group", "PEOPLE", "people", listOf("prijatelji", "ljudje"), visibleUnderIds = listOf("people", "call"), placements = pageOne(22), opensSubicons = true, children = listOf("person_dusan", "person_franc", "person_inna", "person_julija", "person_oksana"), questionByLanguage = mapOf("sl" to "Katerega prijatelja?", "uk" to "Який друг?", "en" to "Which friend?")),
@@ -100,7 +105,7 @@ object AacStarterContentV1 {
         starter("help_feeding", "HRANJENJE", "Potrebujem pomoč pri hranjenju.", "care.help_feeding", "NEED", "care", listOf("hranjenje", "pomoč"), visibleUnderIds = listOf("help"), imagePath = "custom/help/help_feeding.jpg", iconSource = IconSource.CUSTOM),
         starter("dressing", "OBLAČENJE", "Potrebujem pomoč pri oblačenju.", "care.dressing.topic", "NEED", "care", listOf("oblačenje", "pomoč"), visibleUnderIds = listOf("help"), imagePath = "custom/body/dressing.jpg", iconSource = IconSource.CUSTOM, labelByLanguage = mapOf("uk" to "ОДЯГАННЯ"), speechTextByLanguage = mapOf("uk" to "Мені потрібна допомога з одяганням.")),
         starter("position", "POLOŽAJ", "Potrebujem pomoč pri položaju.", "care.position.topic", "NEED", "care", listOf("položaj", "pomoč"), visibleUnderIds = listOf("help", "uncomfortable"), imagePath = "custom/body/position.jpg", iconSource = IconSource.CUSTOM),
-        starter("i_want", "RADA BI", "Rada bi nekaj.", "core.i_want", "CORE_ACTION", "core", listOf("rada_bi", "želim"), visibleUnderIds = listOf("need"), opensSubicons = true, children = listOf("cigarette", "smoking", "lighter", "ashtray"), questionByLanguage = mapOf("sl" to "Kaj želiš?"), imagePath = "system/please.png", iconSource = IconSource.SYSTEM),
+        starter("i_want", "RADA BI", "Rada bi nekaj.", "core.i_want", "CORE_ACTION", "core", listOf("rada_bi", "želim"), visibleUnderIds = listOf("need"), opensSubicons = true, children = listOf("choose_myself", "cigarette", "smoking", "lighter", "ashtray"), questionByLanguage = mapOf("sl" to "Kaj želiš?"), imagePath = "system/please.png", iconSource = IconSource.SYSTEM),
         starter("cigarette", "CIGARETA", "Rada bi cigareto.", "daily.cigarette", "CORE_ACTION", "daily_life", listOf("cigareta", "rada_bi"), visibleUnderIds = listOf("i_want")),
         starter("smoking", "KADITI", "Rada bi kadila.", "daily.smoking", "CORE_ACTION", "daily_life", listOf("kaditi", "cigareta"), visibleUnderIds = listOf("i_want")),
         starter("lighter", "VŽIGALNIK", "Potrebujem vžigalnik.", "daily.lighter", "CORE_ACTION", "daily_life", listOf("vžigalnik", "cigareta"), visibleUnderIds = listOf("i_want")),
@@ -133,7 +138,7 @@ object AacStarterContentV1 {
         starter("sorry", "OPROSTI", "Oprosti.", "core.sorry", "FEELING", "core", listOf("oprosti"), placements = pageTwo(15), imagePath = "system/sorry.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "ВИБАЧТЕ"), speechTextByLanguage = mapOf("uk" to "Вибачте.")),
         starter("please", "PROSIM", "Prosim.", "core.please", "CORE_ACTION", "core", listOf("prosim"), placements = pageTwo(16), opensSubicons = true, children = listOf("pogovor", "socialno", "help", "wait", "repeat", "slower", "come_to_me", "look_at_me", "turn_me", "fix_me"), questionByLanguage = mapOf("sl" to "Kaj želiš prositi?", "uk" to "Що ти хочеш попросити?"), imagePath = "system/please.png", iconSource = IconSource.SYSTEM, labelByLanguage = mapOf("uk" to "БУДЬ ЛАСКА"), speechTextByLanguage = mapOf("uk" to "Будь ласка.")),
         starter("socialno", "SOCIALNO", "Socialno.", "social.root", "CORE_ACTION", "social", listOf("socialno", "pogovor"), visibleUnderIds = listOf("people", "please", "more"), opensSubicons = true, children = listOf("about_me", "dober_dan", "dobro_jutro", "dober_vecer", "lahko_noc", "prosim", "oprosti_social", "v_redu_je", "rada_te_imam", "pogresam_te"), questionByLanguage = mapOf("sl" to "Kaj želiš povedati?", "uk" to "Що ти хочеш сказати?"), labelByLanguage = mapOf("uk" to "СПІЛКУВАННЯ"), speechTextByLanguage = mapOf("uk" to "Спілкування.")),
-        starter("pogovor", "POGOVOR", "Pogovor.", "conversation.root", "CORE_ACTION", "conversation", listOf("pogovor", "razumevanje"), visibleUnderIds = listOf("please", "repeat", "more"), opensSubicons = true, children = listOf("about_me", "govori_pocasneje", "ponovi", "pocakaj", "nisem_koncala", "dajte_mi_cas", "napisi_mi", "pokazi_mi"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ pri pogovoru?", "uk" to "Що тобі потрібно під час розмови?"), labelByLanguage = mapOf("uk" to "РОЗМОВА"), speechTextByLanguage = mapOf("uk" to "Розмова.")),
+        starter("pogovor", "POGOVOR", "Pogovor.", "conversation.root", "CORE_ACTION", "conversation", listOf("pogovor", "razumevanje"), visibleUnderIds = listOf("please", "repeat", "more"), opensSubicons = true, children = listOf("show_you", "not_here", "not_this", "about_me", "govori_pocasneje", "ponovi", "pocakaj", "nisem_koncala", "dajte_mi_cas", "napisi_mi", "pokazi_mi"), questionByLanguage = mapOf("sl" to "Kaj potrebuješ pri pogovoru?", "uk" to "Що тобі потрібно під час розмови?"), labelByLanguage = mapOf("uk" to "РОЗМОВА"), speechTextByLanguage = mapOf("uk" to "Розмова.")),
         starter("dober_dan", "DOBER DAN", "Dober dan.", "social.good_day", "CORE_ACTION", "social", listOf("dober_dan", "pozdrav"), visibleUnderIds = listOf("socialno")),
         starter("dobro_jutro", "DOBRO JUTRO", "Dobro jutro.", "social.good_morning", "CORE_ACTION", "social", listOf("dobro_jutro", "pozdrav"), visibleUnderIds = listOf("socialno")),
         starter("dober_vecer", "DOBER VEČER", "Dober večer.", "social.good_evening", "CORE_ACTION", "social", listOf("dober_večer", "pozdrav"), visibleUnderIds = listOf("socialno")),
@@ -344,7 +349,7 @@ object AacStarterContentV1 {
         starter("pillow", "BLAZINA", "Potrebujem blazino.", "care.pillow", "NEED", "care", listOf("blazina", "udobje"), visibleUnderIds = listOf("care")),
         starter("blanket", "ODEJA", "Potrebujem odejo.", "care.blanket", "NEED", "care", listOf("odeja", "udobje"), visibleUnderIds = listOf("care", "need"), imagePath = "custom/body/blanket.jpg", iconSource = IconSource.CUSTOM),
         starter("uncomfortable", "NEUDOBNO", "Neudobno mi je.", "care.uncomfortable", "FEELING", "care", listOf("neudobno", "udobje"), visibleUnderIds = listOf("care", "problem"), opensSubicons = true, children = listOf("position", "bed", "blanket", "wheelchair", "clothing"), questionByLanguage = mapOf("sl" to "Kaj je neudobno?"), imagePath = "custom/emotion/uncomfortable.jpg", iconSource = IconSource.CUSTOM),
-        starter("clothing", "OBLAČILA", "Izberite oblačilo.", "care.clothing", "NEED", "care", listOf("oblačila", "oblačenje", "nega"), visibleUnderIds = listOf("care", "uncomfortable"), opensSubicons = true, children = listOf("shirt", "pants", "socks", "shoes", "jacket", "pajamas", "underwear", "hat", "scarf", "gloves"), questionByLanguage = mapOf("sl" to "Katero oblačilo?")),
+        starter("clothing", "OBLAČILA", "Izberite oblačilo.", "care.clothing", "NEED", "care", listOf("oblačila", "oblačenje", "nega"), visibleUnderIds = listOf("care", "uncomfortable"), opensSubicons = true, children = listOf("vest", "shirt", "pants", "socks", "shoes", "jacket", "pajamas", "underwear", "hat", "scarf", "gloves"), questionByLanguage = mapOf("sl" to "Katero oblačilo?")),
         starter("shirt", "MAJICA", "Potrebujem majico.", "care.clothing.shirt", "NEED", "care", listOf("majica", "oblačila"), visibleUnderIds = listOf("clothing")),
         starter("pants", "HLAČE", "Potrebujem hlače.", "care.clothing.pants", "NEED", "care", listOf("hlače", "oblačila"), visibleUnderIds = listOf("clothing")),
         starter("socks", "NOGAVICE", "Potrebujem nogavice.", "care.clothing.socks", "NEED", "care", listOf("nogavice", "oblačila"), visibleUnderIds = listOf("clothing")),
@@ -641,6 +646,12 @@ object AacStarterContentV1 {
     )
 
     private val SYSTEM_ICON_BY_STARTER_ID = mapOf(
+        "vest" to "system/vest.png",
+        "choose_myself" to "system/choose_myself.png",
+        "show_you" to "system/show_you.png",
+        "not_here" to "system/not_here.png",
+        "not_this" to "system/not_this.png",
+
         "help_washing" to "system/aac_toilet_washing.png",
         "help_showering" to "system/aac_toilet_shower.png",
         "help_dressing" to "system/aac_toilet_dressing.png",
@@ -803,8 +814,8 @@ object AacStarterContentV1 {
         "washing_help" to "system/care_wash.png",
         "diaper" to "system/care_diaper.png",
         "medicine" to "system/care_medicine.png",
-        "doctor" to "system/person_doctor.png",
-        "nurse" to "system/person_nurse.png",
+        "doctor" to "system/person_doctor_v2.png",
+        "nurse" to "system/person_nurse_v2.png",
         "therapy" to "system/place_therapy.png",
         "wheelchair" to "system/transport_wheelchair.png",
         "bed" to "system/place_bed.png",
@@ -1762,6 +1773,7 @@ object AacStarterContentV1 {
         "daughter", "son", "therapist", "doctor", "nurse", "who_is_coming", "medicine", "therapy",
         "wheelchair", "crutch", "not_safe", "stop_movement", "need_rest", "cold_feeling", "hot_feeling", "sleepy", "fear_falling", "help_to_wc",
         "vending_drinks", "vending_coffee_tea", "shop", "restaurant", "transport", "vending_photo_step_1", "vending_photo_step_2", "move_me",
-        "more"
+        "more",
+        "vest", "choose_myself", "show_you", "not_here", "not_this"
     )
 }

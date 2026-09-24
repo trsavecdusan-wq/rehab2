@@ -145,6 +145,12 @@ object AacContentBootstrap {
     )
 
     private val PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID = mapOf(
+        "vest" to "system/vest.png",
+        "choose_myself" to "system/choose_myself.png",
+        "show_you" to "system/show_you.png",
+        "not_here" to "system/not_here.png",
+        "not_this" to "system/not_this.png",
+
         "wc" to "system/toilet_general.png",
         "nurse_help" to "system/toilet_nurse.png",
         "help_washing" to "system/toilet_wash.png",
@@ -296,8 +302,8 @@ object AacContentBootstrap {
         "washing_help" to "system/care_wash.png",
         "diaper" to "system/care_diaper.png",
         "medicine" to "system/care_medicine.png",
-        "doctor" to "system/person_doctor.png",
-        "nurse" to "system/person_nurse.png",
+        "doctor" to "system/person_doctor_v2.png",
+        "nurse" to "system/person_nurse_v2.png",
         "therapy" to "system/place_therapy.png",
         "wheelchair" to "system/transport_wheelchair.png",
         "bed" to "system/place_bed.png",

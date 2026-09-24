@@ -475,6 +475,21 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 sentenceManager.removeLast()
             }
             val sentenceText = missPersonSentence ?: AacLocalizedTextResolver.resolveSpeakText(item, languageCode)
+            // These complete utterances replace the navigation context and speak exactly once.
+            if (item.id in setOf("vest", "choose_myself", "show_you", "not_here", "not_this") && childItems.isEmpty()) {
+                sentenceManager.clear()
+                sentenceManager.addItem(AacSentenceItem(
+                    conceptId = item.conceptId ?: item.id,
+                    text = sentenceText,
+                    role = item.sentenceRole
+                ))
+                updateSentenceBar()
+                clearPromptText()
+                cancelPendingAutoSpeakSentence()
+                cancelPendingPartialAutoReturn()
+                startSentenceSpeech(sentenceText, speechRequestId)
+                return
+            }
             sentenceManager.addItem(
                 AacSentenceItem(
                     conceptId = item.conceptId ?: item.id,
