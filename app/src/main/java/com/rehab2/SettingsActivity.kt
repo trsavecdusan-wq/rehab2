@@ -30,7 +30,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.rehab2.aac.AacAssistSettings
-import com.rehab2.aac.AiObservationSettings
+import com.rehab2.aac.ai.AacObservation
 import com.rehab2.aac.AudioDuckingSettings
 import com.rehab2.aac.AacAudioPlayer
 import com.rehab2.aac.AacCommunicationContext
@@ -572,6 +572,10 @@ class SettingsActivity : AppCompatActivity() {
         editKeywordMatcherInput = findViewById(R.id.editKeywordMatcherInput)
         txtKeywordMatcherResult = findViewById(R.id.txtKeywordMatcherResult)
         txtAiObservationStatus = findViewById(R.id.txtAiObservationStatus)
+        AacObservation.initialize(applicationContext)
+        txtAiObservationStatus.setOnClickListener {
+            showAdminPinDialog { AdminSuggestionsActivity.openAfterPin(this) }
+        }
         editAiObservationInfo = findViewById(R.id.editAiObservationInfo)
         txtAudioDuckingStatus = findViewById(R.id.txtAudioDuckingStatus)
         switchAudioDuckingEnabled = findViewById(R.id.switchAudioDuckingEnabled)
@@ -2470,21 +2474,9 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun refreshAiObservationSection() {
-        val settings = AiObservationSettings.load(this)
-        val settingsPath = AiObservationSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
-        txtAiObservationStatus.text = "AI opazovanje: PRIPRAVA, IZKLOPLJENO"
-        editAiObservationInfo.setText(
-            buildString {
-                appendLine("Funkcija je pripravljena, vendar trenutno ne uporablja mikrofona ali kamere.")
-                appendLine("Mikrofon: ${if (settings.allowMicrophoneAnalysis) "VKLOPLJEN" else "IZKLOPLJEN"}")
-                appendLine("Kamera: ${if (settings.allowCameraAnalysis) "VKLOPLJENA" else "IZKLOPLJENA"}")
-                appendLine("Ucenje mimike: ${if (settings.allowMimicLearning) "VKLOPLJENO" else "IZKLOPLJENO"}")
-                appendLine("Dnevno ucenje: ${if (settings.allowDailyLearning) "VKLOPLJENO" else "IZKLOPLJENO"}")
-                appendLine("AI dru\u017eabnik: ${if (settings.allowCompanionSuggestions) "VKLOPLJEN" else "IZKLOPLJEN"}")
-                appendLine("Potrjevanje DA/NE: ${if (settings.requireYesNoConfirmation) "OBVEZNO" else "NEOBVEZNO"}")
-                append("Lokalna datoteka: $settingsPath")
-            }
-        )
+        txtAiObservationStatus.text = "AI FOUNDATION — ODPRI ADMIN PREGLED (PIN)"
+        editAiObservationInfo.setText("Lokalno beleženje AAC dogodkov je privzeto izklopljeno. Nastavitev in predlogi so v admin pregledu. " +
+            "Odobritev ne spreminja pacientkinega AAC. Brez mikrofona, kamere in omrežja.")
     }
 
     private fun saveSpeechApiSettings(showSavedToast: Boolean): Boolean {

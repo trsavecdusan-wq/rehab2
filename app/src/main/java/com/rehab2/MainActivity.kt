@@ -1,5 +1,8 @@
 ﻿package com.rehab2
 
+import com.rehab2.aac.ai.AacObservation
+import com.rehab2.aac.ai.AacEventType
+
 import com.rehab2.aac.AacFixedTopRow
 
 import android.Manifest
@@ -855,6 +858,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AacObservation.initialize(applicationContext)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
         prefs = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
@@ -1296,6 +1300,22 @@ class MainActivity : AppCompatActivity() {
                 visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
             )
         }
+        observeMainPageOpened()
+    }
+
+    private var lastObservedMainPage = ""
+    private fun observeMainAac(type: AacEventType, itemId: String? = null, page: String = currentMainAacPageDebugId) {
+        if (!AacObservation.enabled) return
+        runCatching {
+            AacObservation.record(this, "MainActivity", type, itemId, page, mainAacSelectedGridSize(), getActiveSpeechLanguage(),
+                if (type == AacEventType.SENTENCE_SPOKEN) mainAacSentenceManager.getItems().map { it.conceptId } else emptyList())
+        }
+    }
+
+    private fun observeMainPageOpened() {
+        if (!AacObservation.enabled) return
+        val key = "$currentMainAacPageDebugId:$currentMainAacGridPageIndex"
+        if (key != lastObservedMainPage) { observeMainAac(AacEventType.PAGE_OPENED, page = key); lastObservedMainPage = key }
     }
 
     private fun bindMainAacOverlayLabel(labelView: TextView, label: CharSequence) {
@@ -1393,6 +1413,7 @@ class MainActivity : AppCompatActivity() {
                 visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
             )
         }
+        observeMainPageOpened()
     }
 
     private fun lockMainAacInput() {
@@ -1529,7 +1550,9 @@ class MainActivity : AppCompatActivity() {
                     sourcePath = mainAacResolverSourcePath(item, languageCode, speechText, resolvedLabel)
                 )
                 refreshMainAacInputLockVisualState()
+                val observedPage = currentMainAacPageDebugId
                 handleMainAacItemAction(item)
+                observeMainAac(AacEventType.ICON_ACTIVATED, item.id, observedPage)
                 return true
             }
             MotionEvent.ACTION_CANCEL -> {
@@ -2352,6 +2375,7 @@ class MainActivity : AppCompatActivity() {
             text = safeSentence,
             languageCode = languageCode
         )
+        observeMainAac(AacEventType.SENTENCE_SPOKEN)
         shouldResetMainAacRootAfterSpeech = true
         clearMainAacSentenceState()
     }
@@ -3486,6 +3510,7 @@ class MainActivity : AppCompatActivity() {
             lockMainAacInput()
             cancelMainAacGuidedAutoComplete()
             aacAudioPlayer.speakText(sentence, languageCode)
+            observeMainAac(AacEventType.SENTENCE_SPOKEN)
             clearMainAacSentenceState()
             shouldResetMainAacRootAfterSpeech = true
         }
@@ -3498,6 +3523,7 @@ class MainActivity : AppCompatActivity() {
             lockMainAacInput()
             showMainAacQuestion(sentence)
             aacAudioPlayer.speakText(sentence, languageCode)
+            observeMainAac(AacEventType.SENTENCE_SPOKEN)
             shouldResetMainAacRootAfterSpeech = true
         }
         clearMainAacSentenceState()
@@ -3515,7 +3541,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clearMainAacSentenceState(clearConversationContext: Boolean = true) {
+        val observedNonEmpty = AacObservation.enabled && !mainAacSentenceManager.isEmpty()
         mainAacSentenceManager.clear()
+        if (observedNonEmpty) observeMainAac(AacEventType.SENTENCE_CLEARED)
         if (clearConversationContext) {
             currentMainAacConversationParentItem = null
             currentMainAacConversationItems = emptyList()

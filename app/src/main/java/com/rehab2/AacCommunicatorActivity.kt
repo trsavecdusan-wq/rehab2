@@ -1,5 +1,8 @@
 package com.rehab2
 
+import com.rehab2.aac.ai.AacObservation
+import com.rehab2.aac.ai.AacEventType
+
 import com.rehab2.aac.AacFixedTopRow
 
 import android.app.AlertDialog
@@ -118,6 +121,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AacObservation.initialize(applicationContext)
         setContentView(R.layout.activity_aac_communicator)
         addWaterTraceDebugView()
         repository = AacRepository(this)
@@ -240,6 +244,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             clearPromptText()
             returnToRootMenuAfterClear()
             updateSentenceBar()
+            observeAac(AacEventType.SENTENCE_CLEARED)
         }
         btnBackNav.setOnClickListener {
             cancelPendingSpeech()
@@ -361,7 +366,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
             languageCode = languageCode,
             suggestionIds = currentContextSuggestionIds.toSet(),
             onItemClick = { item ->
+                val observedPage = currentPageId
                 handleItemClick(item)
+                observeAac(AacEventType.ICON_ACTIVATED, item.id, observedPage)
             },
             onWaterBindTrace = { item ->
                 waterAdapterBindChildrenCount = item.children.size
@@ -369,6 +376,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
         )
         updateNavigationChrome(txtTitle.text.toString().lineSequence().firstOrNull().orEmpty())
+        observeAacPageOpened(displayedItems)
     }
 
     private fun recentSentenceAacItems(): List<AacItem> {
@@ -415,6 +423,25 @@ class AacCommunicatorActivity : AppCompatActivity() {
         return AacLabelMode.fromPreference(
             prefs.getString(AacLabelMode.PREF_AAC_LABEL_MODE, AacLabelMode.DEFAULT.name)
         )
+    }
+
+    private var lastObservedAacPage = ""
+    private fun observeAac(type: AacEventType, itemId: String? = null, page: String = currentPageId) {
+        if (!AacObservation.enabled) return
+        runCatching {
+            AacObservation.record(this, "AacCommunicatorActivity", type, itemId, page, getAacGridSize(), languageCode,
+                if (type == AacEventType.SENTENCE_SPOKEN) sentenceManager.getItems().map { it.conceptId } else emptyList())
+        }
+    }
+
+    private fun observeAacPageOpened(items: List<AacItem>) {
+        if (!AacObservation.enabled) return
+        // Submenus share currentPageId in the existing renderer; include displayed IDs for deduplication.
+        val key = "$currentPageId:$contentPageIndex:" + items.joinToString(",") { it.id }
+        if (key != lastObservedAacPage) {
+            observeAac(AacEventType.PAGE_OPENED, page = "$currentPageId:$contentPageIndex")
+            lastObservedAacPage = key
+        }
     }
 
     private fun handleItemClick(item: AacItem) {
@@ -632,7 +659,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     private fun bindQuickAacButton(buttonId: Int, item: AacItem) {
         findViewById<Button>(buttonId).setOnClickListener {
+            val observedPage = currentPageId
             handleItemClick(item)
+            observeAac(AacEventType.ICON_ACTIVATED, item.id, observedPage)
         }
     }
 
@@ -1106,6 +1135,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         activeSpeechMode = SpeechMode.SENTENCE
         Log.d(TAG, "AAC_SPEECH SENTENCE_START requestId=$requestId text=$text")
         audioPlayer.speakText(text, languageCode)
+        observeAac(AacEventType.SENTENCE_SPOKEN)
     }
 
     private fun cancelPendingAutoSpeakSentence() {
