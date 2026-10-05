@@ -155,6 +155,7 @@ object AacCoreV2HomeRepair {
 
         val parsedItems = parseItemsFile(itemsFile)
             ?: return Result.Failure("aac_items.json je pokvarjen ali nima polja items.")
+        val restoredFixedItems = AacContentBootstrap.restoreMissingFixedTopRowItems(parsedItems.itemsArray)
         val activeProfileBefore = activeProfileId(context)
         val itemsById = itemObjects(parsedItems.itemsArray).associateBy { it.optString("id").trim() }
         val missingIds = lockedIds.filterNot { it in itemsById }
@@ -175,25 +176,10 @@ object AacCoreV2HomeRepair {
             ?: return Result.Failure("Backup mape ni bilo mogoce ustvariti.")
         backupBeforeWrite(itemsFile, domFile, backupDir)
 
-        var fixedRowUpdatedCount = 0
+        val fixedRowUpdatedCount = restoredFixedItems + AacFixedTopRow.repairMetadata(parsedItems.itemsArray)
         var placementsUpdatedCount = 0
         itemObjects(parsedItems.itemsArray).forEach { item ->
             val id = item.optString("id").trim()
-            if (item.has("fixed_top_row_position")) {
-                item.remove("fixed_top_row_position")
-                fixedRowUpdatedCount++
-            }
-            val fixedPosition = fixedPositions[id]
-            if (fixedPosition != null) {
-                if (item.optInt("fixedTopRowPosition", 0) != fixedPosition) {
-                    item.put("fixedTopRowPosition", fixedPosition)
-                    fixedRowUpdatedCount++
-                }
-            } else if (item.optInt("fixedTopRowPosition", 0) in 1..5) {
-                item.remove("fixedTopRowPosition")
-                fixedRowUpdatedCount++
-            }
-
             val mainPosition = mainPositions[id]
             if (mainPosition != null) {
                 val nextPlacements = placementsWithoutHomePages(item)

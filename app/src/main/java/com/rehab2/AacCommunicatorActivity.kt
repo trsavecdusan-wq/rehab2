@@ -95,6 +95,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
     private lateinit var btnSpeakSentence: Button
     private lateinit var btnClearSentence: Button
     private lateinit var recycler: RecyclerView
+    private var contentPageIndex = 0
+    private var contentPageCount = 1
     private lateinit var txtWaterTraceDebug: TextView
     private var labelMode: AacLabelMode = AacLabelMode.DEFAULT
     private var languageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
@@ -202,8 +204,20 @@ class AacCommunicatorActivity : AppCompatActivity() {
         btnSpeakSentence = findViewById(R.id.btnAacSpeakSentence)
         btnClearSentence = findViewById(R.id.btnAacClearSentence)
         recycler = findViewById(R.id.recyclerAacTiles)
+        findViewById<Button>(R.id.btnAacPreviousContentPage).setOnClickListener {
+            if (contentPageIndex > 0) {
+                contentPageIndex--
+                showItems(currentVisibleItems, resetPaging = false)
+            }
+        }
+        findViewById<Button>(R.id.btnAacNextContentPage).setOnClickListener {
+            if (contentPageIndex < contentPageCount - 1) {
+                contentPageIndex++
+                showItems(currentVisibleItems, resetPaging = false)
+            }
+        }
         readAacGridSize()
-        recycler.layoutManager = GridLayoutManager(this, aacGridSize)
+        recycler.layoutManager = createAacGridLayoutManager()
         labelMode = readAacLabelMode()
         languageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         speechTimingSettings = AacSpeechTimingSettings.read(this)
@@ -322,14 +336,18 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
     }
 
-    private fun showItems(items: List<AacItem>) {
+    private fun showItems(items: List<AacItem>, resetPaging: Boolean = true) {
+        if (resetPaging) contentPageIndex = 0
         currentVisibleItems = items
         applyAacGridSize()
         val waterItem = items.firstOrNull { it.id == WATER_NODE_ID }
         waterBeforeAdapterChildrenCount = waterItem?.children?.size ?: -1
         logWaterTrace("before adapter", waterItem)
         updateWaterTraceDebug("before adapter")
-        val displayedItems = mergePersistentTopRowWithCurrentMenuItems(items)
+        val displayedItems = contentPageItems(items)
+        findViewById<Button>(R.id.btnAacPreviousContentPage).isEnabled = contentPageIndex > 0
+        findViewById<Button>(R.id.btnAacNextContentPage).isEnabled = contentPageIndex < contentPageCount - 1
+        findViewById<TextView>(R.id.txtAacContentPage).text = "${contentPageIndex + 1} / $contentPageCount"
         currentContextSuggestionIds = AacContextSuggestions.suggest(
             context = this,
             currentPageId = currentPageId,
@@ -552,6 +570,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun isGuidedYesItem(item: AacItem): Boolean {
+        if (item.id in AacFixedTopRow.positions) return false
         val conceptId = item.conceptId?.trim().orEmpty()
         return item.id == "yes" ||
             item.id == "quick_yes" ||
@@ -578,6 +597,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun isGuidedBackNoItem(item: AacItem): Boolean {
+        if (item.id in AacFixedTopRow.positions) return false
         if (!isGuidedFollowUpAllowed() || currentV2VisibleHistory.isEmpty()) {
             return false
         }
@@ -871,10 +891,18 @@ class AacCommunicatorActivity : AppCompatActivity() {
         )
     }
 
+    private fun createAacGridLayoutManager(): GridLayoutManager {
+        // The complete NxN page fits the viewport; paging changes only rows below the first.
+        return object : GridLayoutManager(this, aacGridSize) {
+            override fun canScrollVertically() = false
+            override fun canScrollHorizontally() = false
+        }
+    }
+
     private fun applyAacGridSize() {
         val layoutManager = recycler.layoutManager as? GridLayoutManager
         if (layoutManager == null) {
-            recycler.layoutManager = GridLayoutManager(this, aacGridSize)
+            recycler.layoutManager = createAacGridLayoutManager()
         } else if (layoutManager.spanCount != aacGridSize) {
             layoutManager.spanCount = aacGridSize
         }
@@ -890,14 +918,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun readPersistentTopRowSettings() {
-        val prefs = getSharedPreferences(AAC_PREFS_FILE, MODE_PRIVATE)
-        persistentTopRowEnabled = prefs.getBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, true)
-        val rawTopRowCount = prefs.getInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, DEFAULT_PERSISTENT_TOP_ROW_COUNT)
-        persistentTopRowCount = normalizePersistentTopRowConfiguredCount(rawTopRowCount)
-        if (persistentTopRowCount != rawTopRowCount) {
-            prefs.edit().putInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, persistentTopRowCount).apply()
-        }
-        persistentTopRowItemIds = AacFixedTopRow.ids
+        persistentTopRowEnabled = true
+        persistentTopRowCount = getAacGridSize()
+        persistentTopRowItemIds = AacFixedTopRow.rowIds(getAacGridSize())
     }
 
     private fun getPersistentTopRowCount(): Int {
@@ -905,30 +928,18 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun getPersistentTopRowItems(items: List<AacItem>): List<AacItem> {
-        if (!persistentTopRowEnabled) return emptyList()
-
         val homeItems = repository.loadPage("home")?.items.orEmpty()
-        val itemsById = (homeItems + items).distinctBy { it.id }.associateBy { it.id }
-        return AacFixedTopRow.ids.mapNotNull { id -> itemsById[id] }
-            .map { item -> asPersistentTopRowItem(item.copy(fixedTopRowPosition = AacFixedTopRow.positions[item.id])) }
+        // The page/suggestion list is untrusted for fixed meanings; use the home catalog only.
+        return AacFixedTopRow.rowItems(homeItems, getAacGridSize()).map(::asPersistentTopRowItem)
     }
 
-    private fun mergePersistentTopRowWithCurrentMenuItems(items: List<AacItem>): List<AacItem> {
-        val configuredTopRowItems = getPersistentTopRowItems(items)
-        val maxItems = getAacItemsPerPage()
-        if (configuredTopRowItems.isEmpty()) return items.take(maxItems)
-
-        val fixedTopRowItems = configuredTopRowItems.take(getPersistentTopRowCount())
-        val overflowItems = configuredTopRowItems.drop(fixedTopRowItems.size)
-        val fixedTopRowIds = fixedTopRowItems.map { it.id }.toSet()
-        val overflowIds = overflowItems.map { it.id }.toSet()
-        val menuItems = items.filter { it.id !in fixedTopRowIds }
-        val menuWithOverflow = overflowItems + menuItems.filter { it.id !in overflowIds }
-        Log.d(
-            TAG,
-            "AAC_TOP_ROW grid=${getAacGridSize()} fixed=${fixedTopRowItems.map { it.id }} overflow=${overflowItems.map { it.id }} max=$maxItems"
-        )
-        return (fixedTopRowItems + menuWithOverflow).take(maxItems)
+    private fun contentPageItems(items: List<AacItem>): List<AacItem> {
+        val homeItems = repository.loadPage("home")?.items.orEmpty()
+        val content = AacFixedTopRow.dynamicItems(items, homeItems, getAacGridSize())
+        val capacity = AacFixedTopRow.dynamicCapacity(getAacGridSize())
+        contentPageCount = ((content.size + capacity - 1) / capacity).coerceAtLeast(1)
+        contentPageIndex = contentPageIndex.coerceIn(0, contentPageCount - 1)
+        return getPersistentTopRowItems(items) + content.drop(contentPageIndex * capacity).take(capacity)
     }
 
     private fun asPersistentTopRowItem(item: AacItem): AacItem {
@@ -948,11 +959,11 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun normalizePersistentTopRowCount(value: Int, gridSize: Int): Int {
-        return value.coerceIn(MIN_PERSISTENT_TOP_ROW_COUNT, gridSize.coerceIn(3, 5))
+        return getAacGridSize()
     }
 
     private fun normalizePersistentTopRowConfiguredCount(value: Int): Int {
-        return value.coerceIn(MIN_PERSISTENT_TOP_ROW_COUNT, MAX_PERSISTENT_TOP_ROW_COUNT)
+        return getAacGridSize()
     }
 
     private fun updateSentenceBar() {
@@ -1662,6 +1673,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 image.setImageBitmap(null)
                 bindImage(item)
                 applyLabelMode()
+                if (item.fixedTopRowPosition != null) {
+                    if (image.drawable == null) label.visibility = View.VISIBLE
+                    label.maxLines = 2
+                    androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                        label, 8, 12, 1, TypedValue.COMPLEX_UNIT_SP
+                    )
+                }
 
                 itemView.setOnClickListener {
                     debugLog("AAC_INPUT tile_tap_received item=${item.id}")
@@ -1692,7 +1710,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 val margins = (itemView.layoutParams as? android.view.ViewGroup.MarginLayoutParams)
                 val verticalMargins = (margins?.topMargin ?: 0) + (margins?.bottomMargin ?: 0)
                 val targetHeight = ((availableHeight / gridSize.coerceIn(3, 6)) - verticalMargins)
-                    .coerceAtLeast((64 * context.resources.displayMetrics.density).toInt())
+                    .coerceAtLeast(1)
                 val layoutParams = itemView.layoutParams
                 if (layoutParams.height != targetHeight) {
                     layoutParams.height = targetHeight
@@ -1852,8 +1870,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         const val MAX_PERSISTENT_TOP_ROW_COUNT = 5
         const val MAX_POST_SPEECH_SINGLE_ICON_DELAY_MS = 100L
         const val POST_SPEECH_FAST_RESPONSE_WINDOW_MS = 1500L
-        // Future therapist settings/content metadata may provide positions 1..5.
-        // Runtime fixes only the first grid-width items; remaining configured items flow normally.
+        // The first grid row is locked; its size follows the selected 3..6 columns.
         const val DEFAULT_PERSISTENT_TOP_ROW_COUNT = 5
         val DEFAULT_PERSISTENT_TOP_ROW_ITEM_IDS = AacFixedTopRow.ids
         val PAIN_SIDE_ITEM_IDS = setOf("pain_left", "pain_right", "pain_both")

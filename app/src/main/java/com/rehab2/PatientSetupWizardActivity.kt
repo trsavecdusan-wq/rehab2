@@ -285,8 +285,7 @@ class PatientSetupWizardActivity : AppCompatActivity() {
         )
         val profileSaved = PatientProfileSettings.save(this, updatedProfile)
         val speechSynced = syncPatientProfileAacSpeech(updatedProfile)
-        val normalizedTopRowCount = prefs.getInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, DEFAULT_TOP_ROW_COUNT)
-            .coerceIn(3, gridSize)
+        val normalizedTopRowCount = gridSize
         prefs.edit()
             .putInt(PREF_AAC_GRID_SIZE, gridSize)
             .putInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, normalizedTopRowCount)

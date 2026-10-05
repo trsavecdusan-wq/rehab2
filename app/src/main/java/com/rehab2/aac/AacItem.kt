@@ -90,7 +90,7 @@ data class AacItem(
     val protectedPlacement: Boolean = false,
     val isRootItem: Boolean = true,
     val isHiddenUntilParent: Boolean = false,
-    // Optional content/settings hook for future therapist-configured fixed top-row positions 1..5.
+    // Derived from AacFixedTopRow.positions; neither editors nor suggestions may assign slots.
     val fixedTopRowPosition: Int? = null,
     val addsToSentence: Boolean = true,
     val speaksImmediately: Boolean = true,

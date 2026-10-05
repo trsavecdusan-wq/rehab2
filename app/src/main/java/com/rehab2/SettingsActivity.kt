@@ -362,7 +362,7 @@ class SettingsActivity : AppCompatActivity() {
             "go_outside_with_wheelchair" to "VEN Z VOZIČKOM",
             "go_inside" to "NAZAJ NOTRI"
         )
-        private const val AAC_FIRST_PAGE_FIXED_ROW_SNAPSHOT = "NE | NE RAZUMEM | DA | HVALA | OPROSTI"
+        private const val AAC_FIRST_PAGE_FIXED_ROW_SNAPSHOT = "DA | NE RAZUMEM | NE | HVALA | POMOČ"
         private val AAC_FIRST_PAGE_VISIBLE_SNAPSHOT = listOf(
             6 to ("LJUDJE" to "people"),
             7 to ("POTREBUJEM" to "need"),
@@ -1446,11 +1446,12 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun refreshPersistentTopRowSection() {
-        val enabled = prefs.getBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, true)
+        val enabled = true
         val count = getPersistentTopRowCount()
         val itemIds = getPersistentTopRowItemIds().take(count)
         switchPersistentTopRowEnabled.setOnCheckedChangeListener(null)
         switchPersistentTopRowEnabled.isChecked = enabled
+        switchPersistentTopRowEnabled.isEnabled = false
         txtPersistentTopRowStatus.text = buildString {
             append("Stalna zgornja vrstica: ")
             append(if (enabled) "VKLOP" else "IZKLOP")
@@ -1458,7 +1459,7 @@ class SettingsActivity : AppCompatActivity() {
             append(itemIds.joinToString(", ") { persistentTopRowLabel(it) })
         }
         editPersistentTopRowCount.setText("$count ikon")
-        editPersistentTopRowCount.isEnabled = enabled
+        editPersistentTopRowCount.isEnabled = false
         bindPersistentTopRowSwitchListener()
     }
 
@@ -1559,9 +1560,7 @@ class SettingsActivity : AppCompatActivity() {
         return try {
             val items = AacEditorStorage.loadItems(this)
             val gridSize = getAacGridSize()
-            val fixedItems = items
-                .filter { (it.fixedTopRowPosition ?: 0) in 1..5 }
-                .sortedBy { it.fixedTopRowPosition ?: Int.MAX_VALUE }
+            val fixedItems = AacFixedTopRow.rowIds(gridSize).mapNotNull { id -> items.firstOrNull { it.id == id } }
             val firstPageItems = items
                 .filter { item -> item.placements.any { it.pageId == "page_1" && it.position5x5 in 1..25 } }
                 .filterNot { it.isHiddenUntilParent }
@@ -1620,7 +1619,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
             val warnings = mutableListOf<String>()
-            if (fixedCount < 3) warnings += "fiksna zgornja vrstica ima premalo ikon"
+            if (fixedCount != gridSize) warnings += "fiksna zgornja vrstica ima premalo ikon"
             if (firstPageCount < minimumFirstPageCount) warnings += "prva stran ima premalo ikon"
             if (blankItems > 0) warnings += "nekaj ikon je praznih"
             if (imageQuality.smallImages > 0) warnings += "nekaj slik ikon je premajhnih"
@@ -1648,8 +1647,8 @@ class SettingsActivity : AppCompatActivity() {
                 "",
                 "Aktivni profil: $activeProfile",
                 "Velikost mreže: ${gridSize}x$gridSize",
-                statusLine("Fiksna zgornja vrstica", "$fixedCount ikon", fixedCount >= 3),
-                "Trenutna fiksna zgornja vrstica: $AAC_FIRST_PAGE_FIXED_ROW_SNAPSHOT",
+                statusLine("Fiksna zgornja vrstica", "$fixedCount ikon", fixedCount == gridSize),
+                "Trenutna fiksna zgornja vrstica: ${getPersistentTopRowItemIds().joinToString(" | ") { persistentTopRowLabel(it) }}",
                 statusLine("Prva stran", "$firstPageCount ikon", firstPageCount >= minimumFirstPageCount),
                 "Prva stran, položaji 6-25:",
                 AAC_FIRST_PAGE_VISIBLE_SNAPSHOT.joinToString("\n") { (position, item) ->
@@ -2587,27 +2586,10 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun showPersistentTopRowCountPicker() {
-        val gridSize = getAacGridSize()
-        val currentCount = getPersistentTopRowCount()
-        val allowedCounts = AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS.filter { it <= gridSize }.toTypedArray()
-        val labels = allowedCounts.map { "$it ikone" }.toTypedArray()
-        val selectedIndex = allowedCounts
-            .indexOf(currentCount)
-            .coerceAtLeast(0)
         AlertDialog.Builder(this)
-            .setTitle("Stalna zgornja vrstica")
-            .setSingleChoiceItems(labels, selectedIndex) { dialog, which ->
-                prefs.edit()
-                    .putBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, true)
-                    .putInt(PREF_AAC_PERSISTENT_TOP_ROW_COUNT, allowedCounts[which])
-                    .putString(
-                        PREF_AAC_PERSISTENT_TOP_ROW_ITEM_IDS,
-                        DEFAULT_AAC_PERSISTENT_TOP_ROW_ITEM_IDS.joinToString(",")
-                    )
-                    .apply()
-                refreshPersistentTopRowSection()
-                dialog.dismiss()
-            }
+            .setTitle("Zaklenjene komunikacijske ikone")
+            .setMessage(AAC_FIRST_PAGE_FIXED_ROW_SNAPSHOT)
+            .setPositiveButton(android.R.string.ok, null)
             .show()
     }
 
@@ -2908,12 +2890,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun bindPersistentTopRowSwitchListener() {
-        switchPersistentTopRowEnabled.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit()
-                .putBoolean(PREF_AAC_PERSISTENT_TOP_ROW_ENABLED, isChecked)
-                .apply()
-            refreshPersistentTopRowSection()
-        }
+        switchPersistentTopRowEnabled.setOnCheckedChangeListener(null)
     }
 
     private fun bindPainScopeSwitchListener() {
@@ -3047,7 +3024,7 @@ class SettingsActivity : AppCompatActivity() {
         ).let { normalizePersistentTopRowCount(it, gridSize) }
     }
 
-    private fun getPersistentTopRowItemIds(): List<String> = AacFixedTopRow.ids
+    private fun getPersistentTopRowItemIds(): List<String> = AacFixedTopRow.rowIds(getAacGridSize())
 
     private fun persistentTopRowLabel(itemId: String): String {
         return when (itemId) {
@@ -3076,7 +3053,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun normalizePersistentTopRowCount(value: Int, gridSize: Int): Int {
-        return value.coerceIn(AAC_PERSISTENT_TOP_ROW_COUNT_OPTIONS.first(), gridSize.coerceIn(3, 5))
+        return normalizeAacGridSize(gridSize)
     }
 
     private fun createSampleAacPack() {

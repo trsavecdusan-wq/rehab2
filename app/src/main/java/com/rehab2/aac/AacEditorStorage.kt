@@ -285,12 +285,6 @@ object AacEditorStorage {
             val existingIds = items
                 .map { it.optString("id").trim() }
                 .toSet()
-            val occupiedFixedPositions = items
-                .mapNotNull { item ->
-                    item.optInt("fixedTopRowPosition", 0)
-                        .takeIf { it in 1..5 }
-                }
-                .toMutableSet()
             val occupiedPageOnePositions = occupiedPageOnePositions(itemsArray).toMutableSet()
             val starterItemsById = AacStarterContentV1.items()
                 .filter { starterItem -> requestedItems.any { it.id == starterItem.id } }
@@ -312,14 +306,6 @@ object AacEditorStorage {
                     itemJson.put("imagePath", "")
                 }
 
-                val fixedTopRowPosition = itemJson.optInt("fixedTopRowPosition", 0)
-                if (fixedTopRowPosition in 1..5) {
-                    if (fixedTopRowPosition in occupiedFixedPositions) {
-                        itemJson.remove("fixedTopRowPosition")
-                    } else {
-                        occupiedFixedPositions += fixedTopRowPosition
-                    }
-                }
                 if (itemJson.optInt("fixedTopRowPosition", 0) !in 1..5) {
                     placeOnFirstPageIfSpaceExists(itemJson, occupiedPageOnePositions)
                 }
@@ -328,7 +314,8 @@ object AacEditorStorage {
                 addedCount += 1
             }
 
-            if (addedCount <= 0) return 0
+            val fixedRepairs = AacFixedTopRow.repairMetadata(itemsArray)
+            if (addedCount <= 0 && fixedRepairs == 0) return 0
             itemsFile.parentFile?.let { parent -> if (!parent.exists()) parent.mkdirs() }
             itemsFile.writeText(storedJson.toJsonText(), Charsets.UTF_8)
             addedCount

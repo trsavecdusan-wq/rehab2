@@ -185,7 +185,7 @@ object AacLocalJsonLoader {
             protectedPlacement = json.optBoolean("protectedPlacement", false),
             isRootItem = if (json.has("isRootItem")) json.optBoolean("isRootItem", true) else json.optNullableString("parentId").isNullOrBlank(),
             isHiddenUntilParent = json.optBoolean("isHiddenUntilParent", false),
-            fixedTopRowPosition = json.optFixedTopRowPosition(),
+            fixedTopRowPosition = AacFixedTopRow.positions[json.optString("id").trim()],
             addsToSentence = if (json.has("addsToSentence")) json.optBoolean("addsToSentence", true) else true,
             speaksImmediately = if (json.has("speaksImmediately")) json.optBoolean("speaksImmediately", true) else true,
             opensSubicons = if (json.has("opensSubicons")) {
@@ -396,15 +396,6 @@ object AacLocalJsonLoader {
     private fun JSONObject.optNullableString(name: String): String? {
         val value = optString(name).trim()
         return value.takeIf { it.isNotEmpty() }
-    }
-
-    private fun JSONObject.optFixedTopRowPosition(): Int? {
-        val value = when {
-            has("fixedTopRowPosition") -> optInt("fixedTopRowPosition", 0)
-            has("fixed_top_row_position") -> optInt("fixed_top_row_position", 0)
-            else -> 0
-        }
-        return value.takeIf { it in 1..5 }
     }
 
     private const val MAX_ACTIVE_LANGUAGES = 3

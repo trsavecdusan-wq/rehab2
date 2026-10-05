@@ -277,4 +277,28 @@
         android:padding="4dp"
         android:scrollbars="none" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnAacPreviousContentPage"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="PREJŠNJA STRAN" />
+        <TextView
+            android:id="@+id/txtAacContentPage"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="8dp"
+            android:textColor="#F4F7FA" />
+        <Button
+            android:id="@+id/btnAacNextContentPage"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="NASLEDNJA STRAN" />
+    </LinearLayout>
 </LinearLayout>

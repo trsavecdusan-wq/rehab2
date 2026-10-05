@@ -702,7 +702,8 @@ class MainActivity : AppCompatActivity() {
         val selectedItemId: String?,
         val pageDebugId: String,
         val questionText: String,
-        val displaySlots: List<AacItem?>
+        val displaySlots: List<AacItem?>,
+        val gridPageIndex: Int = 0
     )
 
     private data class MainAacVoiceAssistantStep(
@@ -1325,7 +1326,8 @@ class MainActivity : AppCompatActivity() {
             selectedItemId = selectedItemId,
             pageDebugId = currentMainAacPageDebugId,
             questionText = questionText,
-            displaySlots = displaySlots
+            displaySlots = displaySlots,
+            gridPageIndex = currentMainAacGridPageIndex
         )
     }
 
@@ -1334,6 +1336,8 @@ class MainActivity : AppCompatActivity() {
         currentMainAacPageDebugId = page.pageDebugId
         selectedMainAacItemId = page.selectedItemId
         currentMainAacOrderedItems = page.items
+        currentMainAacGridPageIndex = page.gridPageIndex
+        mainAacVisiblePageItems(page.items) // Restore the content page count/index for navigation.
         currentMainAacItems = page.displaySlots.filterNotNull()
         lastMainAacFinalItemCountAfterCap = currentMainAacItems.size
         val languageCode = getActiveSpeechLanguage()
@@ -1427,8 +1431,8 @@ class MainActivity : AppCompatActivity() {
                     isMainAacInputLocked -> 0.62f
                     else -> 1f
                 }
-                binding.view.scaleX = if (isSelected) 1.05f else 1f
-                binding.view.scaleY = if (isSelected) 1.05f else 1f
+                binding.view.scaleX = if (isSelected && binding.item?.fixedTopRowPosition == null) 1.05f else 1f
+                binding.view.scaleY = if (isSelected && binding.item?.fixedTopRowPosition == null) 1.05f else 1f
             }
         }
     }
@@ -1458,9 +1462,6 @@ class MainActivity : AppCompatActivity() {
         if (isMainAacInputLocked) {
             return
         }
-        if (isCoreV2SingleHomePageVisible()) {
-            return
-        }
         if (currentMainAacGridPageIndex <= 0) {
             return
         }
@@ -1470,9 +1471,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showNextMainAacGridPage() {
         if (isMainAacInputLocked) {
-            return
-        }
-        if (isCoreV2SingleHomePageVisible()) {
             return
         }
         if (currentMainAacGridPageIndex >= lastMainAacGridPageCount - 1) {
@@ -1544,81 +1542,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacVisiblePageItems(items: List<AacItem>): List<AacItem> {
-        val capacity = mainAacVisibleContentCapacity()
-        if (capacity <= 0) {
-            lastMainAacGridPageCount = 1
-            currentMainAacGridPageIndex = 0
-            return emptyList()
-        }
-        if (isCoreV2SingleHomePageVisible()) {
-            lastMainAacGridPageCount = 1
-            currentMainAacGridPageIndex = 0
-            return items.take(capacity)
-        }
-        val allFixedItems = fixedTopRowItems(mainAacItemsById.values.toList())
-        val visibleFixedItems = visibleFixedTopRowItems(allFixedItems).take(capacity)
-        val visibleFixedIds = visibleFixedItems.map { it.id }.toSet()
-        val allFixedIds = allFixedItems.map { it.id }.toSet()
-        val overflowFixedItems = allFixedItems.filter { item -> item.id !in visibleFixedIds }
-        val normalItems = (overflowFixedItems + items.filter { item ->
-            item.id !in allFixedIds
-        }).distinctBy { item -> item.id }
-        val normalCapacity = (capacity - mainAacSelectedGridSize()).coerceAtLeast(0)
-        if (normalCapacity <= 0) {
-            lastMainAacGridPageCount = 1
-            currentMainAacGridPageIndex = 0
-            return visibleFixedItems.take(capacity)
-        }
-        if (normalItems.size <= normalCapacity) {
-            lastMainAacGridPageCount = 1
-            currentMainAacGridPageIndex = 0
-            return (visibleFixedItems + normalItems).take(capacity)
-        }
-
-        val normalPageSize = normalCapacity.coerceAtLeast(1)
-        lastMainAacGridPageCount = ((normalItems.size + normalPageSize - 1) / normalPageSize).coerceAtLeast(1)
+        val gridSize = mainAacSelectedGridSize()
+        val catalog = mainAacItemsById.values
+        val fixed = AacFixedTopRow.rowItems(catalog, gridSize)
+        val content = AacFixedTopRow.dynamicItems(items, catalog, gridSize)
+        val capacity = AacFixedTopRow.dynamicCapacity(gridSize)
+        lastMainAacGridPageCount = ((content.size + capacity - 1) / capacity).coerceAtLeast(1)
         currentMainAacGridPageIndex = currentMainAacGridPageIndex.coerceIn(0, lastMainAacGridPageCount - 1)
-        val pageItems = normalItems
-            .drop(currentMainAacGridPageIndex * normalPageSize)
-            .take(normalPageSize)
-        return (visibleFixedItems + pageItems).take(capacity)
+        return fixed + content.drop(currentMainAacGridPageIndex * capacity).take(capacity)
     }
 
     private fun mainAacDisplaySlots(visibleItems: List<AacItem>): List<AacItem?> {
         val gridSize = mainAacSelectedGridSize()
-        val capacity = gridSize * gridSize
-        if (capacity <= 0) {
-            return visibleItems.map { it }.take(capacity)
-        }
-
-        val slots = MutableList<AacItem?>(capacity) { null }
-        val fixedIds = mutableSetOf<String>()
-        visibleItems
-            .filter { item -> item.fixedTopRowPosition in 1..mainAacFixedTopRowCapacity() }
-            .forEach { item ->
-                val slotIndex = ((item.fixedTopRowPosition ?: 1) - 1).coerceIn(0, gridSize - 1)
-                slots[slotIndex] = item
-                fixedIds += item.id
-            }
-
-        val answerSlots = mutableListOf<Int>()
-        val rowRange = if (mainAacHistory.isEmpty()) {
-            1 until gridSize
-        } else {
-            gridSize - 1 downTo 1
-        }
-        for (row in rowRange) {
-            for (column in 0 until gridSize) {
-                answerSlots += row * gridSize + column
-            }
-        }
-        val normalVisibleItems = visibleItems.filter { item -> item.id !in fixedIds }
-        if (applyDefaultVisualSlots(slots, normalVisibleItems, gridSize)) {
-            return slots
-        }
-        normalVisibleItems
-            .zip(answerSlots)
-            .forEach { (item, slotIndex) -> slots[slotIndex] = item }
+        val slots = MutableList<AacItem?>(gridSize * gridSize) { null }
+        val fixed = AacFixedTopRow.rowItems(mainAacItemsById.values, gridSize)
+        fixed.forEachIndexed { index, item -> slots[index] = item }
+        val fixedIds = fixed.map { it.id }.toSet()
+        val content = visibleItems.filter { it.id !in fixedIds }.map { it.copy(fixedTopRowPosition = null) }
+        if (applyDefaultVisualSlots(slots, content, gridSize)) return slots
+        val rows = if (mainAacHistory.isEmpty()) 1 until gridSize else gridSize - 1 downTo 1
+        val contentSlots = rows.flatMap { row -> (0 until gridSize).map { column -> row * gridSize + column } }
+        content.zip(contentSlots).forEach { (item, index) -> slots[index] = item }
         return slots
     }
 
@@ -1640,7 +1584,7 @@ class MainActivity : AppCompatActivity() {
         }
         items.forEach { item ->
             val slotIndex = slotMap[normalizeMainAacKey(item.id)] ?: return@forEach
-            slots[slotIndex] = item
+            if (slotIndex in gridSize until slots.size) slots[slotIndex] = item
         }
         return true
     }
@@ -1704,9 +1648,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
         cancelMainAacVoiceAssistantQuestion()
-        if (handleMainAacSilentNoNavigation(item)) {
-            return
-        }
         if (mainAacHistory.isNotEmpty() && normalizeMainAacKey(item.id) == "back_to_main") {
             showPreviousMainAacItems()
             return
@@ -1776,30 +1717,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun handleMainAacSilentNoNavigation(item: AacItem): Boolean {
-        if (normalizeMainAacKey(item.id) != "no") {
-            return false
-        }
-        if (mainAacHistory.isNotEmpty()) {
-            recordLastAudioEvent("AAC NE silent navigateBack page=$currentMainAacPageDebugId")
-            selectedMainAacItemId = null
-            isMainAacTerminalSelectionAccepted = false
-            cancelMainAacVoiceAssistantQuestion()
-            showPreviousMainAacItems()
-            return true
-        }
-        if (hadMainAacSelectionBeforeTap || currentMainAacConversationItems.isNotEmpty()) {
-            recordLastAudioEvent("AAC NE silent dismissSelection page=$currentMainAacPageDebugId")
-            selectedMainAacItemId = null
-            isMainAacTerminalSelectionAccepted = false
-            cancelMainAacVoiceAssistantQuestion()
-            clearMainAacSentenceState()
-            refreshMainAacInputLockVisualState()
-            return true
-        }
-        recordLastAudioEvent("AAC NE root communication speech allowed page=$currentMainAacPageDebugId")
-        return false
-    }
 
     private fun prepareMainAacContextPrompt(item: AacItem) {
         clearMainAacSentenceState(clearConversationContext = false)
@@ -3052,8 +2969,6 @@ class MainActivity : AppCompatActivity() {
         }
         val itemsById = items.associateBy { it.id }
         val fixedItems = fixedTopRowItems(items)
-        val visibleFixedItems = visibleFixedTopRowItems(fixedItems)
-        val overflowFixedItems = fixedItems.filter { item -> item.id !in visibleFixedItems.map { it.id } }
         val fixedItemIds = fixedItems.map { it.id }.toSet()
         val placedItems = items
             .flatMap { item ->
@@ -3061,7 +2976,7 @@ class MainActivity : AppCompatActivity() {
                     .filter { placement -> placement.pageId == normalizedPageId }
                     .map { placement -> placement.position5x5 to item.id }
             }
-            .filter { (position, itemId) -> position in 1..mainAacSelectedGridCellCount() && itemsById.containsKey(itemId) }
+            .filter { (position, itemId) -> position > 0 && itemsById.containsKey(itemId) }
             .sortedBy { (position, _) -> position }
             .mapNotNull { (_, itemId) -> itemsById[itemId] }
             .filter { item -> item.id !in fixedItemIds }
@@ -3081,7 +2996,7 @@ class MainActivity : AppCompatActivity() {
             emptyList()
         }
         val fillItems = rootFillItems + terminalFillItems
-        val finalOrderedItems = (visibleFixedItems + overflowFixedItems + placedItems + fillItems)
+        val finalOrderedItems = (placedItems + fillItems)
             .distinctBy { item -> item.id }
         lastMainAacPageItemCountBeforeFixed = placedItems.size
         lastMainAacFixedRowItemCount = fixedItems.size
@@ -3096,11 +3011,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun orderedMainAacItemsWithFixedTopRow(items: List<AacItem>): List<AacItem> {
-        val fixedItems = fixedTopRowItems(items)
-        val visibleFixedItems = visibleFixedTopRowItems(fixedItems)
-        val overflowFixedItems = fixedItems.filter { item -> item.id !in visibleFixedItems.map { it.id } }
-        val fixedItemIds = fixedItems.map { it.id }.toSet()
-        return visibleFixedItems + overflowFixedItems + items.filter { item -> item.id !in fixedItemIds }
+        return AacFixedTopRow.content(items)
     }
 
     private fun updateMainAacGridSelectionDebug(pageId: String, orderedItems: List<AacItem>) {
@@ -3110,25 +3021,13 @@ class MainActivity : AppCompatActivity() {
             (item.fixedTopRowPosition ?: 0) !in 1..MAIN_AAC_FIXED_TOP_ROW_MAX
         }
         lastMainAacFixedRowItemCount = fixedCount
-        lastMainAacNormalItemCount = orderedItems.size - fixedCount
+        lastMainAacNormalItemCount = AacFixedTopRow.content(orderedItems).size
         lastMainAacFinalOrderedItemCount = orderedItems.size
         lastMainAacFinalItemCountAfterCap = orderedItems.take(mainAacVisibleContentCapacity()).size
     }
 
     private fun fixedTopRowItems(items: List<AacItem>): List<AacItem> {
-        return items
-            .filter { item -> item.fixedTopRowPosition in 1..MAIN_AAC_FIXED_TOP_ROW_MAX }
-            .sortedBy { item -> item.fixedTopRowPosition ?: Int.MAX_VALUE }
-            .distinctBy { item -> item.fixedTopRowPosition }
-    }
-
-    private fun visibleFixedTopRowItems(items: List<AacItem>): List<AacItem> {
-        val visibleFixedCount = mainAacFixedTopRowCapacity()
-        return items.filter { item -> item.fixedTopRowPosition in 1..visibleFixedCount }
-    }
-
-    private fun mainAacFixedTopRowCapacity(): Int {
-        return mainAacSelectedGridSize().coerceAtMost(MAIN_AAC_FIXED_TOP_ROW_MAX)
+        return AacFixedTopRow.rowItems(items, mainAacSelectedGridSize())
     }
 
     private fun mainAacVisibleContentCapacity(): Int {

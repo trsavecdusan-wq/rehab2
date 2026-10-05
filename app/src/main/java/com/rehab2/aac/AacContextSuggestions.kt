@@ -3,7 +3,7 @@ package com.rehab2.aac
 import android.content.Context
 
 object AacContextSuggestions {
-    private val FIXED_TOP_ROW_IDS = AacFixedTopRow.ids.toSet()
+    private val FIXED_TOP_ROW_IDS = AacFixedTopRow.protectedIds
 
     fun suggest(
         context: Context,

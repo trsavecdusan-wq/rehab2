@@ -1409,30 +1409,15 @@ object AacContentBootstrap {
         return repaired
     }
 
-    private fun repairFixedTopRowMetadata(itemsArray: JSONArray): Int {
-        val desiredPositions = AacFixedTopRow.positions
-        var repaired = 0
-        itemObjects(itemsArray).forEach { item ->
+    internal fun restoreMissingFixedTopRowItems(itemsArray: JSONArray): Int {
+        val existingIds = itemObjects(itemsArray).map { it.optString("id").trim() }.toSet()
+        val missing = AacStarterContentV1.items().filter { it.id in AacFixedTopRow.positions && it.id !in existingIds }
+        missing.forEach { itemsArray.put(it.toBootstrapJson()) }
+        return missing.size
+    }
 
-            if (item.has("fixed_top_row_position")) {
-                item.remove("fixed_top_row_position")
-                repaired++
-            }
-            val id = item.optString("id").trim()
-            val desiredPosition = desiredPositions[id]
-            if (desiredPosition != null) {
-                if (item.optInt("fixedTopRowPosition", 0) != desiredPosition) {
-                    item.put("fixedTopRowPosition", desiredPosition)
-                    repaired++
-                }
-                return@forEach
-            }
-            if (item.has("fixedTopRowPosition")) {
-                item.remove("fixedTopRowPosition")
-                repaired++
-            }
-        }
-        return repaired
+    private fun repairFixedTopRowMetadata(itemsArray: JSONArray): Int {
+        return AacFixedTopRow.repairMetadata(itemsArray)
     }
 
     private fun repairDefaultPageV3Placements(context: Context, itemsArray: JSONArray, pageId: String): Int {

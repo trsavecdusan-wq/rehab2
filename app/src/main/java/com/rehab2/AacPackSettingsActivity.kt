@@ -1,5 +1,7 @@
 package com.rehab2
 
+import com.rehab2.aac.AacFixedTopRow
+
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.Context
@@ -276,6 +278,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
         btnChooseFixedTopRowItem = findViewById(R.id.btnChooseFixedTopRowItem)
         btnSaveFixedTopRowPosition = findViewById(R.id.btnSaveFixedTopRowPosition)
         btnClearFixedTopRowPosition = findViewById(R.id.btnClearFixedTopRowPosition)
+        listOf(editFixedTopRowItemId, editFixedTopRowPosition, btnChooseFixedTopRowItem,
+            btnSaveFixedTopRowPosition, btnClearFixedTopRowPosition).forEach { it.isEnabled = false }
         fixedTopRowVisualActions = findViewById(R.id.fixedTopRowVisualActions)
         previewFixedTopRowActions = findViewById(R.id.previewFixedTopRowActions)
         previewGridActions = findViewById(R.id.previewGridActions)
@@ -4856,6 +4860,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 ?: if (rootObject == null) org.json.JSONArray(itemsText) else return AacMetadataWriteResult.WriteFailed
             val result = update(itemsArray)
             if (result != AacMetadataWriteResult.Success) return result
+            AacFixedTopRow.repairMetadata(itemsArray)
             val output = rootObject?.toString(2) ?: itemsArray.toString(2)
             itemsFile.writeText(output, Charsets.UTF_8)
             AacMetadataWriteResult.Success
@@ -4960,6 +4965,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
             if (!parentDir.exists() && !parentDir.mkdirs()) {
                 return AacItemEditorWriteResult.WriteFailed
             }
+            AacFixedTopRow.repairMetadata(itemsArray)
             val output = rootObject?.toString(2) ?: itemsArray.toString(2)
             itemsFile.writeText(output, Charsets.UTF_8)
             if (created) AacItemEditorWriteResult.SuccessCreated else AacItemEditorWriteResult.SuccessUpdated
@@ -5111,6 +5117,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     }
 
     private fun writeFixedTopRowPosition(itemId: String, position: Int): FixedTopRowWriteResult {
+        if (AacFixedTopRow.positions[itemId] != position) return FixedTopRowWriteResult.WriteFailed
         return updateFixedTopRowItemsJson { itemsArray ->
             var targetFound = false
             for (index in 0 until itemsArray.length()) {
@@ -5130,18 +5137,8 @@ class AacPackSettingsActivity : AppCompatActivity() {
     }
 
     private fun clearFixedTopRowPositionInJson(position: Int): FixedTopRowWriteResult {
-        return updateFixedTopRowItemsJson { itemsArray ->
-            var cleared = false
-            for (index in 0 until itemsArray.length()) {
-                val item = itemsArray.optJSONObject(index) ?: continue
-                if (itemFixedTopRowPosition(item) == position) {
-                    item.remove("fixedTopRowPosition")
-                    item.remove("fixed_top_row_position")
-                    cleared = true
-                }
-            }
-            if (cleared) FixedTopRowWriteResult.Success else FixedTopRowWriteResult.ItemNotFound
-        }
+        // Slots 1..5 are a project invariant, including therapist tools.
+        return FixedTopRowWriteResult.WriteFailed
     }
 
     private fun updateFixedTopRowItemsJson(
@@ -5162,6 +5159,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
                 return updateResult
             }
 
+            AacFixedTopRow.repairMetadata(itemsArray)
             val output = rootObject?.toString(2) ?: itemsArray.toString(2)
             itemsFile.writeText(output, Charsets.UTF_8)
             FixedTopRowWriteResult.Success
@@ -5527,12 +5525,7 @@ class AacPackSettingsActivity : AppCompatActivity() {
     }
 
     private fun itemFixedTopRowPosition(item: org.json.JSONObject): Int? {
-        val value = when {
-            item.has("fixedTopRowPosition") -> item.optInt("fixedTopRowPosition", 0)
-            item.has("fixed_top_row_position") -> item.optInt("fixed_top_row_position", 0)
-            else -> 0
-        }
-        return value.takeIf { it in 1..5 }
+        return AacFixedTopRow.positions[item.optString("id").trim()]
     }
 
     private fun itemProfileIds(item: org.json.JSONObject): List<String> {

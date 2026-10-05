@@ -45,7 +45,7 @@ object AacUsageStats {
         if (entries.isEmpty()) {
             return items
         }
-        return items.withIndex()
+        val ranked = items.filter { it.id !in AacFixedTopRow.protectedIds }.withIndex()
             .sortedWith(
                 compareByDescending<IndexedValue<AacItem>> { indexed ->
                     entries[indexed.value.id]?.useCount ?: 0
@@ -56,6 +56,8 @@ object AacUsageStats {
                 }
             )
             .map { indexed -> indexed.value }
+            .iterator()
+        return items.map { if (it.id in AacFixedTopRow.protectedIds) it else ranked.next() }
     }
 
     fun topSuggestion(context: Context, itemIds: List<String>): String? {
@@ -67,6 +69,7 @@ object AacUsageStats {
             return null
         }
         return itemIds.asSequence()
+            .filter { it !in AacFixedTopRow.protectedIds }
             .mapNotNull { itemId ->
                 val entry = entries[itemId] ?: return@mapNotNull null
                 if (entry.useCount >= MIN_TOP_SUGGESTION_USE_COUNT) entry else null
