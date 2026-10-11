@@ -88,6 +88,7 @@ class PatientIconCatalog(private val directory: File, private val inspect: (File
         require(request.referenceImagePath == reference(request.patientId)?.name) { "REFERENCE_REQUIRED" }
         val root = read(); require(rows(root.getJSONArray("requests")).none { it.optString("requestId") == request.requestId })
         val json = request.copy(status = PatientIconGenerationStatus.READY_FOR_GENERATION).json()
+            .put("baseRevision", rows(root.getJSONArray("icons")).filter { it.getString("patientId")==request.patientId && it.getString("itemId")==request.itemId }.maxOfOrNull { it.getInt("revision") } ?: 0)
         root.getJSONArray("requests").put(json); write(root); JSONObject(json.toString())
     }
     fun requests(patientId: String): List<JSONObject> = synchronized(lock) {
@@ -105,6 +106,18 @@ class PatientIconCatalog(private val directory: File, private val inspect: (File
             .put("history", JSONArray(listOf("DRAFT", "READY_FOR_GENERATION", "GENERATED", "REVIEW_REQUIRED")))
         write(root)
     }
+    fun importGeneratedCandidate(request: PatientIconGenerationRequest, result: PatientIconGenerationResult) = synchronized(lock) {
+        require(result.status == GenerationBackendStatus.GENERATED && result.generationId.isNotBlank() &&
+            result.requestId == request.requestId && result.patientId == request.patientId && result.itemId == request.itemId) { "GENERATION_SCOPE_MISMATCH" }
+        val stored = request(read(), request.patientId, request.requestId)
+        require(stored.getString("itemId") == request.itemId && stored.getString("referenceImagePath") == reference(request.patientId)?.name)
+        importCandidate(request.patientId, request.requestId, requireNotNull(result.candidateImage))
+        val root = read(); val updated = request(root, request.patientId, request.requestId)
+        updated.put("generationId", result.generationId)
+        // Allowlisted provenance only; never persist arbitrary provider payloads or secrets.
+        updated.put("generationMetadata", JSONObject(result.metadata.filterKeys { it in setOf("model", "format", "width", "height") }))
+        write(root)
+    }
     fun candidate(patientId: String, requestId: String): File? = synchronized(lock) {
         runCatching { val r = request(read(), patientId, requestId); file(r.getString("candidatePath")).takeIf { valid(it, true).valid && hash(it)==r.getString("sha256") } }.getOrNull()
     }
@@ -117,10 +130,12 @@ class PatientIconCatalog(private val directory: File, private val inspect: (File
         val root = read(); val r = request(root, patientId, requestId)
         require(r.getString("status") == "REVIEW_REQUIRED" && semanticReviewed) { "ADMIN_REVIEW_REQUIRED" }
         require(reference(patientId)?.name == r.getString("referenceImagePath")) { "REFERENCE_CHANGED" }
-        val id = r.getString("itemId"); require(itemById(id) != null && r.getString("meaning").isNotBlank())
+        val id = r.getString("itemId"); val item = requireNotNull(itemById(id))
+        require(r.getString("meaning") == (item.meaningId ?: item.meaning ?: item.id)) { "SEMANTIC_MAPPING_CHANGED" }
         val f = file(r.getString("candidatePath")); valid(f, true); require(hash(f)==r.getString("sha256")) { "IMAGE_CHANGED" }
         val icons = rows(root.getJSONArray("icons"))
         val same = icons.filter { it.getString("patientId")==patientId && it.getString("itemId")==id }
+        require(r.optInt("baseRevision", 0) == (same.maxOfOrNull { it.getInt("revision") } ?: 0)) { "STALE_REVISION" }
         if (replacement != PatientIconReplacement.REPLACE) return@synchronized false
         require(!duplicateWarning(patientId, requestId) || duplicateAcknowledged) { "DUPLICATE_PATIENT_IMAGE_REVIEW_REQUIRED" }
         same.forEach { it.put("active", false) }

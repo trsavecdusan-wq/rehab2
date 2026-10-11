@@ -93,7 +93,7 @@ class PatientIconAdminActivity : AppCompatActivity() {
         val item=items.firstOrNull { it.id==selectedItem } ?: items.first()
         selectedItem=item.id
         text("USTVARI PACIENTOVO IKONO")
-        text("Vse slike ostanejo lokalno. GENERATION BACKEND NOT CONNECTED")
+        text("GENERIRANJE ŠE NI POVEZANO — fotografije ostanejo lokalno.")
         button("1. PACIENT: "+profile.displayName) {
             val all=profiles.list(); choose("Izberi pacienta",all.map { it.displayName }) { selectedPatient=all[it].id; render() }
         }
@@ -111,7 +111,33 @@ class PatientIconAdminActivity : AppCompatActivity() {
         button("SLOVNIČNI SPOL: "+profile.grammaticalGender.name) {
             choose("Slovnični spol",PatientGender.values().map { it.name }) { index -> operation { profiles.save(profile.copy(grammaticalGender=PatientGender.values()[index])) } }
         }
-        text("Nastavitev glasu TTS ostaja ločena.")
+        text("Glas je ločen od slovničnega in vizualnega spola. Prazen ID uporabi privzeti glas.")
+        for (language in listOf("sl", "uk")) for (role in listOf(AacSpeechRole.PATIENT, AacSpeechRole.GUIDE)) {
+            val patient = role == AacSpeechRole.PATIENT
+            val resolved = AacVoiceResolver.resolve(role, language, profile)
+            button("GLAS $role / $language: ${resolved.voiceId}") {
+                val form = LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
+                val providerId = EditText(this).apply {
+                    hint="ID obstoječega TTS ponudnika (prazno = privzeto)"
+                    setText((if(patient) profile.patientVoiceByLanguage else profile.guideVoiceByLanguage)[language].orEmpty())
+                }
+                val androidId = EditText(this).apply {
+                    hint="ID nameščenega Android glasu (prazno = samodejno)"
+                    setText((if(patient) profile.patientAndroidVoiceByLanguage else profile.guideAndroidVoiceByLanguage)[language].orEmpty())
+                }
+                form.addView(providerId); form.addView(androidId)
+                AlertDialog.Builder(this).setTitle("$role / $language").setView(form).setPositiveButton("SHRANI") { _,_ ->
+                    val provider=providerId.text.toString().trim(); val android=androidId.text.toString().trim()
+                    operation {
+                        val updated=if(patient) profile.copy(patientVoiceByLanguage=profile.patientVoiceByLanguage+(language to provider),
+                            patientAndroidVoiceByLanguage=profile.patientAndroidVoiceByLanguage+(language to android))
+                        else profile.copy(guideVoiceByLanguage=profile.guideVoiceByLanguage+(language to provider),
+                            guideAndroidVoiceByLanguage=profile.guideAndroidVoiceByLanguage+(language to android))
+                        profiles.save(updated)
+                    }
+                }.setNegativeButton("PREKLIČI",null).show()
+            }
+        }
         button("2. AAC: "+item.labelSl+" ["+item.id+"]") {
             choose("AAC element",items.map { it.labelSl+" ["+it.id+"]" }) { selectedItem=items[it].id; render() }
         }
@@ -135,9 +161,11 @@ class PatientIconAdminActivity : AppCompatActivity() {
                 val r=PatientIconGenerationRequest(UUID.randomUUID().toString(),profile.id,item.id,item.meaningId ?: item.meaning ?: item.id,
                     AacLabelResolver.resolve(item,"sl",profile.grammaticalGender),AacLabelResolver.resolve(item,"uk",profile.grammaticalGender),
                     AacSpeechResolver.resolve(item,"sl",profile.grammaticalGender),AacSpeechResolver.resolve(item,"uk",profile.grammaticalGender),
-                    reference.name,profile.visualSex,item.categoryId.orEmpty(),selectedTemplate,System.currentTimeMillis())
+                    reference.name,profile.visualSex,item.categoryId.orEmpty(),selectedTemplate,System.currentTimeMillis(),grammaticalGender=profile.grammaticalGender)
                 icons.create(r)
-                runOnUiThread { AlertDialog.Builder(this).setTitle("GENERATION BACKEND NOT CONNECTED").setMessage(r.json().toString(2)+"\n\n"+selectedTemplate.payload(r).toString(2)).setPositiveButton("ZAPRI",null).show() }
+                val result=PatientIconGenerationWorkflow(icons).generate(r)
+                check(result.status==GenerationBackendStatus.CONFIGURATION_REQUIRED)
+                runOnUiThread { AlertDialog.Builder(this).setTitle("GENERIRANJE ŠE NI POVEZANO").setMessage(r.json().toString(2)+"\n\n"+selectedTemplate.payload(r).toString(2)).setPositiveButton("ZAPRI",null).show() }
             }
         }
         icons.requests(profile.id).filter { it.getString("itemId")==item.id }.reversed().forEach { r ->

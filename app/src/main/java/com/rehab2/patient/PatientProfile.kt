@@ -14,5 +14,11 @@ data class PatientProfile(
     val communicationLevel: String = "",
     val primaryLanguage: String = "sl",
     val secondaryLanguage: String = "",
-    val personalityMode: String = ""
+    val personalityMode: String = "",
+    val patientVoice: String = "",
+    val guideVoice: String = "",
+    val patientVoiceByLanguage: Map<String, String> = emptyMap(),
+    val guideVoiceByLanguage: Map<String, String> = emptyMap(),
+    val patientAndroidVoiceByLanguage: Map<String, String> = emptyMap(),
+    val guideAndroidVoiceByLanguage: Map<String, String> = emptyMap()
 )

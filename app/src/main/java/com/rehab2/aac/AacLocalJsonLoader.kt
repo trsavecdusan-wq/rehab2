@@ -187,6 +187,12 @@ object AacLocalJsonLoader {
             sentenceRole = json.optNullableString("sentenceRole"),
             questionSl = json.optNullableString("questionSl"),
             questionUk = json.optNullableString("questionUk"),
+            questionSlFemale = json.optNullableString("questionSlFemale"),
+            questionSlMale = json.optNullableString("questionSlMale"),
+            questionUkFemale = json.optNullableString("questionUkFemale"),
+            questionUkMale = json.optNullableString("questionUkMale"),
+            questionSlNeutral = json.optNullableString("questionSlNeutral"),
+            questionUkNeutral = json.optNullableString("questionUkNeutral"),
             questionByLanguage = parseLanguageTextMap(json.optJSONObject("questionByLanguage")),
             iconSource = parseIconSource(json.optString("iconSource")),
             suggestedIconPath = json.optNullableString("suggestedIconPath")

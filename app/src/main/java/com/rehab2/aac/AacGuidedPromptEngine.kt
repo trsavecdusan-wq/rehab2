@@ -13,7 +13,7 @@ object AacGuidedPromptEngine {
     }
 
     fun questionFor(item: AacItem): String {
-        return promptFor(item)?.questionSl.orEmpty()
+        return AacQuestionResolver.guided(promptFor(item)?.questionSl.orEmpty(), "sl")
     }
 
     fun childIdsFor(item: AacItem): List<String> {

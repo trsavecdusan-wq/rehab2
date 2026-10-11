@@ -8,6 +8,7 @@ internal object AacUpgradeFieldPolicy {
     private val textFields = setOf(
         "labelSl", "labelUk", "labelEn", "text", "baseText", "base_text",
         "speechText", "speakTextSl", "speakTextUk", "speechTextSl", "speechTextEn",
+        "questionSlFemale", "questionSlMale", "questionUkFemale", "questionUkMale", "questionSlNeutral", "questionUkNeutral",
         "questionSl", "questionUk", "followUpQuestion", "customSpeech", "customLabel"
     )
     private val languageFields = setOf(

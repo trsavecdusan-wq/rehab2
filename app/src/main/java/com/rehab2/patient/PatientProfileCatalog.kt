@@ -14,12 +14,18 @@ class PatientProfileCatalog(private val file: File) {
         val source=if(file.isFile) file else backup
         return if(source.isFile) JSONObject(source.readText()) else JSONObject()
     }
+    private fun voices(o: JSONObject, key: String): Map<String, String> = o.optJSONObject(key)?.let { values ->
+        values.keys().asSequence().associateWith { values.optString(it) }
+    } ?: emptyMap()
     private fun decode(o: JSONObject): PatientProfile = PatientProfile(
         id=o.optString("id","legacy"), displayName=o.optString("displayName","Obstoječi pacient"),
         visualSex=PatientGender.parse(o.optString("visualSex")), grammaticalGender=PatientGender.parse(o.optString("grammaticalGender")),
         gender=o.optString("gender"), paralyzedSide=o.optString("paralyzedSide"), dominantHand=o.optString("dominantHand"),
         aphasiaLevel=o.optString("aphasiaLevel"), communicationLevel=o.optString("communicationLevel"),
-        primaryLanguage=o.optString("primaryLanguage","sl"), secondaryLanguage=o.optString("secondaryLanguage"), personalityMode=o.optString("personalityMode"))
+        primaryLanguage=o.optString("primaryLanguage","sl"), secondaryLanguage=o.optString("secondaryLanguage"), personalityMode=o.optString("personalityMode"),
+        patientVoice=o.optString("patientVoice"), guideVoice=o.optString("guideVoice"),
+        patientVoiceByLanguage=voices(o,"patientVoiceByLanguage"), guideVoiceByLanguage=voices(o,"guideVoiceByLanguage"),
+        patientAndroidVoiceByLanguage=voices(o,"patientAndroidVoiceByLanguage"), guideAndroidVoiceByLanguage=voices(o,"guideAndroidVoiceByLanguage"))
     private fun profiles(root: JSONObject): List<PatientProfile> = root.optJSONArray("visualPatientProfiles")?.let { a ->
         (0 until a.length()).map { decode(a.getJSONObject(it)) }
     } ?: listOf(decode(root))
@@ -32,6 +38,9 @@ class PatientProfileCatalog(private val file: File) {
         .put("visualSex",p.visualSex.name).put("grammaticalGender",p.grammaticalGender.name)
         .put("gender",p.gender).put("paralyzedSide",p.paralyzedSide).put("dominantHand",p.dominantHand)
         .put("aphasiaLevel",p.aphasiaLevel).put("communicationLevel",p.communicationLevel)
+        .put("patientVoice",p.patientVoice).put("guideVoice",p.guideVoice)
+        .put("patientVoiceByLanguage",JSONObject(p.patientVoiceByLanguage)).put("guideVoiceByLanguage",JSONObject(p.guideVoiceByLanguage))
+        .put("patientAndroidVoiceByLanguage",JSONObject(p.patientAndroidVoiceByLanguage)).put("guideAndroidVoiceByLanguage",JSONObject(p.guideAndroidVoiceByLanguage))
         .put("primaryLanguage",p.primaryLanguage).put("secondaryLanguage",p.secondaryLanguage).put("personalityMode",p.personalityMode)
     private fun write(r: JSONObject) {
         check(file.parentFile!!.isDirectory || file.parentFile!!.mkdirs())

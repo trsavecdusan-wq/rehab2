@@ -1,5 +1,8 @@
 ﻿package com.rehab2
 
+import com.rehab2.aac.AacSpeechRole
+import com.rehab2.aac.AacQuestionResolver
+
 import com.rehab2.aac.ai.AacObservation
 import com.rehab2.aac.ai.AacEventType
 
@@ -1751,7 +1754,7 @@ class MainActivity : AppCompatActivity() {
             ""
         }
         val localizedPrompt = AacLocalizedTextResolver.resolveQuestion(item, languageCode).orEmpty()
-        val prompt = guidedPrompt.ifBlank { localizedPrompt }
+        val prompt = (AacQuestionResolver.variant(item, languageCode, com.rehab2.aac.AacGenderContext.gender()) ?: guidedPrompt.ifBlank { localizedPrompt })
             .trim()
             .ifBlank { mainAacQuestionFallback(item, languageCode) }
         if (prompt.isBlank() && requestMainAacQuestionTranslation(item, languageCode)) {
@@ -1765,7 +1768,7 @@ class MainActivity : AppCompatActivity() {
         if (prompt.isNotBlank()) {
             showMainAacQuestion(prompt)
             shouldLockMainAacInputOnSpeechStart = false
-            aacAudioPlayer.speakText(prompt, languageCode)
+            aacAudioPlayer.speakResolvedText(prompt, languageCode, AacSpeechRole.GUIDE)
         } else {
             val speechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode).trim()
             if (speechText.isNotBlank()) {
@@ -2228,7 +2231,7 @@ class MainActivity : AppCompatActivity() {
                 if (selectedMainAacItemId == item.id) {
                     showMainAacQuestion(questionText)
                     shouldLockMainAacInputOnSpeechStart = false
-                    aacAudioPlayer.speakText(questionText, normalizedLanguage)
+                    aacAudioPlayer.speakResolvedText(questionText, normalizedLanguage, AacSpeechRole.GUIDE)
                 }
             }
         }.start()
@@ -2294,8 +2297,8 @@ class MainActivity : AppCompatActivity() {
         mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
         currentMainAacPageDebugId = "guided:${item.id}"
         updateMainAacGridSelectionDebug(currentMainAacPageDebugId, followUpItems)
-        showMainAacQuestion(followUp.questionSl)
-        aacAudioPlayer.speakText(followUp.questionSl, languageCode)
+        showMainAacQuestion(AacQuestionResolver.guided(followUp.questionSl, languageCode))
+        aacAudioPlayer.speakResolvedText(AacQuestionResolver.guided(followUp.questionSl, languageCode), languageCode, AacSpeechRole.GUIDE)
         lockMainAacInput()
         showMainAacItems(followUpItems)
         return true
@@ -2491,7 +2494,7 @@ class MainActivity : AppCompatActivity() {
                 recordLastAudioEvent("AAC voice assistant missing next page snapshot target=${activeStep.targetPageId}")
             }
             shouldLockMainAacInputOnSpeechStart = false
-            aacAudioPlayer.speakText(safeQuestion, languageCode)
+            aacAudioPlayer.speakResolvedText(safeQuestion, languageCode, AacSpeechRole.GUIDE)
         }
         mainAacVoiceAssistantQuestionRunnable = runnable
         recordLastAudioEvent(
@@ -2898,6 +2901,28 @@ class MainActivity : AppCompatActivity() {
             labelByLanguage = storedItem.labelByLanguage.ifEmpty { fallbackItem.labelByLanguage },
             speechTextByLanguage = storedItem.speechTextByLanguage.ifEmpty { fallbackItem.speechTextByLanguage },
             activeLanguages = storedItem.activeLanguages.ifEmpty { fallbackItem.activeLanguages },
+            locked = storedItem.locked || fallbackItem.locked,
+            userEdited = storedItem.userEdited || fallbackItem.userEdited,
+            imageOwner = storedItem.imageOwner ?: fallbackItem.imageOwner,
+            patientManualImages = storedItem.patientManualImages.ifEmpty { fallbackItem.patientManualImages },
+            questionSl = storedItem.questionSl ?: fallbackItem.questionSl,
+            questionUk = storedItem.questionUk ?: fallbackItem.questionUk,
+            questionSlFemale = storedItem.questionSlFemale ?: fallbackItem.questionSlFemale,
+            questionSlMale = storedItem.questionSlMale ?: fallbackItem.questionSlMale,
+            questionUkFemale = storedItem.questionUkFemale ?: fallbackItem.questionUkFemale,
+            questionUkMale = storedItem.questionUkMale ?: fallbackItem.questionUkMale,
+            questionSlNeutral = storedItem.questionSlNeutral ?: fallbackItem.questionSlNeutral,
+            questionUkNeutral = storedItem.questionUkNeutral ?: fallbackItem.questionUkNeutral,
+            labelSlFemale = storedItem.labelSlFemale ?: fallbackItem.labelSlFemale,
+            labelSlMale = storedItem.labelSlMale ?: fallbackItem.labelSlMale,
+            labelUkFemale = storedItem.labelUkFemale ?: fallbackItem.labelUkFemale,
+            labelUkMale = storedItem.labelUkMale ?: fallbackItem.labelUkMale,
+            speechSl = storedItem.speechSl ?: fallbackItem.speechSl,
+            speechUk = storedItem.speechUk ?: fallbackItem.speechUk,
+            speechSlFemale = storedItem.speechSlFemale ?: fallbackItem.speechSlFemale,
+            speechSlMale = storedItem.speechSlMale ?: fallbackItem.speechSlMale,
+            speechUkFemale = storedItem.speechUkFemale ?: fallbackItem.speechUkFemale,
+            speechUkMale = storedItem.speechUkMale ?: fallbackItem.speechUkMale,
             questionByLanguage = storedItem.questionByLanguage.ifEmpty { fallbackItem.questionByLanguage },
             baseLanguage = storedItem.baseLanguage,
             translationGenerated = storedItem.translationGenerated,

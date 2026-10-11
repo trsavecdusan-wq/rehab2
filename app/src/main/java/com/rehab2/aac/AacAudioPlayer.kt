@@ -12,6 +12,8 @@ import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.widget.Toast
 import com.rehab2.radio.RadioDuckingCoordinator
+import com.rehab2.patient.PatientProfile
+import com.rehab2.patient.PatientIconRuntime
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -42,9 +44,11 @@ class AacAudioPlayer(
     private var mediaPlayer: MediaPlayer? = null
     private var loudnessEnhancer: LoudnessEnhancer? = null
     private var textToSpeech: TextToSpeech? = TextToSpeech(context, this)
+    private var engineDefaultVoice: android.speech.tts.Voice? = null
     private var isTtsReady = false
     private var isTtsFailed = false
     private var pendingTextToSpeak: String? = null
+    private var pendingVoice: AacResolvedVoice? = null
     private var pendingLanguageCode: String = AacLanguageResolver.DEFAULT_LANGUAGE_CODE
     private val mainHandler = Handler(Looper.getMainLooper())
     @Volatile
@@ -64,7 +68,8 @@ class AacAudioPlayer(
             return
         }
 
-        isTtsReady = configureTtsLanguage(AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
+        engineDefaultVoice = runCatching { textToSpeech?.defaultVoice }.getOrNull()
+        isTtsReady = true
         isTtsFailed = !isTtsReady
         traceAudio("TTS available=$isTtsReady")
         textToSpeech?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
@@ -87,9 +92,8 @@ class AacAudioPlayer(
         })
         if (isTtsReady) {
             pendingTextToSpeak?.let { text ->
-                configureTtsLanguage(pendingLanguageCode)
                 pendingTextToSpeak = null
-                speak(text, pendingLanguageCode)
+                speak(text, pendingLanguageCode, pendingVoice)
             }
         }
     }
@@ -103,6 +107,7 @@ class AacAudioPlayer(
     }
 
     fun playOrSpeak(item: AacItem, languageCode: String) {
+        val voice = resolvedVoice(AacSpeechRole.PATIENT, languageCode, activeProfile())
         traceAudio("playOrSpeak itemId=${item.id} label=${item.labelSl}")
         stopPlayback(notifyCancellation = false)
         val requestSerial = nextSpeechRequestSerial()
@@ -121,9 +126,10 @@ class AacAudioPlayer(
             text = fallbackText,
             languageCode = speechLanguageCode,
             requestSerial = requestSerial,
-            generatedLog = "AUDIO GENERATED: ${item.id}"
+            generatedLog = "AUDIO GENERATED: ${item.id}",
+            voice = voice
         ) {
-            if (AacLanguageResolver.normalize(speechLanguageCode) == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            if (voice.gender == AacVoiceGender.DEFAULT && voice.androidVoiceId.isBlank() && AacLanguageResolver.normalize(speechLanguageCode) == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
                 val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
                 if (playAudioFileIfAvailable(directAudioFile)) {
                     traceAudio("selected path=direct audio file=${directAudioFile?.absolutePath}")
@@ -142,7 +148,7 @@ class AacAudioPlayer(
             }
 
             traceAudio("selected path=Android TTS fallback itemId=${item.id}")
-            speakAndroidFallback(fallbackText, speechLanguageCode)
+            speakAndroidFallback(fallbackText, speechLanguageCode, voice)
         }
     }
 
@@ -150,8 +156,17 @@ class AacAudioPlayer(
         speakText(text, AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
     }
 
-    fun speakText(text: String, languageCode: String) {
-        val trimmed = text.trim()
+    fun speakText(text: String, languageCode: String) =
+        speakResolvedText(text, languageCode, AacSpeechRole.PATIENT)
+
+    private fun activeProfile(): PatientProfile = runCatching { PatientIconRuntime.profiles(context).active() }.getOrDefault(PatientProfile())
+    private fun resolvedVoice(role: AacSpeechRole, language: String, profile: PatientProfile) =
+        AacVoiceResolver.resolve(role, language, profile, AacSpeechApiConfig.read(context).normalizedVoiceId())
+
+    fun speakResolvedText(text: String, language: String, speechRole: AacSpeechRole, patientProfile: PatientProfile = activeProfile()) {
+        val languageCode = language
+        val voice = resolvedVoice(speechRole, language, patientProfile)
+        val trimmed = (if (speechRole == AacSpeechRole.PATIENT) AacPatientGrammar.resolve(text, language, patientProfile.grammaticalGender) else text).trim()
         traceAudio("speakText called text='${trimmed.take(80)}' language=$languageCode")
         if (trimmed.isEmpty()) {
             traceAudio("speakText ignored: blank text")
@@ -165,10 +180,11 @@ class AacAudioPlayer(
             text = trimmed,
             languageCode = languageCode,
             requestSerial = requestSerial,
-            generatedLog = "AUDIO GENERATED"
+            generatedLog = "AUDIO GENERATED",
+            voice = voice
         ) {
             traceAudio("selected path=Android TTS fallback")
-            speakAndroidFallback(trimmed, languageCode)
+            speakAndroidFallback(trimmed, languageCode, voice)
         }
     }
 
@@ -191,6 +207,7 @@ class AacAudioPlayer(
         languageCode: String,
         requestSerial: Int,
         generatedLog: String,
+        voice: AacResolvedVoice,
         fallback: () -> Unit
     ) {
         showSpeechApiConfigIssueIfNeeded()
@@ -205,7 +222,8 @@ class AacAudioPlayer(
         Thread {
             val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
                 text = text,
-                languageCode = languageCode
+                languageCode = languageCode,
+                voiceId = voice.voiceId
             )
 
             mainHandler.post {
@@ -248,15 +266,8 @@ class AacAudioPlayer(
         }
     }
 
-    private fun speakAndroidFallback(text: String, languageCode: String) {
-        if (isTtsReady && !configureTtsLanguage(languageCode)) {
-            val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
-            traceAudio("Android TTS fallback unavailable language=$normalizedLanguage")
-            Toast.makeText(context, "TTS jezik ni na voljo: $normalizedLanguage", Toast.LENGTH_SHORT).show()
-            notifySpeechError()
-            return
-        }
-        speak(text, languageCode)
+    private fun speakAndroidFallback(text: String, languageCode: String, voice: AacResolvedVoice) {
+        speak(text, languageCode, voice)
     }
 
     private fun playAudioFileIfAvailable(audioFile: File?): Boolean {
@@ -298,49 +309,33 @@ class AacAudioPlayer(
         }
     }
 
-    private fun configureTtsLanguage(languageCode: String): Boolean {
-        val tts = textToSpeech ?: return false
-        val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
-        val ttsLanguageTag = AacLanguageResolver.ttsLanguageTag(languageCode)
-        val selectedResult = tts.setLanguage(Locale.forLanguageTag(ttsLanguageTag))
-        Log.d(TAG, "TTS language selected=$normalizedLanguage tag=$ttsLanguageTag result=$selectedResult")
-        traceAudio("TTS language selected=$normalizedLanguage tag=$ttsLanguageTag result=$selectedResult")
-        traceAudio("TTS voice selected=${tts.voice?.name ?: "unknown"} locale=${tts.voice?.locale?.toLanguageTag() ?: "unknown"}")
-        if (isLanguageUsable(selectedResult)) {
-            return true
-        }
-        if (normalizedLanguage == "uk") {
-            Log.w(TAG, "Ukrainian TTS locale unsupported tag=$ttsLanguageTag result=$selectedResult")
-            traceAudio("WARNING Ukrainian TTS locale unsupported tag=$ttsLanguageTag result=$selectedResult")
-            return false
-        }
-
-        val slovenianResult = tts.setLanguage(Locale("sl"))
-        Log.d(TAG, "TTS language sl result=$slovenianResult")
-        traceAudio("TTS language sl result=$slovenianResult")
-        if (isLanguageUsable(slovenianResult)) {
-            return true
-        }
-
-        val defaultResult = tts.setLanguage(Locale.getDefault())
-        Log.d(TAG, "TTS language default=${Locale.getDefault()} result=$defaultResult")
-        traceAudio("TTS language default=${Locale.getDefault()} result=$defaultResult")
-        if (isLanguageUsable(defaultResult)) {
-            return true
-        }
-
-        return true
+    private fun configureTtsVoice(languageCode: String, voice: AacResolvedVoice) {
+        val tts = textToSpeech ?: return
+        val target = Locale.forLanguageTag(AacLanguageResolver.ttsLanguageTag(languageCode))
+        val available = runCatching { tts.voices.orEmpty().filter {
+            TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty()
+        } }.getOrDefault(emptyList())
+        val candidates = AacVoiceResolver.resolveVoiceCandidates(voice, target, available.map {
+            AacVoiceCandidate(it.name, it.locale, it.isNetworkConnectionRequired, it.quality)
+        })
+        val selection = AacVoiceResolver.selectVoice(candidates,
+            setVoice = { candidate ->
+                val result = tts.setVoice(available.first { it.name == candidate.name })
+                if (result == TextToSpeech.SUCCESS) TextToSpeech.SUCCESS else TextToSpeech.ERROR
+            },
+            setLanguage = { tts.setLanguage(target) },
+            restoreEngineDefault = {
+                engineDefaultVoice?.let { default ->
+                    if (tts.setVoice(default) != TextToSpeech.SUCCESS) traceAudio("Engine default voice restore failed")
+                }
+            })
+        traceAudio("TTS voice fallback=${selection.path} voice=${selection.voiceName.orEmpty()}")
     }
 
-    private fun isLanguageUsable(result: Int): Boolean {
-        return result != TextToSpeech.ERROR &&
-            result != TextToSpeech.LANG_MISSING_DATA &&
-            result != TextToSpeech.LANG_NOT_SUPPORTED
-    }
-
-    private fun speak(text: String, languageCode: String) {
+    private fun speak(text: String, languageCode: String, voice: AacResolvedVoice? = null) {
         if (!isTtsReady && !isTtsFailed) {
             pendingTextToSpeak = text
+            pendingVoice = voice
             pendingLanguageCode = AacLanguageResolver.normalize(languageCode)
             traceAudio("TTS not ready; queued text")
             Toast.makeText(context, "TTS PRIPRAVLJAM: ${text}", Toast.LENGTH_SHORT).show()
@@ -354,14 +349,16 @@ class AacAudioPlayer(
             return
         }
 
-        traceAudio("TTS speak request text='${text.take(80)}' language=${AacLanguageResolver.normalize(languageCode)} voice=${textToSpeech?.voice?.name ?: "unknown"}")
+        configureTtsVoice(languageCode, voice ?: resolvedVoice(AacSpeechRole.PATIENT, languageCode, activeProfile()))
+
+        traceAudio("TTS speak request text='${text.take(80)}' language=${AacLanguageResolver.normalize(languageCode)} voice=${runCatching { textToSpeech?.voice?.name }.getOrNull() ?: "unknown"}")
         Toast.makeText(context, "TTS: ${text}", Toast.LENGTH_SHORT).show()
         requestMusicAudioFocus()
         val params = Bundle().apply {
             putString(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC.toString())
         }
         val utteranceId = "aac_${speechRequestSerial}"
-        val result = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
+        val result = runCatching { textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, params, utteranceId) }.getOrDefault(TextToSpeech.ERROR)
         when (result) {
             TextToSpeech.SUCCESS -> {
                 Log.d(TAG, "TTS speak OK: $text")

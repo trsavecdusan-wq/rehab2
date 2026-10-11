@@ -53,7 +53,13 @@ data class AacConversationNode(
     val questionSl: String?,
     val questionUk: String?,
     val children: List<String>,
-    val sentenceRole: String?
+    val sentenceRole: String?,
+    val questionSlFemale: String? = null,
+    val questionSlMale: String? = null,
+    val questionUkFemale: String? = null,
+    val questionUkMale: String? = null,
+    val questionSlNeutral: String? = null,
+    val questionUkNeutral: String? = null
 )
 
 data class AacSentenceItem(

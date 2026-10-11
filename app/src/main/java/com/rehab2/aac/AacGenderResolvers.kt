@@ -16,7 +16,7 @@ object AacLabelResolver {
         else -> null
     }?.trim()?.takeIf { it.isNotEmpty() }
     fun resolve(item: AacItem, language: String, gender: PatientGender): String =
-        variant(item, language, gender) ?: AacLocalizedTextResolver.resolveLegacyLabel(item, language)
+        variant(item, language, gender) ?: AacPatientGrammar.resolve(AacLocalizedTextResolver.resolveLegacyLabel(item, language), language, gender)
 }
 
 object AacSpeechResolver {
@@ -30,5 +30,31 @@ object AacSpeechResolver {
         return specific?.trim()?.takeIf { it.isNotEmpty() } ?: neutral?.trim()?.takeIf { it.isNotEmpty() }
     }
     fun resolve(item: AacItem, language: String, gender: PatientGender): String =
-        variant(item, language, gender) ?: AacLocalizedTextResolver.resolveLegacySpeakTextResult(item, language).text
+        variant(item, language, gender) ?: AacPatientGrammar.resolve(AacLocalizedTextResolver.resolveLegacySpeakTextResult(item, language).text, language, gender)
+}
+
+/** Limited first-person agreement; never derives grammar from voice or visual sex. */
+object AacPatientGrammar {
+    fun resolve(text: String, language: String, gender: PatientGender): String {
+        if (gender == PatientGender.NEUTRAL) return text
+        val female = gender == PatientGender.FEMALE
+        val pairs = when(AacLanguageResolver.normalize(language)) {
+            "sl" -> listOf("Rada bi počivala" to "Rad bi počival", "Rada bi povedala" to "Rad bi povedal",
+                "Rada bi jedla" to "Rad bi jedel", "Rada bi pila" to "Rad bi pil", "Rada bi šla" to "Rad bi šel",
+                "Utrujena sem" to "Utrujen sem", "Lačna sem" to "Lačen sem", "Žejna sem" to "Žejen sem",
+                "Rada bi" to "Rad bi", "utrujena sem" to "utrujen sem", "lačna sem" to "lačen sem", "žejna sem" to "žejen sem",
+                "rada bi" to "rad bi", "UTRUJENA SEM" to "UTRUJEN SEM", "LAČNA SEM" to "LAČEN SEM", "ŽEJNA SEM" to "ŽEJEN SEM")
+            "uk" -> listOf("Я втомлена" to "Я втомлений", "Я втомилася" to "Я втомився", "Я голодна" to "Я голодний",
+                "Я ВТОМИЛАСЯ" to "Я ВТОМИВСЯ", "Я ГОЛОДНА" to "Я ГОЛОДНИЙ")
+            else -> emptyList()
+        }
+        for ((f,m) in pairs) {
+            val replacement = if(female) f else m
+            for (prefix in listOf(f,m)) {
+                if (text == prefix || text.startsWith(prefix+".") || text.startsWith(prefix+" ") || text.startsWith(prefix+"!"))
+                    return replacement+text.removePrefix(prefix)
+            }
+        }
+        return text
+    }
 }
