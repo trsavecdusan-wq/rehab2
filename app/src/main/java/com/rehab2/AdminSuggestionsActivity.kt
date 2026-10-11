@@ -43,6 +43,10 @@ class AdminSuggestionsActivity : AppCompatActivity() {
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(20, 20, 20, 20) }
         root.addView(TextView(this).apply { text = "AI Foundation — admin pregled"; textSize = 24f })
         root.addView(TextView(this).apply { text = "Odobritev shrani samo status. Predlog se ne doda v pacientkin AAC." })
+        root.addView(Button(this).apply {
+            text = "USTVARI PACIENTOVO IKONO"
+            setOnClickListener { PatientIconAdminActivity.openAfterPin(this@AdminSuggestionsActivity) }
+        })
         root.addView(Switch(this).apply {
             text = "Usage observation (samo lokalni AAC dogodki)"
             isChecked = AacObservation.enabled
@@ -106,7 +110,7 @@ class AdminSuggestionsActivity : AppCompatActivity() {
                     rows.forEach { (s, duplicate, image) ->
                         cards.addView(TemporaryIconRenderer.create(this, s, image))
                         cards.addView(TextView(this).apply {
-                            text = "SL: ${s.labelSl}\nUK: ${s.labelUk}\nVir: ${s.sourceType} · ${s.sourceContext}\nConfidence: ${s.confidence}\nParent: ${s.suggestedParentId.orEmpty()}\nDuplicate: ${duplicate.kind} ${duplicate.itemIds.joinToString()}\nStatus: ${s.status}"
+                            text = "SL: ${s.labelSl}\nUK: ${s.labelUk}\nVir: ${s.sourceType} · ${s.sourceContext}\nConfidence: ${s.confidence}\nParent: ${s.suggestedParentId.orEmpty()}\nCONTENT DUPLICATE: ${when (duplicate.kind) { DuplicateKind.NO_DUPLICATE -> "NONE"; DuplicateKind.EXACT_DUPLICATE -> "EXACT"; else -> "POSSIBLE" }}\nICON DUPLICATE: NONE (ni predlagane trajne slike)\nICON STATUS: ${if (image == null) "MISSING" else "TEMPORARY"}\nPred objavo: pregled pomena, duplikata slike in professional asset PASS.\nDuplicate: ${duplicate.kind} ${duplicate.itemIds.joinToString()}\nStatus: ${s.status}"
                         })
                         fun action(label: String, run: () -> Unit) { cards.addView(Button(this).apply { text = label; setOnClickListener { run() } }) }
                         action("UREDI") { edit(s) }

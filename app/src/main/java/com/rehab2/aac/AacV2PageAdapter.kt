@@ -39,7 +39,8 @@ object AacV2PageAdapter {
             val item = AacItem(
                 id = node.id,
                 labelSl = node.title,
-                imagePath = icon?.imagePath.orEmpty(),
+                imagePath = AacPhase1SystemIcons.resolve(node.id, icon?.imagePath.orEmpty(),
+                    icon?.source?.name.orEmpty()),
                 audioSl = "",
                 actionType = "speak",
                 targetPageId = "",

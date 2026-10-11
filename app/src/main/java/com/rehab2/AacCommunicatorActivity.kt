@@ -263,8 +263,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
         showRepositoryDebugStatus()
     }
 
+    private var patientVisualStamp = ""
+
     override fun onResume() {
         super.onResume()
+        com.rehab2.patient.PatientIconRuntime.bind(this)
+        val updatedPatientVisualStamp = com.rehab2.patient.PatientIconRuntime.stamp(this)
         val updatedLabelMode = readAacLabelMode()
         val updatedLanguageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         val updatedSpeechTimingSettings = AacSpeechTimingSettings.read(this)
@@ -280,6 +284,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         readAacGridSize()
         readPersistentTopRowSettings()
         if (
+            updatedPatientVisualStamp != patientVisualStamp ||
             updatedLabelMode != labelMode ||
             updatedLanguageCode != languageCode ||
             updatedSpeechTimingSettings != speechTimingSettings ||
@@ -292,6 +297,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             oldTopRowCount != persistentTopRowCount ||
             oldTopRowItemIds != persistentTopRowItemIds
         ) {
+            patientVisualStamp = updatedPatientVisualStamp
             labelMode = updatedLabelMode
             languageCode = updatedLanguageCode
             speechTimingSettings = updatedSpeechTimingSettings
@@ -1612,25 +1618,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 context: android.content.Context,
                 item: AacItem
             ): File? {
-                val rawPath = item.imagePath.trim()
-                if (rawPath.isEmpty()) {
-                    debugLog("AAC_IMAGE IMAGE_MISSING item=${item.id}")
-                    return null
-                }
-
-                val resolved = AacStoragePaths.resolveIconFile(context, rawPath, item.iconSource)
-                val resolvedFile = resolved?.takeIf { it.exists() && it.isFile }
-                if (
-                    item.iconSource == com.rehab2.aac.IconSource.SOCA ||
-                    item.iconSource == com.rehab2.aac.IconSource.SYSTEM
-                ) {
-                    val state = if (resolvedFile != null) "resolved" else "missing"
-                    debugLog("AAC_IMAGE ${item.iconSource.name}_$state item=${item.id} path=$rawPath")
-                }
-                return resolvedFile ?: run {
-                    debugLog("AAC_IMAGE IMAGE_MISSING item=${item.id}")
-                    null
-                }
+                return com.rehab2.patient.PatientIconRuntime.image(context, item)
             }
 
             fun debugLog(message: String) {

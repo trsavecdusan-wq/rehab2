@@ -9,7 +9,10 @@ object AacLocalizedTextResolver {
         val usedLanguageFallback: Boolean
     )
 
-    fun resolveLabel(item: AacItem, languageCode: String): String {
+    fun resolveLabel(item: AacItem, languageCode: String): String =
+        AacLabelResolver.resolve(item, languageCode, AacGenderContext.gender())
+
+    fun resolveLegacyLabel(item: AacItem, languageCode: String): String {
         val localizedTexts = item.toLocalizedTexts()
         return resolveText(localizedTexts, languageCode) { it.label }
             ?: resolveText(localizedTexts, languageCode) { it.speakText }
@@ -22,6 +25,12 @@ object AacLocalizedTextResolver {
     }
 
     fun resolveSpeakTextResult(item: AacItem, languageCode: String): ResolvedSpeechText {
+        val variant = AacSpeechResolver.variant(item, languageCode, AacGenderContext.gender())
+        return variant?.let { ResolvedSpeechText(it, AacLanguageResolver.normalize(languageCode), false) }
+            ?: resolveLegacySpeakTextResult(item, languageCode)
+    }
+
+    fun resolveLegacySpeakTextResult(item: AacItem, languageCode: String): ResolvedSpeechText {
         val localizedTexts = item.toLocalizedTexts()
         val selectedCode = AacLanguageResolver.normalize(languageCode)
         if (selectedCode == "uk") {
@@ -49,7 +58,7 @@ object AacLocalizedTextResolver {
 
         return ResolvedSpeechText(
             text = resolveText(localizedTexts, languageCode) { it.speakText }
-                ?: resolveLabel(item, languageCode),
+                ?: resolveLegacyLabel(item, languageCode),
             languageCode = selectedCode,
             usedLanguageFallback = false
         )

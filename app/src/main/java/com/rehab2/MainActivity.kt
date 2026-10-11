@@ -983,6 +983,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        com.rehab2.patient.PatientIconRuntime.bind(this)
         setVolumeControlStream(AudioManager.STREAM_MUSIC)
         syncVolumeSlider()
         refreshRadioTiles()
@@ -3110,7 +3111,7 @@ class MainActivity : AppCompatActivity() {
         val iconView = binding.icon ?: return
         iconView.setTextColor(mainAacIconTextColorFor(item))
         iconView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mainAacFallbackIconTextSizeSp())
-        val iconFile = AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
+        val iconFile = com.rehab2.patient.PatientIconRuntime.image(this, item)
         if (iconFile?.isFile != true) {
             restoreMainAacFallbackIcon(binding, item)
             return
@@ -4327,7 +4328,7 @@ class MainActivity : AppCompatActivity() {
             labelSl = labelSl,
             labelUk = labelUk,
             labelEn = labelEn,
-            imagePath = "",
+            imagePath = com.rehab2.aac.AacPhase1SystemIcons.paths[id].orEmpty(),
             actionType = if (opensSubicons) "open_subicons" else "speak",
             targetPageId = "",
             speakTextSl = speechText,

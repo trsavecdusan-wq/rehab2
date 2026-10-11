@@ -22,9 +22,9 @@ internal object AacUpgradeFieldPolicy {
         val path = item.optString("imagePath").trim()
         val sources = listOf(item.optString("iconSource"), item.optString("source"))
             .map { it.trim().uppercase() }
-        return path.isNotBlank() && (
+        return (
             sources.any { it in setOf("PATIENT", "CUSTOM", "THERAPIST", "CUSTOM_PHOTO", "PATIENT_PHOTO", "PLACE_PHOTO", "SOCA", "ARASAAC") } ||
-                !path.startsWith("system/", ignoreCase = true)
+                (path.isNotBlank() && !path.startsWith("system/", ignoreCase = true))
             )
     }
 
@@ -51,7 +51,7 @@ internal object AacUpgradeFieldPolicy {
             }
         }
         // Editing and translation provenance is never part of a system repair.
-        (editFlags + setOf("source", "translationSource", "translationCacheMeta", "translationGenerated")).forEach { key ->
+        (editFlags + setOf("source", "translationSource", "translationCacheMeta", "translationGenerated", "patientManualImages")).forEach { key ->
             if (before.has(key)) proposed.put(key, before.get(key))
         }
     }

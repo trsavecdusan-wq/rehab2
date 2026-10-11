@@ -1,6 +1,12 @@
 package com.rehab2.patient
 
+import com.rehab2.aac.PatientGender
+
 data class PatientProfile(
+    val id: String = "legacy",
+    val displayName: String = "Obstoječi pacient",
+    val visualSex: PatientGender = PatientGender.NEUTRAL,
+    val grammaticalGender: PatientGender = PatientGender.NEUTRAL,
     val gender: String = "",
     val paralyzedSide: String = "",
     val dominantHand: String = "",

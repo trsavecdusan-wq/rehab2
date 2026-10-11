@@ -92,17 +92,27 @@ object AacEditorStorage {
 
     fun updateImage(context: Context, itemId: String, iconSource: IconSource, imagePath: String): Boolean {
         if (imagePath.isBlank()) return false
-        return updateItem(context, itemId) { item ->
-            item.put("iconSource", iconSource.name)
-            item.put("imagePath", imagePath.trim())
+        return updateItem(context, itemId, markEdited = false) { item ->
+            setPatientImage(context, item, AacManualImage(imagePath.trim(), iconSource))
         }
     }
 
     fun clearImage(context: Context, itemId: String): Boolean {
-        return updateItem(context, itemId) { item ->
-            item.put("iconSource", IconSource.SYSTEM.name)
-            item.put("imagePath", "")
+        return updateItem(context, itemId, markEdited = false) { item ->
+            setPatientImage(context, item, null)
         }
+    }
+
+    private fun setPatientImage(context: Context, item: JSONObject, image: AacManualImage?) {
+        val profiles = com.rehab2.patient.PatientIconRuntime.profiles(context)
+        AacPatientManualImages.update(item, profiles.active().id, profiles.legacyOwner(), image)
+    }
+
+    private fun scopeNewImage(context: Context, item: JSONObject, imagePath: String, source: IconSource) {
+        item.remove("patientManualImages")
+        item.put("imagePath", "").put("iconSource", IconSource.SYSTEM.name)
+        item.remove("source")
+        if (imagePath.isNotBlank()) setPatientImage(context, item, AacManualImage(imagePath.trim(), source))
     }
 
     fun updateChildren(context: Context, itemId: String, children: List<String>): Boolean {
@@ -154,6 +164,7 @@ object AacEditorStorage {
 
             parent.put("children", jsonArrayOf(parentChildren + itemId))
             parent.put("userEdited", true)
+            scopeNewImage(context, newItem, newIcon.imagePath, newIcon.iconSource)
             itemsArray.put(newItem)
 
             itemsFile.parentFile?.let { parentDir -> if (!parentDir.exists()) parentDir.mkdirs() }
@@ -205,6 +216,7 @@ object AacEditorStorage {
 
             parent.put("children", jsonArrayOf(parentChildren + itemId))
             parent.put("userEdited", true)
+            scopeNewImage(context, newItem, copyIcon.imagePath, copyIcon.iconSource)
             itemsArray.put(newItem)
 
             itemsFile.parentFile?.let { parentDir -> if (!parentDir.exists()) parentDir.mkdirs() }
@@ -324,7 +336,7 @@ object AacEditorStorage {
         }
     }
 
-    private fun updateItem(context: Context, itemId: String, mutate: (JSONObject) -> Unit): Boolean {
+    private fun updateItem(context: Context, itemId: String, markEdited: Boolean = true, mutate: (JSONObject) -> Unit): Boolean {
         val itemsFile = AacStoragePaths.getAacItemsFile(context) ?: return false
 
         return try {
@@ -335,7 +347,7 @@ object AacEditorStorage {
                 val item = itemsArray.optJSONObject(index) ?: continue
                 if (item.optString("id").trim() != itemId) continue
                 mutate(item)
-                item.put("userEdited", true)
+                if (markEdited) item.put("userEdited", true)
                 updated = true
                 break
             }
@@ -387,6 +399,18 @@ object AacEditorStorage {
         return JSONObject()
             .put("id", item.id)
             .put("labelSl", item.labelSl)
+            .put("source", item.imageOwner)
+            .put("patientManualImages", AacPatientManualImages.json(item.patientManualImages))
+            .put("labelSlFemale", item.labelSlFemale)
+            .put("labelSlMale", item.labelSlMale)
+            .put("labelUkFemale", item.labelUkFemale)
+            .put("labelUkMale", item.labelUkMale)
+            .put("speechSl", item.speechSl)
+            .put("speechSlFemale", item.speechSlFemale)
+            .put("speechSlMale", item.speechSlMale)
+            .put("speechUk", item.speechUk)
+            .put("speechUkFemale", item.speechUkFemale)
+            .put("speechUkMale", item.speechUkMale)
             .put("imagePath", item.imagePath)
             .put("audioSl", item.audioSl)
             .put("actionType", item.actionType)
