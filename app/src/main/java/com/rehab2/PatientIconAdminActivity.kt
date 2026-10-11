@@ -13,10 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.rehab2.aac.*
 import com.rehab2.patient.*
 import java.io.File
-import java.util.UUID
 import java.util.concurrent.Executors
 
-/** Local-only review. A fresh one-shot PIN grant is required for every activity entry. */
+/** Explicit admin generation and local review. A fresh one-shot PIN grant is required for every activity entry. */
 class PatientIconAdminActivity : AppCompatActivity() {
     companion object {
         private var grantUntil=0L
@@ -36,6 +35,10 @@ class PatientIconAdminActivity : AppCompatActivity() {
     private var selectedPatient=""
     private var selectedItem="sleep"
     private var selectedTemplate=PatientIconGenerationTemplate.PERSON_ACTION
+    private var generationCancellation: PatientGenerationCancellation? = null
+    private var bodyRegion: String? = null
+    private var bodySide: PatientBodySide? = null
+    private var bodyView: PatientBodyView? = null
     private var pendingPatient=""
     private var pendingRequest=""
 
@@ -93,7 +96,20 @@ class PatientIconAdminActivity : AppCompatActivity() {
         val item=items.firstOrNull { it.id==selectedItem } ?: items.first()
         selectedItem=item.id
         text("USTVARI PACIENTOVO IKONO")
-        text("GENERIRANJE ŠE NI POVEZANO — fotografije ostanejo lokalno.")
+        val backend=PatientGenerationBackendSettings.read(this)
+        text(if(backend.validEndpoint()) "Referenčna fotografija se pošlje na ${backend.endpoint} samo ob GENERIRAJ." else "GENERIRANJE ŠE NI POVEZANO")
+        if(backend.requireAuth && runCatching { PatientGenerationBackendSettings.session.token(backend.endpoint) }.getOrNull().isNullOrBlank()) text("Prijava v backend še ni povezana.")
+        button("NASTAVITVE GENERIRANJA") {
+            val form=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
+            val endpoint=EditText(this).apply { hint="HTTPS endpoint"; setText(backend.endpoint) }
+            val auth=CheckBox(this).apply { text="Backend zahteva prijavljeno sejo"; isChecked=backend.requireAuth }
+            form.addView(endpoint);form.addView(auth)
+            AlertDialog.Builder(this).setTitle("Backend za slike").setView(form).setPositiveButton("SHRANI") { _,_ ->
+                runCatching { PatientGenerationBackendSettings.save(this,endpoint.text.toString(),auth.isChecked) }
+                    .onFailure { message(it.message ?: "Nastavitev ni veljavna.") }
+                render()
+            }.setNegativeButton("PREKLIČI",null).show()
+        }
         button("1. PACIENT: "+profile.displayName) {
             val all=profiles.list(); choose("Izberi pacienta",all.map { it.displayName }) { selectedPatient=all[it].id; render() }
         }
@@ -155,24 +171,32 @@ class PatientIconAdminActivity : AppCompatActivity() {
         button("5. PREDLOGA: "+selectedTemplate.name) {
             choose("Predloga",PatientIconGenerationTemplate.values().map { it.name }) { selectedTemplate=PatientIconGenerationTemplate.values()[it]; render() }
         }
-        button("6. PRIPRAVI ZAHTEVO IN PREDOGLED") {
-            operation {
-                val reference=icons.reference(profile.id) ?: error("Najprej izberite referenčno fotografijo.")
-                val r=PatientIconGenerationRequest(UUID.randomUUID().toString(),profile.id,item.id,item.meaningId ?: item.meaning ?: item.id,
-                    AacLabelResolver.resolve(item,"sl",profile.grammaticalGender),AacLabelResolver.resolve(item,"uk",profile.grammaticalGender),
-                    AacSpeechResolver.resolve(item,"sl",profile.grammaticalGender),AacSpeechResolver.resolve(item,"uk",profile.grammaticalGender),
-                    reference.name,profile.visualSex,item.categoryId.orEmpty(),selectedTemplate,System.currentTimeMillis(),grammaticalGender=profile.grammaticalGender)
-                icons.create(r)
-                val result=PatientIconGenerationWorkflow(icons).generate(r)
-                check(result.status==GenerationBackendStatus.CONFIGURATION_REQUIRED)
-                runOnUiThread { AlertDialog.Builder(this).setTitle("GENERIRANJE ŠE NI POVEZANO").setMessage(r.json().toString(2)+"\n\n"+selectedTemplate.payload(r).toString(2)).setPositiveButton("ZAPRI",null).show() }
+        if(selectedTemplate==PatientIconGenerationTemplate.BODY_PAIN) {
+            button("DEL TELESA: "+(bodyRegion ?: "IZBERI")) {
+                val regions=listOf("head","chest","abdomen","back","shoulder","arm","hand","hip","leg","knee","foot")
+                choose("Del telesa",listOf("Glava","Prsni koš","Trebuh","Hrbet","Rama","Roka","Dlan","Kolk","Noga","Koleno","Stopalo")) { bodyRegion=regions[it]; render() }
             }
+            button("PACIENTOVA STRAN: "+(bodySide?.name ?: "IZBERI")) {
+                choose("Stran pacientovega telesa",PatientBodySide.values().map { it.name }) { bodySide=PatientBodySide.values()[it]; render() }
+            }
+            button("POGLED: "+(bodyView?.name ?: "IZBERI")) {
+                choose("Pogled",PatientBodyView.values().map { it.name }) { bodyView=PatientBodyView.values()[it]; render() }
+            }
+            text("Pri pogledu od spredaj je pacientova LEVA na gledalčevi DESNI.")
         }
+        button("6. GENERIRAJ") { generate(profile,item,selectedTemplate,bodyRegion,bodySide,bodyView) }
         icons.requests(profile.id).filter { it.getString("itemId")==item.id }.reversed().forEach { r ->
             val id=r.getString("requestId"); val status=r.getString("status")
             text("Zahteva "+id+" — "+status)
+            button("PONOVNO GENERIRAJ") {
+                generate(profile,item,PatientIconGenerationTemplate.valueOf(r.getString("generationTemplate")),
+                    r.optString("bodyRegion").takeIf { it.isNotBlank() },
+                    runCatching { PatientBodySide.valueOf(r.getString("bodySide")) }.getOrNull(),
+                    runCatching { PatientBodyView.valueOf(r.getString("view")) }.getOrNull())
+            }
             if(status=="READY_FOR_GENERATION") button("UVOZI LOKALNI KANDIDAT") { pendingPatient=profile.id; pendingRequest=id; pick(101) }
             if(status=="REVIEW_REQUIRED") {
+                text("AI GENERATED / PATIENT — KANDIDAT, NI AKTIVEN")
                 preview(icons.candidate(profile.id,id))
                 val duplicate=icons.duplicateWarning(profile.id,id)
                 if(duplicate) text("OPOZORILO: ista slika že obstaja v tem pacientovem profilu.")
@@ -197,6 +221,44 @@ class PatientIconAdminActivity : AppCompatActivity() {
             }
         }
         button("NAZAJ") { finish() }
+    }
+    private fun generate(profile: PatientProfile, item: AacItem, template: PatientIconGenerationTemplate,
+        region: String?, side: PatientBodySide?, view: PatientBodyView?) {
+        if(generationCancellation!=null) return
+        val reference=icons.reference(profile.id)
+        if(reference==null) { message("NAJPREJ DODAJ REFERENČNO FOTOGRAFIJO"); return }
+        val request=runCatching { PatientIconRequestBuilder.create(profile,item,reference.name,template,
+            if(template==PatientIconGenerationTemplate.BODY_PAIN) region else null,
+            if(template==PatientIconGenerationTemplate.BODY_PAIN) side else null,
+            if(template==PatientIconGenerationTemplate.BODY_PAIN) view else null) }.getOrElse {
+            message("Za bolečino izberi del telesa, pacientovo stran in pogled."); return
+        }
+        val cancellation=PatientGenerationCancellation(); generationCancellation=cancellation
+        panel.removeAllViews(); text("GENERIRANJE — počakajte. Kandidat se ne aktivira samodejno.")
+        button("PREKLIČI GENERIRANJE") { cancellation.cancel(); message("Generiranje je preklicano.") }
+        worker.execute {
+            val outcome=runCatching {
+                icons.create(request)
+                PatientIconGenerationWorkflow(icons,PatientGenerationBackendSettings.transport(this,cancellation)).generate(request,cancellation)
+            }
+            runOnUiThread {
+                generationCancellation=null
+                if(!isFinishing && !isDestroyed) {
+                    val status=outcome.getOrNull()?.status
+                    message(when(status) {
+                        GenerationBackendStatus.SUCCESS -> "Kandidat je pripravljen za pregled. Potrebna je odobritev."
+                        GenerationBackendStatus.CONFIGURATION_REQUIRED -> "GENERIRANJE ŠE NI POVEZANO"
+                        GenerationBackendStatus.AUTH_ERROR -> "Prijava v backend ni veljavna."
+                        GenerationBackendStatus.NETWORK_ERROR -> "Omrežje ni dosegljivo ali je čas čakanja potekel. AAC ostaja na voljo."
+                        GenerationBackendStatus.CANCELLED -> "Generiranje je preklicano."
+                        GenerationBackendStatus.INVALID_RESPONSE -> "Kandidat ni veljaven in ni bil uporabljen."
+                        GenerationBackendStatus.SERVER_ERROR -> "Backend trenutno ne more ustvariti slike."
+                        else -> "Generiranje ni uspelo. Preveri referenčno fotografijo in poskusi znova."
+                    })
+                    render()
+                }
+            }
+        }
     }
     private fun pick(code: Int) = runCatching {
         startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply { type="image/*"; addCategory(Intent.CATEGORY_OPENABLE) },code)
@@ -226,5 +288,5 @@ class PatientIconAdminActivity : AppCompatActivity() {
             } finally { temp.delete() }
         }
     }
-    override fun onDestroy() { worker.shutdownNow(); super.onDestroy() }
+    override fun onDestroy() { generationCancellation?.cancel(); worker.shutdownNow(); super.onDestroy() }
 }

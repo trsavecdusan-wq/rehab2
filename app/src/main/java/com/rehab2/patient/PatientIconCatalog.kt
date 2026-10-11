@@ -42,7 +42,7 @@ class PatientIconCatalog(private val directory: File, private val inspect: (File
     }
     private fun rows(a: JSONArray) = (0 until a.length()).map { a.getJSONObject(it) }
     private fun valid(f: File, icon: Boolean): PatientImageCheck {
-        require(f.isFile && f.length() in 1..(16L * 1024 * 1024)) { "MISSING_OR_EMPTY_IMAGE" }
+        require(f.isFile && f.canRead() && f.length() in 1..(16L * 1024 * 1024)) { "MISSING_OR_EMPTY_IMAGE" }
         val v = inspect(f)
         require(v.valid && v.nonEmpty && v.width in 1..4096 && v.height in 1..4096) { "INVALID_IMAGE" }
         if (icon) {
@@ -107,16 +107,26 @@ class PatientIconCatalog(private val directory: File, private val inspect: (File
         write(root)
     }
     fun importGeneratedCandidate(request: PatientIconGenerationRequest, result: PatientIconGenerationResult) = synchronized(lock) {
-        require(result.status == GenerationBackendStatus.GENERATED && result.generationId.isNotBlank() &&
+        require(result.status in setOf(GenerationBackendStatus.GENERATED, GenerationBackendStatus.SUCCESS) && result.generationId.isNotBlank() &&
             result.requestId == request.requestId && result.patientId == request.patientId && result.itemId == request.itemId) { "GENERATION_SCOPE_MISMATCH" }
-        val stored = request(read(), request.patientId, request.requestId)
-        require(stored.getString("itemId") == request.itemId && stored.getString("referenceImagePath") == reference(request.patientId)?.name)
-        importCandidate(request.patientId, request.requestId, requireNotNull(result.candidateImage))
-        val root = read(); val updated = request(root, request.patientId, request.requestId)
-        updated.put("generationId", result.generationId)
-        // Allowlisted provenance only; never persist arbitrary provider payloads or secrets.
-        updated.put("generationMetadata", JSONObject(result.metadata.filterKeys { it in setOf("model", "format", "width", "height") }))
-        write(root)
+        val root=read(); val updated=request(root,request.patientId,request.requestId)
+        require(updated.getString("status")=="READY_FOR_GENERATION") { "INVALID_TRANSITION" }
+        require(updated.getString("itemId")==request.itemId && updated.getString("referenceImagePath")==reference(request.patientId)?.name)
+        require(result.status!=GenerationBackendStatus.SUCCESS || rows(root.getJSONArray("requests")).none { it.optString("generationId")==result.generationId }) { "DUPLICATE_GENERATION_ID" }
+        val (f,h)=copy(requireNotNull(result.candidateImage),true)
+        try {
+            updated.put("candidatePath",f.name).put("sha256",h).put("status","REVIEW_REQUIRED")
+                .put("history",JSONArray(listOf("DRAFT","READY_FOR_GENERATION","GENERATED","REVIEW_REQUIRED")))
+                .put("generationId",result.generationId).put("generationCreatedAt",result.createdAt).put("mimeType",result.mimeType)
+                .put("generationMetadata",JSONObject(result.metadata.filterKeys { it in setOf("model","format","width","height") }))
+            write(root)
+        } catch(e:Exception) { f.delete(); throw e }
+    }
+
+    fun finishGeneration(patientId: String, requestId: String, status: String) = synchronized(lock) {
+        require(status in setOf("REJECTED_INVALID","CANCELLED"))
+        val root=read(); val row=request(root,patientId,requestId)
+        if(row.getString("status")=="READY_FOR_GENERATION") { row.put("status",status); write(root) }
     }
     fun candidate(patientId: String, requestId: String): File? = synchronized(lock) {
         runCatching { val r = request(read(), patientId, requestId); file(r.getString("candidatePath")).takeIf { valid(it, true).valid && hash(it)==r.getString("sha256") } }.getOrNull()
