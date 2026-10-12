@@ -53,7 +53,8 @@ data class PatientProfileSettings(
             return try {
                 file.parentFile?.let { parent -> if (!parent.exists()) parent.mkdirs() }
                 val normalized = settings.normalized()
-                val json = JSONObject()
+                val json = if (file.isFile) JSONObject(file.readText(Charsets.UTF_8)) else JSONObject()
+                json
                     .put("firstName", normalized.firstName)
                     .put("lastName", normalized.lastName)
                     .put("gender", normalized.gender)

@@ -162,8 +162,8 @@ class AacEditorActivity : AppCompatActivity() {
 
     private fun buildImageCleanupAuditText(): String {
         val usedImages = AacEditorStorage.loadItems(this)
-            .filter { item -> item.imagePath.isNotBlank() }
-            .map { item -> imageUsageKey(item.iconSource, item.imagePath) }
+            .flatMap { item -> listOf(imageUsageKey(item.iconSource, item.imagePath)) +
+                item.patientManualImages.values.map { imageUsageKey(it.iconSource, it.imagePath) } }
             .toSet()
         val sources = AacImageGallery.sources(this)
             .filter { source ->
@@ -680,9 +680,10 @@ class AacEditorActivity : AppCompatActivity() {
         }
 
         val existingIds = allItems.map { it.id }.toSet()
-        var selectedImagePath = item.imagePath
+        val selectedManual = selectedManualImage(item)
+        var selectedImagePath = selectedManual?.imagePath.orEmpty()
         var selectedImageFile = resolveImageFile(item)
-        var selectedIconSource = item.iconSource
+        var selectedIconSource = selectedManual?.iconSource ?: IconSource.SYSTEM
         if (selectedImagePath.isNotBlank() && selectedImageFile?.isFile != true) {
             selectedImagePath = ""
             selectedImageFile = null
@@ -1420,6 +1421,10 @@ class AacEditorActivity : AppCompatActivity() {
             Toast.makeText(this, "Tega vira ni mogoče preimenovati.", Toast.LENGTH_SHORT).show()
             return
         }
+        if (isImageUsedByAacItem(entry)) {
+            Toast.makeText(this, "Uporabljene slike ni mogoče preimenovati. Uvozite novo kopijo.", Toast.LENGTH_LONG).show()
+            return
+        }
         val safeBaseName = safeLibraryImageBaseName(requestedName)
         if (safeBaseName.isBlank()) {
             Toast.makeText(this, "Vpišite jasno ime slike.", Toast.LENGTH_SHORT).show()
@@ -1484,7 +1489,8 @@ class AacEditorActivity : AppCompatActivity() {
 
     private fun imageUsedByItems(entry: AacImageGallery.Entry): List<AacItem> {
         return AacEditorStorage.loadItems(this).filter { item ->
-            item.iconSource == entry.source.iconSource && item.imagePath == entry.imagePath
+            (item.iconSource == entry.source.iconSource && item.imagePath == entry.imagePath) ||
+                item.patientManualImages.values.any { it.iconSource == entry.source.iconSource && it.imagePath == entry.imagePath }
         }
     }
 
@@ -1642,7 +1648,7 @@ class AacEditorActivity : AppCompatActivity() {
     }
 
     private fun confirmImageReplacementIfNeeded(item: AacItem, onConfirmed: () -> Unit) {
-        if (item.imagePath.isBlank()) {
+        if (resolveImageFile(item) == null) {
             onConfirmed()
             return
         }
@@ -1943,9 +1949,18 @@ class AacEditorActivity : AppCompatActivity() {
         imageView.setImageBitmap(BitmapFactory.decodeFile(imageFile.absolutePath))
     }
 
+    private fun selectedManualImage(item: AacItem): com.rehab2.aac.AacManualImage? = runCatching {
+        val profiles = com.rehab2.patient.PatientIconRuntime.profiles(this)
+        val id = profiles.active().id
+        item.patientManualImages[id] ?: if (id == profiles.legacyOwner() ||
+            (item.iconSource == IconSource.SYSTEM && item.imagePath.startsWith("system/") && !item.locked && !item.userEdited))
+            com.rehab2.aac.AacManualImage(item.imagePath, item.iconSource) else null
+    }.getOrNull()
+
     private fun imageStatusText(item: AacItem): String {
-        val sourceLabel = imageSourceDisplayName(item.iconSource)
-        val imagePath = item.imagePath.trim()
+        val image = selectedManualImage(item)
+        val sourceLabel = image?.let { imageSourceDisplayName(it.iconSource) } ?: "PACIENT / SYSTEM"
+        val imagePath = resolveImageFile(item)?.name.orEmpty()
         if (imagePath.isEmpty()) {
             return "Trenutna slika: ni izbrana"
         }
@@ -1966,7 +1981,7 @@ class AacEditorActivity : AppCompatActivity() {
     }
 
     private fun resolveImageFile(item: AacItem): File? {
-        return AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
+        return com.rehab2.patient.PatientIconRuntime.image(this, item)
             ?.takeIf { it.exists() && it.isFile }
     }
 
@@ -2008,7 +2023,7 @@ class AacEditorActivity : AppCompatActivity() {
                 label.visibility = View.VISIBLE
                 image.setImageDrawable(null)
 
-                val imageFile = AacStoragePaths.resolveIconFile(itemView.context, item.imagePath, item.iconSource)
+                val imageFile = com.rehab2.patient.PatientIconRuntime.image(itemView.context, item)
                     ?.takeIf { it.exists() && it.isFile }
                 if (imageFile != null) {
                     image.alpha = 1.0f
@@ -2146,7 +2161,7 @@ class AacEditorActivity : AppCompatActivity() {
         ) : RecyclerView.ViewHolder(itemView) {
             fun bind(item: AacItem) {
                 label.text = "${item.labelSl}\n${item.id}"
-                val imageFile = AacStoragePaths.resolveIconFile(itemView.context, item.imagePath, item.iconSource)
+                val imageFile = com.rehab2.patient.PatientIconRuntime.image(itemView.context, item)
                     ?.takeIf { it.exists() && it.isFile }
                 val bitmap = imageFile?.let { BitmapFactory.decodeFile(it.absolutePath) }
                 if (bitmap != null) {

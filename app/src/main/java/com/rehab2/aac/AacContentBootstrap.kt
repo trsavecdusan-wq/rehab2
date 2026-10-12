@@ -394,6 +394,7 @@ object AacContentBootstrap {
         "yes.png"
     )
         .plus(PROFESSIONAL_SYSTEM_ICON_FILES)
+        .plus(AacPhase1SystemIcons.paths.values.map { it.removePrefix("system/") })
         .distinct()
 
     private val ROOT_SYSTEM_ICON_REPAIRS = mapOf(
@@ -805,6 +806,16 @@ object AacContentBootstrap {
         itemObjects(itemsArray).forEach { item ->
             if (AacUpgradeFieldPolicy.hasCustomImage(item)) return@forEach
             val itemId = item.optString("id").trim()
+            val phase1Path = AacPhase1SystemIcons.paths[itemId]
+            if (phase1Path != null) {
+                val approved = AacPhase1SystemIcons.resolve(itemId, item.optString("imagePath"),
+                    item.optString("iconSource"), item.optString("source"))
+                val file = AacStoragePaths.resolveIconFile(context, phase1Path, IconSource.SYSTEM)
+                if (approved == phase1Path && file?.isFile == true && hasPngHeader(file)) {
+                    repaired += putIfDifferent(item, "imagePath", phase1Path)
+                }
+                return@forEach
+            }
             val starter = starterById[itemId] ?: return@forEach
             val isQuickPatientSystemIcon = itemId in QUICK_PATIENT_SYSTEM_ICON_IDS
             val isProfessionalSystemIcon = itemId in PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID

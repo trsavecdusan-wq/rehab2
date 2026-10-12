@@ -605,6 +605,7 @@ object AacStarterContentV1 {
         imagePath: String,
         iconSource: IconSource
     ): String {
+        AacPhase1SystemIcons.paths[id]?.let { return it }
         val normalizedPath = imagePath.trim().replace('\\', '/').removePrefix("/")
         if (iconSource == IconSource.SYSTEM && normalizedPath in SAFE_SYSTEM_ICON_PATHS) {
             return normalizedPath
@@ -1775,5 +1776,35 @@ object AacStarterContentV1 {
         "vending_drinks", "vending_coffee_tea", "shop", "restaurant", "transport", "vending_photo_step_1", "vending_photo_step_2", "move_me",
         "more",
         "vest", "choose_myself", "show_you", "not_here", "not_this"
+    )
+}
+
+/** Only individually reviewed PASS assets from the 1.2.798 Phase 1 pack. */
+internal object AacPhase1SystemIcons {
+    fun resolve(id: String, current: String, iconSource: String, source: String = ""): String {
+        val owners = listOf(iconSource, source).map { it.trim().uppercase(java.util.Locale.ROOT) }
+            .filter { it.isNotEmpty() }
+        if (owners.isEmpty() || owners.any { it != "SYSTEM" } ||
+            (current.isNotBlank() && !current.startsWith("system/", ignoreCase = true))) return current
+        return paths[id] ?: current
+    }
+
+    val paths = mapOf(
+        "stop" to "system/action_stop_v2.png",
+        "family" to "system/person_family_group_v2.png",
+        "medicine" to "system/health_medicine_v2.png",
+        "diaper" to "system/care_adult_diaper_v2.png",
+        "belly_right" to "system/body_abdomen_right_v2.png",
+        "belly_upper" to "system/body_abdomen_upper_v2.png",
+        "belly_lower" to "system/body_abdomen_lower_v2.png",
+        "arm_forearm" to "system/body_forearm_v2.png",
+        "arm_fingers" to "system/body_hand_fingers_v2.png",
+        "leg_toes" to "system/body_foot_toes_v2.png",
+        "arm_upper" to "system/body_upper_arm_v2.png",
+        "sleep" to "system/action_sleep_v2.png",
+        "belly_left" to "system/body_abdomen_left_v2.png",
+        "belly" to "system/body_abdomen_v2.png",
+        "warm_water" to "system/drink_warm_water_v2.png",
+        "wc_blood" to "system/health_blood_v2.png"
     )
 }

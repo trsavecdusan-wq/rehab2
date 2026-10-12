@@ -1,5 +1,8 @@
 package com.rehab2
 
+import com.rehab2.aac.AacSpeechRole
+import com.rehab2.aac.AacQuestionResolver
+
 import com.rehab2.aac.ai.AacObservation
 import com.rehab2.aac.ai.AacEventType
 
@@ -52,7 +55,9 @@ import java.io.File
 class AacCommunicatorActivity : AppCompatActivity() {
     // Speech modes stay separate so tile feedback, sentence composition, and future
     // learning/message flows can share AAC items without double-speaking one tap.
+    private var pendingGuidePrompt: Runnable? = null
     private enum class SpeechMode {
+        GUIDE,
         SINGLE_ICON,
         SENTENCE
     }
@@ -139,7 +144,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                         isSpeakingSingleIcon = true
                         isSpeakingSentence = false
                     }
-                    null -> Unit
+                    SpeechMode.GUIDE, null -> Unit
                 }
                 Log.d(TAG, "AAC_SPEECH SPEECH_STARTED mode=$activeSpeechMode")
             }
@@ -263,8 +268,12 @@ class AacCommunicatorActivity : AppCompatActivity() {
         showRepositoryDebugStatus()
     }
 
+    private var patientVisualStamp = ""
+
     override fun onResume() {
         super.onResume()
+        com.rehab2.patient.PatientIconRuntime.bind(this)
+        val updatedPatientVisualStamp = com.rehab2.patient.PatientIconRuntime.stamp(this)
         val updatedLabelMode = readAacLabelMode()
         val updatedLanguageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         val updatedSpeechTimingSettings = AacSpeechTimingSettings.read(this)
@@ -280,6 +289,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         readAacGridSize()
         readPersistentTopRowSettings()
         if (
+            updatedPatientVisualStamp != patientVisualStamp ||
             updatedLabelMode != labelMode ||
             updatedLanguageCode != languageCode ||
             updatedSpeechTimingSettings != speechTimingSettings ||
@@ -292,6 +302,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             oldTopRowCount != persistentTopRowCount ||
             oldTopRowItemIds != persistentTopRowItemIds
         ) {
+            patientVisualStamp = updatedPatientVisualStamp
             labelMode = updatedLabelMode
             languageCode = updatedLanguageCode
             speechTimingSettings = updatedSpeechTimingSettings
@@ -1374,6 +1385,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun resolveFollowUpQuestion(item: AacItem): String? {
+        AacQuestionResolver.variant(item, languageCode, com.rehab2.aac.AacGenderContext.gender())?.let { return it }
         if (isVendingScenarioActive() && isDrinkFollowUpTrigger(item)) {
             return "Kaj želiš izbrati?"
         }
@@ -1575,9 +1587,29 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun setPromptText(text: String?) {
-        val value = text?.trim().orEmpty()
+        val value = AacQuestionResolver.guided(text?.trim().orEmpty(), languageCode)
         txtPrompt.text = value
         txtPrompt.visibility = if (value.isNotEmpty()) View.VISIBLE else View.GONE
+        pendingGuidePrompt?.let { autoSpeakHandler.removeCallbacks(it) }
+        pendingGuidePrompt = null
+        if (value.isNotEmpty() && isGuidedFollowUpAllowed()) {
+            val requestId = lastSpeechRequestId
+            val prompt = object : Runnable {
+                override fun run() {
+                    if (isFinishing || isDestroyed || requestId != lastSpeechRequestId || txtPrompt.text.toString() != value) return
+                    if (isSpeakingSingleIcon || isSpeakingSentence || pendingSingleIconSpeak != null || pendingAutoSpeakSentence != null) {
+                        autoSpeakHandler.postDelayed(this, 100)
+                        return
+                    }
+                    pendingGuidePrompt = null
+                    pendingSpeechMode = SpeechMode.GUIDE
+                    activeSpeechMode = SpeechMode.GUIDE
+                    audioPlayer.speakResolvedText(AacQuestionResolver.guided(value, languageCode), languageCode, AacSpeechRole.GUIDE)
+                }
+            }
+            pendingGuidePrompt = prompt
+            autoSpeakHandler.postDelayed(prompt, 350)
+        }
     }
 
     private fun clearPromptText() {
@@ -1612,25 +1644,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 context: android.content.Context,
                 item: AacItem
             ): File? {
-                val rawPath = item.imagePath.trim()
-                if (rawPath.isEmpty()) {
-                    debugLog("AAC_IMAGE IMAGE_MISSING item=${item.id}")
-                    return null
-                }
-
-                val resolved = AacStoragePaths.resolveIconFile(context, rawPath, item.iconSource)
-                val resolvedFile = resolved?.takeIf { it.exists() && it.isFile }
-                if (
-                    item.iconSource == com.rehab2.aac.IconSource.SOCA ||
-                    item.iconSource == com.rehab2.aac.IconSource.SYSTEM
-                ) {
-                    val state = if (resolvedFile != null) "resolved" else "missing"
-                    debugLog("AAC_IMAGE ${item.iconSource.name}_$state item=${item.id} path=$rawPath")
-                }
-                return resolvedFile ?: run {
-                    debugLog("AAC_IMAGE IMAGE_MISSING item=${item.id}")
-                    null
-                }
+                return com.rehab2.patient.PatientIconRuntime.image(context, item)
             }
 
             fun debugLog(message: String) {

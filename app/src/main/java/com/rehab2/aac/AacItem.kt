@@ -75,6 +75,12 @@ data class AacItem(
     val sentenceRole: String? = null,
     val questionSl: String? = null,
     val questionUk: String? = null,
+    val questionSlFemale: String? = null,
+    val questionSlMale: String? = null,
+    val questionUkFemale: String? = null,
+    val questionUkMale: String? = null,
+    val questionSlNeutral: String? = null,
+    val questionUkNeutral: String? = null,
     val questionByLanguage: Map<String, String> = emptyMap(),
     // Local icon sources stay separate: SOCA -> icons/soca, CUSTOM/PATIENT -> icons/custom,
     // ARASAAC -> icons/arasaac, SYSTEM -> text/fallback only.
@@ -103,7 +109,19 @@ data class AacItem(
     val hasLargeCupOption: Boolean = false,
     // Upgrade safety: protected local items must win over bundled starter repairs.
     val locked: Boolean = false,
-    val userEdited: Boolean = false
+    val userEdited: Boolean = false,
+    val imageOwner: String? = null,
+    val patientManualImages: Map<String, AacManualImage> = emptyMap(),
+    val labelSlFemale: String? = null,
+    val labelSlMale: String? = null,
+    val labelUkFemale: String? = null,
+    val labelUkMale: String? = null,
+    val speechSl: String? = null,
+    val speechSlFemale: String? = null,
+    val speechSlMale: String? = null,
+    val speechUk: String? = null,
+    val speechUkFemale: String? = null,
+    val speechUkMale: String? = null
 ) {
     val text: String
         get() = labelSl
@@ -112,4 +130,31 @@ data class AacItem(
         get() = speechText?.trim()?.takeIf { it.isNotEmpty() }
             ?: speakTextSl?.trim()?.takeIf { it.isNotEmpty() }
             ?: labelSl
+}
+
+/** Explicit ownership in the existing AAC JSON; legacy unscoped images retain their owner. */
+data class AacManualImage(val imagePath: String, val iconSource: IconSource)
+
+object AacPatientManualImages {
+    fun parse(json: org.json.JSONObject?): Map<String, AacManualImage> = buildMap {
+        if (json != null) for (id in json.keys()) {
+            val row = json.optJSONObject(id) ?: continue
+            val path = row.optString("imagePath").trim()
+            val source = runCatching { IconSource.valueOf(row.optString("iconSource")) }.getOrNull() ?: continue
+            if (id.isNotBlank() && path.isNotBlank()) put(id, AacManualImage(path, source))
+        }
+    }
+    fun json(images: Map<String, AacManualImage>) = org.json.JSONObject().apply {
+        images.forEach { (id, image) -> put(id, org.json.JSONObject()
+            .put("imagePath", image.imagePath).put("iconSource", image.iconSource.name)) }
+    }
+    fun update(item: org.json.JSONObject, patientId: String, legacyOwner: String, image: AacManualImage?) {
+        require(patientId.isNotBlank())
+        val images = parse(item.optJSONObject("patientManualImages")).toMutableMap()
+        if (image == null) images.remove(patientId) else images[patientId] = image
+        item.put("patientManualImages", json(images))
+        if (image == null && patientId == legacyOwner) {
+            item.put("imagePath", "").put("iconSource", IconSource.SYSTEM.name)
+        }
+    }
 }

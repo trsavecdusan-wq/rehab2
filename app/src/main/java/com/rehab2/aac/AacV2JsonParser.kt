@@ -86,6 +86,12 @@ object AacV2JsonParser {
                         speakTextUk = item.optNullableString("speakTextUk"),
                         questionSl = item.optNullableString("questionSl"),
                         questionUk = item.optNullableString("questionUk"),
+                        questionSlFemale = item.optNullableString("questionSlFemale"),
+                        questionSlMale = item.optNullableString("questionSlMale"),
+                        questionUkFemale = item.optNullableString("questionUkFemale"),
+                        questionUkMale = item.optNullableString("questionUkMale"),
+                        questionSlNeutral = item.optNullableString("questionSlNeutral"),
+                        questionUkNeutral = item.optNullableString("questionUkNeutral"),
                         children = children,
                         sentenceRole = item.optNullableString("sentenceRole")
                     )

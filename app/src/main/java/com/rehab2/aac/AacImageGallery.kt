@@ -59,6 +59,23 @@ object AacImageGallery {
         return source.roots
             .filter { root -> root.exists() && root.isDirectory }
             .flatMap { root ->
+                // Reference photos, pending candidates and generated revisions are managed exclusively
+                // by the PIN review flow. Never offer them as unreviewed global gallery overrides.
+                val primary = File(root, "patient_icon_catalog_v1.json")
+                val managed = if (primary.isFile) primary else File(root, primary.name + ".bak")
+                val reserved = if (managed.exists()) runCatching {
+                    val json = org.json.JSONObject(managed.readText(Charsets.UTF_8))
+                    buildSet<String> {
+                        val refs = json.optJSONObject("references")
+                        if (refs != null) for (id in refs.keys()) refs.optJSONObject(id)?.optString("filePath")?.let { add(it) }
+                        for (key in listOf("icons", "requests")) {
+                            val rows = json.optJSONArray(key) ?: continue
+                            for (i in 0 until rows.length()) rows.optJSONObject(i)?.let { row ->
+                                add(row.optString("filePath")); add(row.optString("candidatePath"))
+                            }
+                        }
+                    }
+                }.getOrElse { return@flatMap emptyList<Entry>() } else emptySet()
                 val files = if (source.recursive) {
                     root.walkTopDown().filter { it.isFile }
                 } else {
@@ -66,6 +83,8 @@ object AacImageGallery {
                 }
                 files
                     .filter(::isSupportedImage)
+                    .filter { it.relativeTo(root).invariantSeparatorsPath !in reserved }
+                    .filterNot { source.iconSource == IconSource.PATIENT && it.name.matches(Regex("patient_[0-9a-fA-F-]{36}\\.(png|jpg|webp)")) }
                     .map { file ->
                         Entry(
                             file = file,
