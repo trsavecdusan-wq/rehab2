@@ -65,6 +65,17 @@ android {
     }
 }
 
+// Trial builds use their own versionCode scheme: 10992 * 100 + trialBuild (-PtrialBuild=N, default 0).
+// Debug and release keep the defaultConfig versionCode unchanged.
+androidComponents {
+    onVariants(selector().withBuildType("trial")) { variant ->
+        def trialBuild = (project.findProperty("trialBuild") ?: "0").toString().toInteger()
+        variant.outputs.each { output ->
+            output.versionCode.set(10992 * 100 + trialBuild)
+        }
+    }
+}
+
 dependencies {
     implementation "androidx.core:core-ktx:1.13.1"
     implementation "androidx.appcompat:appcompat:1.7.0"
