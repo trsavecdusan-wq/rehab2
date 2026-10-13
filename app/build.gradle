@@ -23,6 +23,7 @@ android {
         // A rollback APK may contain older stable code, but it must use a higher odd versionCode so Android allows install.
         versionCode 10992
         versionName "1.2.804"
+        manifestPlaceholders = [appLabel: "rehab2"]
     }
 
     signingConfigs {
@@ -44,6 +45,13 @@ android {
             if (hasReleaseSigning) {
                 signingConfig signingConfigs.release
             }
+        }
+        trial {
+            initWith debug
+            applicationIdSuffix ".trial"
+            versionNameSuffix "-trial"
+            matchingFallbacks = ["debug"]
+            manifestPlaceholders = [appLabel: "rehab2 TEST"]
         }
     }
 
