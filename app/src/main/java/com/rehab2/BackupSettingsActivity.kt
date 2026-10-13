@@ -257,6 +257,15 @@ class BackupSettingsActivity : AppCompatActivity() {
             mainHandler.post {
                 val downloadedFile = result.file
                 if (result.success && downloadedFile != null) {
+                    val downloadedPackageName = readApkArchiveInfo(downloadedFile)?.packageName
+                    if (downloadedPackageName != packageName) {
+                        Log.e("NovaRehabUpdater", "Downloaded APK package mismatch: $downloadedPackageName != $packageName")
+                        downloadedFile.delete()
+                        diagnosticToast("Napaka pri prenosu APK.")
+                        txtUpdateStatus.text = "Prenesena posodobitev ni za to aplikacijo. Namestitev je prekinjena."
+                        refreshPrimaryActionButtonState()
+                        return@post
+                    }
                     diagnosticToast("Prenos kon\u010dan.")
                     val backupPrepared = preparePreviousRestorableFromCurrentInstalled(downloadedFile)
                     txtUpdateStatus.text = if (backupPrepared) {
