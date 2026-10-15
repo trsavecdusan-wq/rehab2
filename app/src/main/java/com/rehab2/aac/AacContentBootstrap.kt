@@ -2066,28 +2066,60 @@ object AacContentBootstrap {
         return rootJson
     }
 
-    private fun loadItemsJson(itemsFile: File?, fallbackItems: List<AacItem>): RawItemsJson {
+    internal fun loadItemsJson(itemsFile: File?, fallbackItems: List<AacItem>): RawItemsJson {
         if (itemsFile?.isFile == true) {
-            return try {
-                val raw = itemsFile.readText(Charsets.UTF_8).trim()
-                if (raw.startsWith("[")) {
-                    val itemsArray = JSONArray(raw)
-                    RawItemsJson(rootObject = null, rootArray = itemsArray, itemsArray = itemsArray, createdFromFallback = false)
-                } else {
-                    val rootObject = JSONObject(raw)
-                    RawItemsJson(
-                        rootObject = rootObject,
-                        rootArray = null,
-                        itemsArray = rootObject.optJSONArray("items") ?: JSONArray(),
-                        createdFromFallback = false
-                    )
-                }
+            val parsed = try {
+                parseRawItemsJson(itemsFile.readText(Charsets.UTF_8))
             } catch (error: Exception) {
                 Log.w(TAG, "AAC_BOOTSTRAP_ITEMS_READ_FAILED", error)
-                fallbackRawItems(fallbackItems)
+                null
             }
+            if (parsed != null && parsed.itemsArray.length() > 0) return parsed
+            restoreItemsFromBackup(itemsFile)?.let { restored -> return restored }
+            return parsed ?: fallbackRawItems(fallbackItems)
         }
         return fallbackRawItems(fallbackItems)
+    }
+
+    private fun parseRawItemsJson(text: String): RawItemsJson {
+        val raw = text.trim()
+        return if (raw.startsWith("[")) {
+            val itemsArray = JSONArray(raw)
+            RawItemsJson(rootObject = null, rootArray = itemsArray, itemsArray = itemsArray, createdFromFallback = false)
+        } else {
+            val rootObject = JSONObject(raw)
+            RawItemsJson(
+                rootObject = rootObject,
+                rootArray = null,
+                itemsArray = rootObject.optJSONArray("items") ?: JSONArray(),
+                createdFromFallback = false
+            )
+        }
+    }
+
+    // Main file unreadable, empty or without items: use a valid .bak instead of the fallback content.
+    // The backup is written back in place (the damaged file goes to .corrupt) so AacLocalJsonLoader sees the same data.
+    private fun restoreItemsFromBackup(itemsFile: File): RawItemsJson? {
+        val backup = File(itemsFile.path + ".bak")
+        if (!backup.isFile) return null
+        val backupText = try {
+            backup.readText(Charsets.UTF_8)
+        } catch (_: Exception) {
+            return null
+        }
+        val restored = try {
+            parseRawItemsJson(backupText)
+        } catch (_: Exception) {
+            null
+        }
+        if (restored == null || restored.itemsArray.length() == 0) return null
+        try {
+            writeItemsFileAtomically(itemsFile, backupText)
+        } catch (error: Exception) {
+            Log.w(TAG, "AAC_BOOTSTRAP_ITEMS_BACKUP_RESTORE_WRITE_FAILED", error)
+        }
+        Log.w(TAG, "AAC_BOOTSTRAP_ITEMS_RESTORED_FROM_BACKUP items=${restored.itemsArray.length()}")
+        return restored
     }
 
     private fun fallbackRawItems(fallbackItems: List<AacItem>): RawItemsJson {
@@ -2117,7 +2149,33 @@ object AacContentBootstrap {
                 JSONObject().put("items", itemsArray).toString(2)
             }
         }
-        file.writeText(outputText, Charsets.UTF_8)
+        writeItemsFileAtomically(file, outputText)
+    }
+
+    // Same transaction shape as aac/ai/AiJsonStore (.tmp -> fsync -> rename, API 21 compatible).
+    // The previous readable file is kept as .bak; an unreadable one goes to .corrupt so it never replaces a good .bak.
+    internal fun writeItemsFileAtomically(file: File, outputText: String) {
+        val temporary = File(file.path + ".tmp")
+        temporary.outputStream().use { stream ->
+            stream.write(outputText.toByteArray(Charsets.UTF_8))
+            stream.fd.sync()
+        }
+        if (file.isFile) {
+            val keepSuffix = if (isReadableItemsJson(file)) ".bak" else ".corrupt"
+            file.copyTo(File(file.path + keepSuffix), overwrite = true)
+        }
+        if (!temporary.renameTo(file)) {
+            check(!file.exists() || file.delete()) { "Cannot replace aac_items.json" }
+            check(temporary.renameTo(file)) { "Cannot commit aac_items.json" }
+        }
+    }
+
+    private fun isReadableItemsJson(file: File): Boolean {
+        return try {
+            parseRawItemsJson(file.readText(Charsets.UTF_8)).itemsArray.length() > 0
+        } catch (_: Exception) {
+            false
+        }
     }
 
     private fun jsonArrayOf(values: List<String>): JSONArray {
@@ -3102,7 +3160,7 @@ object AacContentBootstrap {
         )
     }
 
-    private data class RawItemsJson(
+    internal data class RawItemsJson(
         val rootObject: JSONObject?,
         val rootArray: JSONArray?,
         val itemsArray: JSONArray,
