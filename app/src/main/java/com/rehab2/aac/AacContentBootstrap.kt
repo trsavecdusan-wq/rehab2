@@ -485,6 +485,7 @@ object AacContentBootstrap {
         val repairedStarterCategoryChildren = repairStarterCategoryChildren(itemsArray, starterItems)
         val repairedToaletaV1Tree = repairToaletaV1Tree(itemsArray)
         val repairedHungryV1TestTree = repairHungryV1TestTree(itemsArray, starterItems)
+        val repairedFeelingTemperatureDuplicates = repairFeelingTemperatureDuplicates(itemsArray)
         val repairedPeopleGroupChildren = repairPeopleGroupChildren(itemsArray)
         val repairedConversationTreeV3Metadata = repairConversationTreeV3Metadata(itemsArray, starterItems)
         val repairedRootSystemIcons = repairRootSystemIconMetadata(context, itemsArray)
@@ -545,6 +546,7 @@ object AacContentBootstrap {
             repairedStarterCategoryChildren > 0 ||
             repairedToaletaV1Tree > 0 ||
             repairedHungryV1TestTree > 0 ||
+            repairedFeelingTemperatureDuplicates > 0 ||
             repairedPeopleGroupChildren > 0 ||
             repairedConversationTreeV3Metadata > 0 ||
             repairedRootSystemIcons > 0 ||
@@ -589,7 +591,7 @@ object AacContentBootstrap {
         )
         Log.d(
             TAG,
-            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren toaletaV1TreeRepaired=$repairedToaletaV1Tree peopleGroupChildrenRepaired=$repairedPeopleGroupChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata starterUkrainianContentRepaired=$repairedStarterUkrainianContent starterSpeechQualityContentRepaired=$repairedStarterSpeechQualityContent starterSystemIconsRepaired=$repairedStarterSystemIcons fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
+            "AAC_BOOTSTRAP defaultPage=${result.defaultPageId} items=${result.itemCount} normalVisible=${result.visibleNormalItemCount} fixed=${result.fixedRowCount} placementsAdded=${result.addedPlacements} starterPlacementsAdded=$starterPlacements domLinked=${result.domProfileLinkedItemCount} domRelationsSynced=$syncedDomRelations seededSystemIcons=$seededSystemIcons mergedMissingSystemItems=$mergedMissingSystemItems starterCategoryChildrenRepaired=$repairedStarterCategoryChildren toaletaV1TreeRepaired=$repairedToaletaV1Tree feelingTemperatureDuplicatesDetached=$repairedFeelingTemperatureDuplicates peopleGroupChildrenRepaired=$repairedPeopleGroupChildren conversationTreeV3MetadataRepaired=$repairedConversationTreeV3Metadata rootSystemIconsRepaired=$repairedRootSystemIcons fixedRowSystemIconsRepaired=$repairedFixedRowSystemIcons personPhotoRepaired=$repairedPersonPhotoMetadata starterUkrainianContentRepaired=$repairedStarterUkrainianContent starterSpeechQualityContentRepaired=$repairedStarterSpeechQualityContent starterSystemIconsRepaired=$repairedStarterSystemIcons fixedTopRowRepaired=$repairedFixedTopRowMetadata defaultPageV3Repaired=$repairedDefaultPageV3Placements noUnderstandRepaired=$repairedNoUnderstandLabels drinkSpeechRepaired=$repairedDrinkSpeechItems foodSpeechRepaired=$repairedFoodSpeechItems painSpeechRepaired=$repairedPainSpeechItems reason=${result.reason}"
         )
         return result
     }
@@ -986,6 +988,40 @@ object AacContentBootstrap {
         return repaired
     }
 
+    // Detach duplicate temperature tiles from POČUTJE and TEŽAVA; hot and cold stay. Applies to user-edited items
+    // too, but only parents' children, the duplicates' visibleUnderIds and isRootItem=false change. Items are kept.
+    internal fun repairFeelingTemperatureDuplicates(itemsArray: JSONArray): Int {
+        val itemsById = itemObjects(itemsArray)
+            .mapNotNull { item ->
+                item.optString("id").trim().takeIf { it.isNotBlank() }?.let { id -> id to item }
+            }
+            .toMap()
+        var repaired = 0
+
+        FEELING_DUPLICATE_PARENT_IDS.forEach { parentId ->
+            itemsById[parentId]?.let { item ->
+                val children = stringList(item.optJSONArray("children"))
+                val next = children.filterNot { childId -> childId in FEELING_DETACHED_DUPLICATE_IDS }
+                if (next.size != children.size) {
+                    item.put("children", jsonArrayOf(next))
+                    repaired++
+                }
+            }
+        }
+
+        FEELING_DETACHED_DUPLICATE_IDS.forEach { id ->
+            itemsById[id]?.let { item ->
+                FEELING_DUPLICATE_PARENT_IDS.forEach { parentId ->
+                    repaired += removeVisibleUnderValue(item, parentId)
+                }
+                // Without parents the item must not fall back to the home grid.
+                repaired += putIfDifferent(item, "isRootItem", false)
+            }
+        }
+
+        return repaired
+    }
+
     private fun hasUsableLocalIcon(context: Context, item: JSONObject): Boolean {
         val imagePath = item.optString("imagePath").trim()
         if (imagePath.isBlank()) return false
@@ -1256,6 +1292,10 @@ object AacContentBootstrap {
         "hungry_doughnut",
         "hungry_kremsnita"
     )
+
+    private val FEELING_DETACHED_DUPLICATE_IDS = setOf("hot_feeling", "cold_feeling")
+
+    private val FEELING_DUPLICATE_PARENT_IDS = listOf("feeling", "problem")
 
     private val HUNGRY_V1_TEST_LEGACY_CHILDREN = setOf(
         "soup",
