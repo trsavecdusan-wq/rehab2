@@ -1613,12 +1613,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 item: AacItem
             ): File? {
                 val rawPath = item.imagePath.trim()
-                if (rawPath.isEmpty()) {
-                    debugLog("AAC_IMAGE IMAGE_MISSING item=${item.id}")
-                    return null
-                }
-
-                val resolved = AacStoragePaths.resolveIconFile(context, rawPath, item.iconSource)
+                val resolved = com.rehab2.aac.AacPatientImages.resolve(context, item)
                 val resolvedFile = resolved?.takeIf { it.exists() && it.isFile }
                 if (
                     item.iconSource == com.rehab2.aac.IconSource.SOCA ||

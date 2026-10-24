@@ -80,9 +80,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Najprej izberite vir slike. Za osebne fotografije uporabite OSEBE / PACIENT. Za svoje slike uporabite MOJE SLIKE."
+            android:text="Za zasebno fotografijo uporabite OSEBNA SLIKA PACIENTA. OSEBE / PACIENT in MOJE SLIKE sta obstoječi skupni knjižnici."
             android:textColor="#C8D0D8"
             android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnAacEditorPersonalImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="58dp"
+            android:text="OSEBNA SLIKA PACIENTA"
+            android:textAllCaps="false" />
 
         <TextView
             android:id="@+id/txtAacEditorImageSourceChoices"

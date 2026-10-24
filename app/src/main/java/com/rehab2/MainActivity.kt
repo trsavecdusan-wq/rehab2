@@ -3110,7 +3110,7 @@ class MainActivity : AppCompatActivity() {
         val iconView = binding.icon ?: return
         iconView.setTextColor(mainAacIconTextColorFor(item))
         iconView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mainAacFallbackIconTextSizeSp())
-        val iconFile = AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
+        val iconFile = com.rehab2.aac.AacPatientImages.resolve(this, item)
         if (iconFile?.isFile != true) {
             restoreMainAacFallbackIcon(binding, item)
             return

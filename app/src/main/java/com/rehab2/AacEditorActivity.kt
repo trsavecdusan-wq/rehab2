@@ -50,6 +50,10 @@ class AacEditorActivity : AppCompatActivity() {
     private var selectedPageIndex = 0
     private val adapter = AacEditorAdapter(::showEditIconDialog)
     private lateinit var galleryImagePicker: ActivityResultLauncher<Intent>
+    private lateinit var personalImagePicker: ActivityResultLauncher<Intent>
+    private var pendingPersonalItemId: String? = null
+    private var pendingPersonalPatientId: String? = null
+    private var pendingPersonalRefresh: (() -> Unit)? = null
     private lateinit var cameraCaptureLauncher: ActivityResultLauncher<Uri>
     private var pendingGalleryItemId: String? = null
     private var pendingGalleryRefresh: (() -> Unit)? = null
@@ -69,6 +73,20 @@ class AacEditorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        personalImagePicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val itemId = pendingPersonalItemId
+            val patientId = pendingPersonalPatientId
+            val refresh = pendingPersonalRefresh
+            pendingPersonalItemId = null
+            pendingPersonalPatientId = null
+            pendingPersonalRefresh = null
+            val uri = result.data?.data
+            if (result.resultCode == Activity.RESULT_OK && itemId != null && patientId != null && uri != null) {
+                val saved = com.rehab2.aac.AacPatientImages.importPhoto(this, patientId, itemId, uri)
+                Toast.makeText(this, if (saved) "Osebna slika je shranjena." else "Osebne slike ni bilo mogoče shraniti.", Toast.LENGTH_LONG).show()
+                if (saved) { refresh?.invoke(); loadEditorPages() }
+            }
+        }
         galleryImagePicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             handleGalleryImageResult(result.resultCode, result.data?.data)
         }
@@ -402,6 +420,9 @@ class AacEditorActivity : AppCompatActivity() {
         }
         pickGalleryImage.setOnClickListener {
             openGalleryImagePicker(currentItem) { refreshDialogContent() }
+        }
+        dialogView.findViewById<Button>(R.id.btnAacEditorPersonalImage).setOnClickListener {
+            showPersonalImageActions(currentItem) { refreshDialogContent() }
         }
         capturePhoto.setOnClickListener {
             openCameraCapture(currentItem) { refreshDialogContent() }
@@ -1944,6 +1965,9 @@ class AacEditorActivity : AppCompatActivity() {
     }
 
     private fun imageStatusText(item: AacItem): String {
+        if (com.rehab2.aac.AacPatientImages.personalFile(this, item.id) != null) {
+            return "Trenutna slika: osebna fotografija pacienta. Obstoječa slika je ohranjena kot rezerva."
+        }
         val sourceLabel = imageSourceDisplayName(item.iconSource)
         val imagePath = item.imagePath.trim()
         if (imagePath.isEmpty()) {
@@ -1966,8 +1990,48 @@ class AacEditorActivity : AppCompatActivity() {
     }
 
     private fun resolveImageFile(item: AacItem): File? {
-        return AacStoragePaths.resolveIconFile(this, item.imagePath, item.iconSource)
+        return com.rehab2.aac.AacPatientImages.resolve(this, item)
             ?.takeIf { it.exists() && it.isFile }
+    }
+
+    private fun showPersonalImageActions(item: AacItem, refresh: () -> Unit) {
+        if (item.locked) {
+            Toast.makeText(this, "Zaklenjene ikone ni mogoče spreminjati.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val patientId = try {
+            com.rehab2.aac.AacPatientImages.store(this).currentPatientId()
+        } catch (_: Exception) {
+            Toast.makeText(this, "Identitete pacienta ni mogoče prebrati.", Toast.LENGTH_LONG).show()
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("OSEBNA SLIKA PACIENTA")
+            .setMessage("Fotografija bo shranjena samo za tega pacienta. Izvirnik in obstoječa slika ikone ostaneta ohranjena.")
+            .setPositiveButton("IZBERI FOTOGRAFIJO") { _, _ ->
+                pendingPersonalItemId = item.id
+                pendingPersonalPatientId = patientId
+                pendingPersonalRefresh = refresh
+                try {
+                    personalImagePicker.launch(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "image/*"
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    })
+                } catch (_: Exception) {
+                    pendingPersonalItemId = null
+                    pendingPersonalPatientId = null
+                    pendingPersonalRefresh = null
+                    Toast.makeText(this, "Izbirnika fotografij ni mogoče odpreti.", Toast.LENGTH_LONG).show()
+                }
+            }
+            .setNeutralButton("ODSTRANI OSEBNO POVEZAVO") { _, _ ->
+                val saved = com.rehab2.aac.AacPatientImages.clear(this, patientId, item.id)
+                if (saved) { refresh(); loadEditorPages() }
+                else Toast.makeText(this, "Povezave ni mogoče odstraniti.", Toast.LENGTH_LONG).show()
+            }
+            .setNegativeButton("PREKLIČI", null)
+            .show()
     }
 
     private class AacEditorAdapter(
@@ -2008,7 +2072,7 @@ class AacEditorActivity : AppCompatActivity() {
                 label.visibility = View.VISIBLE
                 image.setImageDrawable(null)
 
-                val imageFile = AacStoragePaths.resolveIconFile(itemView.context, item.imagePath, item.iconSource)
+                val imageFile = com.rehab2.aac.AacPatientImages.resolve(itemView.context, item)
                     ?.takeIf { it.exists() && it.isFile }
                 if (imageFile != null) {
                     image.alpha = 1.0f
@@ -2146,7 +2210,7 @@ class AacEditorActivity : AppCompatActivity() {
         ) : RecyclerView.ViewHolder(itemView) {
             fun bind(item: AacItem) {
                 label.text = "${item.labelSl}\n${item.id}"
-                val imageFile = AacStoragePaths.resolveIconFile(itemView.context, item.imagePath, item.iconSource)
+                val imageFile = com.rehab2.aac.AacPatientImages.resolve(itemView.context, item)
                     ?.takeIf { it.exists() && it.isFile }
                 val bitmap = imageFile?.let { BitmapFactory.decodeFile(it.absolutePath) }
                 if (bitmap != null) {
