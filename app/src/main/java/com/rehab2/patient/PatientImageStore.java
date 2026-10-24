@@ -3,6 +3,8 @@ package com.rehab2.patient;
 import java.io.*;
 import java.util.Properties;
 import java.util.UUID;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /** Private image overlay. Never reads or rewrites AAC/profile JSON or communication profiles.
  * All access in this single-process app is serialized, including separate store instances.
@@ -12,6 +14,8 @@ public final class PatientImageStore {
     private static final long MAX_BYTES = 25L * 1024 * 1024;
     private final File root;
     public interface Validator { boolean valid(File file); }
+    public interface Source { InputStream open() throws IOException; }
+    public enum SeedResult { IMPORTED, RECOVERED, SKIPPED_EXISTING }
 
     public PatientImageStore(File root) { this.root = root; }
 
@@ -85,6 +89,107 @@ public final class PatientImageStore {
             checkItem(itemId);
             return read(new File(patientDir(patientId), "images.properties")).containsKey(itemId);
         }
+    }
+
+    public String confirmedSeedPatient(String packId) throws IOException {
+        synchronized (LOCK) {
+            checkPack(packId);
+            return read(new File(root, "seed-consent.properties")).getProperty(packId);
+        }
+    }
+
+    /** Only call after an explicit local caregiver confirmation, never infer from a profile name. */
+    public void confirmSeedPatient(String packId, String patientId) throws IOException {
+        synchronized (LOCK) {
+            checkPack(packId);
+            if (!currentPatientId().equals(patientId)) throw new IOException("Patient changed");
+            Properties consent = read(new File(root, "seed-consent.properties"));
+            String old = consent.getProperty(packId);
+            if (old != null && !old.equals(patientId)) throw new IOException("Package belongs to another patient");
+            consent.setProperty(packId, patientId);
+            write(new File(root, "seed-consent.properties"), consent);
+        }
+    }
+
+    public boolean seedComplete(String packId, String patientId) throws IOException {
+        synchronized (LOCK) {
+            requireSeedIdentity(packId, patientId);
+            return read(new File(patientDir(patientId), "seed-results.properties")).containsKey(packId);
+        }
+    }
+
+    /** Caller invokes this only after every package entry has imported or preserved a valid image. */
+    public void completeSeed(String packId, String patientId, String result) throws IOException {
+        synchronized (LOCK) {
+            requireSeedIdentity(packId, patientId);
+            File file = new File(patientDir(patientId), "seed-results.properties");
+            Properties results = read(file);
+            results.setProperty(packId, result);
+            write(file, results);
+        }
+    }
+
+    /** Resumable seed import: immutable deterministic original, staged copy, then atomic binding.
+     * A crash after rename but before index commit reuses the same verified original on retry.
+     */
+    public SeedResult importSeed(String packId, String patientId, String itemId, String sha256,
+                                  Source source, Validator validator, File... legacyFiles) throws IOException {
+        synchronized (LOCK) {
+            requireSeedIdentity(packId, patientId);
+            checkItem(itemId);
+            if (!sha256.matches("[0-9a-f]{64}")) throw new IOException("Invalid checksum");
+            File existing = resolve(patientId, itemId);
+            if (existing != null && validator.valid(existing)) return SeedResult.SKIPPED_EXISTING;
+            File dir = patientDir(patientId);
+            File originals = new File(dir, "originals");
+            ensureDir(originals);
+            String name = UUID.nameUUIDFromBytes((packId + ":" + itemId + ":" + sha256).getBytes("UTF-8")) + ".png";
+            File original = new File(originals, name);
+            File pending = new File(originals, name + ".pending");
+            boolean recovered = original.isFile();
+            if (recovered) {
+                if (!digest(original).equals(sha256) || !validator.valid(original))
+                    throw new IOException("Existing seed original is invalid; preserved for inspection");
+            } else {
+                try {
+                    try (InputStream input = source.open()) { copy(input, pending); }
+                    if (!digest(pending).equals(sha256) || !validator.valid(pending))
+                        throw new IOException("Package image validation failed");
+                    if (original.exists() || !pending.renameTo(original)) throw new IOException("Cannot publish original");
+                } finally { pending.delete(); }
+            }
+            File[] backups = java.util.Arrays.copyOf(legacyFiles, legacyFiles.length + 1);
+            backups[legacyFiles.length] = new File(dir, "images.properties");
+            backupLegacy(patientId, backups); // No binding changes unless the backup succeeded.
+            Properties bindings = read(new File(dir, "images.properties"));
+            bindings.setProperty(itemId, name);
+            write(new File(dir, "images.properties"), bindings);
+            return recovered ? SeedResult.RECOVERED : SeedResult.IMPORTED;
+        }
+    }
+
+    private void requireSeedIdentity(String packId, String patientId) throws IOException {
+        checkPack(packId);
+        if (!patientId.equals(currentPatientId()) || !patientId.equals(confirmedSeedPatient(packId)))
+            throw new IOException("Patient identity not confirmed for this package");
+    }
+
+    private static void checkPack(String packId) throws IOException {
+        if (packId == null || !packId.matches("[0-9a-f]{64}")) throw new IOException("Invalid package ID");
+    }
+
+    private static String digest(File file) throws IOException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            try (InputStream input = new FileInputStream(file)) {
+                byte[] buffer = new byte[8192];
+                int count;
+                while ((count = input.read(buffer)) != -1) digest.update(buffer, 0, count);
+            }
+            StringBuilder result = new StringBuilder();
+            for (byte value : digest.digest()) result.append(String.format(java.util.Locale.ROOT, "%02x", value & 255));
+            return result.toString();
+        } catch (NoSuchAlgorithmException impossible) { throw new IOException(impossible); }
     }
 
     public File resolve(String patientId, String itemId) throws IOException {
