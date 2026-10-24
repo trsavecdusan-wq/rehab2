@@ -3106,6 +3106,13 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    /** Image-only refresh after a private test import; preserves navigation, text and speech state. */
+    fun refreshPersonalAacImages(itemIds: Set<String>) {
+        mainAacTileBindings.forEach { binding ->
+            binding.item?.takeIf { it.id in itemIds }?.let { bindMainAacIcon(binding, it) }
+        }
+    }
+
     private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
         val iconView = binding.icon ?: return
         iconView.setTextColor(mainAacIconTextColorFor(item))

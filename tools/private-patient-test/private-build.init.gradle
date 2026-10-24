@@ -1,0 +1,54 @@
+// Explicit local init script, never applied by app/build.gradle or GitHub workflows.
+gradle.beforeProject { project ->
+    if (project.path != ':app') return
+    project.plugins.withId('com.android.application') {
+        if (System.getenv('GITHUB_ACTIONS') || System.getenv('CI')) {
+            throw new GradleException('Private patient packages must never be built in CI.')
+        }
+        def assetsPath = project.findProperty('privatePatientAssets')
+        def outputPath = project.findProperty('privatePatientOutput')
+        if (!assetsPath || !outputPath) throw new GradleException('Explicit private asset/output paths required.')
+        def repo = project.rootProject.projectDir.canonicalFile.toPath()
+        def assets = new File(assetsPath.toString()).canonicalFile
+        def output = new File(outputPath.toString()).canonicalFile
+        if (assets.toPath().startsWith(repo) || output.toPath().startsWith(repo)) {
+            throw new GradleException('Private assets and build outputs must be outside the checkout.')
+        }
+        if (!new File(assets, 'private-patient-seed/manifest.properties').isFile()) {
+            throw new GradleException('Private package manifest missing.')
+        }
+        project.layout.buildDirectory.set(output)
+        project.tasks.configureEach { task ->
+            task.outputs.doNotCacheIf('Private patient test data must not enter the build cache') { true }
+        }
+        // Wait until the existing release config has been declared; reuse it without alteration.
+        project.extensions.getByName('androidComponents').finalizeDsl { android ->
+            def unsigned = project.findProperty('privatePatientUnsigned') == 'true'
+            if (!unsigned && !['ANDROID_KEYSTORE_PATH', 'ANDROID_KEYSTORE_PASSWORD', 'ANDROID_KEY_ALIAS', 'ANDROID_KEY_PASSWORD'].every { System.getenv(it) }) {
+                throw new GradleException('Original release signing configuration unavailable. No substitute key is allowed.')
+            }
+            android.buildTypes.create('privatePatientTest') {
+                initWith(android.buildTypes.getByName('release'))
+                matchingFallbacks = ['release']
+                signingConfig = unsigned ? null : android.signingConfigs.getByName('release')
+            }
+            android.sourceSets.getByName('privatePatientTest').assets.srcDir(assets)
+        }
+        project.extensions.getByName('android').applicationVariants.all { variant ->
+                if (variant.buildType.name == 'privatePatientTest') {
+                    variant.outputs.all { apk ->
+                        apk.versionCodeOverride = 10984 // next even code after stable 794 / 10982
+                        apk.versionNameOverride = '1.2.796-private-test'
+                        apk.outputFileName = project.findProperty('privatePatientUnsigned') == 'true' ? 'NovaRehab-1.2.796-private-test-UNSIGNED.apk' : 'NovaRehab-1.2.796-private-test.apk'
+                    }
+                }
+        }
+    }
+}
+
+gradle.taskGraph.whenReady { graph ->
+    def allowed = graph.allTasks.findAll { it.project.path == ':app' && it.name.startsWith('assemble') }
+    if (allowed.any { it.name != 'assemblePrivatePatientTest' }) {
+        throw new GradleException('This init script is exclusively for assemblePrivatePatientTest.')
+    }
+}
