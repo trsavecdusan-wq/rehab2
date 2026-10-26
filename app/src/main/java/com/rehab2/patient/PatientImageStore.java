@@ -217,6 +217,25 @@ public final class PatientImageStore {
         }
     }
 
+    /** A completed snapshot gates a migration; failures never mark it as safe to write. */
+    public File backupMigrationOnce(String patientId, String migrationId, File... sources) throws IOException {
+        synchronized (LOCK) {
+            if (!migrationId.matches("[a-z0-9-]+")) throw new IOException("Invalid migration ID");
+            File index = new File(patientDir(patientId), "migration-backups.properties");
+            Properties state = read(index);
+            String saved = state.getProperty(migrationId);
+            if (saved != null) {
+                File existing = new File(patientDir(patientId), "backups/" + saved);
+                if (!existing.isDirectory()) throw new IOException("Migration backup missing");
+                return existing;
+            }
+            File backup = backupLegacy(patientId, sources);
+            state.setProperty(migrationId, backup.getName());
+            write(index, state);
+            return backup;
+        }
+    }
+
     /** One immutable snapshot per import. Missing legacy files are legitimate on a fresh install. */
     public File backupLegacy(String patientId, File... sources) throws IOException {
         synchronized (LOCK) {

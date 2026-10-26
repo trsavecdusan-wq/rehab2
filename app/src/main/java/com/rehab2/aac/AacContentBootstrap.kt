@@ -145,6 +145,12 @@ object AacContentBootstrap {
     )
 
     private val PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID = mapOf(
+        "dont_understand" to "system/daily_dont_understand_798.png",
+        "place_group" to "system/daily_place_group_798.png",
+        "i_want" to "system/daily_i_want_798.png",
+        "call" to "system/daily_call_798.png",
+        "friends_group" to "system/daily_friends_group_798.png",
+        "family_group" to "system/daily_family_group_798.png",
         "vest" to "system/vest.png",
         "choose_myself" to "system/choose_myself.png",
         "show_you" to "system/show_you.png",
@@ -289,9 +295,9 @@ object AacContentBootstrap {
         "hungry_pizza" to "system/food_pizza.png",
         "hungry_doughnut" to "system/food_donut.png",
         "hungry_pancakes" to "system/food_pancakes.png",
-        "feeling" to "system/feeling.png",
-        "care" to "system/care.png",
-        "health" to "system/health.png",
+        "feeling" to "system/daily_feeling_798.png",
+        "care" to "system/daily_care_798.png",
+        "health" to "system/daily_health_798.png",
         "cannot" to "system/cannot.png",
         "cold_hot" to "system/cold_hot.png",
         "dressing" to "system/care_dress.png",
@@ -311,7 +317,7 @@ object AacContentBootstrap {
         "balcony" to "system/place_balcony.png",
         "courtyard" to "system/place_yard.png",
         "bathroom" to "system/place_bathroom.png",
-        "shop" to "system/place_shop.png",
+        "shop" to "system/daily_shop_798.png",
         "vending_drinks" to "system/place_vending_machine.png",
         "vending_coffee_tea" to "system/place_vending_machine.png"
     )
@@ -473,6 +479,20 @@ object AacContentBootstrap {
     )
 
     fun ensurePatientStartupContent(context: Context, fallbackItems: List<AacItem>): Result {
+        // Snapshot existing data before any 798 repair, including preference/profile writes.
+        try {
+            val store = AacPatientImages.store(context)
+            store.backupMigrationOnce(store.currentPatientId(), "daily-798",
+                AacStoragePaths.getAacItemsFile(context),
+                AacStoragePaths.getPatientProfileFile(context),
+                AacStoragePaths.getProfilesDataDir(context)?.let { File(it, DOM_PROFILE_FILE) },
+                File(context.applicationInfo.dataDir, "shared_prefs/$PATIENT_PAGE_PREFS_NAME.xml"),
+                File(context.applicationInfo.dataDir, "shared_prefs/$CORE_V2_REPAIR_PREFS_NAME.xml"))
+        } catch (_: Exception) {
+            Log.w(TAG, "AAC 798 migration skipped: backup unavailable; existing data retained.")
+            return Result(0, currentPatientPages(context).size, false, "", 0, 0,
+                false, 0, 0, true, "daily_798_backup_failed")
+        }
         AacStoragePaths.ensureAacContentDirs(context)
         val seededSystemIcons = seedBundledSystemIcons(context)
         val itemsFile = AacStoragePaths.getAacItemsFile(context)
@@ -913,6 +933,14 @@ object AacContentBootstrap {
             .filter { starter -> starter.children.isNotEmpty() }
             .forEach { starter ->
                 val item = itemsById[starter.id] ?: return@forEach
+                if (AacDailyTreeUpgrade.handles(starter.id)) {
+                    val next = AacDailyTreeUpgrade.children(
+                        starter.id, stringList(item.optJSONArray("children")), starter.children,
+                        isUserProtected(item)
+                    )
+                    repaired += replaceChildrenIfDifferent(item, next)
+                    return@forEach
+                }
                 val children = item.optJSONArray("children") ?: JSONArray()
                 val existingChildren = stringList(children).toMutableSet()
                 var itemRepaired = 0

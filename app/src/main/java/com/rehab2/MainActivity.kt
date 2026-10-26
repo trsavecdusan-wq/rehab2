@@ -1671,7 +1671,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         cancelMainAacVoiceAssistantQuestion()
-        if (mainAacHistory.isNotEmpty() && normalizeMainAacKey(item.id) == "back_to_main") {
+        if (mainAacHistory.isNotEmpty() && normalizeMainAacKey(item.id) in setOf("back_to_main", "no")) {
             showPreviousMainAacItems()
             return
         }

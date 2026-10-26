@@ -2,9 +2,11 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $testOutput = Join-Path ([IO.Path]::GetTempPath()) ('NovaRehab-patient-tests-' + [guid]::NewGuid())
 New-Item -ItemType Directory -Path $testOutput | Out-Null
-& javac -encoding UTF-8 -d $testOutput (Join-Path $repoRoot 'app/src/main/java/com/rehab2/patient/PatientImageStore.java') (Join-Path $PSScriptRoot 'PatientImageStoreTest.java') (Join-Path $PSScriptRoot 'SeedImportTest.java')
+& javac -encoding UTF-8 -d $testOutput (Join-Path $repoRoot 'app/src/main/java/com/rehab2/patient/PatientImageStore.java') (Join-Path $PSScriptRoot 'PatientImageStoreTest.java') (Join-Path $PSScriptRoot 'SeedImportTest.java') (Join-Path $PSScriptRoot 'MigrationBackupTest.java')
 if ($LASTEXITCODE -ne 0) { throw 'Test compilation failed' }
 & java -cp $testOutput PatientImageStoreTest
 if ($LASTEXITCODE -ne 0) { throw 'Patient image tests failed' }
 & java -cp $testOutput SeedImportTest
 if ($LASTEXITCODE -ne 0) { throw 'Seed import tests failed' }
+& java -cp $testOutput MigrationBackupTest
+if ($LASTEXITCODE -ne 0) { throw 'Migration backup tests failed' }

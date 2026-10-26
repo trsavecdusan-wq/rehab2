@@ -624,8 +624,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun isGuidedBackNoItem(item: AacItem): Boolean {
-        if (item.id in AacFixedTopRow.positions) return false
-        if (!isGuidedFollowUpAllowed() || currentV2VisibleHistory.isEmpty()) {
+        if (currentV2VisibleHistory.isEmpty() && pageHistory.isEmpty()) {
             return false
         }
 

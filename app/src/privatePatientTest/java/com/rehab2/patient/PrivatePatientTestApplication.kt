@@ -17,7 +17,7 @@ import java.io.File
 import java.lang.ref.WeakReference
 import java.util.Properties
 
-/** Compiled ONLY by the local privatePatientTest build; ordinary debug/release cannot load it. */
+/** Local private build, plus the explicitly consented 798 test release; never infer patient identity. */
 class PrivatePatientTestApplication : Application(), Application.ActivityLifecycleCallbacks {
     private var attempted = false
     private var activity = WeakReference<MainActivity>(null)
