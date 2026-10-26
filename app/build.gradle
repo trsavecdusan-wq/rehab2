@@ -21,13 +21,13 @@ android {
         // Normal releases use even versionCode values only, for example 170, 172, 174.
         // Rollback releases use odd versionCode values only, for example 171, 173, 175.
         // A rollback APK may contain older stable code, but it must use a higher odd versionCode so Android allows install.
-        versionCode 10986
-        versionName "1.2.798"
+        versionCode 10996
+        versionName "1.2.808"
     }
 
     // Explicitly consented public test package for this release only.
     // Future versions must not inherit personal assets or the import entry point.
-    if (defaultConfig.versionCode == 10986 && defaultConfig.versionName == "1.2.798") {
+    if (defaultConfig.versionCode == 10996 && defaultConfig.versionName == "1.2.808") {
         ["debug", "release"].each { variant ->
             sourceSets.getByName(variant).java.srcDir("src/privatePatientTest/java")
             sourceSets.getByName(variant).assets.srcDir("src/consentedPatientTest798/assets")

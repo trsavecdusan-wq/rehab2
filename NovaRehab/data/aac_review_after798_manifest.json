@@ -1,0 +1,1706 @@
+{
+  "base": "v1.2.798",
+  "baseCommit": "9f27025",
+  "status": "prepared, not published",
+  "technicalSize": "512px maximum edge; original generated files preserved separately",
+  "entries": [
+    {
+      "id": "about_me",
+      "imagePath": "system/review_profile_card_bef437f2.png",
+      "sourceMeaning": "profile_card",
+      "sha256": "bef437f24ac972ad65d3fae7b4956dcd9934c85a186c349a35d6dc0ac5c68bac"
+    },
+    {
+      "id": "activity_group",
+      "imagePath": "system/review_activity_group_789fd08c.png",
+      "sourceMeaning": "activity_group",
+      "sha256": "789fd08c71ff986c72eac4df62bd82e5bc9df325e2af0c6cc9339093b3e6fc72"
+    },
+    {
+      "id": "afternoon",
+      "imagePath": "system/review_afternoon_647d55e1.png",
+      "sourceMeaning": "afternoon",
+      "sha256": "647d55e1eec945cf6643d00836f35389fe53a23a628c2c83d44882b66d8a5003"
+    },
+    {
+      "id": "angry",
+      "imagePath": "system/review_angry_623b3507.png",
+      "sourceMeaning": "angry",
+      "sha256": "623b35070edc2020b2ff987eec32ab26ec6e5f364e5b6da81ea67eca55183153"
+    },
+    {
+      "id": "animals",
+      "imagePath": "system/review_animals_9720a58c.png",
+      "sourceMeaning": "animals",
+      "sha256": "9720a58c20de28ddbafcf56b8386e58f822d6cc4f12971489dcf43d678724613"
+    },
+    {
+      "id": "arm",
+      "imagePath": "system/review_arm_9d268d88.png",
+      "sourceMeaning": "arm",
+      "sha256": "9d268d88d8ead4643e8d1021a7a50e53866af3c4d623b390d17868694d7de8be"
+    },
+    {
+      "id": "arm_fingers",
+      "imagePath": "system/review_arm_fingers_3501fb16.png",
+      "sourceMeaning": "arm_fingers",
+      "sha256": "3501fb160f7e595b4a7debb9b120d1b6cab99c077d8bec25eecffb744b02c86c"
+    },
+    {
+      "id": "arm_forearm",
+      "imagePath": "system/review_arm_forearm_4ee76471.png",
+      "sourceMeaning": "arm_forearm",
+      "sha256": "4ee76471ff9567c7c2bdaddc0992eaad2199a884c58b74c3d0cadc1dafe1c248"
+    },
+    {
+      "id": "arm_upper",
+      "imagePath": "system/review_arm_upper_54755159.png",
+      "sourceMeaning": "arm_upper",
+      "sha256": "5475515971dbbe1a3e55131aa8d98eea19f65e809ee82d725a3250c7af789652"
+    },
+    {
+      "id": "ashtray",
+      "imagePath": "system/review_ashtray_2b64d580.png",
+      "sourceMeaning": "ashtray",
+      "sha256": "2b64d5805205ddf4bf18b24f132ab46f6cc173c9d1fc59a124cf902d9f212ef4"
+    },
+    {
+      "id": "back_lower",
+      "imagePath": "system/review_back_lower_d6712fdd.png",
+      "sourceMeaning": "back_lower",
+      "sha256": "d6712fdd76b172d23718a49eb0270ab37ed1291df5f954131f9d0b8a1cd7e0ee"
+    },
+    {
+      "id": "back_middle",
+      "imagePath": "system/review_back_middle_fe8f72c3.png",
+      "sourceMeaning": "back_middle",
+      "sha256": "fe8f72c3621b0b8cdf2c5a8a7f6d2a7cbe2c649a302472f6783cffac22cc2b43"
+    },
+    {
+      "id": "back_to_main",
+      "imagePath": "system/review_reuse_home_a8216339.png",
+      "sourceMeaning": "@home.png",
+      "sha256": "a8216339bef6f01f399e6d6f2460dd541dc8150cfba577f178bf733ef7cb268f"
+    },
+    {
+      "id": "back_upper",
+      "imagePath": "system/review_back_upper_232e7330.png",
+      "sourceMeaning": "back_upper",
+      "sha256": "232e7330ac0e58671c1e3a9be768a90396bda4291ba2178c275b72aec872c6e8"
+    },
+    {
+      "id": "balcony",
+      "imagePath": "system/review_balcony_5cde31d6.png",
+      "sourceMeaning": "balcony",
+      "sha256": "5cde31d6c3a7b1334c556a0c9a82177ab9a3047beeba7ea6ea0cc02712431c49"
+    },
+    {
+      "id": "bathroom",
+      "imagePath": "system/review_bathroom_4f990427.png",
+      "sourceMeaning": "bathroom",
+      "sha256": "4f990427dff35ba3d70a5b522fb904d267767ffc7d9594a83d3f2b3aa8b52d82"
+    },
+    {
+      "id": "be_patient",
+      "imagePath": "system/review_reuse_wait_cf2f6d11.png",
+      "sourceMeaning": "@wait.png",
+      "sha256": "cf2f6d11e3e0dae9f482559c1348d3d0ed5621a06ac616db74ecc7e2985ebf0c"
+    },
+    {
+      "id": "bed",
+      "imagePath": "system/review_bed_f302e2c2.png",
+      "sourceMeaning": "bed",
+      "sha256": "f302e2c2346b2e53ee565db22ec161ca890ec4aecdab76d0f6447b6c667a77d0"
+    },
+    {
+      "id": "belly",
+      "imagePath": "system/review_belly_23aaf562.png",
+      "sourceMeaning": "belly",
+      "sha256": "23aaf5621e637686540e4b159a031210fa1f0ec162fbb60bf4b93992078845df"
+    },
+    {
+      "id": "belly_left",
+      "imagePath": "system/review_belly_left_624068af.png",
+      "sourceMeaning": "belly_left",
+      "sha256": "624068af87869bb601706884f099cacd7dfb321fc856854c0f0d673e9f7e30be"
+    },
+    {
+      "id": "belly_lower",
+      "imagePath": "system/review_belly_lower_3c91803d.png",
+      "sourceMeaning": "belly_lower",
+      "sha256": "3c91803d8fc32aa43483244412a0ea7d599a8b35a2c6526691e8a7c98ee69163"
+    },
+    {
+      "id": "belly_right",
+      "imagePath": "system/review_belly_right_8bae9bd0.png",
+      "sourceMeaning": "belly_right",
+      "sha256": "8bae9bd081eef62fdf2aa62b1b2b0bfce0775a32d42923f0f8de99a1cc6e4293"
+    },
+    {
+      "id": "belly_upper",
+      "imagePath": "system/review_belly_upper_8568f18b.png",
+      "sourceMeaning": "belly_upper",
+      "sha256": "8568f18be639be9b0b6c05f17299e45b6a486b9ddee1b7382c5a38051a0b3ce9"
+    },
+    {
+      "id": "bird",
+      "imagePath": "system/review_bird_06e6451c.png",
+      "sourceMeaning": "bird",
+      "sha256": "06e6451c8bfb66ff69af072f556ab8f6154a6294b74c0f60d7466182b14984c6"
+    },
+    {
+      "id": "blanket",
+      "imagePath": "system/review_blanket_8994e8c4.png",
+      "sourceMeaning": "blanket",
+      "sha256": "8994e8c43408d19ba9fbe894acda3e097ec0a5bad67a7d3b79646c72136b0750"
+    },
+    {
+      "id": "call_doctor",
+      "imagePath": "system/review_reuse_person_doctor_v2_9b6a2fbe.png",
+      "sourceMeaning": "person_doctor_v2",
+      "sha256": "9b6a2fbee037de9ec937e1078678319eda67e3ab7dc31bba5e277cc79ede25fe"
+    },
+    {
+      "id": "call_me",
+      "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
+      "sourceMeaning": "@daily_call_798.png",
+      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+    },
+    {
+      "id": "call_my_caregiver",
+      "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
+      "sourceMeaning": "@daily_call_798.png",
+      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+    },
+    {
+      "id": "call_my_therapist",
+      "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
+      "sourceMeaning": "@daily_call_798.png",
+      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+    },
+    {
+      "id": "call_nurse",
+      "imagePath": "system/review_reuse_person_nurse_v2_b23c8564.png",
+      "sourceMeaning": "person_nurse_v2",
+      "sha256": "b23c85641825f64bfdd6d8b6969fdf51a3f2210415952e23862f7f140e85a1be"
+    },
+    {
+      "id": "cannot",
+      "imagePath": "system/review_cannot_da19e481.png",
+      "sourceMeaning": "cannot",
+      "sha256": "da19e48153dea7b0095a9a2a5cad2d267c9976bcb264447b21449cac76b825ac"
+    },
+    {
+      "id": "cannot_breathe",
+      "imagePath": "system/review_cannot_breathe_6aacfefd.png",
+      "sourceMeaning": "cannot_breathe",
+      "sha256": "6aacfefdc6312e0484c2db7d6b8f4eca680f386230ee29cb78915cab3231e816"
+    },
+    {
+      "id": "cannot_drink",
+      "imagePath": "system/review_cannot_drink_93b295a9.png",
+      "sourceMeaning": "cannot_drink",
+      "sha256": "93b295a9fb6a1af0e07a86d8f88dfc985d0e33c0cacfa84c1b18caca5a966419"
+    },
+    {
+      "id": "cannot_eat",
+      "imagePath": "system/review_cannot_eat_7d601048.png",
+      "sourceMeaning": "cannot_eat",
+      "sha256": "7d601048b76256dc88955d4330b24e0ee0a26cae80c4a6562b882dc27a9788a3"
+    },
+    {
+      "id": "cannot_move",
+      "imagePath": "system/review_cannot_move_08ec742e.png",
+      "sourceMeaning": "cannot_move",
+      "sha256": "08ec742e52626e604502182a993dde054856cfbde7f53ee58a4d60aaff1fb8dd"
+    },
+    {
+      "id": "cannot_speak",
+      "imagePath": "system/review_cannot_speak_d2293812.png",
+      "sourceMeaning": "cannot_speak",
+      "sha256": "d2293812adebeb362f857a47a6e5520bc6b26c60c2487b4c4b760f6dd3204060"
+    },
+    {
+      "id": "cannot_stand",
+      "imagePath": "system/review_cannot_stand_022017fc.png",
+      "sourceMeaning": "cannot_stand",
+      "sha256": "022017fcc48ee1ead8174fd58566d010ce94f0859cc239801b09ca8ec74a4800"
+    },
+    {
+      "id": "cannot_understand",
+      "imagePath": "system/review_cannot_understand_a408604a.png",
+      "sourceMeaning": "cannot_understand",
+      "sha256": "a408604aa0ecfb74ecf943b5f7fdf3f0205bbe68d395220f81a0b1afdf30c8f6"
+    },
+    {
+      "id": "cat",
+      "imagePath": "system/review_cat_e12e3ec2.png",
+      "sourceMeaning": "cat",
+      "sha256": "e12e3ec226cbb4f3abd55ebf4a45ad638a578800d6343615f98b07701e8c8ab7"
+    },
+    {
+      "id": "chocolate_milk",
+      "imagePath": "system/review_chocolate_milk_3f300eb6.png",
+      "sourceMeaning": "chocolate_milk",
+      "sha256": "3f300eb687a14437958ed378472364b48d01d2d36e1885c6500ca1a31c73e3d5"
+    },
+    {
+      "id": "cigarette",
+      "imagePath": "system/review_cigarette_b52176f1.png",
+      "sourceMeaning": "cigarette",
+      "sha256": "b52176f155dcfe1bae3b26cdebc639c0f22d28e0d213f9f5b051e73df8ad25fa"
+    },
+    {
+      "id": "close_window",
+      "imagePath": "system/review_close_window_c9ab05a7.png",
+      "sourceMeaning": "close_window",
+      "sha256": "c9ab05a75eecb97ef8d7ba60d5d6e41362ab24423939d4fe7bfa660e08affdd7"
+    },
+    {
+      "id": "clothing",
+      "imagePath": "system/review_clothing_2e385270.png",
+      "sourceMeaning": "clothing",
+      "sha256": "2e38527006f657807a0f1cac483197cbaaf905306d78be84a0ce43989fffc912"
+    },
+    {
+      "id": "cocoa_drink",
+      "imagePath": "system/review_cocoa_drink_f1c6de67.png",
+      "sourceMeaning": "cocoa_drink",
+      "sha256": "f1c6de672928d7e553f0fd06d23ac9743f65d91e7fd105fa3ed29735f5676614"
+    },
+    {
+      "id": "coffee_no_sugar",
+      "imagePath": "system/review_coffee_no_sugar_1c9fdcce.png",
+      "sourceMeaning": "coffee_no_sugar",
+      "sha256": "1c9fdcce2be069c9456910ff76a49cb2e24bbbb8a2fecf08b61c591aa74249e4"
+    },
+    {
+      "id": "cold_hot",
+      "imagePath": "system/review_cold_hot_8d74dc65.png",
+      "sourceMeaning": "cold_hot",
+      "sha256": "8d74dc656b6719d08f3b2bf286f937a96164864fc2476879cab4966515e2f7e6"
+    },
+    {
+      "id": "contact_call",
+      "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
+      "sourceMeaning": "@daily_call_798.png",
+      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+    },
+    {
+      "id": "contact_help",
+      "imagePath": "system/review_reuse_help_2245b360.png",
+      "sourceMeaning": "@help.png",
+      "sha256": "2245b360e96df4170327282ea79a7b9c8c3a89ec7fe27a3821dd4c228c2482df"
+    },
+    {
+      "id": "contact_message",
+      "imagePath": "system/review_message_e9abde7b.png",
+      "sourceMeaning": "message",
+      "sha256": "e9abde7b1c1934e2de0e583f1ff94d63e81f6a283a3d4097679226edbb9cf3a9"
+    },
+    {
+      "id": "courtyard",
+      "imagePath": "system/review_courtyard_54e768cb.png",
+      "sourceMeaning": "courtyard",
+      "sha256": "54e768cb9e7ab1c90d1329282eea84b59ab48c9db4add6df0d1e44a2e551a4a9"
+    },
+    {
+      "id": "crutch",
+      "imagePath": "system/review_crutch_0e61d767.png",
+      "sourceMeaning": "crutch",
+      "sha256": "0e61d767ec1423536e929c9b4171909ac39c33901b8eb0a799c4ce0ee35d61b1"
+    },
+    {
+      "id": "dajte_mi_cas",
+      "imagePath": "system/review_reuse_wait_cf2f6d11.png",
+      "sourceMeaning": "@wait.png",
+      "sha256": "cf2f6d11e3e0dae9f482559c1348d3d0ed5621a06ac616db74ecc7e2985ebf0c"
+    },
+    {
+      "id": "diaper",
+      "imagePath": "system/review_diaper_da07c79b.png",
+      "sourceMeaning": "diaper",
+      "sha256": "da07c79b747bb5fc4e2cd39805b0af8f395797dda87348f2990cf5dd865631d8"
+    },
+    {
+      "id": "dining_room",
+      "imagePath": "system/review_restaurant_93d462e8.png",
+      "sourceMeaning": "restaurant",
+      "sha256": "93d462e89569b08c03f87506c31281685db89686146cbd50af15e15abe90486a"
+    },
+    {
+      "id": "dober_dan",
+      "imagePath": "system/review_visit_4e09043f.png",
+      "sourceMeaning": "visit",
+      "sha256": "4e09043f22319110db8e55343fd7b00f697be2ea566ee641e9ef86c6e16b61e4"
+    },
+    {
+      "id": "dober_vecer",
+      "imagePath": "system/review_evening_1d6216b2.png",
+      "sourceMeaning": "evening",
+      "sha256": "1d6216b2a93712e968a6d4ed94dbc634424112e1d84bb5a85316fa9eed718c09"
+    },
+    {
+      "id": "dobro_jutro",
+      "imagePath": "system/review_morning_b865300c.png",
+      "sourceMeaning": "morning",
+      "sha256": "b865300c1f23a1314f3ee71e303866c646c8df1f4542434e1ab1487a359bed67"
+    },
+    {
+      "id": "dog",
+      "imagePath": "system/review_dog_8251da9f.png",
+      "sourceMeaning": "dog",
+      "sha256": "8251da9f9b2a64dc0d8338fa9c86e978ec66b7f0405341c29329f5ed347c7837"
+    },
+    {
+      "id": "dont_know_problem",
+      "imagePath": "system/review_reuse_daily_dont_understand_798_a54dfeb9.png",
+      "sourceMeaning": "@daily_dont_understand_798.png",
+      "sha256": "a54dfeb9fb181243f5e9928cdead07c397539dd0aaa11e602b8e19e4247721bd"
+    },
+    {
+      "id": "dressing",
+      "imagePath": "system/review_reuse_toilet_dress_97089135.png",
+      "sourceMeaning": "@toilet_dress.png",
+      "sha256": "9708913522bef28a063f7427378393c27eba0c2de791aa65cab5e263ec6b7097"
+    },
+    {
+      "id": "drink",
+      "imagePath": "system/review_drink_category_7141f96c.png",
+      "sourceMeaning": "drink_category",
+      "sha256": "7141f96c1324746fc7b6e92deb03016f56abfe38197e42728efc6cb48e5d510f"
+    },
+    {
+      "id": "drink_cold",
+      "imagePath": "system/review_drink_cold_aa93522e.png",
+      "sourceMeaning": "drink_cold",
+      "sha256": "aa93522e174ebaffa8812b56e1159caf320315db3b0fa7d922df38b84b827bcc"
+    },
+    {
+      "id": "drink_milk",
+      "imagePath": "system/review_reuse_aac_drink_milk_440d1a3e.png",
+      "sourceMeaning": "@aac_drink_milk.png",
+      "sha256": "440d1a3e4e37fb7de28c6ea78f621d3f54d76f545f94d4b7a6d394c187771fd3"
+    },
+    {
+      "id": "drink_more",
+      "imagePath": "system/review_reuse_other_844b78eb.png",
+      "sourceMeaning": "@other.png",
+      "sha256": "844b78ebc1d83d4b6296ac9b45c6118316bc8a09be1a251bfaff3f596a99939e"
+    },
+    {
+      "id": "drink_no_additive",
+      "imagePath": "system/review_drink_no_additive_ec382f9f.png",
+      "sourceMeaning": "drink_no_additive",
+      "sha256": "ec382f9ff9206ce117e0e9658ae220e6625eb0331d2982ef50c439ff4633d1b1"
+    },
+    {
+      "id": "drink_small",
+      "imagePath": "system/review_drink_small_7903bc91.png",
+      "sourceMeaning": "drink_small",
+      "sha256": "7903bc9123a66983cffb8fe71eba21733a8b8ce6cbdf2ccfd6ec16feef1617a6"
+    },
+    {
+      "id": "drink_warm",
+      "imagePath": "system/review_drink_warm_bfa4d0e1.png",
+      "sourceMeaning": "drink_warm",
+      "sha256": "bfa4d0e1e74eb8bdb90b806dcab864b2b73cf233879d4881b9b2426b79e8e55d"
+    },
+    {
+      "id": "drink_yogurt",
+      "imagePath": "system/review_drink_yogurt_e73c91db.png",
+      "sourceMeaning": "drink_yogurt",
+      "sha256": "e73c91dbbb6e5f0e13a65a031a8c5a2de640cb60963acb93739b8f59eff01582"
+    },
+    {
+      "id": "ear",
+      "imagePath": "system/review_ear_78650fb4.png",
+      "sourceMeaning": "ear",
+      "sha256": "78650fb40fda76cc23e2c45d2267bdbc1d0575f36a5eea20785b49f6709875ff"
+    },
+    {
+      "id": "ear_both",
+      "imagePath": "system/review_ear_both_f398e4d5.png",
+      "sourceMeaning": "ear_both",
+      "sha256": "f398e4d5aa95dbc477f0829cc51c5bcc11ec47797fe3689974cb7849e288b081"
+    },
+    {
+      "id": "ear_left",
+      "imagePath": "system/review_ear_left_e2ec8c61.png",
+      "sourceMeaning": "ear_left",
+      "sha256": "e2ec8c617a9c29e39974cdb7db51f3bb56bbd39dea80f4c5c8f8167e7cfb20e0"
+    },
+    {
+      "id": "ear_right",
+      "imagePath": "system/review_ear_right_d9334f55.png",
+      "sourceMeaning": "ear_right",
+      "sha256": "d9334f55ec3aac41e136ac6921d18760702f423ba59f0480464fcd8b168bfeba"
+    },
+    {
+      "id": "emergency",
+      "imagePath": "system/review_reuse_problem_e432a520.png",
+      "sourceMeaning": "@problem.png",
+      "sha256": "e432a520ee72c89ad1772941e7d0904a8370b4a997a0e60c87005ba68957ca9d"
+    },
+    {
+      "id": "environment_group",
+      "imagePath": "system/review_room_b2c12416.png",
+      "sourceMeaning": "room",
+      "sha256": "b2c12416c4c8bf2c7405e8991f968295c56e6dbc551d53dad10e08949ef70db7"
+    },
+    {
+      "id": "evening",
+      "imagePath": "system/review_evening_1d6216b2.png",
+      "sourceMeaning": "evening",
+      "sha256": "1d6216b2a93712e968a6d4ed94dbc634424112e1d84bb5a85316fa9eed718c09"
+    },
+    {
+      "id": "eye",
+      "imagePath": "system/review_eye_501a27aa.png",
+      "sourceMeaning": "eye",
+      "sha256": "501a27aa4e1e314c5eef9343ce15b49cf36554c9c9fb2d0cf56854071eba7fa9"
+    },
+    {
+      "id": "eye_both",
+      "imagePath": "system/review_eye_both_150c4cbd.png",
+      "sourceMeaning": "eye_both",
+      "sha256": "150c4cbd222b5b348e1e4c738e74c7417dd41e35bb8f521151d105f1dc189ea7"
+    },
+    {
+      "id": "eye_left",
+      "imagePath": "system/review_eye_left_ab6c29c5.png",
+      "sourceMeaning": "eye_left",
+      "sha256": "ab6c29c5581804c2c0482fc7cffab1c6c11dd217c7a3260f6855709c614b8ee6"
+    },
+    {
+      "id": "eye_right",
+      "imagePath": "system/review_eye_right_dcd7e866.png",
+      "sourceMeaning": "eye_right",
+      "sha256": "dcd7e866ab0dced27aa12ef84acd0f4c72e4c1212d144747787de100115d02c0"
+    },
+    {
+      "id": "fear_falling",
+      "imagePath": "system/review_fear_falling_83667395.png",
+      "sourceMeaning": "fear_falling",
+      "sha256": "836673950ef332d36e628a178f85f814310ac1740f745413a48cf43703dfdaae"
+    },
+    {
+      "id": "feel_bad",
+      "imagePath": "system/review_reuse_feeling_bad_61749ded.png",
+      "sourceMeaning": "@feeling_bad.png",
+      "sha256": "61749dedc23c691c70f2fa9152e1e21783c4c9b10b5dcbd07205fac410fd8733"
+    },
+    {
+      "id": "fish",
+      "imagePath": "system/review_fish_b713ff74.png",
+      "sourceMeaning": "fish",
+      "sha256": "b713ff7454a901644bc13c9d9efcf81464af0383df0718cdbfb8ac8185fe691f"
+    },
+    {
+      "id": "fix_me",
+      "imagePath": "system/review_reuse_care_turn_bed_3c7caecd.png",
+      "sourceMeaning": "@care_turn_bed.png",
+      "sha256": "3c7caecd5f1b042b7e8375e4073434c3eaa65555477b60cfbff5e48ad41ce89b"
+    },
+    {
+      "id": "flavored_water",
+      "imagePath": "system/review_flavored_water_4cf92a98.png",
+      "sourceMeaning": "flavored_water",
+      "sha256": "4cf92a984470209e63812af75348247bb323a5fa1d7dcb759e500b55bc9a1db2"
+    },
+    {
+      "id": "food_enough",
+      "imagePath": "system/review_reuse_yes_287fe28f.png",
+      "sourceMeaning": "@yes.png",
+      "sha256": "287fe28f385cb1b2c339b47d7498919e646c42884eedb89326a26513f931c6fa"
+    },
+    {
+      "id": "food_later",
+      "imagePath": "system/review_reuse_wait_cf2f6d11.png",
+      "sourceMeaning": "@wait.png",
+      "sha256": "cf2f6d11e3e0dae9f482559c1348d3d0ed5621a06ac616db74ecc7e2985ebf0c"
+    },
+    {
+      "id": "food_little",
+      "imagePath": "system/review_food_little_3d607c54.png",
+      "sourceMeaning": "food_little",
+      "sha256": "3d607c5452ed6ff1e3b0e20a17eab5666800cf210802bdda8626374c85834d03"
+    },
+    {
+      "id": "food_more",
+      "imagePath": "system/review_reuse_other_844b78eb.png",
+      "sourceMeaning": "@other.png",
+      "sha256": "844b78ebc1d83d4b6296ac9b45c6118316bc8a09be1a251bfaff3f596a99939e"
+    },
+    {
+      "id": "food_yogurt",
+      "imagePath": "system/review_plain_yogurt_7d5b945b.png",
+      "sourceMeaning": "plain_yogurt",
+      "sha256": "7d5b945b5f5bd49d49b1fcba0cedc1b451f97f05994ebbb614a64dbf216c62a6"
+    },
+    {
+      "id": "gloves",
+      "imagePath": "system/review_gloves_2762d93a.png",
+      "sourceMeaning": "gloves",
+      "sha256": "2762d93a405d7f3c4fc5355a182a4e1ce234cb4d2900d79bb61517de3ae45b2c"
+    },
+    {
+      "id": "go_inside",
+      "imagePath": "system/review_room_b2c12416.png",
+      "sourceMeaning": "room",
+      "sha256": "b2c12416c4c8bf2c7405e8991f968295c56e6dbc551d53dad10e08949ef70db7"
+    },
+    {
+      "id": "go_outside_with_wheelchair",
+      "imagePath": "system/review_wheelchair_46e4c622.png",
+      "sourceMeaning": "wheelchair",
+      "sha256": "46e4c62274e737b37f1f76f22da890f9a2f785d0fae5ee31659cbb325958bac8"
+    },
+    {
+      "id": "govori_pocasneje",
+      "imagePath": "system/review_reuse_slower_113dc3dd.png",
+      "sourceMeaning": "@slower.png",
+      "sha256": "113dc3dd419f521a45b99d5cd96dd0fd0d901387fd81350220e814f403b8b558"
+    },
+    {
+      "id": "hat",
+      "imagePath": "system/review_hat_37588d00.png",
+      "sourceMeaning": "hat",
+      "sha256": "37588d00d334e4376512f900a5d82dca64485a4895fb5f698db03645c4697e5e"
+    },
+    {
+      "id": "help_drinking",
+      "imagePath": "system/review_help_drinking_cba9d2fd.png",
+      "sourceMeaning": "help_drinking",
+      "sha256": "cba9d2fdc9ccc9b0dc68694911cabbd3590e5ffe9fc50792ec2309b92beaac01"
+    },
+    {
+      "id": "help_feeding",
+      "imagePath": "system/review_help_feeding_3591d4bb.png",
+      "sourceMeaning": "help_feeding",
+      "sha256": "3591d4bb09e3d68f81548ab00951650b066f65b7a1f44c1cc3ab8d62b80ee520"
+    },
+    {
+      "id": "help_to_wc",
+      "imagePath": "system/review_reuse_toilet_general_cea817c3.png",
+      "sourceMeaning": "@toilet_general.png",
+      "sha256": "cea817c3c8c9a4e1fb9c142157dd0035381c0b7a87773f45906b6614a4627d7d"
+    },
+    {
+      "id": "horse",
+      "imagePath": "system/review_horse_c61c243e.png",
+      "sourceMeaning": "horse",
+      "sha256": "c61c243eb0f0477b4f02d537d96deb730973c1ec3c9008a8addf6f15ff858977"
+    },
+    {
+      "id": "hungry_beef",
+      "imagePath": "system/review_hungry_beef_b6758afc.png",
+      "sourceMeaning": "hungry_beef",
+      "sha256": "b6758afc3848d08084b708c76911bd41f72062f4fb0fdf5f0f479962ad88fbce"
+    },
+    {
+      "id": "hungry_burek",
+      "imagePath": "system/review_hungry_burek_b29734c8.png",
+      "sourceMeaning": "hungry_burek",
+      "sha256": "b29734c82d95742bba2984cecd505943973091021df5be7ed6665c100ce976e8"
+    },
+    {
+      "id": "hungry_cevapcici",
+      "imagePath": "system/review_hungry_cevapcici_983f8191.png",
+      "sourceMeaning": "hungry_cevapcici",
+      "sha256": "983f8191218015b519205015a9e0ddd7d800ce67223d89454cd038d1dc100245"
+    },
+    {
+      "id": "hungry_chips",
+      "imagePath": "system/review_hungry_chips_0cf95a3c.png",
+      "sourceMeaning": "hungry_chips",
+      "sha256": "0cf95a3c65040d2f523f4823b0963358a999ea308ae79770f09b5d9c3984f662"
+    },
+    {
+      "id": "hungry_cookies",
+      "imagePath": "system/review_hungry_cookies_8346c61e.png",
+      "sourceMeaning": "hungry_cookies",
+      "sha256": "8346c61e58e2309caddc2442f3280d4c673e0743b429a82afee2b1cd5df0ccd3"
+    },
+    {
+      "id": "hungry_crackers",
+      "imagePath": "system/review_hungry_crackers_4dbe5f92.png",
+      "sourceMeaning": "hungry_crackers",
+      "sha256": "4dbe5f92fed0f330406f897cab358354ba6f716f7b50e3c80443639adff1a5a8"
+    },
+    {
+      "id": "hungry_fries",
+      "imagePath": "system/review_hungry_fries_e17ac9a5.png",
+      "sourceMeaning": "hungry_fries",
+      "sha256": "e17ac9a5626a31cc2c19c6aec9245c7d989f1576c876285d837b34609de11a77"
+    },
+    {
+      "id": "hungry_fruit_yogurt",
+      "imagePath": "system/review_hungry_fruit_yogurt_663f5f94.png",
+      "sourceMeaning": "hungry_fruit_yogurt",
+      "sha256": "663f5f941c3379f2bda996cc81a83106c8fae440ae7d9625ecbb441fdf135d07"
+    },
+    {
+      "id": "hungry_hotdog",
+      "imagePath": "system/review_hungry_hotdog_92e83d09.png",
+      "sourceMeaning": "hungry_hotdog",
+      "sha256": "92e83d09ed10511ce720c9f6d08465b58f9eb57af386cdfd903fb6efe1828b92"
+    },
+    {
+      "id": "hungry_kid_goat",
+      "imagePath": "system/review_hungry_kid_goat_db014e54.png",
+      "sourceMeaning": "hungry_kid_goat",
+      "sha256": "db014e545d2f6af78b93f8142bc02ff2ea35a566085ca593895075597d391409"
+    },
+    {
+      "id": "hungry_kremsnita",
+      "imagePath": "system/review_hungry_kremsnita_0314f714.png",
+      "sourceMeaning": "hungry_kremsnita",
+      "sha256": "0314f71461ad77e0ee5e94365a6be8bd8fd0442f081d99e7df29841a49b1f2f3"
+    },
+    {
+      "id": "hungry_lamb",
+      "imagePath": "system/review_hungry_lamb_671a508a.png",
+      "sourceMeaning": "hungry_lamb",
+      "sha256": "671a508ab3c1c6514cb7094a46385ded925f2eb3039ffeb5e99fdec6eb6d0fd0"
+    },
+    {
+      "id": "hungry_pleskavica",
+      "imagePath": "system/review_hungry_pleskavica_a54902fd.png",
+      "sourceMeaning": "hungry_pleskavica",
+      "sha256": "a54902fd48513ab2f30e90dc94cf088470c89d5b8449d45b3d40c3e0459873c0"
+    },
+    {
+      "id": "hungry_pork",
+      "imagePath": "system/review_hungry_pork_a639d7f8.png",
+      "sourceMeaning": "hungry_pork",
+      "sha256": "a639d7f83c73c8cedb3c316cf7eb64c79b1aab48a548b4c3bfaea19f3311a055"
+    },
+    {
+      "id": "hungry_roasted_potato",
+      "imagePath": "system/review_hungry_roasted_potato_2f16e051.png",
+      "sourceMeaning": "hungry_roasted_potato",
+      "sha256": "2f16e0512fa4f7721eadc21e6533354f427f3447817a9cba1e3e9a175f843efd"
+    },
+    {
+      "id": "hungry_snack",
+      "imagePath": "system/review_hungry_chips_0cf95a3c.png",
+      "sourceMeaning": "hungry_chips",
+      "sha256": "0cf95a3c65040d2f523f4823b0963358a999ea308ae79770f09b5d9c3984f662"
+    },
+    {
+      "id": "hungry_toast",
+      "imagePath": "system/review_hungry_toast_93cd9c3e.png",
+      "sourceMeaning": "hungry_toast",
+      "sha256": "93cd9c3e95a1fd07c51622fb8dc8050dead2af4d6ef05cf614b60661d4fbc176"
+    },
+    {
+      "id": "hungry_veal",
+      "imagePath": "system/review_hungry_veal_d20cff1a.png",
+      "sourceMeaning": "hungry_veal",
+      "sha256": "d20cff1a554ca066a0d19a636979b97836413fae3135e9a31993f162b03a8411"
+    },
+    {
+      "id": "hungry_vegetable_soup",
+      "imagePath": "system/review_hungry_vegetable_soup_288340a1.png",
+      "sourceMeaning": "hungry_vegetable_soup",
+      "sha256": "288340a1944fdf650298f4b64b8076b031d36fba1f44e71ed5ef37aca2c6a0e1"
+    },
+    {
+      "id": "hungry_yogurt",
+      "imagePath": "system/review_plain_yogurt_7d5b945b.png",
+      "sourceMeaning": "plain_yogurt",
+      "sha256": "7d5b945b5f5bd49d49b1fcba0cedc1b451f97f05994ebbb614a64dbf216c62a6"
+    },
+    {
+      "id": "i_understand",
+      "imagePath": "system/review_reuse_yes_287fe28f.png",
+      "sourceMeaning": "@yes.png",
+      "sha256": "287fe28f385cb1b2c339b47d7498919e646c42884eedb89326a26513f931c6fa"
+    },
+    {
+      "id": "ice_cream",
+      "imagePath": "system/review_reuse_food_icecream_080d6bb0.png",
+      "sourceMeaning": "@food_icecream.png",
+      "sha256": "080d6bb096c73fa8f9cd26ce7d4e13b744ed83cffe40fa5710c474e74db1c6db"
+    },
+    {
+      "id": "inside",
+      "imagePath": "system/review_room_b2c12416.png",
+      "sourceMeaning": "room",
+      "sha256": "b2c12416c4c8bf2c7405e8991f968295c56e6dbc551d53dad10e08949ef70db7"
+    },
+    {
+      "id": "jacket",
+      "imagePath": "system/review_jacket_45676639.png",
+      "sourceMeaning": "jacket",
+      "sha256": "456766396427eeeba5deb5d0bd0a9984841168ac3a7ef35827da773f7098128d"
+    },
+    {
+      "id": "lahko_noc",
+      "imagePath": "system/review_night_e59109c7.png",
+      "sourceMeaning": "night",
+      "sha256": "e59109c721a35f2dcf7ba89370fc502b64ada35d06a28e52a4740938a30f28c7"
+    },
+    {
+      "id": "later",
+      "imagePath": "system/review_reuse_wait_cf2f6d11.png",
+      "sourceMeaning": "@wait.png",
+      "sha256": "cf2f6d11e3e0dae9f482559c1348d3d0ed5621a06ac616db74ecc7e2985ebf0c"
+    },
+    {
+      "id": "left_side",
+      "imagePath": "system/review_left_side_dfb32e05.png",
+      "sourceMeaning": "left_side",
+      "sha256": "dfb32e05ac9f827af87217c3707c463941f65c8d9227739d25320905d3efe20a"
+    },
+    {
+      "id": "leg",
+      "imagePath": "system/review_leg_59abc145.png",
+      "sourceMeaning": "leg",
+      "sha256": "59abc14581992aed30b6f67804f37d256659b180df5bb33e425ca03777db3c5b"
+    },
+    {
+      "id": "leg_shin",
+      "imagePath": "system/review_leg_shin_57057237.png",
+      "sourceMeaning": "leg_shin",
+      "sha256": "57057237d41baec01f77eabf7d45e09298aa09ce2cae6603fd320a37a23cf83e"
+    },
+    {
+      "id": "leg_thigh",
+      "imagePath": "system/review_leg_thigh_68a96a40.png",
+      "sourceMeaning": "leg_thigh",
+      "sha256": "68a96a40cdeca56bc0f31d5e457d66143ff3de08a83eaaab0477114f5713854f"
+    },
+    {
+      "id": "leg_toes",
+      "imagePath": "system/review_leg_toes_3447f7ca.png",
+      "sourceMeaning": "leg_toes",
+      "sha256": "3447f7ca370c682514ee9c74f769291d7153fa939396e126b5b94793bf605057"
+    },
+    {
+      "id": "lie_down",
+      "imagePath": "system/review_lie_down_f9dfaf9b.png",
+      "sourceMeaning": "lie_down",
+      "sha256": "f9dfaf9b33d843601463e63cb61c0bab1d18d54132e7b83b9ab684891661c9e6"
+    },
+    {
+      "id": "lighter",
+      "imagePath": "system/review_lighter_dfdf6815.png",
+      "sourceMeaning": "lighter",
+      "sha256": "dfdf6815d5e5f7f289879aa2a426054af00eaaca795905d62bc14caa0ff17d74"
+    },
+    {
+      "id": "look_at_me",
+      "imagePath": "system/review_look_at_me_37f02789.png",
+      "sourceMeaning": "look_at_me",
+      "sha256": "37f027892536c94767ccfc069f8b8a8e790e15a5fd6c8853c5bbc8c363ee3e41"
+    },
+    {
+      "id": "love_you",
+      "imagePath": "system/review_reuse_miss_someone_3c864c60.png",
+      "sourceMeaning": "@miss_someone.png",
+      "sha256": "3c864c60725d88859b55d24092930051677de1d958ebc5716cd89f0e86b48834"
+    },
+    {
+      "id": "medicine",
+      "imagePath": "system/review_medicine_1346ce92.png",
+      "sourceMeaning": "medicine",
+      "sha256": "1346ce9227bd525a9be3fac0f139a80152ed6f074e971a9057c219d1c8c4cc56"
+    },
+    {
+      "id": "message",
+      "imagePath": "system/review_message_e9abde7b.png",
+      "sourceMeaning": "message",
+      "sha256": "e9abde7b1c1934e2de0e583f1ff94d63e81f6a283a3d4097679226edbb9cf3a9"
+    },
+    {
+      "id": "mineral_water",
+      "imagePath": "system/review_radenska_b37bdf84.png",
+      "sourceMeaning": "radenska",
+      "sha256": "b37bdf8460363f3b099c751c6383b5e2627fe7a7eb99eb14a22bcac831e3a0c8"
+    },
+    {
+      "id": "miss_little",
+      "imagePath": "system/review_miss_little_96025b95.png",
+      "sourceMeaning": "miss_little",
+      "sha256": "96025b95cd974c393877ab11f6cf97cf09bcfd798efa5484dd0f07348be7fc71"
+    },
+    {
+      "id": "miss_very",
+      "imagePath": "system/review_miss_very_ac11f20f.png",
+      "sourceMeaning": "miss_very",
+      "sha256": "ac11f20f6b100177ddecd04ffe0765f89430578632de88dbded4203e3e1b212a"
+    },
+    {
+      "id": "morning",
+      "imagePath": "system/review_morning_b865300c.png",
+      "sourceMeaning": "morning",
+      "sha256": "b865300c1f23a1314f3ee71e303866c646c8df1f4542434e1ab1487a359bed67"
+    },
+    {
+      "id": "mouth",
+      "imagePath": "system/review_mouth_0ae0696b.png",
+      "sourceMeaning": "mouth",
+      "sha256": "0ae0696b46a32233abb79cb3230d7e6e9c9dc480a1d5dd98c79329d05171ffa3"
+    },
+    {
+      "id": "move_me",
+      "imagePath": "system/review_wheelchair_46e4c622.png",
+      "sourceMeaning": "wheelchair",
+      "sha256": "46e4c62274e737b37f1f76f22da890f9a2f785d0fae5ee31659cbb325958bac8"
+    },
+    {
+      "id": "movement_pain",
+      "imagePath": "system/review_pain_general_e8a89094.png",
+      "sourceMeaning": "pain_general",
+      "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+    },
+    {
+      "id": "music",
+      "imagePath": "system/review_music_93adcb0a.png",
+      "sourceMeaning": "music",
+      "sha256": "93adcb0abbd74ce8b78b9022f932fb9c8f5418a3a6793f39ada742ff3694b1c1"
+    },
+    {
+      "id": "my_age",
+      "imagePath": "system/review_birthday_a4d10ce0.png",
+      "sourceMeaning": "birthday",
+      "sha256": "a4d10ce0ae2754a08f8ac48d19ff103a0a42f732d68b7e3ddb64f0e26d3a3f37"
+    },
+    {
+      "id": "my_birth_date",
+      "imagePath": "system/review_birthday_a4d10ce0.png",
+      "sourceMeaning": "birthday",
+      "sha256": "a4d10ce0ae2754a08f8ac48d19ff103a0a42f732d68b7e3ddb64f0e26d3a3f37"
+    },
+    {
+      "id": "my_caregiver",
+      "imagePath": "system/review_reuse_daily_care_798_760fc0a6.png",
+      "sourceMeaning": "@daily_care_798.png",
+      "sha256": "760fc0a66c3d61b0de1a81996c1634f285a7ca78bd05fb27e1227534a17f93a3"
+    },
+    {
+      "id": "my_country",
+      "imagePath": "system/review_reuse_real_world_51b54975.png",
+      "sourceMeaning": "@real_world.png",
+      "sha256": "51b549753735c8fdaf6dddecab3ed46b8ed9c7f3e117d444ca8ab6ade989af7a"
+    },
+    {
+      "id": "my_home",
+      "imagePath": "system/review_reuse_home_a8216339.png",
+      "sourceMeaning": "@home.png",
+      "sha256": "a8216339bef6f01f399e6d6f2460dd541dc8150cfba577f178bf733ef7cb268f"
+    },
+    {
+      "id": "my_language",
+      "imagePath": "system/review_reuse_real_world_51b54975.png",
+      "sourceMeaning": "@real_world.png",
+      "sha256": "51b549753735c8fdaf6dddecab3ed46b8ed9c7f3e117d444ca8ab6ade989af7a"
+    },
+    {
+      "id": "my_name",
+      "imagePath": "system/review_profile_card_bef437f2.png",
+      "sourceMeaning": "profile_card",
+      "sha256": "bef437f24ac972ad65d3fae7b4956dcd9934c85a186c349a35d6dc0ac5c68bac"
+    },
+    {
+      "id": "my_therapist",
+      "imagePath": "system/review_therapy_4ea445a8.png",
+      "sourceMeaning": "therapy",
+      "sha256": "4ea445a80064517721135b3f795519f662e44cfe2c7af21bf226f7beae40bbaf"
+    },
+    {
+      "id": "napisi_mi",
+      "imagePath": "system/review_napisi_mi_a9b35c6e.png",
+      "sourceMeaning": "napisi_mi",
+      "sha256": "a9b35c6e07836ef213ae8ad4f35025d93d4f1e601aebb498ff9c85f3e8f10381"
+    },
+    {
+      "id": "neck",
+      "imagePath": "system/review_neck_36c79e1f.png",
+      "sourceMeaning": "neck",
+      "sha256": "36c79e1fbb3fbdaebb1850b797af576dbf8d0c1b3b5d85623c8e834cdab2af21"
+    },
+    {
+      "id": "night",
+      "imagePath": "system/review_night_e59109c7.png",
+      "sourceMeaning": "night",
+      "sha256": "e59109c721a35f2dcf7ba89370fc502b64ada35d06a28e52a4740938a30f28c7"
+    },
+    {
+      "id": "nisem_koncala",
+      "imagePath": "system/review_nisem_koncala_759115e5.png",
+      "sourceMeaning": "nisem_koncala",
+      "sha256": "759115e590dca527b2d54647bd09ad9098b144590bc0a39bc9e234244bb93a62"
+    },
+    {
+      "id": "nose",
+      "imagePath": "system/review_nose_c9d2275a.png",
+      "sourceMeaning": "nose",
+      "sha256": "c9d2275acc98668709a59376ed6c19be9d5d6b2562c160f2af9cbaab627b335f"
+    },
+    {
+      "id": "not_hungry",
+      "imagePath": "system/review_not_hungry_bc078ea1.png",
+      "sourceMeaning": "not_hungry",
+      "sha256": "bc078ea1a3c785508ccd879092887e80e1db859768af4574e82dffe60532400e"
+    },
+    {
+      "id": "not_safe",
+      "imagePath": "system/review_reuse_problem_e432a520.png",
+      "sourceMeaning": "@problem.png",
+      "sha256": "e432a520ee72c89ad1772941e7d0904a8370b4a997a0e60c87005ba68957ca9d"
+    },
+    {
+      "id": "not_thirsty",
+      "imagePath": "system/review_not_thirsty_5f3a1827.png",
+      "sourceMeaning": "not_thirsty",
+      "sha256": "5f3a18276359e56e4ee4dfcfaddccfdee9e28a6bfadb93aea1890db8f43338d1"
+    },
+    {
+      "id": "now",
+      "imagePath": "system/review_now_eb4b343c.png",
+      "sourceMeaning": "now",
+      "sha256": "eb4b343c8d29f54875cd59b0ab5476b26469422ae5552fccf651ef633252d636"
+    },
+    {
+      "id": "open_window",
+      "imagePath": "system/review_open_window_7da2ab3a.png",
+      "sourceMeaning": "open_window",
+      "sha256": "7da2ab3ac3a80364077740bb62156a700a1d48d8407c037b9e25159464636997"
+    },
+    {
+      "id": "oprosti_social",
+      "imagePath": "system/review_reuse_sorry_289621ee.png",
+      "sourceMeaning": "@sorry.png",
+      "sha256": "289621ee0791e872f6a61f973861b3c704d9df0a08808899364e79a2ee8ed08b"
+    },
+    {
+      "id": "other",
+      "imagePath": "system/review_other_18728943.png",
+      "sourceMeaning": "other",
+      "sha256": "1872894343cdc5f2b0a8fdb704ee6e37a69f5f8b3ce79d9e512a9089e94a74d8"
+    },
+    {
+      "id": "other_body",
+      "imagePath": "system/review_other_body_05ae2ec8.png",
+      "sourceMeaning": "other_body",
+      "sha256": "05ae2ec86d51d446b6aaa4a3ec880b65744c731effd9a203382ac2395f8da88f"
+    },
+    {
+      "id": "other_food",
+      "imagePath": "system/review_reuse_food_main_dish_ce03f417.png",
+      "sourceMeaning": "@food_main_dish.png",
+      "sha256": "ce03f417ec540d59b5e66d9c02c17583163d96b80cc13b9f9f5c5682efc6f0ac"
+    },
+    {
+      "id": "outside",
+      "imagePath": "system/review_courtyard_54e768cb.png",
+      "sourceMeaning": "courtyard",
+      "sha256": "54e768cb9e7ab1c90d1329282eea84b59ab48c9db4add6df0d1e44a2e551a4a9"
+    },
+    {
+      "id": "pain",
+      "imagePath": "system/review_pain_general_e8a89094.png",
+      "sourceMeaning": "pain_general",
+      "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+    },
+    {
+      "id": "pain_area",
+      "imagePath": "system/review_pain_general_e8a89094.png",
+      "sourceMeaning": "pain_general",
+      "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+    },
+    {
+      "id": "pain_light",
+      "imagePath": "system/review_pain_light_11f05cd6.png",
+      "sourceMeaning": "pain_light",
+      "sha256": "11f05cd65c1a94088ce0dc286adb34faafd95699380f967ef460951b24c463fb"
+    },
+    {
+      "id": "pain_many_days",
+      "imagePath": "system/review_many_days_4fabc567.png",
+      "sourceMeaning": "many_days",
+      "sha256": "4fabc567b134b1638f78410dbbad030d69efc96045e1cc08cf83dcd4bc37cd37"
+    },
+    {
+      "id": "pain_medium",
+      "imagePath": "system/review_pain_medium_34262fd7.png",
+      "sourceMeaning": "pain_medium",
+      "sha256": "34262fd79ed305ebccf8962a527b635ec2d69981ecf93ddae2b70fec0b0df40a"
+    },
+    {
+      "id": "pain_now",
+      "imagePath": "system/review_now_eb4b343c.png",
+      "sourceMeaning": "now",
+      "sha256": "eb4b343c8d29f54875cd59b0ab5476b26469422ae5552fccf651ef633252d636"
+    },
+    {
+      "id": "pain_since_evening",
+      "imagePath": "system/review_evening_1d6216b2.png",
+      "sourceMeaning": "evening",
+      "sha256": "1d6216b2a93712e968a6d4ed94dbc634424112e1d84bb5a85316fa9eed718c09"
+    },
+    {
+      "id": "pain_since_long",
+      "imagePath": "system/review_many_days_4fabc567.png",
+      "sourceMeaning": "many_days",
+      "sha256": "4fabc567b134b1638f78410dbbad030d69efc96045e1cc08cf83dcd4bc37cd37"
+    },
+    {
+      "id": "pain_since_morning",
+      "imagePath": "system/review_morning_b865300c.png",
+      "sourceMeaning": "morning",
+      "sha256": "b865300c1f23a1314f3ee71e303866c646c8df1f4542434e1ab1487a359bed67"
+    },
+    {
+      "id": "pain_since_today",
+      "imagePath": "system/review_today_1e80e967.png",
+      "sourceMeaning": "today",
+      "sha256": "1e80e96793ce7a96fc1f5b24c38546b11de29b66962beb3c1f8c332c0e089642"
+    },
+    {
+      "id": "pain_since_yesterday",
+      "imagePath": "system/review_yesterday_2c5f8fef.png",
+      "sourceMeaning": "yesterday",
+      "sha256": "2c5f8fef056e29d4efa7421d33320782ed7868e03fad0af3ad54e2d72c2cc394"
+    },
+    {
+      "id": "pain_strong",
+      "imagePath": "system/review_pain_strong_7d453f64.png",
+      "sourceMeaning": "pain_strong",
+      "sha256": "7d453f649457f37530ee152161c22f418e134f79d40d3323745f40b1e207c792"
+    },
+    {
+      "id": "pain_today",
+      "imagePath": "system/review_today_1e80e967.png",
+      "sourceMeaning": "today",
+      "sha256": "1e80e96793ce7a96fc1f5b24c38546b11de29b66962beb3c1f8c332c0e089642"
+    },
+    {
+      "id": "pain_very",
+      "imagePath": "system/review_pain_very_strong_ec6c4eca.png",
+      "sourceMeaning": "pain_very_strong",
+      "sha256": "ec6c4eca181ec1d116afff9a5bd5f75fe8f38be9cf95966b0dfa27ed1d183d0e"
+    },
+    {
+      "id": "pain_very_strong",
+      "imagePath": "system/review_pain_very_strong_ec6c4eca.png",
+      "sourceMeaning": "pain_very_strong",
+      "sha256": "ec6c4eca181ec1d116afff9a5bd5f75fe8f38be9cf95966b0dfa27ed1d183d0e"
+    },
+    {
+      "id": "pain_when_gripping",
+      "imagePath": "system/review_pain_when_gripping_238a5c56.png",
+      "sourceMeaning": "pain_when_gripping",
+      "sha256": "238a5c56d02473d4b61058cc125f785e36c3d0de192b59933babde6125816201"
+    },
+    {
+      "id": "pain_when_lifting",
+      "imagePath": "system/review_pain_when_lifting_f76eee32.png",
+      "sourceMeaning": "pain_when_lifting",
+      "sha256": "f76eee322f55c7a0eeaf353a9e7789a400c4127732d8347a68131d25e0167f83"
+    },
+    {
+      "id": "pain_when_moving",
+      "imagePath": "system/review_pain_when_moving_b9997028.png",
+      "sourceMeaning": "pain_when_moving",
+      "sha256": "b9997028e12fca3f458085115455e8d0718cc67ba258e1176ebcef96cd961e9d"
+    },
+    {
+      "id": "pain_when_sitting",
+      "imagePath": "system/review_pain_when_sitting_2fb7bb7f.png",
+      "sourceMeaning": "pain_when_sitting",
+      "sha256": "2fb7bb7f709c1a401daf8688cfcadc6639ae467e1cc303568650a9feb1c681ab"
+    },
+    {
+      "id": "pain_when_standing",
+      "imagePath": "system/review_pain_when_standing_8af3061f.png",
+      "sourceMeaning": "pain_when_standing",
+      "sha256": "8af3061f78f1adba0f34993bc5469cffa432efd898a48f51cecbddf2201ac241"
+    },
+    {
+      "id": "pain_when_walking",
+      "imagePath": "system/review_pain_when_walking_94ab5dcc.png",
+      "sourceMeaning": "pain_when_walking",
+      "sha256": "94ab5dcc4efe891fb1a737ebb6978a4b4f0382cdba8ed8b6cf9ba2ed1b134a18"
+    },
+    {
+      "id": "pajamas",
+      "imagePath": "system/review_pajamas_35669362.png",
+      "sourceMeaning": "pajamas",
+      "sha256": "3566936292573708f5d9f1b5e2c7159ff67116dab8af04d343ecddbc1bd1ad71"
+    },
+    {
+      "id": "pants",
+      "imagePath": "system/review_pants_bda97047.png",
+      "sourceMeaning": "pants",
+      "sha256": "bda970478d6972d4b524ee0b7d9785a937daf4f8368f3c9dffb9961c034b1a7b"
+    },
+    {
+      "id": "person_come",
+      "imagePath": "system/review_reuse_come_to_me_2344ba78.png",
+      "sourceMeaning": "@come_to_me.png",
+      "sha256": "2344ba78fb2fcfafa7b7632efe5de5a123496b79dbe4f8dea0b5be7e248f7e5e"
+    },
+    {
+      "id": "person_see",
+      "imagePath": "system/review_eye_501a27aa.png",
+      "sourceMeaning": "eye",
+      "sha256": "501a27aa4e1e314c5eef9343ce15b49cf36554c9c9fb2d0cf56854071eba7fa9"
+    },
+    {
+      "id": "person_tell",
+      "imagePath": "system/review_pogovor_6b62dd63.png",
+      "sourceMeaning": "pogovor",
+      "sha256": "6b62dd637290a0bf59241d0e13c3729d4b6f22fa614884706d0637a9f482f209"
+    },
+    {
+      "id": "person_where_is",
+      "imagePath": "system/review_reuse_where_e6d70b54.png",
+      "sourceMeaning": "@where.png",
+      "sha256": "e6d70b54b644a5079a311c9a8eb69d4cd64cd5fdab063c627b516d7f75a4c42d"
+    },
+    {
+      "id": "pillow",
+      "imagePath": "system/review_pillow_9350f7ce.png",
+      "sourceMeaning": "pillow",
+      "sha256": "9350f7ceaa04a6019b91a1acf7fa1c18e952211ee79af01ec4241667a565184e"
+    },
+    {
+      "id": "pocakaj",
+      "imagePath": "system/review_reuse_wait_cf2f6d11.png",
+      "sourceMeaning": "@wait.png",
+      "sha256": "cf2f6d11e3e0dae9f482559c1348d3d0ed5621a06ac616db74ecc7e2985ebf0c"
+    },
+    {
+      "id": "pogovor",
+      "imagePath": "system/review_pogovor_6b62dd63.png",
+      "sourceMeaning": "pogovor",
+      "sha256": "6b62dd637290a0bf59241d0e13c3729d4b6f22fa614884706d0637a9f482f209"
+    },
+    {
+      "id": "pogresam_te",
+      "imagePath": "system/review_reuse_miss_someone_3c864c60.png",
+      "sourceMeaning": "@miss_someone.png",
+      "sha256": "3c864c60725d88859b55d24092930051677de1d958ebc5716cd89f0e86b48834"
+    },
+    {
+      "id": "pokazi_mi",
+      "imagePath": "system/review_reuse_show_you_b0170840.png",
+      "sourceMeaning": "@show_you.png",
+      "sha256": "b0170840be8ba3bd1adbb49c002e8bf01304b135b7aeec2d8f9650e82ff98510"
+    },
+    {
+      "id": "ponovi",
+      "imagePath": "system/review_reuse_repeat_d8ca4799.png",
+      "sourceMeaning": "@repeat.png",
+      "sha256": "d8ca47990a56abb8053f6f3a844f06acf20c11a9e8724fecdb00faa030089a27"
+    },
+    {
+      "id": "position",
+      "imagePath": "system/review_reuse_care_turn_bed_3c7caecd.png",
+      "sourceMeaning": "@care_turn_bed.png",
+      "sha256": "3c7caecd5f1b042b7e8375e4073434c3eaa65555477b60cfbff5e48ad41ce89b"
+    },
+    {
+      "id": "prosim",
+      "imagePath": "system/review_reuse_please_1384915c.png",
+      "sourceMeaning": "@please.png",
+      "sha256": "1384915c7a8d79ffdf1482d554b73c6cc04090e6d55116e5bfd86716f65df7e1"
+    },
+    {
+      "id": "rabbit",
+      "imagePath": "system/review_rabbit_b116e137.png",
+      "sourceMeaning": "rabbit",
+      "sha256": "b116e137cf2260d9a3e7c1424ff517188a1f1b35aec22196b5899a42d216b8b6"
+    },
+    {
+      "id": "rada_te_imam",
+      "imagePath": "system/review_reuse_miss_someone_3c864c60.png",
+      "sourceMeaning": "@miss_someone.png",
+      "sha256": "3c864c60725d88859b55d24092930051677de1d958ebc5716cd89f0e86b48834"
+    },
+    {
+      "id": "radenska",
+      "imagePath": "system/review_radenska_b37bdf84.png",
+      "sourceMeaning": "radenska",
+      "sha256": "b37bdf8460363f3b099c751c6383b5e2627fe7a7eb99eb14a22bcac831e3a0c8"
+    },
+    {
+      "id": "restaurant",
+      "imagePath": "system/review_restaurant_93d462e8.png",
+      "sourceMeaning": "restaurant",
+      "sha256": "93d462e89569b08c03f87506c31281685db89686146cbd50af15e15abe90486a"
+    },
+    {
+      "id": "right_side",
+      "imagePath": "system/review_right_side_3ca944e1.png",
+      "sourceMeaning": "right_side",
+      "sha256": "3ca944e1d04b06a1aac5bf33d49ec5bcb55c329f06bb55b03acf8e36369ac7ed"
+    },
+    {
+      "id": "room",
+      "imagePath": "system/review_room_b2c12416.png",
+      "sourceMeaning": "room",
+      "sha256": "b2c12416c4c8bf2c7405e8991f968295c56e6dbc551d53dad10e08949ef70db7"
+    },
+    {
+      "id": "scarf",
+      "imagePath": "system/review_scarf_79b38ef3.png",
+      "sourceMeaning": "scarf",
+      "sha256": "79b38ef3a501eafcbf2219146ef717c1c4d2f8b40be48b42e391a8f3a6a3bf46"
+    },
+    {
+      "id": "shirt",
+      "imagePath": "system/review_shirt_809d7ca9.png",
+      "sourceMeaning": "shirt",
+      "sha256": "809d7ca997276296f6f4ad1844a307c565d3bd96454d2c9e89b3977de9b945fc"
+    },
+    {
+      "id": "shoes",
+      "imagePath": "system/review_shoes_d9fe64b1.png",
+      "sourceMeaning": "shoes",
+      "sha256": "d9fe64b122d0a4cd2e4a5aa809f5ada07de4b0917620900f42f2cc39ca9abd29"
+    },
+    {
+      "id": "sit_up",
+      "imagePath": "system/review_sit_up_6bffe97d.png",
+      "sourceMeaning": "sit_up",
+      "sha256": "6bffe97d1548d0fbd3d3749b7e219205fe8cf17635d05c75809b68771c5998f2"
+    },
+    {
+      "id": "smoking",
+      "imagePath": "system/review_smoking_0c3ff876.png",
+      "sourceMeaning": "smoking",
+      "sha256": "0c3ff876e8adaf7293e5017d569e74238dc4077a77e06c6e0e0f79a408724fdb"
+    },
+    {
+      "id": "socialno",
+      "imagePath": "system/review_pogovor_6b62dd63.png",
+      "sourceMeaning": "pogovor",
+      "sha256": "6b62dd637290a0bf59241d0e13c3729d4b6f22fa614884706d0637a9f482f209"
+    },
+    {
+      "id": "socks",
+      "imagePath": "system/review_socks_ec1cdfb3.png",
+      "sourceMeaning": "socks",
+      "sha256": "ec1cdfb37724c05b96f66c243d1bbd42262832b944d92f5196ae0d56236fd4e5"
+    },
+    {
+      "id": "sparkling_drink",
+      "imagePath": "system/review_sparkling_drink_a152a547.png",
+      "sourceMeaning": "sparkling_drink",
+      "sha256": "a152a54792fd8865e4d715f9f48a7b94fe87315fe826b616a0b5a2237b5085de"
+    },
+    {
+      "id": "sparkling_water",
+      "imagePath": "system/review_radenska_b37bdf84.png",
+      "sourceMeaning": "radenska",
+      "sha256": "b37bdf8460363f3b099c751c6383b5e2627fe7a7eb99eb14a22bcac831e3a0c8"
+    },
+    {
+      "id": "speak_slowly",
+      "imagePath": "system/review_reuse_slower_113dc3dd.png",
+      "sourceMeaning": "@slower.png",
+      "sha256": "113dc3dd419f521a45b99d5cd96dd0fd0d901387fd81350220e814f403b8b558"
+    },
+    {
+      "id": "speech_difficulty",
+      "imagePath": "system/review_cannot_speak_d2293812.png",
+      "sourceMeaning": "cannot_speak",
+      "sha256": "d2293812adebeb362f857a47a6e5520bc6b26c60c2487b4c4b760f6dd3204060"
+    },
+    {
+      "id": "stop_movement",
+      "imagePath": "system/review_reuse_no_82e5714f.png",
+      "sourceMeaning": "@no.png",
+      "sha256": "82e5714f4f6ada3711ecf81d5fbe34f7873132d9a27e65437da15600c82519bd"
+    },
+    {
+      "id": "stroke_info",
+      "imagePath": "system/review_stroke_info_2d89372c.png",
+      "sourceMeaning": "stroke_info",
+      "sha256": "2d89372cec1c89de777166d81e945e0e011ae82f9092783e519762d17cef9f5b"
+    },
+    {
+      "id": "sweet",
+      "imagePath": "system/review_hungry_cookies_8346c61e.png",
+      "sourceMeaning": "hungry_cookies",
+      "sha256": "8346c61e58e2309caddc2442f3280d4c673e0743b429a82afee2b1cd5df0ccd3"
+    },
+    {
+      "id": "tea_black_honey_lemon",
+      "imagePath": "system/review_tea_honey_lemon_902e1510.png",
+      "sourceMeaning": "tea_honey_lemon",
+      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+    },
+    {
+      "id": "tea_chamomile_honey_lemon",
+      "imagePath": "system/review_tea_honey_lemon_902e1510.png",
+      "sourceMeaning": "tea_honey_lemon",
+      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+    },
+    {
+      "id": "tea_fruit_honey_lemon",
+      "imagePath": "system/review_tea_honey_lemon_902e1510.png",
+      "sourceMeaning": "tea_honey_lemon",
+      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+    },
+    {
+      "id": "tea_green_honey_lemon",
+      "imagePath": "system/review_tea_honey_lemon_902e1510.png",
+      "sourceMeaning": "tea_honey_lemon",
+      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+    },
+    {
+      "id": "tea_mint_honey_lemon",
+      "imagePath": "system/review_tea_honey_lemon_902e1510.png",
+      "sourceMeaning": "tea_honey_lemon",
+      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+    },
+    {
+      "id": "tea_rosehip",
+      "imagePath": "system/review_tea_rosehip_15d754be.png",
+      "sourceMeaning": "tea_rosehip",
+      "sha256": "15d754be72fd467ac90520ec70d0c8d23261ce60c8053bb3b0194b8ff88908ef"
+    },
+    {
+      "id": "tea_rosehip_honey_lemon",
+      "imagePath": "system/review_tea_honey_lemon_902e1510.png",
+      "sourceMeaning": "tea_honey_lemon",
+      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+    },
+    {
+      "id": "terrace",
+      "imagePath": "system/review_terrace_13e17ef8.png",
+      "sourceMeaning": "terrace",
+      "sha256": "13e17ef8e7ff6bb5795d5c5f90153705c0bc9f41adff4f44224a1abca1395fdb"
+    },
+    {
+      "id": "therapist",
+      "imagePath": "system/review_therapy_4ea445a8.png",
+      "sourceMeaning": "therapy",
+      "sha256": "4ea445a80064517721135b3f795519f662e44cfe2c7af21bf226f7beae40bbaf"
+    },
+    {
+      "id": "therapy",
+      "imagePath": "system/review_therapy_4ea445a8.png",
+      "sourceMeaning": "therapy",
+      "sha256": "4ea445a80064517721135b3f795519f662e44cfe2c7af21bf226f7beae40bbaf"
+    },
+    {
+      "id": "thirsty",
+      "imagePath": "system/review_drink_category_7141f96c.png",
+      "sourceMeaning": "drink_category",
+      "sha256": "7141f96c1324746fc7b6e92deb03016f56abfe38197e42728efc6cb48e5d510f"
+    },
+    {
+      "id": "throat",
+      "imagePath": "system/review_throat_341cf27b.png",
+      "sourceMeaning": "throat",
+      "sha256": "341cf27b136d4f1c981d116074a4bf67876941b4e057537226554f2255709e77"
+    },
+    {
+      "id": "today",
+      "imagePath": "system/review_today_1e80e967.png",
+      "sourceMeaning": "today",
+      "sha256": "1e80e96793ce7a96fc1f5b24c38546b11de29b66962beb3c1f8c332c0e089642"
+    },
+    {
+      "id": "tomorrow",
+      "imagePath": "system/review_tomorrow_172b5ae0.png",
+      "sourceMeaning": "tomorrow",
+      "sha256": "172b5ae0ea9865d15709908d7f65a6bf975f2f25b711f597e8c1c51993c7622f"
+    },
+    {
+      "id": "tooth",
+      "imagePath": "system/review_tooth_add82ec1.png",
+      "sourceMeaning": "tooth",
+      "sha256": "add82ec136e3c6a62d79c9d1f6a1807b426b385d3b0087823ac89b104a4c7cf7"
+    },
+    {
+      "id": "tooth_left",
+      "imagePath": "system/review_tooth_left_ee8eb450.png",
+      "sourceMeaning": "tooth_left",
+      "sha256": "ee8eb450593fcb06c265cdaa67e061d93febe4215b71e7c2cdd163b94220aac6"
+    },
+    {
+      "id": "tooth_lower",
+      "imagePath": "system/review_tooth_lower_a615ff58.png",
+      "sourceMeaning": "tooth_lower",
+      "sha256": "a615ff58bca87dc80c8d6539a9f7ca7ab80f37895f375e66dd16ff5e6e2b4fb0"
+    },
+    {
+      "id": "tooth_right",
+      "imagePath": "system/review_tooth_right_0ec048e3.png",
+      "sourceMeaning": "tooth_right",
+      "sha256": "0ec048e3b0f8eb727182e9eb131e4770fdd25be267fac7862ad22412dabfabf6"
+    },
+    {
+      "id": "tooth_upper",
+      "imagePath": "system/review_tooth_upper_dad53014.png",
+      "sourceMeaning": "tooth_upper",
+      "sha256": "dad53014d1d14342848c8dad54975dd498d72fc9548c31e5d382259959a87842"
+    },
+    {
+      "id": "transport",
+      "imagePath": "system/review_transport_cb3e5a9b.png",
+      "sourceMeaning": "transport",
+      "sha256": "cb3e5a9bdf72653fbfdf9f0c2fa4f5a2695a7406805cfb29ce458751d804504b"
+    },
+    {
+      "id": "turn_back",
+      "imagePath": "system/review_turn_back_15c7f796.png",
+      "sourceMeaning": "turn_back",
+      "sha256": "15c7f79631af19bc0f9d3946419fb2e3c3de97a0521865bc3dfb572c7a1f5c0b"
+    },
+    {
+      "id": "turn_left",
+      "imagePath": "system/review_turn_left_4f39ba6d.png",
+      "sourceMeaning": "turn_left",
+      "sha256": "4f39ba6d894a241b9b5e870c6ee1bcb530384c250d85ebbbfa82e62d88def839"
+    },
+    {
+      "id": "turn_off_light",
+      "imagePath": "system/review_turn_off_light_1c0d62c3.png",
+      "sourceMeaning": "turn_off_light",
+      "sha256": "1c0d62c3ccc0a955fd114045bb99b2d54e90db82007538d69c9633ee0f9e72a9"
+    },
+    {
+      "id": "turn_off_tv",
+      "imagePath": "system/review_turn_off_tv_ac0396ae.png",
+      "sourceMeaning": "turn_off_tv",
+      "sha256": "ac0396ae15d0e651045a43e369d164c1398803e8385d46ee50b0b0baf8b43b21"
+    },
+    {
+      "id": "turn_on_light",
+      "imagePath": "system/review_turn_on_light_cd5e65b9.png",
+      "sourceMeaning": "turn_on_light",
+      "sha256": "cd5e65b990704e5060d009d68a41097c1beac8591603b2bc3e58151e914245cf"
+    },
+    {
+      "id": "turn_on_tv",
+      "imagePath": "system/review_turn_on_tv_9d53fc58.png",
+      "sourceMeaning": "turn_on_tv",
+      "sha256": "9d53fc580423170d66ca8cad627b59ea1936a435debe7077ad875989dda2f995"
+    },
+    {
+      "id": "turn_right",
+      "imagePath": "system/review_turn_right_011ebb78.png",
+      "sourceMeaning": "turn_right",
+      "sha256": "011ebb7894cb7e8c4f9e9f699e846bf840643c81a686f30e0b1fa7211a1ad866"
+    },
+    {
+      "id": "turn_side",
+      "imagePath": "system/review_turn_side_c5d4b3e7.png",
+      "sourceMeaning": "turn_side",
+      "sha256": "c5d4b3e7f4cdb5112ad80fe251fbcb95821281f57fad3ee3928a67cede7df0e6"
+    },
+    {
+      "id": "tv",
+      "imagePath": "system/review_tv_7d6f1850.png",
+      "sourceMeaning": "tv",
+      "sha256": "7d6f185063821962039567f27aeec8f2ffcddddfb4f49c2b0b98c5daddb943ff"
+    },
+    {
+      "id": "uncomfortable",
+      "imagePath": "system/review_pain_light_11f05cd6.png",
+      "sourceMeaning": "pain_light",
+      "sha256": "11f05cd65c1a94088ce0dc286adb34faafd95699380f967ef460951b24c463fb"
+    },
+    {
+      "id": "underwear",
+      "imagePath": "system/review_underwear_95de2ae5.png",
+      "sourceMeaning": "underwear",
+      "sha256": "95de2ae5f66ce5e49cf6fb5833dd5dc66864234d5b81e5abc6df44a18a1a0e95"
+    },
+    {
+      "id": "urgent_help",
+      "imagePath": "system/review_reuse_problem_e432a520.png",
+      "sourceMeaning": "@problem.png",
+      "sha256": "e432a520ee72c89ad1772941e7d0904a8370b4a997a0e60c87005ba68957ca9d"
+    },
+    {
+      "id": "v_redu_je",
+      "imagePath": "system/review_reuse_yes_287fe28f.png",
+      "sourceMeaning": "@yes.png",
+      "sha256": "287fe28f385cb1b2c339b47d7498919e646c42884eedb89326a26513f931c6fa"
+    },
+    {
+      "id": "vending_coffee_tea",
+      "imagePath": "system/review_vending_coffee_tea_497114b6.png",
+      "sourceMeaning": "vending_coffee_tea",
+      "sha256": "497114b6f487bc9e65ed2dea35cf7f5a26d6ad3262e00f526492017ec9d1b101"
+    },
+    {
+      "id": "vending_drinks",
+      "imagePath": "system/review_vending_e8948e89.png",
+      "sourceMeaning": "vending",
+      "sha256": "e8948e8932b8fc5ea84e863267c92d100a38dd538b7fce6944bec81ad892211a"
+    },
+    {
+      "id": "vending_photo_step_1",
+      "imagePath": "system/review_photo_placeholder_dde1d737.png",
+      "sourceMeaning": "photo_placeholder",
+      "sha256": "dde1d737b5e30d69b4a561edd279a343efee1d87f28aa89315419fbf308f58c4"
+    },
+    {
+      "id": "vending_photo_step_2",
+      "imagePath": "system/review_photo_placeholder_dde1d737.png",
+      "sourceMeaning": "photo_placeholder",
+      "sha256": "dde1d737b5e30d69b4a561edd279a343efee1d87f28aa89315419fbf308f58c4"
+    },
+    {
+      "id": "visit",
+      "imagePath": "system/review_visit_4e09043f.png",
+      "sourceMeaning": "visit",
+      "sha256": "4e09043f22319110db8e55343fd7b00f697be2ea566ee641e9ef86c6e16b61e4"
+    },
+    {
+      "id": "walk",
+      "imagePath": "system/review_walk_4cc7bd3b.png",
+      "sourceMeaning": "walk",
+      "sha256": "4cc7bd3babe8c856f33ad8b24db43ac01ddc5cefe0a22be0c55e69b4e8b6303d"
+    },
+    {
+      "id": "washing_help",
+      "imagePath": "system/review_reuse_toilet_wash_4982e59c.png",
+      "sourceMeaning": "@toilet_wash.png",
+      "sha256": "4982e59c90d173e07b31f4a6af61a0a9a101a875671b6743ff35ae794eb193a8"
+    },
+    {
+      "id": "water",
+      "imagePath": "system/review_reuse_drink_water_still_6c987aa3.png",
+      "sourceMeaning": "@drink_water_still.png",
+      "sha256": "6c987aa30736e1c5686cee78f2a6585b44ddb9ebc0e8f53c19cf189fb5396e4a"
+    },
+    {
+      "id": "water_detail",
+      "imagePath": "system/review_reuse_drink_water_still_6c987aa3.png",
+      "sourceMeaning": "@drink_water_still.png",
+      "sha256": "6c987aa30736e1c5686cee78f2a6585b44ddb9ebc0e8f53c19cf189fb5396e4a"
+    },
+    {
+      "id": "wc_blood",
+      "imagePath": "system/review_reuse_toilet_blood_3a11da8e.png",
+      "sourceMeaning": "@toilet_blood.png",
+      "sha256": "3a11da8e209f0220095e579dfc550c60c8a7ba65bbae022914681ccd5be6d236"
+    },
+    {
+      "id": "wc_burning",
+      "imagePath": "system/review_wc_burning_e11e546b.png",
+      "sourceMeaning": "wc_burning",
+      "sha256": "e11e546bae2198a96c432af9a9a5c4db902e464b73272f181843b6d7180006da"
+    },
+    {
+      "id": "wc_call_nurse",
+      "imagePath": "system/review_reuse_person_nurse_v2_b23c8564.png",
+      "sourceMeaning": "person_nurse_v2",
+      "sha256": "b23c85641825f64bfdd6d8b6969fdf51a3f2210415952e23862f7f140e85a1be"
+    },
+    {
+      "id": "wc_diaper_change",
+      "imagePath": "system/review_diaper_da07c79b.png",
+      "sourceMeaning": "diaper",
+      "sha256": "da07c79b747bb5fc4e2cd39805b0af8f395797dda87348f2990cf5dd865631d8"
+    },
+    {
+      "id": "wc_itching",
+      "imagePath": "system/review_wc_itching_4926ec8a.png",
+      "sourceMeaning": "wc_itching",
+      "sha256": "4926ec8a6f421a683c7f6b23c7bd6452fe6ee91e3d1ad26a3e71aa84aecad095"
+    },
+    {
+      "id": "wc_pain",
+      "imagePath": "system/review_pain_general_e8a89094.png",
+      "sourceMeaning": "pain_general",
+      "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+    },
+    {
+      "id": "wc_very_urgent",
+      "imagePath": "system/review_reuse_problem_e432a520.png",
+      "sourceMeaning": "@problem.png",
+      "sha256": "e432a520ee72c89ad1772941e7d0904a8370b4a997a0e60c87005ba68957ca9d"
+    },
+    {
+      "id": "what_did_i_say",
+      "imagePath": "system/review_pogovor_6b62dd63.png",
+      "sourceMeaning": "pogovor",
+      "sha256": "6b62dd637290a0bf59241d0e13c3729d4b6f22fa614884706d0637a9f482f209"
+    },
+    {
+      "id": "what_do",
+      "imagePath": "system/review_activity_group_789fd08c.png",
+      "sourceMeaning": "activity_group",
+      "sha256": "789fd08c71ff986c72eac4df62bd82e5bc9df325e2af0c6cc9339093b3e6fc72"
+    },
+    {
+      "id": "wheelchair",
+      "imagePath": "system/review_wheelchair_46e4c622.png",
+      "sourceMeaning": "wheelchair",
+      "sha256": "46e4c62274e737b37f1f76f22da890f9a2f785d0fae5ee31659cbb325958bac8"
+    },
+    {
+      "id": "when_come",
+      "imagePath": "system/review_when_come_5fa9375d.png",
+      "sourceMeaning": "when_come",
+      "sha256": "5fa9375d51558a5d52ea04276081e85a3da605803b08186dc4b7b1e173e06322"
+    },
+    {
+      "id": "when_eat",
+      "imagePath": "system/review_when_eat_75a5e488.png",
+      "sourceMeaning": "when_eat",
+      "sha256": "75a5e488d4325b501ff7d375a446400dc171451d5529c8e4c9fdd1eaf7f7dc4f"
+    },
+    {
+      "id": "when_go",
+      "imagePath": "system/review_when_go_ea9b7bad.png",
+      "sourceMeaning": "when_go",
+      "sha256": "ea9b7badeba75e7d4199dbfc96eee963472916916450eca88328bac16a15f11e"
+    },
+    {
+      "id": "when_home",
+      "imagePath": "system/review_when_home_fd1bba6d.png",
+      "sourceMeaning": "when_home",
+      "sha256": "fd1bba6d1d1180ad42f31db032806bdb0a6725e4827fd1f522b086f5a83df69b"
+    },
+    {
+      "id": "when_therapy",
+      "imagePath": "system/review_when_therapy_12890474.png",
+      "sourceMeaning": "when_therapy",
+      "sha256": "128904749fbcec72d3e0d803feb0561c71a27e0e1dbfd892883855794c01bbc5"
+    },
+    {
+      "id": "where_are_we",
+      "imagePath": "system/review_reuse_daily_place_group_798_12986d00.png",
+      "sourceMeaning": "@daily_place_group_798.png",
+      "sha256": "12986d002b70041a6d1339917571cc03e73d8e21bc28b686a64df96adc34e57e"
+    },
+    {
+      "id": "where_phone",
+      "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
+      "sourceMeaning": "@daily_call_798.png",
+      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+    },
+    {
+      "id": "where_wheelchair",
+      "imagePath": "system/review_wheelchair_46e4c622.png",
+      "sourceMeaning": "wheelchair",
+      "sha256": "46e4c62274e737b37f1f76f22da890f9a2f785d0fae5ee31659cbb325958bac8"
+    },
+    {
+      "id": "who_is_coming",
+      "imagePath": "system/review_visit_4e09043f.png",
+      "sourceMeaning": "visit",
+      "sha256": "4e09043f22319110db8e55343fd7b00f697be2ea566ee641e9ef86c6e16b61e4"
+    },
+    {
+      "id": "yesterday",
+      "imagePath": "system/review_yesterday_2c5f8fef.png",
+      "sourceMeaning": "yesterday",
+      "sha256": "2c5f8fef056e29d4efa7421d33320782ed7868e03fad0af3ad54e2d72c2cc394"
+    }
+  ]
+}

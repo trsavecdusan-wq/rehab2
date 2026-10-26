@@ -68,6 +68,7 @@ object AacContentBootstrap {
     )
 
     private val AAC_SPEECH_QUALITY_REPAIR_IDS = setOf(
+        "stroke_info",
         "pain",
         "wc",
         "nurse_help",
@@ -320,7 +321,7 @@ object AacContentBootstrap {
         "shop" to "system/daily_shop_798.png",
         "vending_drinks" to "system/place_vending_machine.png",
         "vending_coffee_tea" to "system/place_vending_machine.png"
-    )
+    ).plus(AacReviewedIcons.paths)
 
     private val PROFESSIONAL_SYSTEM_ICON_FILES = PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID.values
         .map { path -> path.substringAfterLast('/') }
@@ -479,19 +480,19 @@ object AacContentBootstrap {
     )
 
     fun ensurePatientStartupContent(context: Context, fallbackItems: List<AacItem>): Result {
-        // Snapshot existing data before any 798 repair, including preference/profile writes.
+        // Snapshot existing data before this reviewed content repair, including preference/profile writes.
         try {
             val store = AacPatientImages.store(context)
-            store.backupMigrationOnce(store.currentPatientId(), "daily-798",
+            store.backupMigrationOnce(store.currentPatientId(), "icon-review-after-798",
                 AacStoragePaths.getAacItemsFile(context),
                 AacStoragePaths.getPatientProfileFile(context),
                 AacStoragePaths.getProfilesDataDir(context)?.let { File(it, DOM_PROFILE_FILE) },
                 File(context.applicationInfo.dataDir, "shared_prefs/$PATIENT_PAGE_PREFS_NAME.xml"),
                 File(context.applicationInfo.dataDir, "shared_prefs/$CORE_V2_REPAIR_PREFS_NAME.xml"))
         } catch (_: Exception) {
-            Log.w(TAG, "AAC 798 migration skipped: backup unavailable; existing data retained.")
+            Log.w(TAG, "AAC icon review skipped: backup unavailable; existing data retained.")
             return Result(0, currentPatientPages(context).size, false, "", 0, 0,
-                false, 0, 0, true, "daily_798_backup_failed")
+                false, 0, 0, true, "icon_review_backup_failed")
         }
         AacStoragePaths.ensureAacContentDirs(context)
         val seededSystemIcons = seedBundledSystemIcons(context)
@@ -823,7 +824,7 @@ object AacContentBootstrap {
         val starterById = starterItems.associateBy { item -> item.id }
         var repaired = 0
         itemObjects(itemsArray).forEach { item ->
-            if (AacUpgradeFieldPolicy.hasCustomImage(item)) return@forEach
+            if (isUserProtected(item) || AacUpgradeFieldPolicy.hasCustomImage(item)) return@forEach
             val itemId = item.optString("id").trim()
             val starter = starterById[itemId] ?: return@forEach
             val isQuickPatientSystemIcon = itemId in QUICK_PATIENT_SYSTEM_ICON_IDS

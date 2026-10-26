@@ -45,7 +45,7 @@ internal object AacUpgradeFieldPolicy {
                 }
             }
         }
-        if (hasCustomImage(before)) {
+        if (edited || hasCustomImage(before)) {
             listOf("imagePath", "iconSource", "suggestedIconPath").forEach { key ->
                 if (before.has(key)) proposed.put(key, before.get(key)) else proposed.remove(key)
             }
