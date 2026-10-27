@@ -151,6 +151,16 @@ class AacAudioPlayer(
     }
 
     fun speakText(text: String, languageCode: String) {
+        speakTextWithGenerationTimeout(text, languageCode, SPEECH_GENERATION_TIMEOUT_MS)
+    }
+
+    // Date/weather utterances change on every request and usually have no cached
+    // recording. Do not discard their first generated recording after only 1.8s.
+    fun speakStatusText(text: String, languageCode: String) {
+        speakTextWithGenerationTimeout(text, languageCode, STATUS_SPEECH_GENERATION_TIMEOUT_MS)
+    }
+
+    private fun speakTextWithGenerationTimeout(text: String, languageCode: String, timeoutMs: Long) {
         val trimmed = text.trim()
         traceAudio("speakText called text='${trimmed.take(80)}' language=$languageCode")
         if (trimmed.isEmpty()) {
@@ -165,7 +175,8 @@ class AacAudioPlayer(
             text = trimmed,
             languageCode = languageCode,
             requestSerial = requestSerial,
-            generatedLog = "AUDIO GENERATED"
+            generatedLog = "AUDIO GENERATED",
+            timeoutMs = timeoutMs
         ) {
             traceAudio("selected path=Android TTS fallback")
             speakAndroidFallback(trimmed, languageCode)
@@ -191,6 +202,7 @@ class AacAudioPlayer(
         languageCode: String,
         requestSerial: Int,
         generatedLog: String,
+        timeoutMs: Long = SPEECH_GENERATION_TIMEOUT_MS,
         fallback: () -> Unit
     ) {
         showSpeechApiConfigIssueIfNeeded()
@@ -201,7 +213,7 @@ class AacAudioPlayer(
                 traceAudio("speech generation timeout -> Android TTS fallback")
                 fallback()
             }
-        }, SPEECH_GENERATION_TIMEOUT_MS)
+        }, timeoutMs)
         Thread {
             val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
                 text = text,
@@ -577,6 +589,7 @@ class AacAudioPlayer(
         const val MIN_AUDIO_DURATION_MS = 700
         const val MAX_LOUDNESS_GAIN_MB = 400
         const val SPEECH_GENERATION_TIMEOUT_MS = 1800L
+        const val STATUS_SPEECH_GENERATION_TIMEOUT_MS = 30_000L
         const val PREFS_AUDIO_DIAGNOSTICS = "audio_diagnostics"
         const val KEY_AUDIO_EVENTS = "audio_events"
         const val AUDIO_EVENT_LIMIT = 20

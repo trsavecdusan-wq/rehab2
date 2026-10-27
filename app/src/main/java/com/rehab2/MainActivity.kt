@@ -747,6 +747,7 @@ class MainActivity : AppCompatActivity() {
     @Volatile private var currentStatusWeatherText: String? = null
     @Volatile private var isStatusWeatherFetchRunning = false
     private var lastStatusWeatherFetchAtMs = 0L
+    private var statusOrientationRequestSerial = 0
     private var hasCurrentSpeedData = false
     private var previousTrackedLocation: Location? = null
     private var locationPermissionRequestShown = false
@@ -962,6 +963,17 @@ class MainActivity : AppCompatActivity() {
         txtStatusDate.setOnClickListener {
             speakStatusOrientation()
         }
+        txtStatusDate.setOnLongClickListener {
+            speakStatusOrientation()
+            true
+        }
+        txtStatusWeather.setOnClickListener {
+            speakStatusOrientation()
+        }
+        txtStatusWeather.setOnLongClickListener {
+            speakStatusOrientation()
+            true
+        }
         txtStatusSpeed.setOnLongClickListener {
             showAdminPinDialog()
             true
@@ -997,6 +1009,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        statusOrientationRequestSerial += 1
         radioPlayerController.stop()
         activeStationKey = null
         updateRadioTileColors()
@@ -1527,6 +1540,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     return true
                 }
+                statusOrientationRequestSerial += 1
                 mainAacTapId += 1
                 mainAacSpeakCallNumberForTap = 0
                 selectedMainAacItemIdBeforeTap = selectedMainAacItemId
@@ -4543,6 +4557,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun speakStatusOrientation() {
+        val requestSerial = ++statusOrientationRequestSerial
         val settings = StatusOrientationSettings.load(this)
         val languageCode = getActiveSpeechLanguage()
         val speechText = StatusOrientationSpeaker.buildBaseSpeechText(this, languageCode = languageCode)
@@ -4555,21 +4570,23 @@ class MainActivity : AppCompatActivity() {
         if (!settings.speakWeather || settings.weatherSourceUrl.isBlank()) {
             Log.d(TAG, "STATUS_ORIENTATION weatherFetchOk=false")
             Log.d(TAG, "STATUS_ORIENTATION spokenText=$speechText")
-            aacAudioPlayer.speakText(speechText, languageCode)
+            aacAudioPlayer.speakStatusText(speechText, languageCode)
             return
         }
 
         val speechHandled = AtomicBoolean(false)
         mainHandler.postDelayed({
-            if (speechHandled.compareAndSet(false, true)) {
+            if (requestSerial == statusOrientationRequestSerial && speechHandled.compareAndSet(false, true)) {
                 Log.d(TAG, "STATUS_ORIENTATION weatherFetchOk=false")
                 Log.d(TAG, "STATUS_ORIENTATION spokenText=$speechText")
-                aacAudioPlayer.speakText(
+                aacAudioPlayer.speakStatusText(
                     speechText,
                     languageCode
                 )
             }
-        }, 1800L)
+            // The fetch has separate 1.8s connect/read limits. Give it time to
+            // finish instead of dropping a valid weather sentence at 1.8s.
+        }, 4500L)
         Thread {
             val weatherSentence = WeatherClient.fetchOrientationSentence(settings.weatherSourceUrl, languageCode)
             val fullSpeechText = StatusOrientationSpeaker.buildSpeechText(
@@ -4580,8 +4597,8 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "STATUS_ORIENTATION weatherFetchOk=${weatherSentence != null}")
             Log.d(TAG, "STATUS_ORIENTATION spokenText=$fullSpeechText")
             runOnUiThread {
-                if (speechHandled.compareAndSet(false, true)) {
-                    aacAudioPlayer.speakText(fullSpeechText, languageCode)
+                if (requestSerial == statusOrientationRequestSerial && speechHandled.compareAndSet(false, true)) {
+                    aacAudioPlayer.speakStatusText(fullSpeechText, languageCode)
                 }
             }
         }.start()
