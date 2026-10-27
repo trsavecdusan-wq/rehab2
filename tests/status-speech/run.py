@@ -13,7 +13,7 @@ def function(source,name):
   depth+=(source[end]=='{')-(source[end]=='}');end+=1
  return source[start:end].replace('private fun','fun',1)
 assert 'speakTextWithGenerationTimeout(text, languageCode, SPEECH_GENERATION_TIMEOUT_MS)' in audio
-assert 'speakTextWithGenerationTimeout(text, languageCode, STATUS_SPEECH_GENERATION_TIMEOUT_MS)' in audio
+assert 'speakTextWithGenerationTimeout(text, languageCode, STATUS_SPEECH_GENERATION_TIMEOUT_MS, guide = true)' in audio
 for view in ('txtStatusDate','txtStatusWeather'):
  assert re.search(view+r'\.setOnLongClickListener\s*\{\s*speakStatusOrientation\(\)\s*true\s*}',main)
  assert re.search(view+r'\.setOnClickListener\s*\{\s*speakStatusOrientation\(\)\s*}',main)
@@ -40,16 +40,18 @@ object Toast {val LENGTH_SHORT=0;fun makeText(c:Any,s:String,n:Int)=this;fun sho
 object Log {fun d(tag:String,message:String){}}
 class Coordinator {
  var available=true
- fun getOrGenerateSpeechFile(text:String,languageCode:String):File?=if(available) File("fake.wav") else null
+ fun getOrGenerateSpeechFile(text:String,languageCode:String,voiceId:String):File?=if(available) File("fake.wav") else null
 }
+object AacPatientVoiceSettings {fun voice(context:Any, guide:Boolean)="test"}
 class Audio {
+ val context=Any()
  val TAG="test";val mainHandler=Handler();var speechRequestSerial=1
  val speechCoordinator=Coordinator();var plays=0;var fallbacks=0
  fun showSpeechApiConfigIssueIfNeeded(){}
  fun traceAudio(s:String){}
  fun playAudioFileIfAvailable(file:File?):Boolean {if(file!=null){plays++;return true};return false}
 '''+constants+'\n'+function(audio,'playGeneratedSpeechOrFallback')+'''
- fun start(status:Boolean){playGeneratedSpeechOrFallback("date","sl",speechRequestSerial,"generated",if(status) STATUS_SPEECH_GENERATION_TIMEOUT_MS else SPEECH_GENERATION_TIMEOUT_MS){fallbacks++}}
+ fun start(status:Boolean){playGeneratedSpeechOrFallback("date","sl",speechRequestSerial,"generated",timeoutMs=if(status) STATUS_SPEECH_GENERATION_TIMEOUT_MS else SPEECH_GENERATION_TIMEOUT_MS){fallbacks++}}
 }
 object StatusOrientationSettings {
  var speakWeather=true;var weatherSourceUrl="test"

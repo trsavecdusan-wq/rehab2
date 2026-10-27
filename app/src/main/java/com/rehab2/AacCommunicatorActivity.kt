@@ -64,6 +64,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     )
 
     private lateinit var repository: AacRepository
+    private var personalContentStamp = ""
     private val pageHistory = ArrayDeque<String>()
     private val sentenceManager = AacSentenceStateManager()
     private var currentV2ItemsById: Map<String, AacItem> = emptyMap()
@@ -121,6 +122,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.rehab2.aac.AacPatientVoiceSettings.bind(this)
         AacObservation.initialize(applicationContext)
         setContentView(R.layout.activity_aac_communicator)
         addWaterTraceDebugView()
@@ -266,6 +268,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val updatedLabelMode = readAacLabelMode()
+        val updatedPersonalContentStamp = com.rehab2.aac.AacPatientVoiceSettings.stamp(this)
         val updatedLanguageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         val updatedSpeechTimingSettings = AacSpeechTimingSettings.read(this)
         val updatedGuidedFollowUpSettings = AacGuidedFollowUpSettings.read(this)
@@ -280,6 +283,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         readAacGridSize()
         readPersistentTopRowSettings()
         if (
+            updatedPersonalContentStamp != personalContentStamp ||
             updatedLabelMode != labelMode ||
             updatedLanguageCode != languageCode ||
             updatedSpeechTimingSettings != speechTimingSettings ||
@@ -292,6 +296,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             oldTopRowCount != persistentTopRowCount ||
             oldTopRowItemIds != persistentTopRowItemIds
         ) {
+            personalContentStamp = updatedPersonalContentStamp
             labelMode = updatedLabelMode
             languageCode = updatedLanguageCode
             speechTimingSettings = updatedSpeechTimingSettings
@@ -995,7 +1000,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun updateSentenceBar() {
-        val displayText = sentenceManager.getDisplayText()
+        val displayText = com.rehab2.aac.AacPatientVoiceSettings.text(this, sentenceManager.getDisplayText(), languageCode)
         txtSentence.text = displayText
         val hasSentence = displayText.isNotBlank()
         btnSpeakSentence.isEnabled = hasSentence
@@ -1113,7 +1118,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         singleIconSpeechOccurredInCurrentSentence = true
         Log.d(TAG, "AAC_SPEECH SINGLE_ICON_OCCURRED_IN_SENTENCE requestId=$requestId")
         Log.d(TAG, "AAC_SPEECH SINGLE_ICON_START requestId=$requestId text=$text")
-        audioPlayer.speakText(text, languageCode)
+        audioPlayer.speakPatientText(text, languageCode)
     }
 
     private fun startSentenceSpeech(text: String, requestId: Int) {
@@ -1133,7 +1138,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         pendingSpeechMode = SpeechMode.SENTENCE
         activeSpeechMode = SpeechMode.SENTENCE
         Log.d(TAG, "AAC_SPEECH SENTENCE_START requestId=$requestId text=$text")
-        audioPlayer.speakText(text, languageCode)
+        audioPlayer.speakPatientText(text, languageCode)
         observeAac(AacEventType.SENTENCE_SPOKEN)
     }
 
@@ -1477,7 +1482,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         if (pendingText.isNotEmpty() &&
             isRealWorldHelperAllowed() &&
             guidedFollowUpSettings.speakDigitsSeparatelyEnabled) {
-            audioPlayer.speakText(pendingText, languageCode)
+            audioPlayer.speakPatientText(pendingText, languageCode)
         }
     }
 
@@ -1574,7 +1579,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun setPromptText(text: String?) {
-        val value = text?.trim().orEmpty()
+        val value = com.rehab2.aac.AacPatientVoiceSettings.text(this, text?.trim().orEmpty(), languageCode)
         txtPrompt.text = value
         txtPrompt.visibility = if (value.isNotEmpty()) View.VISIBLE else View.GONE
     }

@@ -32,3 +32,4 @@ google-services.json
 
 # Android Profiling
 *.hprof
+tools/personalization_service/__pycache__/

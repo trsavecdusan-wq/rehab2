@@ -859,6 +859,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.rehab2.aac.AacPatientVoiceSettings.bind(this)
         AacObservation.initialize(applicationContext)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
@@ -1778,7 +1779,7 @@ class MainActivity : AppCompatActivity() {
         if (prompt.isNotBlank()) {
             showMainAacQuestion(prompt)
             shouldLockMainAacInputOnSpeechStart = false
-            aacAudioPlayer.speakText(prompt, languageCode)
+            aacAudioPlayer.speakGuideText(prompt, languageCode)
         } else {
             val speechText = AacLocalizedTextResolver.resolveSpeakText(item, languageCode).trim()
             if (speechText.isNotBlank()) {
@@ -1819,7 +1820,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showMainAacQuestion(question: String) {
         if (!::mainAacQuestionText.isInitialized) return
-        val displayQuestion = question.trim().uppercase(Locale("sl", "SI"))
+        val displayQuestion = com.rehab2.aac.AacPatientVoiceSettings.text(this, question, getActiveSpeechLanguage()).trim().uppercase(Locale("sl", "SI"))
         val displayMode = mainAacGuidedPromptDisplayMode()
         if (displayQuestion.isBlank() || displayMode == AAC_GUIDED_PROMPT_OFF) {
             hideMainAacQuestion()
@@ -2113,11 +2114,11 @@ class MainActivity : AppCompatActivity() {
         )
         if (delayMs > 0L) {
             mainHandler.postDelayed({
-                aacAudioPlayer.speakText(text, languageCode)
+                aacAudioPlayer.speakPatientText(text, languageCode)
             }, delayMs)
             return
         }
-        aacAudioPlayer.speakText(text, languageCode)
+        aacAudioPlayer.speakPatientText(text, languageCode)
     }
 
     private fun recordMainAacSpeechDiagnostics(
@@ -2241,7 +2242,7 @@ class MainActivity : AppCompatActivity() {
                 if (selectedMainAacItemId == item.id) {
                     showMainAacQuestion(questionText)
                     shouldLockMainAacInputOnSpeechStart = false
-                    aacAudioPlayer.speakText(questionText, normalizedLanguage)
+                    aacAudioPlayer.speakGuideText(questionText, normalizedLanguage)
                 }
             }
         }.start()
@@ -2308,7 +2309,7 @@ class MainActivity : AppCompatActivity() {
         currentMainAacPageDebugId = "guided:${item.id}"
         updateMainAacGridSelectionDebug(currentMainAacPageDebugId, followUpItems)
         showMainAacQuestion(followUp.questionSl)
-        aacAudioPlayer.speakText(followUp.questionSl, languageCode)
+        aacAudioPlayer.speakGuideText(followUp.questionSl, languageCode)
         lockMainAacInput()
         showMainAacItems(followUpItems)
         return true
@@ -2504,7 +2505,7 @@ class MainActivity : AppCompatActivity() {
                 recordLastAudioEvent("AAC voice assistant missing next page snapshot target=${activeStep.targetPageId}")
             }
             shouldLockMainAacInputOnSpeechStart = false
-            aacAudioPlayer.speakText(safeQuestion, languageCode)
+            aacAudioPlayer.speakGuideText(safeQuestion, languageCode)
         }
         mainAacVoiceAssistantQuestionRunnable = runnable
         recordLastAudioEvent(
@@ -3530,7 +3531,7 @@ class MainActivity : AppCompatActivity() {
             shouldLockMainAacInputOnSpeechStart = true
             lockMainAacInput()
             cancelMainAacGuidedAutoComplete()
-            aacAudioPlayer.speakText(sentence, languageCode)
+            aacAudioPlayer.speakPatientText(sentence, languageCode)
             observeMainAac(AacEventType.SENTENCE_SPOKEN)
             clearMainAacSentenceState()
             shouldResetMainAacRootAfterSpeech = true
@@ -3543,7 +3544,7 @@ class MainActivity : AppCompatActivity() {
             shouldLockMainAacInputOnSpeechStart = true
             lockMainAacInput()
             showMainAacQuestion(sentence)
-            aacAudioPlayer.speakText(sentence, languageCode)
+            aacAudioPlayer.speakPatientText(sentence, languageCode)
             observeMainAac(AacEventType.SENTENCE_SPOKEN)
             shouldResetMainAacRootAfterSpeech = true
         }

@@ -11,10 +11,11 @@ object AacLocalizedTextResolver {
 
     fun resolveLabel(item: AacItem, languageCode: String): String {
         val localizedTexts = item.toLocalizedTexts()
-        return resolveText(localizedTexts, languageCode) { it.label }
+        val label = resolveText(localizedTexts, languageCode) { it.label }
             ?: resolveText(localizedTexts, languageCode) { it.speakText }
             ?: safeMissingTextFallback(item, languageCode)
             ?: item.id
+        return AacPatientVoiceSettings.itemText(item, label, languageCode)
     }
 
     fun resolveSpeakText(item: AacItem, languageCode: String): String {
@@ -22,6 +23,11 @@ object AacLocalizedTextResolver {
     }
 
     fun resolveSpeakTextResult(item: AacItem, languageCode: String): ResolvedSpeechText {
+        val result = resolveStoredSpeakTextResult(item, languageCode)
+        return result.copy(text = AacPatientVoiceSettings.itemText(item, result.text, result.languageCode))
+    }
+
+    private fun resolveStoredSpeakTextResult(item: AacItem, languageCode: String): ResolvedSpeechText {
         val localizedTexts = item.toLocalizedTexts()
         val selectedCode = AacLanguageResolver.normalize(languageCode)
         if (selectedCode == "uk") {
@@ -57,7 +63,9 @@ object AacLocalizedTextResolver {
 
     fun resolveQuestion(item: AacItem, languageCode: String): String? {
         val localizedTexts = item.toLocalizedTexts()
-        return resolveText(localizedTexts, languageCode) { it.question }
+        return resolveText(localizedTexts, languageCode) { it.question }?.let {
+            AacPatientVoiceSettings.itemText(item, it, languageCode)
+        }
     }
 
     fun hasStoredLabelForLanguage(item: AacItem, languageCode: String): Boolean {

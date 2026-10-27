@@ -34,7 +34,7 @@ class AacAudioPlayer(
     private val speechCoordinator = AacSpeechCoordinator(
         speechCache,
         OpenAiAacSpeechApiClient(context),
-        voiceIdProvider = { AacSpeechApiConfig.read(context).normalizedVoiceId() },
+        voiceIdProvider = { AacPatientVoiceSettings.voice(context, guide = false) },
         speedProvider = { AacSpeechApiConfig.read(context).normalizedSpeed() }
     )
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -108,7 +108,8 @@ class AacAudioPlayer(
         val requestSerial = nextSpeechRequestSerial()
         val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
         val resolvedSpeech = resolveTileSpeechText(item, languageCode)
-        val fallbackText = resolvedSpeech.text
+        val fallbackText = if (item.userEdited || item.locked || item.translationManualOverride) resolvedSpeech.text else
+            AacPatientVoiceSettings.text(context, resolvedSpeech.text, resolvedSpeech.languageCode)
         val speechLanguageCode = resolvedSpeech.languageCode
         traceAudio("playOrSpeak resolvedText='${fallbackText.take(80)}'")
         if (fallbackText.isBlank()) {
@@ -121,9 +122,10 @@ class AacAudioPlayer(
             text = fallbackText,
             languageCode = speechLanguageCode,
             requestSerial = requestSerial,
-            generatedLog = "AUDIO GENERATED: ${item.id}"
+            generatedLog = "AUDIO GENERATED: ${item.id}",
+            timeoutMs = STATUS_SPEECH_GENERATION_TIMEOUT_MS
         ) {
-            if (AacLanguageResolver.normalize(speechLanguageCode) == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
+            if (!AacPatientVoiceSettings.male(context) && AacLanguageResolver.normalize(speechLanguageCode) == AacLanguageResolver.DEFAULT_LANGUAGE_CODE) {
                 val directAudioFile = item.audioSl.takeIf { it.isNotBlank() }?.let { File(it) }
                 if (playAudioFileIfAvailable(directAudioFile)) {
                     traceAudio("selected path=direct audio file=${directAudioFile?.absolutePath}")
@@ -157,11 +159,19 @@ class AacAudioPlayer(
     // Date/weather utterances change on every request and usually have no cached
     // recording. Do not discard their first generated recording after only 1.8s.
     fun speakStatusText(text: String, languageCode: String) {
+        speakTextWithGenerationTimeout(text, languageCode, STATUS_SPEECH_GENERATION_TIMEOUT_MS, guide = true)
+    }
+
+    fun speakGuideText(text: String, languageCode: String) {
+        speakTextWithGenerationTimeout(text, languageCode, STATUS_SPEECH_GENERATION_TIMEOUT_MS, guide = true)
+    }
+
+    fun speakPatientText(text: String, languageCode: String) {
         speakTextWithGenerationTimeout(text, languageCode, STATUS_SPEECH_GENERATION_TIMEOUT_MS)
     }
 
-    private fun speakTextWithGenerationTimeout(text: String, languageCode: String, timeoutMs: Long) {
-        val trimmed = text.trim()
+    private fun speakTextWithGenerationTimeout(text: String, languageCode: String, timeoutMs: Long, guide: Boolean = false) {
+        val trimmed = AacPatientVoiceSettings.text(context, text, languageCode).trim()
         traceAudio("speakText called text='${trimmed.take(80)}' language=$languageCode")
         if (trimmed.isEmpty()) {
             traceAudio("speakText ignored: blank text")
@@ -176,6 +186,7 @@ class AacAudioPlayer(
             languageCode = languageCode,
             requestSerial = requestSerial,
             generatedLog = "AUDIO GENERATED",
+            voiceId = AacPatientVoiceSettings.voice(context, guide),
             timeoutMs = timeoutMs
         ) {
             traceAudio("selected path=Android TTS fallback")
@@ -202,6 +213,7 @@ class AacAudioPlayer(
         languageCode: String,
         requestSerial: Int,
         generatedLog: String,
+        voiceId: String = AacPatientVoiceSettings.voice(context, guide = false),
         timeoutMs: Long = SPEECH_GENERATION_TIMEOUT_MS,
         fallback: () -> Unit
     ) {
@@ -217,7 +229,8 @@ class AacAudioPlayer(
         Thread {
             val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
                 text = text,
-                languageCode = languageCode
+                languageCode = languageCode,
+                voiceId = voiceId
             )
 
             mainHandler.post {

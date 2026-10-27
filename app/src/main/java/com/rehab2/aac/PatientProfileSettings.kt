@@ -66,6 +66,7 @@ data class PatientProfileSettings(
                     .put("therapistContact", normalized.therapistContact)
                     .put("shortDescription", normalized.shortDescription)
                 file.writeText(json.toString(2), Charsets.UTF_8)
+                AacPatientVoiceSettings.saveGender(context, normalized.gender)
                 true
             } catch (_: Exception) {
                 false
@@ -106,8 +107,8 @@ data class PatientProfileSettings(
         return when (itemId) {
             "about_me" -> shortDescription.ifBlank { fullName }.sentenceOrEmpty { it.ensureSentenceEnding() }
             "my_name" -> fullName.ifBlank { "" }.let { if (it.isBlank()) EMPTY_FIELD_SENTENCE else "Ime mi je $it." }
-            "my_age" -> age.sentenceOrEmpty { "Stara sem $it let." }
-            "my_birth_date" -> birthDate.sentenceOrEmpty { "Rojena sem $it." }
+            "my_age" -> age.sentenceOrEmpty { "${if (gender == GENDER_MALE) "Star" else "Stara"} sem $it let." }
+            "my_birth_date" -> birthDate.sentenceOrEmpty { "${if (gender == GENDER_MALE) "Rojen" else "Rojena"} sem $it." }
             "my_home" -> homeTown.sentenceOrEmpty { "\u017divim v $it." }
             "my_country" -> country.sentenceOrEmpty { "Sem iz $it." }
             "my_language" -> mainLanguage.sentenceOrEmpty { "Govorim $it." }

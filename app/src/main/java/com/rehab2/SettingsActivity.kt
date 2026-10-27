@@ -820,6 +820,9 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnPatientSetupWizard).setOnClickListener {
             startActivity(Intent(this, PatientSetupWizardActivity::class.java))
         }
+        findViewById<Button>(R.id.btnPatientPersonalization).setOnClickListener {
+            startActivity(Intent(this, PatientPersonalizationActivity::class.java))
+        }
         findViewById<Button>(R.id.btnKeywordMatcherTest).setOnClickListener {
             runKeywordMatcherTest()
         }

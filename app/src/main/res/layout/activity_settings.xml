@@ -1476,6 +1476,14 @@
             android:textSize="15sp" />
 
         <Button
+            android:id="@+id/btnPatientPersonalization"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:text="OSEBNE IKONE IZ FOTOGRAFIJE IN GLASOVA"
+            android:textAllCaps="false" />
+
+        <Button
             android:id="@+id/btnPatientSetupWizard"
             android:layout_width="match_parent"
             android:layout_height="64dp"
