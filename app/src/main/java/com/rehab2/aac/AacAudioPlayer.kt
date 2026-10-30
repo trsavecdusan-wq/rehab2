@@ -42,6 +42,7 @@ class AacAudioPlayer(
     private var mediaPlayer: MediaPlayer? = null
     private var loudnessEnhancer: LoudnessEnhancer? = null
     private var textToSpeech: TextToSpeech? = TextToSpeech(context, this)
+    @Volatile private var released = false
     private var isTtsReady = false
     private var isTtsFailed = false
     private var pendingTextToSpeak: String? = null
@@ -56,40 +57,45 @@ class AacAudioPlayer(
     private var speechListener: SpeechListener? = null
 
     override fun onInit(status: Int) {
+        if (released) return
         traceAudio("TTS onInit status=$status")
         if (status != TextToSpeech.SUCCESS) {
             isTtsFailed = true
             isTtsReady = false
             traceAudio("TTS unavailable: init failed")
+            if (pendingTextToSpeak != null) {
+                pendingTextToSpeak = null
+                notifySpeechError()
+            }
             return
         }
 
-        isTtsReady = configureTtsLanguage(AacLanguageResolver.DEFAULT_LANGUAGE_CODE)
-        isTtsFailed = !isTtsReady
+        // Engine readiness is separate from the language of an individual request.
+        isTtsReady = true
+        isTtsFailed = false
         traceAudio("TTS available=$isTtsReady")
         textToSpeech?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
-                notifySpeechStarted()
+                postCurrentTtsCallback(utteranceId) { notifySpeechStarted() }
             }
 
             override fun onDone(utteranceId: String?) {
-                notifySpeechCompleted()
+                postCurrentTtsCallback(utteranceId) { notifySpeechCompleted() }
             }
 
             @Deprecated("Deprecated in Java")
             override fun onError(utteranceId: String?) {
-                notifySpeechError()
+                postCurrentTtsCallback(utteranceId) { notifySpeechError() }
             }
 
             override fun onError(utteranceId: String?, errorCode: Int) {
-                notifySpeechError()
+                postCurrentTtsCallback(utteranceId) { notifySpeechError() }
             }
         })
         if (isTtsReady) {
             pendingTextToSpeak?.let { text ->
-                configureTtsLanguage(pendingLanguageCode)
                 pendingTextToSpeak = null
-                speak(text, pendingLanguageCode)
+                speakAndroidFallback(text, pendingLanguageCode)
             }
         }
     }
@@ -104,8 +110,7 @@ class AacAudioPlayer(
 
     fun playOrSpeak(item: AacItem, languageCode: String) {
         traceAudio("playOrSpeak itemId=${item.id} label=${item.labelSl}")
-        stopPlayback(notifyCancellation = false)
-        val requestSerial = nextSpeechRequestSerial()
+        val requestSerial = beginSpeechRequest()
         val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
         val resolvedSpeech = resolveTileSpeechText(item, languageCode)
         val fallbackText = if (item.userEdited || item.locked || item.translationManualOverride) resolvedSpeech.text else
@@ -178,8 +183,7 @@ class AacAudioPlayer(
             return
         }
 
-        stopPlayback(notifyCancellation = false)
-        val requestSerial = nextSpeechRequestSerial()
+        val requestSerial = beginSpeechRequest()
 
         playGeneratedSpeechOrFallback(
             text = trimmed,
@@ -195,17 +199,32 @@ class AacAudioPlayer(
     }
 
     fun stopCurrentSpeech() {
+        nextSpeechRequestSerial()
         pendingTextToSpeak = null
         stopPlayback()
         textToSpeech?.stop()
-        nextSpeechRequestSerial()
     }
 
     fun interruptCurrentSpeechForNewInput() {
+        nextSpeechRequestSerial()
         pendingTextToSpeak = null
         stopPlayback(notifyCancellation = false, restoreDuckingWhenSilent = true)
         textToSpeech?.stop()
-        nextSpeechRequestSerial()
+    }
+
+    private fun beginSpeechRequest(): Int {
+        // Invalidate old callbacks before stopping TTS; keep only the newest pending text.
+        val serial = nextSpeechRequestSerial()
+        pendingTextToSpeak = null
+        stopPlayback(notifyCancellation = false, restoreDuckingWhenSilent = true)
+        textToSpeech?.stop()
+        return serial
+    }
+
+    private fun postCurrentTtsCallback(utteranceId: String?, callback: () -> Unit) {
+        mainHandler.post {
+            if (AacSpeechRequestPolicy.isCurrent(utteranceId, speechRequestSerial, released)) callback()
+        }
     }
 
     private fun playGeneratedSpeechOrFallback(
@@ -274,6 +293,7 @@ class AacAudioPlayer(
     }
 
     private fun speakAndroidFallback(text: String, languageCode: String) {
+        if (released) return
         if (isTtsReady && !configureTtsLanguage(languageCode)) {
             val normalizedLanguage = AacLanguageResolver.normalize(languageCode)
             traceAudio("Android TTS fallback unavailable language=$normalizedLanguage")
@@ -294,11 +314,13 @@ class AacAudioPlayer(
             traceAudio("play audio file=${audioFile.absolutePath}")
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(audioFile.absolutePath)
-                setOnCompletionListener {
+                setOnCompletionListener { completed ->
+                    if (mediaPlayer !== completed) return@setOnCompletionListener
                     releaseMediaPlayer()
                     notifySpeechCompleted()
                 }
-                setOnErrorListener { _, what, extra ->
+                setOnErrorListener { failed, what, extra ->
+                    if (mediaPlayer !== failed) return@setOnErrorListener true
                     Log.e(TAG, "SPEECH_ERROR media what=$what extra=$extra")
                     releaseMediaPlayer()
                     notifySpeechError()
@@ -354,7 +376,7 @@ class AacAudioPlayer(
             return true
         }
 
-        return true
+        return false
     }
 
     private fun isLanguageUsable(result: Int): Boolean {
@@ -456,7 +478,8 @@ class AacAudioPlayer(
     }
 
     fun release() {
-        stopPlayback()
+        released = true
+        stopCurrentSpeech()
         textToSpeech?.stop()
         textToSpeech?.setOnUtteranceProgressListener(null)
         textToSpeech?.shutdown()
@@ -583,8 +606,9 @@ class AacAudioPlayer(
     }
 
     private fun postSpeechCallback(callback: (SpeechListener) -> Unit) {
+        val serial = speechRequestSerial
         mainHandler.post {
-            speechListener?.let(callback)
+            if (!released && serial == speechRequestSerial) speechListener?.let(callback)
         }
     }
 
