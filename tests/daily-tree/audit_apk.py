@@ -24,7 +24,8 @@ with zipfile.ZipFile(apk) as archive:
     expected = {'assets/' + p.relative_to(ROOT / 'app/src/main/assets').as_posix(): p
                 for p in (ROOT / 'app/src/main/assets').rglob('*') if p.is_file()}
     actual = {name for name in names if name.startswith('assets/') and not name.endswith('/')}
-    assert actual == set(expected), ('Unexpected/missing assets', actual ^ set(expected))
+    generated_profiles = {'assets/dexopt/baseline.prof', 'assets/dexopt/baseline.profm'}
+    assert actual - generated_profiles == set(expected), ('Unexpected/missing assets', (actual - generated_profiles) ^ set(expected))
     for name, source in expected.items():
         assert archive.read(name) == source.read_bytes(), name
     checked = set()
