@@ -13,15 +13,25 @@ import java.io.File
 object AacPatientImages {
     fun store(context: Context) = PatientImageStore(File(context.noBackupFilesDir, "aac-patients"))
 
-    fun personalFile(context: Context, itemId: String): File? = try {
+    fun personalFile(context: Context, itemId: String, includeAliases: Boolean = true): File? = try {
         val store = store(context)
-        store.resolve(store.currentPatientId(), itemId)?.let(::preview)
+        val patientId = store.currentPatientId()
+        val file = AacContactImageAliases.candidates(itemId, includeAliases).firstNotNullOfOrNull { candidateId ->
+            store.resolve(patientId, candidateId)?.let(::preview)
+        }
+        if (store.currentPatientId() == patientId) file else null
     } catch (_: Exception) {
         null // Fail closed on a damaged private index; retain the existing system image.
     }
 
     fun resolve(context: Context, item: AacItem): File? {
-        personalFile(context, item.id)?.let { return it }
+        val inheritContactPhoto = !item.userEdited && !item.locked && item.iconSource == IconSource.SYSTEM &&
+            item.imagePath == AacAuditedIcons.defaultPaths[item.id]
+        personalFile(context, item.id, includeAliases = inheritContactPhoto)?.let { return it }
+        AacAuditedIcons.variant(item, AacPatientVoiceSettings.male(context))?.let { path ->
+            AacStoragePaths.resolveIconFile(context, path, IconSource.SYSTEM)
+                ?.takeIf { it.isFile }?.let { return it }
+        }
         val showLegacyImage = try {
             val store = store(context)
             val patientId = store.currentPatientId()
@@ -34,6 +44,10 @@ object AacPatientImages {
                 ?.takeIf { it.isFile }?.let { return it }
         }
         val original = AacStarterContentV1.items().firstOrNull { it.id == item.id } ?: return null
+        AacAuditedIcons.variant(original, AacPatientVoiceSettings.male(context))?.let { path ->
+            AacStoragePaths.resolveIconFile(context, path, IconSource.SYSTEM)
+                ?.takeIf { it.isFile }?.let { return it }
+        }
         return AacStoragePaths.resolveIconFile(context, original.imagePath, original.iconSource)
             ?.takeIf { it.isFile }
     }

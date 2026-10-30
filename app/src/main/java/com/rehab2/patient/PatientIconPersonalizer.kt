@@ -74,7 +74,8 @@ class PatientIconPersonalizer(private val context: Context) {
     private fun systemImage(itemId: String): File {
         // Always use the reviewed SYSTEM reference, never an existing patient overlay.
         val item = AacStarterContentV1.items().single { it.id == itemId }
-        return AacStoragePaths.resolveIconFile(context, item.imagePath, item.iconSource)
+        val path = AacAuditedIcons.variant(item, AacPatientVoiceSettings.male(context)) ?: item.imagePath
+        return AacStoragePaths.resolveIconFile(context, path, item.iconSource)
             ?.takeIf { it.isFile } ?: error("Sistemska ikona ni dosegljiva.")
     }
     fun systemPreview(itemId: String): File = systemImage(itemId)

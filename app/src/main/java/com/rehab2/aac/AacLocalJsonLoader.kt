@@ -200,7 +200,7 @@ object AacLocalJsonLoader {
             largeCupImagePath = json.optNullableString("largeCupImagePath"),
             hasLargeCupOption = json.optBoolean("hasLargeCupOption", false),
             locked = json.optBoolean("locked", false),
-            userEdited = json.optBoolean("userEdited", false)
+            userEdited = AacUpgradeFieldPolicy.isUserEdited(json)
         )
     }
 

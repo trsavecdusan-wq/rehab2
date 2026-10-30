@@ -75,6 +75,9 @@ object AacImageGallery {
                     }
                     .toList()
             }
+            // Legacy bundled crops remain readable for existing manual bindings.
+            // New user-added system files and all non-system sources remain available.
+            .filter { entry -> entry.source.iconSource != IconSource.SYSTEM || AacAuditedIcons.offerInGallery(entry.imagePath) }
             .distinctBy { entry -> "${entry.source.iconSource.name}:${entry.imagePath}" }
             .sortedWith(compareBy({ it.file.parentFile?.name.orEmpty() }, { it.file.name.lowercase() }))
     }

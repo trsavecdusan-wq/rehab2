@@ -277,7 +277,7 @@ object AacStarterContentV1 {
         starter("hungry_pasta", "TESTENINE", "Prosim, rada bi testenine.", "food.hungry.pasta", "FOOD", "food", listOf("testenine", "jesti"), visibleUnderIds = listOf("hungry_side_dishes")),
         starter("hungry_rice", "RIŽ", "Prosim, rada bi riž.", "food.hungry.rice", "FOOD", "food", listOf("riž", "jesti"), visibleUnderIds = listOf("hungry_side_dishes")),
         starter("hungry_vegetables", "ZELENJAVA", "Prosim, rada bi zelenjavo.", "food.hungry.vegetables", "FOOD", "food", listOf("zelenjava", "jesti"), visibleUnderIds = listOf("hungry_side_dishes")),
-        starter("hungry_roasted_potato", "PRAŽEN KROMPIR", "Prosim, rada bi pražen krompir.", "food.hungry.roasted_potato", "FOOD", "food", listOf("pražen_krompir", "jesti"), visibleUnderIds = listOf("hungry_potato")),
+        starter("hungry_roasted_potato", "PEČEN KROMPIR", "Prosim, rada bi pečen krompir.", "food.hungry.roasted_potato", "FOOD", "food", listOf("pečen_krompir", "jesti"), visibleUnderIds = listOf("hungry_potato"), labelByLanguage = mapOf("uk" to "ЗАПЕЧЕНА КАРТОПЛЯ")),
         starter("hungry_fries", "POMFRI", "Prosim, rada bi pomfri.", "food.hungry.fries", "FOOD", "food", listOf("pomfri", "jesti"), visibleUnderIds = listOf("hungry_potato")),
         starter("hungry_mashed_potato", "PIRE", "Prosim, rada bi pire krompir.", "food.hungry.mashed_potato", "FOOD", "food", listOf("pire", "krompir", "jesti"), visibleUnderIds = listOf("hungry_potato")),
         starter("hungry_yogurt", "JOGURT", "Prosim, rada bi jogurt.", "food.hungry.yogurt", "FOOD", "food", listOf("jogurt", "jesti"), visibleUnderIds = listOf("hungry_snack")),
@@ -526,7 +526,7 @@ object AacStarterContentV1 {
                 meaningType = meaningType,
                 meaningGroup = meaningGroup
             )
-        )
+        ).let { texts -> AacAuditedText.ukSpeech[id]?.let { texts + ("uk" to it) } ?: texts }
         val effectiveImagePath = safeStarterSystemIconPath(
             id = id,
             meaningType = meaningType,
@@ -606,6 +606,7 @@ object AacStarterContentV1 {
         iconSource: IconSource
     ): String {
         val normalizedPath = imagePath.trim().replace('\\', '/').removePrefix("/")
+        AacAuditedIcons.defaultPaths[id]?.let { return it }
         if (iconSource == IconSource.SYSTEM && normalizedPath in SAFE_SYSTEM_ICON_PATHS) {
             return normalizedPath
         }
@@ -1014,7 +1015,7 @@ object AacStarterContentV1 {
         "coffee_plain" to "Будь ласка, я хочу звичайну каву.",
         "coffee_milk" to "Будь ласка, я хочу каву з молоком.",
         "coffee_no_sugar" to "Будь ласка, я хочу каву без цукру."
-    )
+    ).plus(AacAuditedText.ukSpeech)
 
     private val UK_LABEL_BY_ID = mapOf(
         "tea_chamomile" to "РОМАШКОВИЙ",

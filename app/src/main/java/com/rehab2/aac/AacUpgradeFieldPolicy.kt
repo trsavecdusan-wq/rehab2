@@ -28,9 +28,11 @@ internal object AacUpgradeFieldPolicy {
             )
     }
 
+    fun isUserEdited(item: JSONObject): Boolean = editFlags.any { item.optBoolean(it, false) } ||
+        item.optString("source").trim().uppercase() in setOf("PATIENT", "CUSTOM", "THERAPIST")
+
     fun mergeUserFields(before: JSONObject, proposed: JSONObject) {
-        val edited = editFlags.any { before.optBoolean(it, false) } ||
-            before.optString("source").trim().uppercase() in setOf("PATIENT", "CUSTOM", "THERAPIST")
+        val edited = isUserEdited(before)
         // Only explicit editing provenance protects text; shipped legacy values remain repairable.
         if (edited) {
             textFields.forEach { key ->

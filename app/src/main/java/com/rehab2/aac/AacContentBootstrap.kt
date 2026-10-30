@@ -96,7 +96,7 @@ object AacContentBootstrap {
         "left_leg",
         "right_leg",
         "arm_palm"
-    )
+    ).plus(AacAuditedText.ukSpeech.keys)
 
     private val QUICK_PATIENT_SYSTEM_ICON_IDS = setOf(
         "help_washing",
@@ -321,10 +321,12 @@ object AacContentBootstrap {
         "shop" to "system/daily_shop_798.png",
         "vending_drinks" to "system/place_vending_machine.png",
         "vending_coffee_tea" to "system/place_vending_machine.png"
-    ).plus(AacReviewedIcons.paths)
+    ).plus(AacReviewedIcons.paths).plus(AacAuditedIcons.defaultPaths)
 
     private val PROFESSIONAL_SYSTEM_ICON_FILES = PROFESSIONAL_SYSTEM_ICON_BY_STARTER_ID.values
         .map { path -> path.substringAfterLast('/') }
+        .distinct()
+        .plus(AacAuditedIcons.allFiles.map { it.substringAfterLast('/') })
         .distinct()
 
     private val BUNDLED_SYSTEM_ICON_FILES = listOf(
@@ -483,7 +485,7 @@ object AacContentBootstrap {
         // Snapshot existing data before this reviewed content repair, including preference/profile writes.
         try {
             val store = AacPatientImages.store(context)
-            store.backupMigrationOnce(store.currentPatientId(), "icon-review-after-798",
+            store.backupMigrationOnce(store.currentPatientId(), "icon-review-after-812",
                 AacStoragePaths.getAacItemsFile(context),
                 AacStoragePaths.getPatientProfileFile(context),
                 AacStoragePaths.getProfilesDataDir(context)?.let { File(it, DOM_PROFILE_FILE) },

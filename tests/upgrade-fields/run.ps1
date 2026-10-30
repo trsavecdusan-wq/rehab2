@@ -7,10 +7,11 @@ $stdlib=Get-ChildItem (Join-Path $env:USERPROFILE '.gradle/caches/modules-2/file
 if(!$stdlib){throw 'Kotlin 1.9.24 standard library missing'}
 $out=Join-Path ([IO.Path]::GetTempPath()) ('NovaRehab-field-tests-'+[guid]::NewGuid())
 New-Item -ItemType Directory $out | Out-Null
-$cp="$classes;$JsonJar;$stdlib"
+$javaClasses=Join-Path $repo 'app/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes'
+$cp="$classes;$javaClasses;$JsonJar;$stdlib"
 & javac -encoding UTF-8 -cp $cp -d $out (Join-Path $PSScriptRoot 'UpgradeFieldPolicyTest.java') (Join-Path $PSScriptRoot 'ReviewedRuntimeTest.java')
 if($LASTEXITCODE -ne 0){throw 'Test compilation failed'}
 & java -cp "$out;$cp" UpgradeFieldPolicyTest
 if($LASTEXITCODE -ne 0){throw 'Preservation tests failed'}
-& java -cp "$out;$cp" ReviewedRuntimeTest (Join-Path $repo 'NovaRehab/data/aac_review_after798_manifest.json')
+& java -cp "$out;$cp" ReviewedRuntimeTest (Join-Path $repo 'NovaRehab/data/aac_full_icon_review_manifest.json')
 if($LASTEXITCODE -ne 0){throw 'Runtime mappings failed'}

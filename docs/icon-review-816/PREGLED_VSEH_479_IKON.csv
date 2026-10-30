@@ -1,0 +1,480 @@
+﻿ID;NAPIS;GOVOR SL;SLIKA;SPOLNI RAZLICICI;POPRAVEK;POTREBEN OSEBNI VNOS;PODIKONE
+vest;BREZROKAVNIK;Potrebujem brezrokavnik.;system/vest.png;SKUPNA;retained_reviewed;;
+choose_myself;SAMA BOM IZBRALA;Želim iti v trgovino. Tam bom sama izbrala, kaj potrebujem.;system/choose_myself.png;SKUPNA;retained_reviewed;;
+show_you;POKAŽEM TI;Prosim poglej, pokazala ti bom.;system/show_you.png;SKUPNA;retained_reviewed;;
+not_here;NI TUKAJ;Tukaj ni tega, kar želim povedati.;system/not_here.png;SKUPNA;retained_reviewed;;
+not_this;NI TO;Ne, to ni tisto, kar mislim.;system/not_this.png;SKUPNA;retained_reviewed;;
+no;NE;Ne.;system/no.png;SKUPNA;retained_reviewed;;
+yes;DA;Da.;system/yes.png;SKUPNA;retained_reviewed;;
+dont_understand;NE RAZUMEM;Ne razumem.;system/daily_dont_understand_798.png;DA;gender_dont_understand_male;;
+thank_you;HVALA;Hvala.;system/full816_pair_thanks_female_e64cfe12.png;DA;pair_thanks_male;;
+help;POMOČ;Prosim, pomagajte mi.;system/help.png;SKUPNA;retained_reviewed;;help_drinking, help_feeding, wc, dressing, washing_help, position
+wait;POČAKAJ;Počakajte, prosim.;system/wait.png;SKUPNA;retained_reviewed;;
+repeat;PONOVI;Prosim, ponovite.;system/repeat.png;SKUPNA;retained_reviewed;;pogovor, repeat_question, repeat_last_sentence, repeat_slower
+slower;POČASNEJE;Prosim, govorite počasneje.;system/full816_pair_slow_female_0586a7eb.png;DA;pair_slow_male;;slower_little, slower_much
+understand;RAZUMEM;Razumem.;system/yes.png;SKUPNA;retained_reviewed;;
+people;LJUDJE;Ljudje.;system/people.png;SKUPNA;retained_reviewed;;family_group, friends_group, acquaintances_group, about_me, socialno, miss_someone
+need;POTREBUJEM;Potrebujem pomoč.;system/need.png;SKUPNA;retained_reviewed;;choose_myself, help, water, food, wc, blanket, wheelchair, crutch, doctor, nurse, therapy
+problem;TEŽAVA;Imam težavo.;system/problem.png;SKUPNA;retained_reviewed;;pain, cannot, cold, hot, afraid, bad, uncomfortable, dont_know_problem
+family_group;DRUŽINA;Družina.;system/daily_family_group_798.png;SKUPNA;retained_reviewed;;person_zana, person_sergej
+friends_group;PRIJATELJI;Prijatelji.;system/daily_friends_group_798.png;SKUPNA;retained_reviewed;;person_dusan, person_franc, person_inna, person_julija, person_oksana
+call;POKLIČI;Izberite skupino oseb.;system/daily_call_798.png;SKUPNA;retained_reviewed;;family_group, friends_group, acquaintances_group
+acquaintances_group;ZNANCI;Znanci.;system/people.png;SKUPNA;retained_reviewed;;doctor, nurse, therapist, person_other
+message;SPOROČILO;Pošljite sporočilo.;system/review_message_e9abde7b.png;SKUPNA;retained_reviewed;;
+miss_someone;POGREŠAM;Pogrešam vas.;system/miss_someone.png;SKUPNA;retained_reviewed;;miss_little, miss_very
+about_me;O MENI;Izberite podatek o meni.;system/review_profile_card_bef437f2.png;SKUPNA;retained_reviewed;patient_profile_value_required;stroke_info, speech_difficulty, i_understand, speak_slowly, give_me_time, be_patient, my_name, my_age, my_birth_date, my_home, my_country, my_language, my_caregiver, my_therapist, call_my_caregiver, call_my_therapist
+stroke_info;PO MOŽGANSKI KAPI;Prebolela sem možgansko kap.;system/review_stroke_info_2d89372c.png;SKUPNA;retained_reviewed;;
+speech_difficulty;TEŽKO GOVORIM;Težko govorim.;system/review_cannot_speak_d2293812.png;DA;gender_speech_difficulty_male;;
+i_understand;RAZUMEM VAS;Razumem vas.;system/review_reuse_yes_287fe28f.png;SKUPNA;retained_reviewed;;
+speak_slowly;GOVORITE POČASI;Prosim, govorite počasneje.;system/full816_pair_slow_female_0586a7eb.png;DA;pair_slow_male;;
+give_me_time;DAJTE MI ČAS;Prosim, dajte mi čas.;system/wait.png;SKUPNA;retained_reviewed;;
+be_patient;POTRPITE Z MANO;Prosim, potrpite z mano.;system/review_reuse_wait_cf2f6d11.png;SKUPNA;retained_reviewed;;
+my_name;MOJE IME;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/review_profile_card_bef437f2.png;SKUPNA;retained_reviewed;patient_profile_value_required;
+my_age;STAROST;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/review_birthday_a4d10ce0.png;SKUPNA;retained_reviewed;patient_profile_value_required;
+my_birth_date;ROJSTVO;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/full816_audit_birth_date_243a1a31.png;SKUPNA;audit_birth_date;patient_profile_value_required;
+my_home;KJE ŽIVIM;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/review_reuse_home_a8216339.png;SKUPNA;retained_reviewed;patient_profile_value_required;
+my_country;DRŽAVA;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/full816_audit_country_28595089.png;SKUPNA;audit_country;patient_profile_value_required;
+my_language;JEZIK;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/full816_audit_language_8f3b5b9c.png;SKUPNA;audit_language;patient_profile_value_required;
+my_caregiver;SKRBNIK;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/review_reuse_daily_care_798_760fc0a6.png;DA;gender_my_caregiver_male;patient_profile_value_required;
+my_therapist;TERAPEVT;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/review_therapy_4ea445a8.png;DA;gender_my_therapist_male;patient_profile_value_required;
+call_my_caregiver;POKLIČI SKRBNIKA;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/review_reuse_daily_call_798_85433d19.png;SKUPNA;retained_reviewed;patient_profile_value_required;
+call_my_therapist;POKLIČI TERAPEVTA;PatientProfileSettings.EMPTY_FIELD_SENTENCE;system/review_reuse_daily_call_798_85433d19.png;SKUPNA;retained_reviewed;patient_profile_value_required;
+thirsty;PIJAČA;Izberi pijačo.;system/review_drink_category_7141f96c.png;SKUPNA;retained_reviewed;;water, tea, coffee, juice, sparkling_drink, milk_drinks
+hungry;HRANA;Izberi hrano.;system/hungry.png;SKUPNA;retained_reviewed;;hungry_main_dish, hungry_snack, hungry_fast_food, hungry_fruit, hungry_dessert
+wc;TOALETA;Moram v toaleto.;system/toilet_general.png;SKUPNA;canonical_mapping;;wc_wet, wc_dirty, wc_wet_and_dirty, nurse_help
+tired;UTRUJENA SEM;Utrujena sem.;system/full816_pair_tired_female_a1ba376b.png;DA;pair_tired_male;;
+what_root;KAJ?;Kaj?;system/what.png;SKUPNA;retained_reviewed;;activity_group, what_do, what_is_this, what_is_happening, what_next, what_did_i_say
+where_root;KJE?;Kje?;system/where.png;SKUPNA;retained_reviewed;;place_group, where_zana, where_dusan, where_are_we, where_phone, where_wheelchair
+when_root;KDAJ?;Kdaj?;system/when.png;SKUPNA;retained_reviewed;;time_group, when_come, when_go, when_therapy, when_home, when_eat
+home;DOMOV;Domov.;system/home.png;SKUPNA;retained_reviewed;;
+other;DRUGO;Drugo.;system/review_other_18728943.png;SKUPNA;retained_reviewed;;
+real_world;RESNIČNI SVET;Resnični svet.;system/full816_audit_real_world_da9cd612.png;SKUPNA;audit_real_world;;vending_drinks, vending_coffee_tea, shop, restaurant, transport
+what_do;KAJ BOMO DELALI?;Kaj bomo delali?;system/review_activity_group_789fd08c.png;SKUPNA;retained_reviewed;;
+what_is_this;KAJ JE TO?;Kaj je to?;system/full816_audit_what_this_d65cab7a.png;SKUPNA;audit_what_this;;
+what_is_happening;KAJ SE DOGAJA?;Kaj se dogaja?;system/full816_audit_what_happening_ecc806e8.png;SKUPNA;audit_what_happening;;
+what_next;KAJ BO POTEM?;Kaj bo potem?;system/full816_audit_what_next_cd9b2b84.png;SKUPNA;audit_what_next;;
+what_did_i_say;KAJ SEM REKLA?;Kaj sem rekla?;system/review_pogovor_6b62dd63.png;DA;gender_what_did_i_say_male;;
+activity_group;KAJ BI DELALA?;Izberite dejavnost.;system/review_activity_group_789fd08c.png;SKUPNA;retained_reviewed;;rest, music, tv, environment_group, walk, visit, animals, therapy
+music;GLASBA;Rada bi poslušala glasbo.;system/review_music_93adcb0a.png;SKUPNA;retained_reviewed;;
+tv;TELEVIZIJA;Rada bi gledala televizijo.;system/review_tv_7d6f1850.png;SKUPNA;retained_reviewed;;
+environment_group;OKOLJE;Izberite pomoč v prostoru.;system/review_room_b2c12416.png;SKUPNA;retained_reviewed;;turn_on_tv, turn_off_tv, turn_on_light, turn_off_light, open_window, close_window
+turn_on_tv;PRIŽGI TV;Prosim, prižgite televizijo.;system/review_turn_on_tv_9d53fc58.png;SKUPNA;retained_reviewed;;
+turn_off_tv;UGASNI TV;Prosim, ugasnite televizijo.;system/review_turn_off_tv_ac0396ae.png;SKUPNA;retained_reviewed;;
+turn_on_light;PRIŽGI LUČ;Prosim, prižgite luč.;system/review_turn_on_light_cd5e65b9.png;SKUPNA;retained_reviewed;;
+turn_off_light;UGASNI LUČ;Prosim, ugasnite luč.;system/review_turn_off_light_1c0d62c3.png;SKUPNA;retained_reviewed;;
+open_window;ODPRI OKNO;Prosim, odprite okno.;system/review_open_window_7da2ab3a.png;SKUPNA;retained_reviewed;;
+close_window;ZAPRI OKNO;Prosim, zaprite okno.;system/review_close_window_c9ab05a7.png;SKUPNA;retained_reviewed;;
+walk;SPREHOD;Rada bi šla na sprehod s spremstvom.;system/review_walk_4cc7bd3b.png;DA;gender_walk_male;;
+visit;OBISK;Rada bi obisk.;system/review_visit_4e09043f.png;DA;gender_visit_male;;
+animals;ŽIVALI;Izberite žival.;system/review_animals_9720a58c.png;SKUPNA;retained_reviewed;;dog, cat, bird, fish, horse, rabbit
+dog;PES;Rada bi videla psa.;system/review_dog_8251da9f.png;SKUPNA;retained_reviewed;;
+cat;MAČKA;Rada bi videla mačko.;system/review_cat_e12e3ec2.png;SKUPNA;retained_reviewed;;
+bird;PTIČ;Rada bi videla ptiča.;system/review_bird_06e6451c.png;SKUPNA;retained_reviewed;;
+fish;RIBA;Rada bi videla ribo.;system/review_fish_b713ff74.png;SKUPNA;retained_reviewed;;
+horse;KONJ;Rada bi videla konja.;system/review_horse_c61c243e.png;SKUPNA;retained_reviewed;;
+rabbit;ZAJEC;Rada bi videla zajca.;system/review_rabbit_b116e137.png;SKUPNA;retained_reviewed;;
+where_go;KAM GREMO?;Kam gremo?;system/where.png;SKUPNA;retained_reviewed;;
+where_zana;KJE JE ŽANA?;Kje je Žana?;system/what.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+where_dusan;KJE JE DUŠAN?;Kje je Dušan?;system/what.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+where_are_we;KJE SMO?;Kje smo?;system/review_reuse_daily_place_group_798_12986d00.png;SKUPNA;retained_reviewed;;
+where_phone;KJE JE TELEFON?;Kje je telefon?;system/review_reuse_daily_call_798_85433d19.png;SKUPNA;retained_reviewed;;
+where_wheelchair;KJE JE VOZIČEK?;Kje je voziček?;system/review_wheelchair_46e4c622.png;SKUPNA;retained_reviewed;;
+place_group;KAM ŽELIM;Izberite, kam želim.;system/daily_place_group_798.png;SKUPNA;retained_reviewed;;shop, room, terrace, balcony, courtyard, go_outside_with_wheelchair, go_inside, bathroom, dining_room, home, outside, inside, therapy
+room;SOBA;Rada bi v sobo.;system/review_room_b2c12416.png;SKUPNA;retained_reviewed;;
+terrace;TERASA;Rada bi na teraso.;system/review_terrace_13e17ef8.png;SKUPNA;retained_reviewed;;
+balcony;BALKON;Rada bi na balkon.;system/review_balcony_5cde31d6.png;SKUPNA;retained_reviewed;;
+courtyard;DVORIŠČE;Rada bi na dvorišče.;system/review_courtyard_54e768cb.png;SKUPNA;retained_reviewed;;
+go_outside_with_wheelchair;VEN Z VOZIČKOM;Rada bi šla ven z vozičkom.;system/review_wheelchair_46e4c622.png;SKUPNA;retained_reviewed;;
+go_inside;NAZAJ NOTRI;Rada bi nazaj notri.;system/review_room_b2c12416.png;SKUPNA;retained_reviewed;;
+bathroom;KOPALNICA;Rada bi v kopalnico.;system/review_bathroom_4f990427.png;SKUPNA;retained_reviewed;;
+dining_room;JEDILNICA;Rada bi v jedilnico.;system/review_restaurant_93d462e8.png;SKUPNA;retained_reviewed;;
+outside;ZUNAJ;Rada bi ven.;system/review_courtyard_54e768cb.png;SKUPNA;retained_reviewed;;
+inside;NOTRI;Rada bi notri.;system/review_room_b2c12416.png;SKUPNA;retained_reviewed;;
+miss_little;MALO;Malo pogrešam.;system/review_miss_little_96025b95.png;SKUPNA;retained_reviewed;;
+miss_very;ZELO;Zelo pogrešam.;system/review_miss_very_ac11f20f.png;SKUPNA;retained_reviewed;;
+repeat_question;VPRAŠANJE;Prosim, ponovi vprašanje.;system/full816_audit_repeat_question_765e8aef.png;SKUPNA;audit_repeat_question;;
+repeat_last_sentence;ZADNJI STAVEK;Prosim, ponovi zadnji stavek.;system/full816_audit_repeat_sentence_a64577cd.png;SKUPNA;audit_repeat_sentence;;
+repeat_slower;POČASNEJE;Prosim, ponovi počasneje.;system/full816_pair_slow_female_0586a7eb.png;DA;pair_slow_male;;
+slower_little;MALO POČASNEJE;Prosim, govori malo počasneje.;system/full816_pair_slow_little_female_03e3d804.png;DA;pair_slow_little_male;;
+slower_much;ZELO POČASNEJE;Prosim, govori zelo počasneje.;system/full816_pair_slow_much_female_e61c5f94.png;DA;pair_slow_much_male;;
+help_drinking;PITJE;Potrebujem pomoč pri pitju.;system/review_help_drinking_cba9d2fd.png;SKUPNA;retained_reviewed;;
+help_feeding;HRANJENJE;Potrebujem pomoč pri hranjenju.;system/review_help_feeding_3591d4bb.png;SKUPNA;retained_reviewed;;
+dressing;OBLAČENJE;Potrebujem pomoč pri oblačenju.;system/review_reuse_toilet_dress_97089135.png;SKUPNA;retained_reviewed;;
+position;POLOŽAJ;Potrebujem pomoč pri položaju.;system/review_reuse_care_turn_bed_3c7caecd.png;SKUPNA;retained_reviewed;;
+i_want;RADA BI;Rada bi nekaj.;system/daily_i_want_798.png;SKUPNA;retained_reviewed;;thirsty, hungry, rest, walk, shop, choose_myself, smoking, cigarette, lighter, ashtray
+cigarette;CIGARETA;Rada bi cigareto.;system/review_cigarette_b52176f1.png;SKUPNA;retained_reviewed;;
+smoking;KADITI;Rada bi kadila.;system/review_smoking_0c3ff876.png;SKUPNA;retained_reviewed;;
+lighter;VŽIGALNIK;Potrebujem vžigalnik.;system/review_lighter_dfdf6815.png;SKUPNA;retained_reviewed;;
+ashtray;PEPELNIK;Potrebujem pepelnik.;system/review_ashtray_2b64d580.png;SKUPNA;retained_reviewed;;
+dont_want;NE ŽELIM;Tega ne želim.;system/no.png;SKUPNA;retained_reviewed;;
+rest;POČITEK;Rada bi počivala.;system/rest.png;SKUPNA;retained_reviewed;;
+drink;PIJAČA;Izberi, kaj želiš piti.;system/review_drink_category_7141f96c.png;SKUPNA;retained_reviewed;;water, tea, coffee, juice, sparkling_drink, milk_drinks
+food;HRANA;Rada bi hrano.;system/hungry.png;SKUPNA;retained_reviewed;;soup, bread, fruit, ice_cream, potato, rice, food_yogurt, food_banana, food_apple, food_lunch, food_dinner, sweet
+feeling;POČUTJE;Rada bi povedala, kako se počutim.;system/daily_feeling_798.png;DA;gender_feeling_male;;good, bad, sad, happy, afraid, tired, cold_feeling, hot_feeling, sleepy, need_rest, cold, hot, peace, rest
+care;NEGA;Potrebujem pomoč pri negi.;system/review_reuse_daily_care_798_760fc0a6.png;DA;gender_my_caregiver_male;;washing_help, dressing_help, clothing, bed, wheelchair, blanket, pillow, change_position, crutch, body_position, movement_pain, wait, help
+health;ZDRAVJE;Kaj je z zdravjem?;system/daily_health_798.png;SKUPNA;retained_reviewed;;emergency, pain, head, arm, leg, belly, back, throat, medicine, therapy, doctor
+emergency;NUJNO;Izberite nujno potrebo.;system/review_reuse_problem_e432a520.png;SKUPNA;retained_reviewed;;urgent_help, feel_bad, cannot_breathe, chest_pain, call_doctor, call_nurse
+urgent_help;NUJNO;Nujno potrebujem pomoč.;system/review_reuse_problem_e432a520.png;SKUPNA;retained_reviewed;;
+feel_bad;SLABO MI JE;Slabo mi je.;system/full816_pair_uncomfortable_female_b6c402a0.png;DA;pair_uncomfortable_male;;
+cannot_breathe;NE MOREM DIHATI;Ne morem dihati.;system/review_cannot_breathe_6aacfefd.png;DA;gender_cannot_breathe_male;;
+chest_pain;BOLI ME V PRSIH;Boli me v prsih.;system/full816_gender_chest_female_0245e62d.png;DA;gender_chest_female;;
+call_doctor;POKLIČI ZDRAVNIKA;Prosim, pokličite zdravnika.;system/review_reuse_person_doctor_v2_9b6a2fbe.png;SKUPNA;retained_reviewed;;
+call_nurse;POKLIČI SESTRO;Prosim, pokličite sestro.;system/review_reuse_person_nurse_v2_b23c8564.png;SKUPNA;retained_reviewed;;
+more;VEČ;Kaj še potrebuješ?;system/other.png;SKUPNA;retained_reviewed;;pogovor, socialno, repeat, slower, understand, wheelchair, not_safe, stop_movement, need_rest, fear_falling, move_me
+pain_area;BOLEČINA;Kje te boli?;system/review_pain_general_e8a89094.png;DA;gender_pain_male;;head, arm, leg, belly, back, chest, throat
+sister_zana;SESTRA ŽANA;Pokličite sestro Žano.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+grandfather_sergej;DEDEK SERGEJ;Pokličite dedka Sergeja.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+julija;JULIJA;Pokličite Julijo.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+oksana;OKSANA;Pokličite Oksano.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+inna;INNA;Pokličite Inno.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+franc;FRANC;Pokličite Franca.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+miss_you;POGREŠAM TE;Pogrešam te.;system/miss_someone.png;SKUPNA;retained_reviewed;;
+love_you;RADA TE IMAM;Rada te imam.;system/review_reuse_miss_someone_3c864c60.png;SKUPNA;retained_reviewed;;
+sorry;OPROSTI;Oprosti.;system/sorry.png;SKUPNA;retained_reviewed;;
+please;PROSIM;Prosim.;system/full816_pair_please_female_fd477c53.png;DA;pair_please_male;;pogovor, socialno, help, wait, repeat, slower, come_to_me, look_at_me, turn_me, fix_me
+socialno;SOCIALNO;Socialno.;system/review_pogovor_6b62dd63.png;DA;gender_what_did_i_say_male;;about_me, dober_dan, dobro_jutro, dober_vecer, lahko_noc, prosim, oprosti_social, v_redu_je, rada_te_imam, pogresam_te
+pogovor;POGOVOR;Pogovor.;system/review_pogovor_6b62dd63.png;DA;gender_what_did_i_say_male;;show_you, not_here, not_this, about_me, govori_pocasneje, ponovi, pocakaj, nisem_koncala, dajte_mi_cas, napisi_mi, pokazi_mi
+dober_dan;DOBER DAN;Dober dan.;system/review_visit_4e09043f.png;DA;gender_visit_male;;
+dobro_jutro;DOBRO JUTRO;Dobro jutro.;system/review_morning_b865300c.png;SKUPNA;retained_reviewed;;
+dober_vecer;DOBER VEČER;Dober večer.;system/review_evening_1d6216b2.png;SKUPNA;retained_reviewed;;
+lahko_noc;LAHKO NOČ;Lahko noč.;system/review_night_e59109c7.png;SKUPNA;retained_reviewed;;
+prosim;PROSIM;Prosim.;system/full816_pair_please_female_fd477c53.png;DA;pair_please_male;;
+oprosti_social;OPROSTI;Oprosti.;system/review_reuse_sorry_289621ee.png;SKUPNA;retained_reviewed;;
+v_redu_je;V REDU JE;V redu je.;system/full816_pair_happy_female_5af4f42a.png;DA;pair_happy_male;;
+rada_te_imam;RADA TE IMAM;Rada te imam.;system/review_reuse_miss_someone_3c864c60.png;SKUPNA;retained_reviewed;;
+pogresam_te;POGREŠAM TE;Pogrešam te.;system/review_reuse_miss_someone_3c864c60.png;SKUPNA;retained_reviewed;;
+govori_pocasneje;GOVORITE POČASI;Govorite počasneje.;system/full816_pair_slow_female_0586a7eb.png;DA;pair_slow_male;;
+ponovi;PONOVI;Prosim, ponovite.;system/review_reuse_repeat_d8ca4799.png;SKUPNA;retained_reviewed;;
+pocakaj;POČAKAJ;Počakaj.;system/review_reuse_wait_cf2f6d11.png;SKUPNA;retained_reviewed;;
+nisem_koncala;NISEM KONČALA;Nisem končala.;system/review_nisem_koncala_759115e5.png;SKUPNA;retained_reviewed;;
+dajte_mi_cas;DAJTE MI ČAS;Dajte mi čas.;system/review_reuse_wait_cf2f6d11.png;SKUPNA;retained_reviewed;;
+napisi_mi;NAPIŠI MI;Napišite mi.;system/review_napisi_mi_a9b35c6e.png;SKUPNA;retained_reviewed;;
+pokazi_mi;POKAŽI MI;Pokažite mi.;system/review_reuse_show_you_b0170840.png;SKUPNA;retained_reviewed;;
+call_me;POKLIČI ME;Prosim, pokliči me.;system/review_reuse_daily_call_798_85433d19.png;SKUPNA;retained_reviewed;;
+come_to_me;PRIDI K MENI;Prosim, pridi k meni.;system/come_to_me.png;SKUPNA;retained_reviewed;;
+look_at_me;POGLEJ ME;Prosim, poglej me.;system/review_look_at_me_37f02789.png;DA;gender_look_at_me_male;;
+turn_me;OBRNI ME;Prosim, obrnite me.;system/care_turn_bed.png;SKUPNA;retained_reviewed;;turn_left, turn_right, turn_back, turn_side
+fix_me;POPRAVI ME;Prosim, popravi me.;system/review_reuse_care_turn_bed_3c7caecd.png;SKUPNA;retained_reviewed;;
+turn_left;OBRNI LEVO;Prosim, obrnite me na levo.;system/full816_gender_turn_left_female_585f5172.png;DA;gender_turn_left_female;;
+turn_right;OBRNI DESNO;Prosim, obrnite me na desno.;system/full816_gender_turn_right_female_f6b97d99.png;DA;gender_turn_right_female;;
+turn_back;NA HRBET;Prosim, obrni me na hrbet.;system/review_turn_back_15c7f796.png;DA;gender_turn_back_male;;
+turn_side;NA BOK;Prosim, obrni me na bok.;system/review_turn_side_c5d4b3e7.png;DA;gender_turn_side_male;;
+cannot;NE MOREM;Ne morem.;system/review_cannot_da19e481.png;SKUPNA;retained_reviewed;;cannot_speak, cannot_stand, cannot_drink, cannot_eat, cannot_move, cannot_understand
+cannot_speak;GOVORITI;Ne morem govoriti.;system/review_cannot_speak_d2293812.png;DA;gender_speech_difficulty_male;;
+cannot_stand;VSTATI;Ne morem vstati.;system/review_cannot_stand_022017fc.png;DA;gender_cannot_stand_male;;
+cannot_drink;PITI;Ne morem piti.;system/review_cannot_drink_93b295a9.png;SKUPNA;retained_reviewed;;
+cannot_eat;JESTI;Ne morem jesti.;system/review_cannot_eat_7d601048.png;SKUPNA;retained_reviewed;;
+cannot_move;PREMAKNITI SE;Ne morem se premakniti.;system/review_cannot_move_08ec742e.png;DA;gender_cannot_move_male;;
+cannot_understand;RAZUMETI;Ne morem razumeti.;system/review_cannot_understand_a408604a.png;DA;gender_cannot_understand_male;;
+cold_hot;MRAZ/VROČE;Mraz ali vroče.;system/review_cold_hot_8d74dc65.png;SKUPNA;retained_reviewed;;cold, hot
+contact_message;SPOROČILO;Želim poslati sporočilo.;system/review_message_e9abde7b.png;SKUPNA;retained_reviewed;;later
+contact_call;KLIČI;Prosim, pokličite to osebo.;system/review_reuse_daily_call_798_85433d19.png;SKUPNA;retained_reviewed;;
+cancel_call;PREKLIČI;Prekliči.;system/no.png;SKUPNA;retained_reviewed;;
+contact_help;POMOČ;Prosim, pomagajte mi.;system/review_reuse_help_2245b360.png;SKUPNA;retained_reviewed;;
+back_to_main;NAZAJ;Nazaj.;system/review_reuse_home_a8216339.png;SKUPNA;retained_reviewed;;
+person_dusan;DUŠAN;Dušan.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;contact_call, cancel_call
+person_zana;ŽANA;Žana.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;contact_call, cancel_call
+person_sergej;SERGEJ;Sergej.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;contact_call, cancel_call
+person_julija;JULIJA;Julija.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;contact_call, cancel_call
+person_oksana;OKSANA;Oksana.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;contact_call, cancel_call
+person_inna;INNA;Inna.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;contact_call, cancel_call
+person_franc;FRANC;Franc.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;contact_call, cancel_call
+person_other;DRUGO;Druga oseba.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;contact_call, cancel_call
+person_see;VIDELA;Rada bi videla to osebo.;system/review_eye_501a27aa.png;SKUPNA;retained_reviewed;;
+person_come;DA PRIDE;Rada bi, da pride.;system/review_reuse_come_to_me_2344ba78.png;SKUPNA;retained_reviewed;;
+later;KASNEJE;Kasneje.;system/review_reuse_wait_cf2f6d11.png;SKUPNA;retained_reviewed;;
+person_where_is;KJE JE;Kje je?;system/review_reuse_where_e6d70b54.png;SKUPNA;retained_reviewed;;
+person_tell;POVEJ MU/JI;Povej mu ali ji.;system/review_pogovor_6b62dd63.png;DA;gender_what_did_i_say_male;;
+friend_1;PRIJATELJ 1;Prijatelj.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+friend_2;PRIJATELJ 2;Prijatelj.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+friend_3;PRIJATELJ 3;Prijatelj.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+water;VODA;Rada bi vodo.;system/review_reuse_drink_water_still_6c987aa3.png;SKUPNA;retained_reviewed;;non_sparkling_water, flavored_water, mineral_water, cold_water
+water_detail;VODA PODROBNO;Kakšno vodo?;system/review_reuse_drink_water_still_6c987aa3.png;SKUPNA;retained_reviewed;;
+cold_water;HLADNA;Rada bi mrzlo vodo.;system/drink_water_cold.png;SKUPNA;canonical_mapping;;
+non_sparkling_water;NAVADNA;Rada bi negazirano vodo.;system/drink_water_still.png;SKUPNA;canonical_mapping;;
+flavored_water;VODA Z OKUSOM;Rada bi vodo z okusom.;system/review_flavored_water_4cf92a98.png;SKUPNA;retained_reviewed;;
+mineral_water;MINERALNA;Rada bi mineralno vodo.;system/review_radenska_b37bdf84.png;SKUPNA;retained_reviewed;;
+sparkling_water;VODA Z MEHURČKI;Rada bi vodo z mehurčki.;system/review_radenska_b37bdf84.png;SKUPNA;retained_reviewed;;
+coffee;KAVA;Prosim, rada bi kavo.;system/drink_coffee.png;SKUPNA;canonical_mapping;;coffee_plain, coffee_milk, coffee_no_sugar
+tea;ČAJ;Prosim, rada bi čaj.;system/drink_tea.png;SKUPNA;canonical_mapping;;tea_chamomile, tea_fruit, tea_green, tea_black, tea_mint, tea_rosehip
+juice;SOK;Rada bi sok.;system/drink_juice.png;SKUPNA;canonical_mapping;;orange_juice, apple_juice, blueberry_juice, strawberry_juice, cedevita
+sparkling_drink;GAZIRANA PIJAČA;Prosim, rada bi gazirano pijačo.;system/review_sparkling_drink_a152a547.png;SKUPNA;retained_reviewed;;drink_fanta, drink_coca_cola, drink_pepsi, radenska
+drink_fanta;FANTA;Prosim, rada bi Fanto.;system/full816_audit_fanta_07bbea78.png;SKUPNA;audit_fanta;;
+drink_coca_cola;COCA COLA;Prosim, rada bi Coca-Colo.;system/full816_audit_cola_ef15b2fe.png;SKUPNA;audit_cola;;
+drink_pepsi;PEPSI;Prosim, rada bi Pepsi.;system/full816_audit_pepsi_0159be1f.png;SKUPNA;audit_pepsi;;
+radenska;RADENSKA;Rada bi Radensko.;system/review_radenska_b37bdf84.png;SKUPNA;retained_reviewed;;
+milk_drinks;MLEČNI NAPITKI;Prosim, rada bi mlečni napitek.;system/drink_milk.png;SKUPNA;canonical_mapping;;drink_yogurt, cocoa_drink, drink_milk, chocolate_milk
+drink_yogurt;JOGURT;Prosim, rada bi jogurt.;system/full816_audit_drinking_yogurt_a1ea257b.png;SKUPNA;audit_drinking_yogurt;;
+cocoa_drink;KAKAV;Prosim, rada bi kakav.;system/review_cocoa_drink_f1c6de67.png;SKUPNA;retained_reviewed;;
+drink_milk;MLEKO;Prosim, rada bi mleko.;system/drink_milk.png;SKUPNA;retained_reviewed;;
+chocolate_milk;ČOKOLADNO MLEKO;Prosim, rada bi čokoladno mleko.;system/review_chocolate_milk_3f300eb6.png;SKUPNA;retained_reviewed;;
+drink_warm;TOPLO;Rada bi toplo pijačo.;system/review_drink_warm_bfa4d0e1.png;SKUPNA;retained_reviewed;;
+drink_cold;HLADNO;Rada bi hladno pijačo.;system/review_drink_cold_aa93522e.png;SKUPNA;retained_reviewed;;
+drink_small;MALO;Samo malo, prosim.;system/review_drink_small_7903bc91.png;SKUPNA;retained_reviewed;;
+drink_more;VEČ;Še malo, prosim.;system/review_reuse_other_844b78eb.png;SKUPNA;retained_reviewed;;
+drink_no_additive;BREZ DODATKA;Rada bi brez dodatka.;system/review_drink_no_additive_ec382f9f.png;SKUPNA;retained_reviewed;;
+coffee_plain;NAVADNA;Prosim, rada bi navadno kavo.;system/coffee_black.png;SKUPNA;retained_reviewed;;
+coffee_milk;Z MLEKOM;Prosim, rada bi kavo z mlekom.;system/coffee_milk.png;SKUPNA;retained_reviewed;;
+coffee_no_sugar;BREZ SLADKORJA;Prosim, rada bi kavo brez sladkorja.;system/review_coffee_no_sugar_1c9fdcce.png;SKUPNA;retained_reviewed;;
+tea_chamomile;KAMILIČNI;Prosim, rada bi kamilični čaj.;system/tea_chamomile.png;SKUPNA;retained_reviewed;;tea_chamomile_lemon, tea_chamomile_honey, tea_chamomile_honey_lemon
+tea_chamomile_lemon;Z LIMONO;Prosim, rada bi kamilični čaj z limono.;system/tea_add_lemon.png;SKUPNA;retained_reviewed;;
+tea_chamomile_honey;Z MEDOM;Prosim, rada bi kamilični čaj z medom.;system/tea_add_honey.png;SKUPNA;retained_reviewed;;
+tea_chamomile_honey_lemon;Z MEDOM IN LIMONO;Prosim, rada bi kamilični čaj z medom in limono.;system/review_tea_honey_lemon_902e1510.png;SKUPNA;retained_reviewed;;
+tea_fruit;SADNI;Prosim, rada bi sadni čaj.;system/tea_fruit.png;SKUPNA;retained_reviewed;;tea_fruit_lemon, tea_fruit_honey, tea_fruit_honey_lemon
+tea_fruit_lemon;Z LIMONO;Prosim, rada bi sadni čaj z limono.;system/tea_add_lemon.png;SKUPNA;retained_reviewed;;
+tea_fruit_honey;Z MEDOM;Prosim, rada bi sadni čaj z medom.;system/tea_add_honey.png;SKUPNA;retained_reviewed;;
+tea_fruit_honey_lemon;Z MEDOM IN LIMONO;Prosim, rada bi sadni čaj z medom in limono.;system/review_tea_honey_lemon_902e1510.png;SKUPNA;retained_reviewed;;
+tea_green;ZELENI;Prosim, rada bi zeleni čaj.;system/tea_green.png;SKUPNA;retained_reviewed;;tea_green_lemon, tea_green_honey, tea_green_honey_lemon
+tea_green_lemon;Z LIMONO;Prosim, rada bi zeleni čaj z limono.;system/tea_add_lemon.png;SKUPNA;retained_reviewed;;
+tea_green_honey;Z MEDOM;Prosim, rada bi zeleni čaj z medom.;system/tea_add_honey.png;SKUPNA;retained_reviewed;;
+tea_green_honey_lemon;Z MEDOM IN LIMONO;Prosim, rada bi zeleni čaj z medom in limono.;system/review_tea_honey_lemon_902e1510.png;SKUPNA;retained_reviewed;;
+tea_black;ČRNI;Prosim, rada bi črni čaj.;system/tea_black.png;SKUPNA;retained_reviewed;;tea_black_lemon, tea_black_honey, tea_black_honey_lemon
+tea_black_lemon;Z LIMONO;Prosim, rada bi črni čaj z limono.;system/tea_add_lemon.png;SKUPNA;retained_reviewed;;
+tea_black_honey;Z MEDOM;Prosim, rada bi črni čaj z medom.;system/tea_add_honey.png;SKUPNA;retained_reviewed;;
+tea_black_honey_lemon;Z MEDOM IN LIMONO;Prosim, rada bi črni čaj z medom in limono.;system/review_tea_honey_lemon_902e1510.png;SKUPNA;retained_reviewed;;
+tea_mint;METIN;Prosim, rada bi metin čaj.;system/tea_mint.png;SKUPNA;retained_reviewed;;tea_mint_lemon, tea_mint_honey, tea_mint_honey_lemon
+tea_mint_lemon;Z LIMONO;Prosim, rada bi metin čaj z limono.;system/tea_add_lemon.png;SKUPNA;retained_reviewed;;
+tea_mint_honey;Z MEDOM;Prosim, rada bi metin čaj z medom.;system/tea_add_honey.png;SKUPNA;retained_reviewed;;
+tea_mint_honey_lemon;Z MEDOM IN LIMONO;Prosim, rada bi metin čaj z medom in limono.;system/review_tea_honey_lemon_902e1510.png;SKUPNA;retained_reviewed;;
+tea_rosehip;ŠIPKOV;Prosim, rada bi šipkov čaj.;system/review_tea_rosehip_15d754be.png;SKUPNA;retained_reviewed;;tea_rosehip_lemon, tea_rosehip_honey, tea_rosehip_honey_lemon
+tea_rosehip_lemon;Z LIMONO;Prosim, rada bi šipkov čaj z limono.;system/tea_add_lemon.png;SKUPNA;retained_reviewed;;
+tea_rosehip_honey;Z MEDOM;Prosim, rada bi šipkov čaj z medom.;system/tea_add_honey.png;SKUPNA;retained_reviewed;;
+tea_rosehip_honey_lemon;Z MEDOM IN LIMONO;Prosim, rada bi šipkov čaj z medom in limono.;system/review_tea_honey_lemon_902e1510.png;SKUPNA;retained_reviewed;;
+orange_juice;POMARANČNI;Rada bi pomarančni sok.;system/drink_juice_orange.png;SKUPNA;canonical_mapping;;
+apple_juice;JABOLČNI;Rada bi jabolčni sok.;system/drink_juice_apple.png;SKUPNA;canonical_mapping;;
+blueberry_juice;BOROVNIČEV;Rada bi sok iz borovnic.;system/drink_juice_blueberry.png;SKUPNA;canonical_mapping;;
+strawberry_juice;JAGODNI;Rada bi jagodni sok.;system/drink_juice_strawberry.png;SKUPNA;canonical_mapping;;
+cedevita;CEDEVITA;Rada bi Cedevito.;system/drink_cedevita.png;SKUPNA;canonical_mapping;;
+not_thirsty;NISEM ŽEJNA;Nisem žejna.;system/review_not_thirsty_5f3a1827.png;DA;gender_not_thirsty_male;;
+not_hungry;NISEM LAČNA;Nisem lačna.;system/review_not_hungry_bc078ea1.png;DA;gender_not_hungry_male;;
+hungry_main_dish;GLAVNA JED;Glavna jed.;system/food_main_dish.png;SKUPNA;retained_reviewed;;hungry_soup, hungry_meat, hungry_side_dishes
+hungry_snack;PRIGRIZEK;Prigrizek.;system/review_hungry_chips_0cf95a3c.png;SKUPNA;retained_reviewed;;hungry_yogurt, hungry_fruit_yogurt, hungry_chips, hungry_crackers
+hungry_fast_food;HITRA PREHRANA;Hitra prehrana.;system/food_fast_food.png;SKUPNA;retained_reviewed;;hungry_hamburger, hungry_cevapcici, hungry_pleskavica, hungry_hotdog, hungry_pizza, hungry_burek, hungry_toast, hungry_pancakes
+hungry_fruit;SADJE;Sadje.;system/food_fruit.png;SKUPNA;retained_reviewed;;hungry_apple, hungry_pear, hungry_banana, hungry_grapes, hungry_blueberries, hungry_strawberries, hungry_kiwi
+hungry_dessert;SLADICA;Sladica.;system/food_dessert.png;SKUPNA;retained_reviewed;;hungry_ice_cream, hungry_cake, hungry_cookies, hungry_doughnut, hungry_kremsnita
+hungry_soup;JUHA;Juha.;system/food_soup.png;SKUPNA;retained_reviewed;;hungry_beef_soup, hungry_chicken_soup, hungry_vegetable_soup
+hungry_meat;MESO;Meso.;system/food_meat.png;SKUPNA;retained_reviewed;;hungry_pork, hungry_chicken, hungry_beef, hungry_veal, hungry_lamb, hungry_kid_goat, hungry_fish
+hungry_side_dishes;PRILOGE;Priloge.;system/food_sides.png;SKUPNA;retained_reviewed;;hungry_potato, hungry_pasta, hungry_rice, hungry_vegetables
+hungry_potato;KROMPIR;Krompir.;system/food_potato.png;SKUPNA;retained_reviewed;;hungry_roasted_potato, hungry_fries, hungry_mashed_potato
+hungry_beef_soup;GOVEJA;Prosim, rada bi govejo juho.;system/food_beef_soup.png;SKUPNA;retained_reviewed;;
+hungry_chicken_soup;KOKOŠJA;Prosim, rada bi kokošjo juho.;system/food_chicken_soup.png;SKUPNA;retained_reviewed;;
+hungry_vegetable_soup;ZELENJAVNA;Prosim, rada bi zelenjavno juho.;system/review_hungry_vegetable_soup_288340a1.png;SKUPNA;retained_reviewed;;
+hungry_pork;SVINJINA;Prosim, rada bi svinjino.;system/review_hungry_pork_a639d7f8.png;SKUPNA;retained_reviewed;;
+hungry_chicken;PIŠČANEC;Prosim, rada bi piščanca.;system/food_chicken.png;SKUPNA;retained_reviewed;;
+hungry_beef;GOVEDINA;Prosim, rada bi govedino.;system/review_hungry_beef_b6758afc.png;SKUPNA;retained_reviewed;;
+hungry_veal;TELETINA;Prosim, rada bi teletino.;system/review_hungry_veal_d20cff1a.png;SKUPNA;retained_reviewed;;
+hungry_lamb;JAGNJETINA;Prosim, rada bi jagnjetino.;system/review_hungry_lamb_671a508a.png;SKUPNA;retained_reviewed;;
+hungry_kid_goat;KOZLIČEK;Prosim, rada bi kozlička.;system/review_hungry_kid_goat_db014e54.png;SKUPNA;retained_reviewed;;
+hungry_fish;RIBA;Prosim, rada bi ribo.;system/food_fish.png;SKUPNA;retained_reviewed;;
+hungry_pasta;TESTENINE;Prosim, rada bi testenine.;system/food_pasta.png;SKUPNA;retained_reviewed;;
+hungry_rice;RIŽ;Prosim, rada bi riž.;system/food_rice.png;SKUPNA;retained_reviewed;;
+hungry_vegetables;ZELENJAVA;Prosim, rada bi zelenjavo.;system/food_vegetables.png;SKUPNA;retained_reviewed;;
+hungry_roasted_potato;PEČEN KROMPIR;Prosim, rada bi pečen krompir.;system/review_hungry_roasted_potato_2f16e051.png;SKUPNA;retained_reviewed;;
+hungry_fries;POMFRI;Prosim, rada bi pomfri.;system/review_hungry_fries_e17ac9a5.png;SKUPNA;retained_reviewed;;
+hungry_mashed_potato;PIRE;Prosim, rada bi pire krompir.;system/food_mashed_potato.png;SKUPNA;retained_reviewed;;
+hungry_yogurt;JOGURT;Prosim, rada bi jogurt.;system/review_plain_yogurt_7d5b945b.png;SKUPNA;retained_reviewed;;
+hungry_fruit_yogurt;SADNI JOGURT;Prosim, rada bi sadni jogurt.;system/review_hungry_fruit_yogurt_663f5f94.png;SKUPNA;retained_reviewed;;
+hungry_chips;ČIPS;Prosim, rada bi čips.;system/review_hungry_chips_0cf95a3c.png;SKUPNA;retained_reviewed;;
+hungry_crackers;KREKERJI;Prosim, rada bi krekerje.;system/review_hungry_crackers_4dbe5f92.png;SKUPNA;retained_reviewed;;
+hungry_hamburger;HAMBURGER;Prosim, rada bi hamburger.;system/food_hamburger.png;SKUPNA;retained_reviewed;;
+hungry_cevapcici;ČEVAPČIČI;Prosim, rada bi čevapčiče.;system/review_hungry_cevapcici_983f8191.png;SKUPNA;retained_reviewed;;
+hungry_pleskavica;PLESKAVICA;Prosim, rada bi pleskavico.;system/review_hungry_pleskavica_a54902fd.png;SKUPNA;retained_reviewed;;
+hungry_hotdog;HOTDOG;Prosim, rada bi hotdog.;system/review_hungry_hotdog_92e83d09.png;SKUPNA;retained_reviewed;;
+hungry_pizza;PICA;Prosim, rada bi pico.;system/food_pizza.png;SKUPNA;retained_reviewed;;
+hungry_burek;BUREK;Prosim, rada bi burek.;system/review_hungry_burek_b29734c8.png;SKUPNA;retained_reviewed;;
+hungry_toast;TOAST;Prosim, rada bi toast.;system/review_hungry_toast_93cd9c3e.png;SKUPNA;retained_reviewed;;
+hungry_pancakes;PALAČINKE;Prosim, rada bi palačinke.;system/food_pancakes.png;SKUPNA;retained_reviewed;;
+hungry_apple;JABOLKO;Prosim, rada bi jabolko.;system/food_apple.png;SKUPNA;retained_reviewed;;
+hungry_pear;HRUŠKA;Prosim, rada bi hruško.;system/food_pear.png;SKUPNA;retained_reviewed;;
+hungry_banana;BANANA;Prosim, rada bi banano.;system/food_banana.png;SKUPNA;retained_reviewed;;
+hungry_grapes;GROZDJE;Prosim, rada bi grozdje.;system/food_grapes.png;SKUPNA;retained_reviewed;;
+hungry_blueberries;BOROVNICE;Prosim, rada bi borovnice.;system/food_blueberries.png;SKUPNA;retained_reviewed;;
+hungry_strawberries;JAGODE;Prosim, rada bi jagode.;system/food_strawberry.png;SKUPNA;retained_reviewed;;
+hungry_kiwi;KIVI;Prosim, rada bi kivi.;system/food_kiwi.png;SKUPNA;retained_reviewed;;
+hungry_ice_cream;SLADOLED;Prosim, rada bi sladoled.;system/food_icecream.png;SKUPNA;retained_reviewed;;
+hungry_cake;TORTA;Prosim, rada bi torto.;system/food_cake.png;SKUPNA;retained_reviewed;;
+hungry_cookies;PIŠKOTI;Prosim, rada bi piškote.;system/review_hungry_cookies_8346c61e.png;SKUPNA;retained_reviewed;;
+hungry_doughnut;KROF;Prosim, rada bi krof.;system/food_donut.png;SKUPNA;retained_reviewed;;
+hungry_kremsnita;KREMŠNITA;Prosim, rada bi kremšnito.;system/review_hungry_kremsnita_0314f714.png;SKUPNA;retained_reviewed;;
+soup;JUHA;Želim jesti juho;system/food_soup.png;SKUPNA;retained_reviewed;;
+bread;KRUH;Želim jesti kruh;system/food_bread.png;SKUPNA;retained_reviewed;;
+fruit;SADJE;Želim jesti sadje;system/food_fruit.png;SKUPNA;retained_reviewed;;
+ice_cream;SLADOLED;Rada bi sladoled.;system/review_reuse_food_icecream_080d6bb0.png;SKUPNA;retained_reviewed;;
+potato;KROMPIR;Rada bi krompir.;system/food_potato.png;SKUPNA;retained_reviewed;;
+rice;RIŽ;Rada bi riž.;system/food_rice.png;SKUPNA;retained_reviewed;;
+meat;MESO;Rada bi jedla meso.;system/food_meat.png;SKUPNA;retained_reviewed;;
+sweet;SLADKO;Rada bi nekaj sladkega.;system/review_hungry_cookies_8346c61e.png;SKUPNA;retained_reviewed;;
+other_food;DRUGO;Rada bi nekaj drugega.;system/full816_audit_other_food_6725c805.png;SKUPNA;audit_other_food;;
+food_yogurt;JOGURT;Rada bi jogurt.;system/review_plain_yogurt_7d5b945b.png;SKUPNA;retained_reviewed;;
+food_banana;BANANA;Rada bi banano.;system/food_banana.png;SKUPNA;retained_reviewed;;
+food_apple;JABOLKO;Rada bi jabolko.;system/food_apple.png;SKUPNA;retained_reviewed;;
+food_lunch;KOSILO;Rada bi kosilo.;system/full816_audit_lunch_ef7ec5cf.png;SKUPNA;audit_lunch;;
+food_dinner;VEČERJA;Rada bi večerjo.;system/full816_audit_dinner_94afa873.png;SKUPNA;audit_dinner;;
+food_little;MALO;Rada bi malo.;system/review_food_little_3d607c54.png;SKUPNA;retained_reviewed;;
+food_more;ŠE;Še malo, prosim.;system/review_reuse_other_844b78eb.png;SKUPNA;retained_reviewed;;
+food_enough;DOVOLJ;Dovolj je.;system/review_reuse_yes_287fe28f.png;SKUPNA;retained_reviewed;;
+food_later;KASNEJE;Kasneje bi jedla.;system/review_reuse_wait_cf2f6d11.png;SKUPNA;retained_reviewed;;
+diaper;PLENICA;Prosim, zamenjajte mi plenico.;system/review_diaper_da07c79b.png;SKUPNA;retained_reviewed;;
+wc_now;TAKOJ;Takoj moram v toaleto.;system/toilet_now.png;SKUPNA;canonical_mapping;;
+wc_soon;KMALU;Kmalu moram v toaleto.;system/toilet_soon.png;SKUPNA;canonical_mapping;;
+wc_help;POMOČ;Potrebujem pomoč pri toaleti.;system/full816_pair_toilet_help_female_920f74da.png;DA;pair_toilet_help_female;;
+dressing_help;PREOBLAČENJE;Potrebujem pomoč pri preoblačenju.;system/care_change_clothes.png;SKUPNA;retained_reviewed;;
+washing_help;UMIVANJE;Potrebujem pomoč pri umivanju.;system/review_reuse_toilet_wash_4982e59c.png;SKUPNA;retained_reviewed;;
+body_position;POPRAVI ME;Prosim, popravite moj položaj.;system/care_turn_bed.png;SKUPNA;retained_reviewed;;
+wc_wet;MOKRA;Prosim, zamenjajte mi plenico. Mokra sem.;system/toilet_wet.png;SKUPNA;canonical_mapping;;
+wc_dirty;UMAZANA;Prosim, zamenjajte mi plenico. Umazana sem.;system/toilet_dirty.png;SKUPNA;canonical_mapping;;
+wc_wet_and_dirty;OBOJE;Prosim, zamenjajte mi plenico. Mokra in umazana sem.;system/toilet_both.png;SKUPNA;canonical_mapping;;
+nurse_help;SESTRA;Potrebujem medicinsko sestro.;system/toilet_nurse.png;SKUPNA;canonical_mapping;;help_dressing, help_washing, help_showering, noticed_blood
+help_dressing;OBLAČENJE;Rabim pomoč pri oblačenju.;system/toilet_dress.png;SKUPNA;canonical_mapping;;
+help_washing;UMIVANJE;Rabim pomoč pri umivanju.;system/toilet_wash.png;SKUPNA;canonical_mapping;;
+help_showering;TUŠ;Rabim pomoč pri tuširanju.;system/toilet_shower.png;SKUPNA;canonical_mapping;;
+noticed_blood;KRI;Opazila sem kri pri negi.;system/toilet_blood.png;SKUPNA;canonical_mapping;;
+wc_diaper_change;ZAMENJAVA PLENICE;Potrebujem menjavo plenice.;system/review_diaper_da07c79b.png;SKUPNA;retained_reviewed;;
+wc_burning;PEČE;Peče me.;system/review_wc_burning_e11e546b.png;SKUPNA;retained_reviewed;;
+wc_pain;BOLI;Boli me.;system/review_pain_general_e8a89094.png;DA;gender_pain_male;;
+wc_itching;SRBI;Srbi me.;system/review_wc_itching_4926ec8a.png;SKUPNA;retained_reviewed;;
+wc_blood;KRI;Vidim kri.;system/review_reuse_toilet_blood_3a11da8e.png;SKUPNA;retained_reviewed;;
+wc_please;PROSIM;Prosim.;system/full816_pair_please_female_fd477c53.png;DA;pair_please_male;;
+wc_very_urgent;ZELO NUJNO;Zelo nujno.;system/review_reuse_problem_e432a520.png;SKUPNA;retained_reviewed;;
+wc_call_nurse;POKLIČI MEDICINSKO SESTRO;Prosim, pokličite medicinsko sestro.;system/review_reuse_person_nurse_v2_b23c8564.png;SKUPNA;retained_reviewed;;
+pillow;BLAZINA;Potrebujem blazino.;system/review_pillow_9350f7ce.png;SKUPNA;retained_reviewed;;
+blanket;ODEJA;Potrebujem odejo.;system/review_blanket_8994e8c4.png;SKUPNA;retained_reviewed;;
+uncomfortable;NEUDOBNO;Neudobno mi je.;system/full816_pair_uncomfortable_female_b6c402a0.png;DA;pair_uncomfortable_male;;position, bed, blanket, wheelchair, clothing
+clothing;OBLAČILA;Izberite oblačilo.;system/review_clothing_2e385270.png;SKUPNA;retained_reviewed;;vest, shirt, pants, socks, shoes, jacket, pajamas, underwear, hat, scarf, gloves
+shirt;MAJICA;Potrebujem majico.;system/review_shirt_809d7ca9.png;SKUPNA;retained_reviewed;;
+pants;HLAČE;Potrebujem hlače.;system/review_pants_bda97047.png;SKUPNA;retained_reviewed;;
+socks;NOGAVICE;Potrebujem nogavice.;system/review_socks_ec1cdfb3.png;SKUPNA;retained_reviewed;;
+shoes;ČEVLJI;Potrebujem čevlje.;system/review_shoes_d9fe64b1.png;SKUPNA;retained_reviewed;;
+jacket;JAKNA;Potrebujem jakno.;system/review_jacket_45676639.png;SKUPNA;retained_reviewed;;
+pajamas;PIŽAMA;Potrebujem pižamo.;system/review_pajamas_35669362.png;SKUPNA;retained_reviewed;;
+underwear;SPODNJE PERILO;Potrebujem spodnje perilo.;system/review_underwear_95de2ae5.png;SKUPNA;retained_reviewed;;
+hat;KAPA;Potrebujem kapo.;system/review_hat_37588d00.png;SKUPNA;retained_reviewed;;
+scarf;ŠAL;Potrebujem šal.;system/review_scarf_79b38ef3.png;SKUPNA;retained_reviewed;;
+gloves;ROKAVICE;Potrebujem rokavice.;system/review_gloves_2762d93a.png;SKUPNA;retained_reviewed;;
+bed;POSTELJA;Prosim, pomagajte mi v posteljo.;system/review_bed_f302e2c2.png;SKUPNA;retained_reviewed;;
+change_position;PREMESTITEV;Prosim, pomagajte mi spremeniti položaj.;system/care_transfer.png;SKUPNA;retained_reviewed;;turn_left, turn_right, sit_up, lie_down
+sit_up;DVIGNI ME;Prosim, dvignite me.;system/review_sit_up_6bffe97d.png;DA;gender_sit_up_male;;
+lie_down;POLOŽI ME;Prosim, položite me.;system/review_lie_down_f9dfaf9b.png;DA;gender_lie_down_male;;
+movement_pain;BOLI PRI PREMIKU;Boli me pri premiku.;system/review_pain_when_moving_b9997028.png;DA;gender_pain_when_moving_male;;
+pain;BOLI ME;Boli me.;system/review_pain_general_e8a89094.png;DA;gender_pain_male;;head, left_arm, right_arm, left_leg, right_leg, back, belly, chest, eye, ear, nose, mouth, tooth, neck
+arm;ROKA;Boli me roka.;system/review_arm_9d268d88.png;SKUPNA;retained_reviewed;;
+leg;NOGA;Boli me noga.;system/review_leg_59abc145.png;SKUPNA;retained_reviewed;;
+throat;GRLO;Boli me grlo.;system/full816_pair_throat_female_23286bc9.png;DA;pair_throat_male;;
+head;GLAVA;Boli me glava.;system/full816_gender_head_female_19c9274c.png;DA;gender_head_female;;pain_light, pain_medium, pain_strong, pain_very_strong
+left_arm;LEVA ROKA;Leva roka me boli.;system/full816_clean_pain_left_arm_828ba5df.png;SKUPNA;clean_pain_left_arm;;arm_shoulder, arm_upper, arm_elbow, arm_forearm, arm_wrist, arm_palm, arm_fingers
+right_arm;DESNA ROKA;Desna roka me boli.;system/full816_clean_pain_right_arm_8b104030.png;SKUPNA;clean_pain_right_arm;;arm_shoulder, arm_upper, arm_elbow, arm_forearm, arm_wrist, arm_palm, arm_fingers
+left_leg;LEVA NOGA;Leva noga me boli.;system/full816_clean_pain_left_leg_cef24d9e.png;SKUPNA;clean_pain_left_leg;;leg_hip, leg_thigh, leg_knee, leg_shin, leg_ankle, leg_foot, leg_toes
+right_leg;DESNA NOGA;Desna noga me boli.;system/full816_clean_pain_right_leg_1f6f5f9f.png;SKUPNA;clean_pain_right_leg;;leg_hip, leg_thigh, leg_knee, leg_shin, leg_ankle, leg_foot, leg_toes
+back;HRBET;Boli me hrbet.;system/full816_gender_back_female_6166bda7.png;DA;gender_back_female;;back_upper, back_middle, back_lower
+belly;TREBUH;Boli me trebuh.;system/review_belly_23aaf562.png;DA;gender_belly_male;;belly_left, belly_right, belly_upper, belly_lower
+chest;PRSI;Boli me v prsih.;system/full816_gender_chest_female_0245e62d.png;DA;gender_chest_female;;pain_light, pain_medium, pain_strong, pain_very_strong
+neck;VRAT;Boli me vrat.;system/full816_gender_neck_female_e5f66fcc.png;DA;gender_neck_female;;pain_light, pain_medium, pain_strong, pain_very_strong
+eye;OKO;Boli me oko.;system/review_eye_501a27aa.png;SKUPNA;retained_reviewed;;eye_left, eye_right, eye_both
+ear;UHO;Boli me uho.;system/review_ear_78650fb4.png;SKUPNA;retained_reviewed;;ear_left, ear_right, ear_both
+nose;NOS;Boli me nos.;system/review_nose_c9d2275a.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+mouth;USTA;Bolijo me usta.;system/review_mouth_0ae0696b.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+tooth;ZOB;Boli me zob.;system/review_tooth_add82ec1.png;SKUPNA;retained_reviewed;;tooth_left, tooth_right, tooth_upper, tooth_lower
+arm_shoulder;RAMA;Boli me rama.;system/full816_clean_pain_shoulder_e624fae0.png;SKUPNA;clean_pain_shoulder;;pain_light, pain_medium, pain_strong, pain_very_strong
+arm_upper;NADLAHT;Boli me nadlaht.;system/review_arm_upper_54755159.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+arm_elbow;KOMOLEC;Boli me komolec.;system/full816_clean_pain_elbow_01f95264.png;SKUPNA;clean_pain_elbow;;pain_light, pain_medium, pain_strong, pain_very_strong
+arm_forearm;PODLAHT;Boli me podlaht.;system/review_arm_forearm_4ee76471.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+arm_wrist;ZAPESTJE;Boli me zapestje.;system/full816_clean_pain_wrist_32e29933.png;SKUPNA;clean_pain_wrist;;pain_light, pain_medium, pain_strong, pain_very_strong
+arm_palm;DLAN;Dlan me boli.;system/full816_clean_pain_hand_5fe107d2.png;SKUPNA;clean_pain_hand;;pain_light, pain_medium, pain_strong, pain_very_strong
+arm_fingers;PRSTI;Bolijo me prsti na roki.;system/review_arm_fingers_3501fb16.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+leg_hip;KOLK;Boli me kolk.;system/full816_clean_pain_hip_b2ca2119.png;SKUPNA;clean_pain_hip;;pain_light, pain_medium, pain_strong, pain_very_strong
+leg_thigh;STEGNO;Boli me stegno.;system/review_leg_thigh_68a96a40.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+leg_knee;KOLENO;Boli me koleno.;system/full816_clean_pain_knee_83791174.png;SKUPNA;clean_pain_knee;;pain_light, pain_medium, pain_strong, pain_very_strong
+leg_shin;GOLEN;Boli me golen.;system/review_leg_shin_57057237.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+leg_ankle;GLEŽENJ;Boli me gleženj.;system/pain_ankle.png;SKUPNA;canonical_mapping;;pain_light, pain_medium, pain_strong, pain_very_strong
+leg_foot;STOPALO;Boli me stopalo.;system/full816_clean_pain_foot_6fe29b9d.png;SKUPNA;clean_pain_foot;;pain_light, pain_medium, pain_strong, pain_very_strong
+leg_toes;PRSTI;Bolijo me prsti na nogi.;system/review_leg_toes_3447f7ca.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+back_upper;ZGORNJI DEL;Boli me zgornji del hrbta.;system/full816_gender_back_upper_female_9f3a4551.png;DA;gender_back_upper_female;;pain_light, pain_medium, pain_strong, pain_very_strong
+back_middle;SREDNJI DEL;Boli me srednji del hrbta.;system/full816_gender_back_middle_female_912dbcc8.png;DA;gender_back_middle_female;;pain_light, pain_medium, pain_strong, pain_very_strong
+back_lower;SPODNJI DEL;Boli me spodnji del hrbta.;system/full816_gender_back_lower_female_d0296d79.png;DA;gender_back_lower_female;;pain_light, pain_medium, pain_strong, pain_very_strong
+belly_left;LEVO;Boli me leva stran trebuha.;system/review_belly_left_624068af.png;DA;gender_belly_left_male;;pain_light, pain_medium, pain_strong, pain_very_strong
+belly_right;DESNO;Boli me desna stran trebuha.;system/review_belly_right_8bae9bd0.png;DA;gender_belly_right_male;;pain_light, pain_medium, pain_strong, pain_very_strong
+belly_upper;ZGORAJ;Boli me zgornji del trebuha.;system/full816_gender_belly_upper_female_35a9b590.png;DA;gender_belly_upper_female;;pain_light, pain_medium, pain_strong, pain_very_strong
+belly_lower;SPODAJ;Boli me spodnji del trebuha.;system/review_belly_lower_3c91803d.png;DA;gender_belly_lower_male;;pain_light, pain_medium, pain_strong, pain_very_strong
+eye_left;LEVO;Boli me levo oko.;system/review_eye_left_ab6c29c5.png;DA;gender_eye_left_male;;pain_light, pain_medium, pain_strong, pain_very_strong
+eye_right;DESNO;Boli me desno oko.;system/review_eye_right_dcd7e866.png;DA;gender_eye_right_male;;pain_light, pain_medium, pain_strong, pain_very_strong
+eye_both;OBE;Bolita me obe očesi.;system/review_eye_both_150c4cbd.png;DA;gender_eye_both_male;;pain_light, pain_medium, pain_strong, pain_very_strong
+ear_left;LEVO;Boli me levo uho.;system/review_ear_left_e2ec8c61.png;DA;gender_ear_left_male;;pain_light, pain_medium, pain_strong, pain_very_strong
+ear_right;DESNO;Boli me desno uho.;system/review_ear_right_d9334f55.png;DA;gender_ear_right_male;;pain_light, pain_medium, pain_strong, pain_very_strong
+ear_both;OBE;Bolita me obe ušesi.;system/review_ear_both_f398e4d5.png;DA;gender_ear_both_male;;pain_light, pain_medium, pain_strong, pain_very_strong
+tooth_left;LEVO;Boli me levi zob.;system/review_tooth_left_ee8eb450.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+tooth_right;DESNO;Boli me desni zob.;system/review_tooth_right_0ec048e3.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+tooth_upper;ZGORAJ;Boli me zgornji zob.;system/review_tooth_upper_dad53014.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+tooth_lower;SPODAJ;Boli me spodnji zob.;system/review_tooth_lower_a615ff58.png;SKUPNA;retained_reviewed;;pain_light, pain_medium, pain_strong, pain_very_strong
+left_side;LEVA;Na levi strani.;system/full816_gender_left_side_female_d443b3e2.png;DA;gender_left_side_female;;
+right_side;DESNA;Na desni strani.;system/full816_gender_right_side_female_ffe3523f.png;DA;gender_right_side_female;;
+other_body;DRUGO;Boli drugje.;system/full816_gender_other_body_female_448b7a42.png;DA;gender_other_body_female;;
+pain_light;MALO;Malo boli.;system/review_pain_light_11f05cd6.png;DA;gender_pain_light_male;;pain_since_today, pain_since_yesterday, pain_since_morning, pain_since_evening, pain_since_long
+pain_medium;SREDNJE;Srednje močno boli.;system/review_pain_medium_34262fd7.png;DA;gender_pain_medium_male;;pain_since_today, pain_since_yesterday, pain_since_morning, pain_since_evening, pain_since_long
+pain_strong;MOČNO;Močno boli.;system/review_pain_strong_7d453f64.png;DA;gender_pain_strong_male;;pain_since_today, pain_since_yesterday, pain_since_morning, pain_since_evening, pain_since_long
+pain_very;ZELO;Zelo boli.;system/review_pain_very_strong_ec6c4eca.png;DA;gender_pain_very_strong_male;;
+pain_very_strong;ZELO MOČNO;Zelo močno boli.;system/review_pain_very_strong_ec6c4eca.png;DA;gender_pain_very_strong_male;;pain_since_today, pain_since_yesterday, pain_since_morning, pain_since_evening, pain_since_long
+pain_now;ZDAJ;Boli me zdaj.;system/review_now_eb4b343c.png;SKUPNA;retained_reviewed;;
+pain_today;DANES;Boli me od danes.;system/review_today_1e80e967.png;SKUPNA;retained_reviewed;;
+pain_many_days;VEČ DNI;Boli me več dni.;system/review_many_days_4fabc567.png;SKUPNA;retained_reviewed;;
+pain_since_today;OD DANES;Od danes;system/review_today_1e80e967.png;SKUPNA;retained_reviewed;;
+pain_since_yesterday;OD VČERAJ;Od včeraj;system/review_yesterday_2c5f8fef.png;SKUPNA;retained_reviewed;;
+pain_since_morning;OD JUTRA;Od jutra;system/review_morning_b865300c.png;SKUPNA;retained_reviewed;;
+pain_since_evening;OD VEČERA;Od večera;system/review_evening_1d6216b2.png;SKUPNA;retained_reviewed;;
+pain_since_long;ŽE DOLGO;Že dolgo;system/review_many_days_4fabc567.png;SKUPNA;retained_reviewed;;
+pain_when_moving;PRI GIBANJU;Pri gibanju;system/review_pain_when_moving_b9997028.png;DA;gender_pain_when_moving_male;;
+pain_when_lifting;PRI DVIGOVANJU;Pri dvigovanju;system/review_pain_when_lifting_f76eee32.png;DA;gender_pain_when_lifting_male;;
+pain_when_gripping;PRI PRIJEMU;Pri prijemu;system/review_pain_when_gripping_238a5c56.png;SKUPNA;retained_reviewed;;
+pain_when_walking;PRI HOJI;Pri hoji;system/review_pain_when_walking_94ab5dcc.png;DA;gender_pain_when_walking_male;;
+pain_when_sitting;PRI SEDENJU;Pri sedenju;system/review_pain_when_sitting_2fb7bb7f.png;DA;gender_pain_when_sitting_male;;
+pain_when_standing;PRI VSTAJANJU;Pri vstajanju;system/review_pain_when_standing_8af3061f.png;DA;gender_pain_when_standing_male;;
+good;DOBRO SEM;Dobro sem.;system/full816_pair_happy_female_5af4f42a.png;DA;pair_happy_male;;
+bad;SLABO SEM;Slabo se počutim.;system/full816_pair_uncomfortable_female_b6c402a0.png;DA;pair_uncomfortable_male;;
+afraid;STRAH ME JE;Strah me je.;system/full816_pair_afraid_female_64c24551.png;DA;pair_afraid_male;;
+dont_know_problem;NE VEM;Ne vem.;system/daily_dont_understand_798.png;DA;gender_dont_understand_male;;
+angry;JEZNA SEM;Jezna sem.;system/review_angry_623b3507.png;DA;gender_angry_male;;
+sad;ŽALOSTNA SEM;Žalostna sem.;system/full816_pair_sad_female_ed4cd71f.png;DA;pair_sad_male;;
+happy;VESELA SEM;Vesela sem.;system/full816_pair_happy_female_5af4f42a.png;DA;pair_happy_male;;
+cold;MRAZ MI JE;Mraz mi je.;system/full816_pair_cold_female_174136df.png;DA;pair_cold_male;;
+hot;VROČE MI JE;Vroče mi je.;system/full816_pair_hot_female_d25c712d.png;DA;pair_hot_male;;
+peace;MIR;Rada bi mir.;system/full816_pair_peace_female_1f80dbdf.png;DA;pair_peace_male;;
+dusan;DUŠAN;Prosim, pokličite Dušana.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+daughter;HČERKA;Prosim, pokličite hčerko.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+son;SIN;Prosim, pokličite sina.;system/people.png;SKUPNA;retained_reviewed;local_contact_photo_required;
+therapist;TERAPEVT;Prosim, pokličite terapevta.;system/review_therapy_4ea445a8.png;DA;gender_my_therapist_male;;contact_call, cancel_call
+doctor;ZDRAVNIK;Prosim, pokličite zdravnika.;system/person_doctor_v2.png;SKUPNA;retained_reviewed;;contact_call, cancel_call
+nurse;MEDICINSKA SESTRA;Prosim, pokličite medicinsko sestro.;system/person_nurse_v2.png;SKUPNA;retained_reviewed;;contact_call, cancel_call
+who_is_coming;KDO PRIHAJA;Kdo prihaja?;system/review_visit_4e09043f.png;DA;gender_visit_male;;
+when_come;KDAJ PRIDE?;Kdaj pride?;system/review_when_come_5fa9375d.png;SKUPNA;retained_reviewed;;
+when_go;KDAJ GREMO?;Kdaj gremo?;system/review_when_go_ea9b7bad.png;SKUPNA;retained_reviewed;;
+when_therapy;KDAJ BO TERAPIJA?;Kdaj bo terapija?;system/review_when_therapy_12890474.png;SKUPNA;retained_reviewed;;
+when_home;KDAJ DOMOV?;Kdaj gremo domov?;system/review_when_home_fd1bba6d.png;SKUPNA;retained_reviewed;;
+when_eat;KDAJ JEMO?;Kdaj jemo?;system/review_when_eat_75a5e488.png;SKUPNA;retained_reviewed;;
+time_group;ČAS;Izberite čas.;system/when.png;SKUPNA;retained_reviewed;;today, tomorrow, yesterday, now, later, morning, afternoon, evening, night
+today;DANES;Danes.;system/review_today_1e80e967.png;SKUPNA;retained_reviewed;;
+tomorrow;JUTRI;Jutri.;system/review_tomorrow_172b5ae0.png;SKUPNA;retained_reviewed;;
+yesterday;VČERAJ;Včeraj.;system/review_yesterday_2c5f8fef.png;SKUPNA;retained_reviewed;;
+now;ZDAJ;Zdaj.;system/review_now_eb4b343c.png;SKUPNA;retained_reviewed;;
+morning;ZJUTRAJ;Zjutraj.;system/review_morning_b865300c.png;SKUPNA;retained_reviewed;;
+afternoon;POPOLDNE;Popoldne.;system/review_afternoon_647d55e1.png;SKUPNA;retained_reviewed;;
+evening;ZVEČER;Zvečer.;system/review_evening_1d6216b2.png;SKUPNA;retained_reviewed;;
+night;PONOČI;Ponoči.;system/review_night_e59109c7.png;SKUPNA;retained_reviewed;;
+medicine;ZDRAVILA;Prosim za zdravila.;system/review_medicine_1346ce92.png;SKUPNA;retained_reviewed;;
+therapy;TERAPIJA;Rada bi na terapijo.;system/review_therapy_4ea445a8.png;DA;gender_my_therapist_male;;
+wheelchair;VOZIČEK;Prosim, pomagajte mi v voziček.;system/review_wheelchair_46e4c622.png;SKUPNA;retained_reviewed;;
+crutch;BERGLA;Prosim, pomagajte mi z berglo.;system/review_crutch_0e61d767.png;SKUPNA;retained_reviewed;;
+not_safe;NE VARNO;Ne počutim se varno.;system/review_reuse_problem_e432a520.png;SKUPNA;retained_reviewed;;
+stop_movement;USTAVIMO SE;Ustavimo se, prosim.;system/review_reuse_no_82e5714f.png;SKUPNA;retained_reviewed;;
+need_rest;RABIM POČITEK;Rabim počitek.;system/full816_pair_sleepy_female_c3e9dc1c.png;DA;pair_sleepy_male;;
+cold_feeling;MRZLO MI JE;Mrzlo mi je.;system/full816_pair_cold_female_174136df.png;DA;pair_cold_male;;
+hot_feeling;VROČE MI JE;Vroče mi je.;system/full816_pair_hot_female_d25c712d.png;DA;pair_hot_male;;
+sleepy;SPI SE MI;Spi se mi.;system/full816_pair_sleepy_female_c3e9dc1c.png;DA;pair_sleepy_male;;
+fear_falling;STRAH PASTI;Strah me je, da bom padla.;system/review_fear_falling_83667395.png;DA;gender_fear_falling_male;;
+help_to_wc;POMAGAJTE MI DO TOALETE;Prosim, pomagajte mi do stranišča.;system/full816_pair_toilet_help_female_920f74da.png;DA;pair_toilet_help_female;;
+vending_drinks;AVTOMAT PIJAČ;Prosim, pomagajte mi pri avtomatu za pijače.;system/review_vending_e8948e89.png;SKUPNA;retained_reviewed;;drink_fanta, drink_coca_cola, drink_pepsi, water, juice
+vending_coffee_tea;AVTOMAT KAVA/ČAJ;Prosim, pomagajte mi pri avtomatu za kavo in čaj.;system/review_vending_coffee_tea_497114b6.png;SKUPNA;retained_reviewed;;coffee, tea, drink_milk, vending_photo_step_1, vending_photo_step_2
+shop;TRGOVINA;Prosim, pomagajte mi v trgovini.;system/daily_shop_798.png;SKUPNA;retained_reviewed;;
+restaurant;RESTAVRACIJA;Prosim, pomagajte mi v restavraciji.;system/review_restaurant_93d462e8.png;SKUPNA;retained_reviewed;;
+transport;PREVOZ;Prosim, pomagajte mi pri prevozu.;system/review_transport_cb3e5a9b.png;SKUPNA;retained_reviewed;;
+vending_photo_step_1;KORAK 1;Poglejte sliko prvega koraka.;system/review_photo_placeholder_dde1d737.png;SKUPNA;retained_reviewed;local_machine_photo_required;
+vending_photo_step_2;KORAK 2;Poglejte sliko drugega koraka.;system/review_photo_placeholder_dde1d737.png;SKUPNA;retained_reviewed;local_machine_photo_required;
+move_me;PREMAKNITE ME;Prosim, premaknite me.;system/review_wheelchair_46e4c622.png;SKUPNA;retained_reviewed;;

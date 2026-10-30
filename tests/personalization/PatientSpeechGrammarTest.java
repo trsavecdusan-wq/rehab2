@@ -30,6 +30,15 @@ public class PatientSpeechGrammarTest {
         equal(PatientSpeechGrammar.voice(false, true), "onyx");
         equal(PatientSpeechGrammar.voice(true, false), "onyx");
         equal(PatientSpeechGrammar.voice(true, true), "coral");
+        equal(PatientSpeechGrammar.resolve("Nisem končala.", "sl", true), "Nisem končal.");
+        equal(PatientSpeechGrammar.resolve("Nisem lačna.", "sl", true), "Nisem lačen.");
+        equal(PatientSpeechGrammar.resolve("Nisem žejna.", "sl", true), "Nisem žejen.");
+        equal(PatientSpeechGrammar.resolve("Prosim poglej, pokazala ti bom.", "sl", true), "Prosim poglej, pokazal ti bom.");
+        equal(PatientSpeechGrammar.resolve("Opazila sem kri.", "sl", true), "Opazil sem kri.");
+        equal(PatientSpeechGrammar.resolve("Strah me je, da bom padla.", "sl", true), "Strah me je, da bom padel.");
+        equal(PatientSpeechGrammar.resolve("Kaj bi delala?", "sl", true), "Kaj bi delal?");
+        equal(PatientSpeechGrammar.resolve("Що ти хотіла б їсти?", "uk", true), "Що ти хотів би їсти?");
+        equal(PatientSpeechGrammar.resolve("Я не закінчила.", "uk", true), "Я не закінчив.");
         System.out.println(checks + " patient grammar and role checks passed");
     }
 }

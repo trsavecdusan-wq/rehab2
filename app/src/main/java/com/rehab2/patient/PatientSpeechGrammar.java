@@ -25,7 +25,12 @@ public final class PatientSpeechGrammar {
                 {"vesela sem", "vesel sem"}, {"žalostna sem", "žalosten sem"},
                 {"prebolela sem", "prebolel sem"}, {"rojena sem", "rojen sem"},
                 {"stara sem", "star sem"}, {"kaj bi jedla", "kaj bi jedel"},
-                {"bi rada jedla", "bi rad jedel"}, {"si lačna", "si lačen"},
+                {"pokazala ti bom", "pokazal ti bom"}, {"nisem končala", "nisem končal"},
+                {"nisem žejna", "nisem žejen"}, {"nisem lačna", "nisem lačen"},
+                {"jezna sem", "jezen sem"}, {"opazila sem", "opazil sem"},
+                {"da bom padla", "da bom padel"},
+                {"bi rada jedla", "bi rad jedel"}, {"kaj bi delala", "kaj bi delal"},
+                {"bi rada", "bi rad"}, {"si lačna", "si lačen"},
                 {"si žejna", "si žejen"}, {"si utrujena", "si utrujen"}, {"si zaspana", "si zaspan"}
             };
         } else if ("uk".equals(language) || "ua".equals(language)) {
@@ -33,7 +38,9 @@ public final class PatientSpeechGrammar {
                 {"я хотіла б", "я хотів би"}, {"я втомилася", "я втомився"},
                 {"я втомлена", "я втомлений"}, {"я голодна", "я голодний"},
                 {"я перенесла", "я переніс"}, {"я народилася", "я народився"},
-                {"я сама", "я сам"}
+                {"я сама", "я сам"}, {"я не закінчила", "я не закінчив"},
+                {"я не голодна", "я не голодний"}, {"я помітила", "я помітив"},
+                {"ти хотіла б", "ти хотів би"}
             };
         } else return text;
         String result = text;

@@ -15,6 +15,7 @@ public final class UpgradeFieldPolicyTest {
             JSONObject before = new JSONObject().put(flag, true).put("imagePath", "system/chosen.png")
                 .put("iconSource", "SYSTEM").put("labelSl", "Moj napis")
                 .put("speechTextByLanguage", new JSONObject().put("uk", "Моє речення"));
+            check(AacUpgradeFieldPolicy.INSTANCE.isUserEdited(before));
             JSONObject proposed = new JSONObject().put("imagePath", "system/review.png")
                 .put("iconSource", "SYSTEM").put("labelSl", "Sistemski napis");
             AacUpgradeFieldPolicy.INSTANCE.mergeUserFields(before, proposed);
