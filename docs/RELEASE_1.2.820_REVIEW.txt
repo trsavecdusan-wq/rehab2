@@ -1,0 +1,53 @@
+NovaRehab v1.2.820 / 11008 — pregled pred izdajo
+Osnova: oznaka v1.2.818, 609c311ff99a454aaa8652d6dbba1aa6cf251dd4.
+Veja: codex/v1.2.820-release.
+Priloženi NovaRehab_1.2.820.patch SHA-256:
+FDF59662A316A81ABF1DAEE0217066638E76C4CBA23D8E70CC7C098E4F90F345
+
+Patch je uporabljen na čistem checkoutu oznake 818. Pred uporabo je bil preverjen
+forward/reverse apply; spremembe niso bile že vključene. Zaradi CRLF je bil uporabljen
+--ignore-space-change; obratni pregled celotnega patcha je nato uspel.
+Prejšnji lokalni razvoj codex/aac-first-batch je ostal ločeno in ni bil združen.
+
+Dopolnitve patcha:
+- Šest slik aac_please_* je bilo dodanih v BUNDLED_SYSTEM_ICON_FILES.
+  Patch je vseboval PNG in poti, vendar ne kopiranja teh slik v runtime.
+- Obstoječi runtime pregled pričakuje 487 namesto 479 zapisov ter preverja
+  osem novih poti in njihovo slovensko/ukrajinsko vsebino.
+- Dodana statični pregled izdaje in JVM test shrambe prejemnikov.
+
+Preverjeno:
+- Lokalni assembleDebug: BUILD SUCCESSFUL.
+- audit_catalog.py: 487 enoličnih ID-jev, 661 povezav, 21 komunikacijskih poti;
+  283 obstoječih slikovnih preslikav/zgoščenih vrednosti ostaja veljavnih.
+- upgrade-fields/run.ps1: 58 pravil ohranitve polj; 487 runtime zapisov,
+  479 obstoječih slikovnih preslikav in fiksna vrstica.
+- patient-images/run.ps1: 33 + 27 + 9 uspešnih preverjanj osebnih slik/uvoza/migracij.
+- release-820/audit.py: mesta 11 LULAT, 13 SESTRA, 15 NA BLATO; osem različnih
+  PNG, kopiranje vseh osmih v runtime; struktura zgodovine, bližnjice POMOČ,
+  tri kombinacije DA/NE in povezave nastavitev (statični pregled).
+- release-820/recipients.py: 5 preverjanj dejanske kode AacEmailRecipients z
+  diskovnim testnim nadomestkom Context; vsi trije naslovi, ponovno branje,
+  prazno srednje polje, odstranitev vseh ter zavrnitev napačnega števila.
+  To ni dokaz ponovnega zagona Androida ali e-poštne dostave.
+- status-speech/tts_lifecycle.py: 27 preverjanj dejanskih funkcij z JVM
+  nadomestki Androida; ne vključuje poslušanja zvoka na napravi.
+- Vizualno pregledane slike DA, NE, LULAT in NA BLATO; PNG nimata besedila,
+  motiva urina in blata sta različna.
+- Obe poti do wc_diaper_change ter poti do prošenj za odejo in cigarete
+  preverjene v grafu in runtime katalogu.
+- git diff --check uspešen. Workflow, signing in OTA/rollback koda nespremenjeni;
+  app/build.gradle spreminja samo versionName in versionCode.
+
+Nepreizkušeno na tablici:
+ADB devices -l je vrnil prazen seznam. Ni namestitve, UI dotikov, SL/UK
+izgovorjave, poslušanja zvoka, ponovnega zagona, večnivojske tihe vrnitve
+ali osebne nadgradnje na fizični napravi. Dejansko stanje profila DOM
+ni bilo pridobljeno. Pregledi kode/JVM niso nadomestek teh testov.
+
+Samodejno poslušanje, AI odgovori in pošiljanje e-pošte ostajajo naslednja etapa.
+Tri polja hranijo naslove; ne sprožajo pošiljanja.
+
+Povezava ChatGPT Library do načrta ni bila dostopna s spletnim branjem.
+Izvedba temelji na uporabnikovem navodilu in priloženem patchu.
+Rezultat GitHub Actions in podpis bodo preverjeni pred objavo oznake.

@@ -19,6 +19,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.InputType
 import android.text.method.PasswordTransformationMethod
+import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.rehab2.aac.AacAssistSettings
+import com.rehab2.aac.AacEmailRecipients
 import com.rehab2.aac.ai.AacObservation
 import com.rehab2.aac.AudioDuckingSettings
 import com.rehab2.aac.AacAudioPlayer
@@ -567,6 +569,13 @@ class SettingsActivity : AppCompatActivity() {
         txtAacAssistStatus = findViewById(R.id.txtAacAssistStatus)
         switchAacAssistShowSuggestions = findViewById(R.id.switchAacAssistShowSuggestions)
         editAacAssistInfo = findViewById(R.id.editAacAssistInfo)
+        bindAacEmailRecipientFields(savedInstanceState == null)
+        findViewById<Button>(R.id.btnAacYesDisplay).setOnClickListener {
+            showFixedAnswerDisplayPicker("yes", R.string.aac_yes_display)
+        }
+        findViewById<Button>(R.id.btnAacNoDisplay).setOnClickListener {
+            showFixedAnswerDisplayPicker("no", R.string.aac_no_display)
+        }
         txtKeywordListenerStatus = findViewById(R.id.txtKeywordListenerStatus)
         editKeywordListenerInfo = findViewById(R.id.editKeywordListenerInfo)
         editKeywordMatcherInput = findViewById(R.id.editKeywordMatcherInput)
@@ -1210,6 +1219,10 @@ class SettingsActivity : AppCompatActivity() {
             R.id.txtAacAssistStatus,
             R.id.switchAacAssistShowSuggestions,
             R.id.editAacAssistInfo,
+            R.id.editAiEmailRecipientOne,
+            R.id.editAiEmailRecipientTwo,
+            R.id.editAiEmailRecipientThree,
+            R.id.btnSaveAiEmailRecipients,
             R.id.txtKeywordListenerTitle,
             R.id.txtKeywordListenerStatus,
             R.id.editKeywordListenerInfo,
@@ -2386,6 +2399,55 @@ class SettingsActivity : AppCompatActivity() {
             Toast.makeText(this, "Vir vremena shranjen", Toast.LENGTH_SHORT).show()
         }
         refreshStatusOrientationSection()
+    }
+
+    private fun bindAacEmailRecipientFields(loadSavedValues: Boolean) {
+        val fields = listOf(
+            findViewById<EditText>(R.id.editAiEmailRecipientOne),
+            findViewById<EditText>(R.id.editAiEmailRecipientTwo),
+            findViewById<EditText>(R.id.editAiEmailRecipientThree)
+        )
+        if (loadSavedValues) {
+            fields.zip(AacEmailRecipients.load(this)).forEach { (field, address) ->
+                field.setText(address)
+            }
+        }
+        findViewById<Button>(R.id.btnSaveAiEmailRecipients).setOnClickListener {
+            val addresses = fields.map { it.text.toString().trim() }
+            var valid = true
+            fields.zip(addresses).forEach { (field, address) ->
+                val invalid = address.isNotEmpty() && !Patterns.EMAIL_ADDRESS.matcher(address).matches()
+                field.error = if (invalid) getString(R.string.aac_email_invalid) else null
+                if (invalid) valid = false
+            }
+            if (valid) {
+                AacEmailRecipients.save(this, addresses)
+                fields.zip(addresses).forEach { (field, address) -> field.setText(address) }
+                Toast.makeText(this, R.string.aac_email_recipients_saved, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun showFixedAnswerDisplayPicker(key: String, title: Int) {
+        val displayPrefs = getSharedPreferences("aac_fixed_answer_display", MODE_PRIVATE)
+        val values = listOf("both", "symbol", "text")
+        val labels = arrayOf(
+            getString(R.string.aac_fixed_answer_both),
+            getString(R.string.aac_fixed_answer_symbol),
+            getString(R.string.aac_fixed_answer_text)
+        )
+        val current = values.indexOf(displayPrefs.getString(key, null).orEmpty())
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setSingleChoiceItems(labels, current) { dialog, which ->
+                displayPrefs.edit().putString(key, values[which]).apply()
+                dialog.dismiss()
+            }
+            .setNeutralButton(R.string.aac_fixed_answer_default) { _, _ ->
+                displayPrefs.edit().remove(key).apply()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun refreshAacAssistSection() {

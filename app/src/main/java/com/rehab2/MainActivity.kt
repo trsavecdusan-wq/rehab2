@@ -428,7 +428,10 @@ class MainActivity : AppCompatActivity() {
         )
         private val AAC_DEFAULT_VISUAL_SLOTS_BY_PARENT_ID = mapOf(
             "wc" to mapOf(
+                "wc_pee" to 10,
                 "nurse_help" to 12,
+                "wc_poop" to 14,
+                "wc_diaper_change" to 17,
                 "wc_wet" to 20,
                 "wc_wet_and_dirty" to 22,
                 "wc_dirty" to 24
@@ -706,7 +709,9 @@ class MainActivity : AppCompatActivity() {
         val pageDebugId: String,
         val questionText: String,
         val displaySlots: List<AacItem?>,
-        val gridPageIndex: Int = 0
+        val gridPageIndex: Int = 0,
+        val conversationItems: List<AacItem> = emptyList(),
+        val modifierItemsByGroup: Map<String, AacItem> = emptyMap()
     )
 
     private data class MainAacVoiceAssistantStep(
@@ -785,6 +790,7 @@ class MainActivity : AppCompatActivity() {
     private var shouldLockMainAacInputOnSpeechStart = true
     private var isMainAacTerminalSelectionAccepted = false
     private var shouldResetMainAacRootAfterSpeech = false
+    private var pendingMainAacHelpShortcuts = false
     private var selectedMainAacItemId: String? = null
     private var selectedMainAacItemIdBeforeTap: String? = null
     private var mainAacTapId = 0L
@@ -1282,7 +1288,7 @@ class MainActivity : AppCompatActivity() {
             item?.let {
                 binding.view.background = mainAacTileBackgroundFor(it)
                 binding.view.isEnabled = !isMainAacInputLocked
-                bindMainAacOverlayLabel(binding.label, mainAacDisplayLabel(it, languageCode, topSuggestionItemId))
+                bindMainAacItemLabel(binding, it, languageCode, topSuggestionItemId)
                 bindMainAacIcon(binding, it)
                 binding.view.setOnClickListener(null)
                 binding.view.setOnTouchListener { _, event ->
@@ -1338,6 +1344,24 @@ class MainActivity : AppCompatActivity() {
         labelView.visibility = if (value.isBlank()) View.GONE else View.VISIBLE
     }
 
+    private fun bindMainAacItemLabel(
+        binding: MainAacTileBinding,
+        item: AacItem,
+        languageCode: String,
+        topSuggestionItemId: String?
+    ) {
+        val mode = fixedMainAacAnswerDisplayMode(item)
+        (binding.label.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
+            val gravity = if (mode == "text") android.view.Gravity.CENTER else android.view.Gravity.BOTTOM
+            if (params.gravity != gravity) {
+                params.gravity = gravity
+                binding.label.layoutParams = params
+            }
+        }
+        val label = if (mode == "symbol") "" else mainAacDisplayLabel(item, languageCode, topSuggestionItemId)
+        bindMainAacOverlayLabel(binding.label, label)
+    }
+
     private fun currentMainAacPageSnapshot(
         selectedItemId: String?,
         questionTextOverride: String? = null
@@ -1361,7 +1385,9 @@ class MainActivity : AppCompatActivity() {
             pageDebugId = currentMainAacPageDebugId,
             questionText = questionText,
             displaySlots = displaySlots,
-            gridPageIndex = currentMainAacGridPageIndex
+            gridPageIndex = currentMainAacGridPageIndex,
+            conversationItems = currentMainAacConversationItems,
+            modifierItemsByGroup = currentMainAacModifierItemsByGroup.toMap()
         )
     }
 
@@ -1384,7 +1410,7 @@ class MainActivity : AppCompatActivity() {
             item?.let {
                 binding.view.background = mainAacTileBackgroundFor(it)
                 binding.view.isEnabled = !isMainAacInputLocked
-                bindMainAacOverlayLabel(binding.label, mainAacDisplayLabel(it, languageCode, topSuggestionItemId))
+                bindMainAacItemLabel(binding, it, languageCode, topSuggestionItemId)
                 bindMainAacIcon(binding, it)
                 binding.view.setOnClickListener(null)
                 binding.view.setOnTouchListener { _, event ->
@@ -1448,9 +1474,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun completeMainAacSpeechLock() {
         val resetAfterSpeech = shouldResetMainAacRootAfterSpeech
+        val showHelpShortcuts = pendingMainAacHelpShortcuts
         shouldResetMainAacRootAfterSpeech = false
+        pendingMainAacHelpShortcuts = false
         unlockMainAacInput()
-        if (resetAfterSpeech) {
+        if (showHelpShortcuts) {
+            openMainAacHelpShortcuts()
+        } else if (resetAfterSpeech) {
             resetMainAacAfterTerminalSpeech()
         }
     }
@@ -1477,18 +1507,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val previousPage = mainAacHistory.removeLast()
-        if (currentMainAacConversationItems.size > 1) {
-            currentMainAacConversationItems = currentMainAacConversationItems.dropLast(1)
-            currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
-            selectedMainAacItemId = currentMainAacConversationItems.lastOrNull()?.id ?: previousPage.selectedItemId
-            currentMainAacModifierItemsByGroup.clear()
-            cancelMainAacGuidedAutoComplete()
-            restoreMainAacPageSnapshot(previousPage)
-            return
-        }
-        currentMainAacConversationParentItem = null
-        currentMainAacConversationItems = emptyList()
+        isMainAacTerminalSelectionAccepted = false
+        currentMainAacConversationItems = previousPage.conversationItems
+        currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
         currentMainAacModifierItemsByGroup.clear()
+        currentMainAacModifierItemsByGroup.putAll(previousPage.modifierItemsByGroup)
         cancelMainAacGuidedAutoComplete()
         restoreMainAacPageSnapshot(previousPage)
     }
@@ -1640,6 +1663,7 @@ class MainActivity : AppCompatActivity() {
         mainAacHistory.clear()
         isMainAacTerminalSelectionAccepted = false
         shouldResetMainAacRootAfterSpeech = false
+        pendingMainAacHelpShortcuts = false
         selectedMainAacItemId = null
         hideMainAacQuestion()
         currentMainAacConversationParentItem = null
@@ -1654,7 +1678,7 @@ class MainActivity : AppCompatActivity() {
         val coreV2HomeLayoutActive = isCoreV2HomeLayoutActive(items)
         mainAacItemsById = items.associateBy { it.id }
         val fallbackRootItems = orderedMainAacItemsWithFixedTopRow(
-            items.filter { it.isRootItem && !it.isHiddenUntilParent }
+            items.filter { it.isRootItem && !it.isHiddenUntilParent && !isMainAacPainDetail(it) }
         )
         if (startPageItems.isEmpty()) {
             if (coreV2HomeLayoutActive) {
@@ -1687,7 +1711,12 @@ class MainActivity : AppCompatActivity() {
         }
         cancelMainAacVoiceAssistantQuestion()
         if (mainAacHistory.isNotEmpty() && normalizeMainAacKey(item.id) in setOf("back_to_main", "no")) {
+            aacAudioPlayer.interruptCurrentSpeechForNewInput()
             showPreviousMainAacItems()
+            return
+        }
+        if (item.id == "help") {
+            speakMainAacHelp(item)
             return
         }
         if (mainAacHistory.isNotEmpty() && isMainAacGlobalDirectAction(item)) {
@@ -1697,12 +1726,13 @@ class MainActivity : AppCompatActivity() {
         }
         val targetPageItems = mainAacPageItems(item.targetPageId)
         if (targetPageItems.isNotEmpty()) {
+            val previousPage = currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap)
             recordLastAudioEvent("AAC opens target page itemId=${item.id} target=${item.targetPageId}")
             isMainAacTerminalSelectionAccepted = false
             selectedMainAacItemId = item.id
             updateMainAacConversationContextForBranch(item)
             prepareMainAacContextPrompt(item)
-            mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
+            mainAacHistory.addLast(previousPage)
             currentMainAacPageDebugId = item.targetPageId
             showMainAacItems(targetPageItems)
             captureMainAacVoiceAssistantNextPageSnapshot()
@@ -1715,12 +1745,13 @@ class MainActivity : AppCompatActivity() {
             (childItems.isNotEmpty() && (mainAacHistory.isNotEmpty() || AacGuidedPromptEngine.hasFlow(item)))
         if (canOpenChildItems) {
             if (childItems.isNotEmpty()) {
+                val previousPage = currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap)
                 recordLastAudioEvent("AAC opens children itemId=${item.id} count=${childItems.size}")
                 isMainAacTerminalSelectionAccepted = false
                 selectedMainAacItemId = item.id
                 updateMainAacConversationContextForBranch(item)
                 prepareMainAacContextPrompt(item)
-                mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
+                mainAacHistory.addLast(previousPage)
                 currentMainAacPageDebugId = "children:${item.id}"
                 updateMainAacGridSelectionDebug(currentMainAacPageDebugId, childItems)
                 showMainAacItems(childItems)
@@ -1755,9 +1786,40 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private fun speakMainAacHelp(item: AacItem) {
+        aacAudioPlayer.interruptCurrentSpeechForNewInput()
+        clearMainAacSentenceState(clearConversationContext = false)
+        val languageCode = getActiveSpeechLanguage()
+        val text = when (languageCode) {
+            "uk" -> "Будь ласка, допоможіть мені."
+            "en" -> "Please help me."
+            else -> "Prosim, pomagajte mi."
+        }
+        recordMainAacUsage(item)
+        pendingMainAacHelpShortcuts = true
+        shouldLockMainAacInputOnSpeechStart = true
+        lockMainAacInput()
+        speakMainAacTextOnce("direct_help", item.id, text, languageCode)
+    }
+
+    private fun openMainAacHelpShortcuts() {
+        val shortcuts = listOf("wc_diaper_change", "pain", "please").mapNotNull { mainAacItemsById[it] }
+        if (shortcuts.isEmpty() || currentMainAacPageDebugId == "help_shortcuts") return
+        mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
+        clearMainAacConversationContext()
+        isMainAacTerminalSelectionAccepted = false
+        currentMainAacPageDebugId = "help_shortcuts"
+        updateMainAacGridSelectionDebug(currentMainAacPageDebugId, shortcuts)
+        showMainAacItems(shortcuts)
+    }
+
 
     private fun prepareMainAacContextPrompt(item: AacItem) {
         clearMainAacSentenceState(clearConversationContext = false)
+        if (item.id in setOf("please", "please_more", "please_cigarettes", "please_blanket")) {
+            hideMainAacQuestion()
+            return
+        }
         val languageCode = getActiveSpeechLanguage()
         val guidedPrompt = if (languageCode.trim().lowercase(Locale.ROOT) == "sl") {
             AacGuidedPromptEngine.questionFor(item)
@@ -2300,12 +2362,13 @@ class MainActivity : AppCompatActivity() {
             return false
         }
 
+        val previousPage = currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap)
         selectedMainAacItemId = item.id
         recordMainAacUsage(item)
         currentMainAacConversationItems = currentMainAacConversationItems + item
         currentMainAacConversationParentItem = currentMainAacConversationItems.firstOrNull()
         cancelMainAacGuidedAutoComplete()
-        mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
+        mainAacHistory.addLast(previousPage)
         currentMainAacPageDebugId = "guided:${item.id}"
         updateMainAacGridSelectionDebug(currentMainAacPageDebugId, followUpItems)
         showMainAacQuestion(followUp.questionSl)
@@ -3006,10 +3069,15 @@ class MainActivity : AppCompatActivity() {
         if (!isSafeMainAacPageId(normalizedPageId)) {
             return emptyList()
         }
-        val itemsById = items.associateBy { it.id }
+        val configuredHome = getSharedPreferences(PREFS_AAC_PATIENT_PAGES, MODE_PRIVATE)
+            .getString(KEY_DEFAULT_PATIENT_PAGE_ID, "").orEmpty().trim()
+        val isHome = normalizedPageId == CORE_V2_HOME_PAGE_ID ||
+            normalizedPageId == MAIN_AAC_HOME_PAGE_ID || normalizedPageId == configuredHome
+        val pageCatalog = if (isHome) items.filterNot(::isMainAacPainDetail) else items
+        val itemsById = pageCatalog.associateBy { it.id }
         val fixedItems = fixedTopRowItems(items)
         val fixedItemIds = fixedItems.map { it.id }.toSet()
-        val placedItems = items
+        val placedItems = pageCatalog
             .flatMap { item ->
                 item.placements
                     .filter { placement -> placement.pageId == normalizedPageId }
@@ -3021,13 +3089,13 @@ class MainActivity : AppCompatActivity() {
             .filter { item -> item.id !in fixedItemIds }
             .distinctBy { item -> item.id }
         val usedItemIds = fixedItemIds + placedItems.map { it.id }.toSet()
-        val rootFillItems = items
+        val rootFillItems = pageCatalog
             .filter { item -> item.isRootItem && !item.isHiddenUntilParent }
             .filter { item -> item.id !in usedItemIds }
             .sortedWith(compareBy<AacItem> { it.priority }.thenBy { it.id })
         val usedAfterRootFillIds = usedItemIds + rootFillItems.map { it.id }.toSet()
         val terminalFillItems = if (showSubiconsOnMainPages()) {
-            items
+            pageCatalog
                 .filter { item -> item.id !in usedAfterRootFillIds }
                 .filter { item -> !item.opensSubicons && item.children.isEmpty() && item.addsToSentence }
                 .sortedWith(compareBy<AacItem> { it.priority }.thenBy { it.id })
@@ -3047,6 +3115,16 @@ class MainActivity : AppCompatActivity() {
             "PAGE FILL DEBUG pageId=$normalizedPageId totalItems=${items.size} placed=${placedItems.size} fixed=${fixedItems.size} rootFill=${rootFillItems.size} terminalFill=${terminalFillItems.size} finalOrdered=${finalOrderedItems.size} capacity=${mainAacVisibleContentCapacity()} excluded=${items.size - finalOrderedItems.size}"
         )
         return finalOrderedItems
+    }
+
+    private fun isMainAacPainDetail(item: AacItem): Boolean {
+        val id = normalizeMainAacKey(item.id)
+        return id != "pain" && (
+            item.categoryId == "pain" ||
+                id in AAC_PAIN_ROOT_BASE_CHILDREN ||
+                id in AAC_PAIN_EXTENDED_ROOT_IDS ||
+                id in AAC_PAIN_EXTENDED_DETAIL_IDS
+            )
     }
 
     private fun orderedMainAacItemsWithFixedTopRow(items: List<AacItem>): List<AacItem> {
@@ -3130,6 +3208,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
         val iconView = binding.icon ?: return
+        if (fixedMainAacAnswerDisplayMode(item) == "text") {
+            iconView.visibility = View.INVISIBLE
+            iconView.setCompoundDrawables(null, null, null, null)
+            iconView.text = ""
+            return
+        }
+        iconView.visibility = View.VISIBLE
         iconView.setTextColor(mainAacIconTextColorFor(item))
         iconView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mainAacFallbackIconTextSizeSp())
         val iconFile = com.rehab2.aac.AacPatientImages.resolve(this, item)
@@ -3492,18 +3577,39 @@ class MainActivity : AppCompatActivity() {
         languageCode: String,
         topSuggestionItemId: String?
     ): String {
+        if (currentMainAacPageDebugId == "help_shortcuts" && item.id == "please") {
+            return when (languageCode) {
+                "uk" -> "БІЛЬШЕ ВАРІАНТІВ"
+                "en" -> "MORE OPTIONS"
+                else -> "VEČ MOŽNOSTI"
+            }
+        }
         val resolvedLabel = AacLocalizedTextResolver.resolveLabel(item, languageCode).trim()
         val safeLabel = if (isLikelyCorruptAacDisplayText(resolvedLabel)) {
             item.labelSl.trim().takeUnless(::isLikelyCorruptAacDisplayText).orEmpty()
         } else {
             resolvedLabel
-        }.uppercase(Locale.ROOT)
+        }.uppercase(Locale.ROOT).ifBlank {
+            when (item.id) {
+                "yes" -> if (languageCode == "uk") "ТАК" else if (languageCode == "en") "YES" else "DA"
+                "no" -> if (languageCode == "uk") "НІ" else if (languageCode == "en") "NO" else "NE"
+                else -> ""
+            }
+        }
         return if (item.id == topSuggestionItemId && safeLabel.isNotBlank()) {
             val label = safeLabel
             "\u2b50 $label"
         } else {
             safeLabel
         }
+    }
+
+    private fun fixedMainAacAnswerDisplayMode(item: AacItem): String? {
+        if (item.id != "yes" && item.id != "no") return null
+        return getSharedPreferences("aac_fixed_answer_display", MODE_PRIVATE)
+            .getString(item.id, "both")
+            ?.takeIf { it in setOf("symbol", "text", "both") }
+            ?: "symbol"
     }
 
     private fun isLikelyCorruptAacDisplayText(text: String): Boolean {
@@ -3727,7 +3833,7 @@ class MainActivity : AppCompatActivity() {
                 speakTextUk = "Мені потрібно в туалет",
                 speechTextEn = "I need the toilet",
                 opensSubicons = true,
-                children = listOf("wc_wet", "wc_dirty", "wc_wet_and_dirty", "nurse_help"),
+                children = AacStarterContentV1.toaletaChildren,
                 placements = mainAacPageOnePlacement(7)
             ),
             mainAacItem(

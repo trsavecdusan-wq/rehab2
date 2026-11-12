@@ -822,6 +822,28 @@
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/btnAacYesDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#2F80ED"
+            android:text="@string/aac_yes_display"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAacNoDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#2F80ED"
+            android:text="@string/aac_no_display"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/subgroupCommunicatorGridSize"
             android:layout_width="match_parent"
@@ -1772,6 +1794,56 @@
             android:textColor="#F4F7FA"
             android:textColorHint="#9EA8B2"
             android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editAiEmailRecipientOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:hint="@string/aac_email_recipient_1"
+            android:inputType="textEmailAddress"
+            android:minHeight="56dp"
+            android:padding="12dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2" />
+
+        <EditText
+            android:id="@+id/editAiEmailRecipientTwo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:hint="@string/aac_email_recipient_2"
+            android:inputType="textEmailAddress"
+            android:minHeight="56dp"
+            android:padding="12dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2" />
+
+        <EditText
+            android:id="@+id/editAiEmailRecipientThree"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#1E2329"
+            android:hint="@string/aac_email_recipient_3"
+            android:inputType="textEmailAddress"
+            android:minHeight="56dp"
+            android:padding="12dp"
+            android:textColor="#F4F7FA"
+            android:textColorHint="#9EA8B2" />
+
+        <Button
+            android:id="@+id/btnSaveAiEmailRecipients"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#2F80ED"
+            android:text="@string/aac_email_save_recipients"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtKeywordListenerTitle"

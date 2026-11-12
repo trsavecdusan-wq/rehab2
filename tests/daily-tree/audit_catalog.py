@@ -24,9 +24,16 @@ edges = {}
 for key, line in items.items():
     match = re.search(r'children = (\w+)\(([^)]*)\)', line)
     if not match:
-        edges[key] = []
-        continue
-    name, args = match.groups()
+        reference = re.search(r'children = (\w+)(?=,|\))', line)
+        if not reference:
+            edges[key] = []
+            continue
+        name = 'listOf'
+        declaration = re.search(r'\bval ' + re.escape(reference[1]) + r' = listOf\((.*?)\)', s, re.S)
+        assert declaration, (key, reference[1])
+        args = declaration[1]
+    else:
+        name, args = match.groups()
     if name == 'listOf':
         children = quoted(args)
     else:
@@ -57,6 +64,12 @@ paths = [
     ['thirsty', 'tea', 'tea_mint', 'tea_mint_honey'],
     ['hungry', 'hungry_main_dish', 'hungry_soup', 'hungry_beef_soup'],
     ['care', 'washing_help'], ['health', 'doctor'], ['feeling', 'tired'],
+    ['wc', 'wc_pee'], ['wc', 'wc_poop'],
+    ['wc', 'wc_diaper_change'], ['please', 'wc_diaper_change'],
+    ['please', 'please_more', 'please_cigarettes', 'cigarette'],
+    ['please', 'please_more', 'please_cigarettes', 'please_buy_cigarettes'],
+    ['please', 'please_more', 'please_blanket', 'please_blanket_laundry'],
+    ['please', 'please_more', 'please_blanket', 'please_blanket_bed'],
 ]
 for path in paths:
     for parent, child in zip(path, path[1:]):

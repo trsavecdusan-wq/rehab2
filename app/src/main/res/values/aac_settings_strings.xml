@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aac_email_recipient_1">E-poštni prejemnik 1</string>
+    <string name="aac_email_recipient_2">E-poštni prejemnik 2</string>
+    <string name="aac_email_recipient_3">E-poštni prejemnik 3</string>
+    <string name="aac_email_save_recipients">Shrani e-poštne prejemnike</string>
+    <string name="aac_email_invalid">Vnesite veljaven e-poštni naslov</string>
+    <string name="aac_email_recipients_saved">E-poštni prejemniki so shranjeni</string>
+    <string name="aac_yes_display">Prikaz ikone DA</string>
+    <string name="aac_no_display">Prikaz ikone NE</string>
+    <string name="aac_fixed_answer_both">Simbol in napis</string>
+    <string name="aac_fixed_answer_symbol">Samo simbol</string>
+    <string name="aac_fixed_answer_text">Samo napis</string>
+    <string name="aac_fixed_answer_default">Privzeti prikaz</string>
+</resources>

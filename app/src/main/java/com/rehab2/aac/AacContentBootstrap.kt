@@ -41,12 +41,7 @@ object AacContentBootstrap {
         0x0A
     )
 
-    private val TOALETA_V1_WC_CHILDREN = listOf(
-        "wc_wet",
-        "wc_dirty",
-        "wc_wet_and_dirty",
-        "nurse_help"
-    )
+    private val TOALETA_V1_WC_CHILDREN = AacStarterContentV1.toaletaChildren
     private val TOALETA_V1_NURSE_CHILDREN = listOf(
         "help_dressing",
         "help_washing",
@@ -54,7 +49,6 @@ object AacContentBootstrap {
         "noticed_blood"
     )
     private val TOALETA_V1_EXCLUDED_WC_CHILDREN = setOf(
-        "wc_diaper_change",
         "wc_burning",
         "wc_pain",
         "wc_itching",
@@ -330,6 +324,12 @@ object AacContentBootstrap {
         .distinct()
 
     private val BUNDLED_SYSTEM_ICON_FILES = listOf(
+        "aac_please_more.png",
+        "aac_please_cigarettes.png",
+        "aac_please_buy_cigarettes.png",
+        "aac_please_blanket.png",
+        "aac_please_blanket_laundry.png",
+        "aac_please_blanket_bed.png",
         "aac_drink_coffee.png",
         "aac_drink_cola.png",
         "aac_drink_cold_water.png",
@@ -373,6 +373,8 @@ object AacContentBootstrap {
         "aac_toilet_washing.png",
         "aac_wc_both.png",
         "aac_wc_dirty.png",
+        "aac_wc_pee.png",
+        "aac_wc_poop.png",
         "aac_wc_wet.png",
         "come_to_me.png",
         "dont_understand.png",
@@ -1063,6 +1065,46 @@ object AacContentBootstrap {
             repaired += removeQuestionMetadata(item)
             repaired += putLanguageValue(item, "questionByLanguage", "sl", "Kaj naj naredi sestra?")
             repaired += putLanguageValue(item, "questionByLanguage", "uk", "Що має зробити медсестра?")
+        }
+
+        val diaperChange = canonicalStarterById.getValue("wc_diaper_change")
+        itemsById[diaperChange.id]?.let { item ->
+            repaired += ensureOnlyVisibleUnder(item, diaperChange.visibleUnderIds)
+            if (!isUserProtected(item)) {
+                repaired += putIfDifferent(item, "labelSl", diaperChange.labelSl)
+                repaired += putIfDifferent(item, "speakTextSl", diaperChange.speakTextSl.orEmpty())
+                repaired += putIfDifferent(item, "speechTextSl", diaperChange.speakTextSl.orEmpty())
+                repaired += putIfDifferent(item, "speechText", diaperChange.speechText.orEmpty())
+                repaired += putLanguageValue(item, "speechTextByLanguage", "sl", diaperChange.speakTextSl.orEmpty())
+                diaperChange.labelByLanguage.forEach { (language, label) ->
+                    repaired += putLanguageValue(item, "labelByLanguage", language, label)
+                }
+                diaperChange.speechTextByLanguage.forEach { (language, speech) ->
+                    repaired += putLanguageValue(item, "speechTextByLanguage", language, speech)
+                }
+            }
+        }
+        itemsById["please"]?.let { item ->
+            val current = stringList(item.optJSONArray("children"))
+            val shortcuts = listOf(diaperChange.id, "please_more").filter(itemsById::containsKey)
+            repaired += replaceChildrenIfDifferent(item, shortcuts + current.filterNot { it in shortcuts })
+        }
+        itemsById["cigarette"]?.let { item ->
+            if (!isUserProtected(item) && item.optString("labelSl").trim() == "CIGARETA") {
+                val cigarette = canonicalStarterById.getValue("cigarette")
+                val speechSl = cigarette.speakTextSl.orEmpty()
+                repaired += putIfDifferent(item, "labelSl", cigarette.labelSl)
+                repaired += putIfDifferent(item, "speakTextSl", speechSl)
+                repaired += putIfDifferent(item, "speechTextSl", speechSl)
+                repaired += putIfDifferent(item, "speechText", speechSl)
+                repaired += putLanguageValue(item, "speechTextByLanguage", "sl", speechSl)
+                cigarette.labelByLanguage.forEach { (language, label) ->
+                    repaired += putLanguageValue(item, "labelByLanguage", language, label)
+                }
+                cigarette.speechTextByLanguage.forEach { (language, speech) ->
+                    repaired += putLanguageValue(item, "speechTextByLanguage", language, speech)
+                }
+            }
         }
 
         val terminalRepairs = mapOf(
