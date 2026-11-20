@@ -35,7 +35,9 @@ class AacSpeechCoordinator(
             languageCode = normalizedLanguage,
             voiceId = voiceId,
             speed = speed
-        ) ?: return null
+        ) ?: return speechCache.getLegacyGeneratedSpeechFile(
+            trimmed, normalizedLanguage, voiceId, speed
+        )
 
         val savedFile = speechCache.saveGeneratedSpeech(
             text = trimmed,

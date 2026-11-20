@@ -102,7 +102,7 @@ class OpenAiAacSpeechApiClient(context: Context) : AacSpeechApiClient {
             "de" -> "Speak clearly in German."
             "hr" -> "Speak clearly in Croatian."
             "sr" -> "Speak clearly in Serbian."
-            else -> "Speak clearly in Slovenian."
+            else -> AacSpeechPronunciationPolicy.SLOVENIAN_INSTRUCTIONS
         }
     }
 

@@ -67,6 +67,17 @@ class AacSpeechCache(private val context: Context) {
         }
     }
 
+    // Keep existing recordings available when regeneration cannot reach the service.
+    fun getLegacyGeneratedSpeechFile(
+        text: String,
+        languageCode: String,
+        voiceId: String,
+        speed: Double
+    ): File? {
+        val file = getGeneratedSpeechCacheFile(text, languageCode, voiceId, speed, legacy = true)
+        return file?.takeIf { it.isFile && it.length() > 0L }
+    }
+
     private fun getCacheFile(itemId: String, extension: String): File? {
         val normalizedItemId = itemId.trim()
         if (normalizedItemId.isBlank()) {
@@ -81,7 +92,8 @@ class AacSpeechCache(private val context: Context) {
         text: String,
         languageCode: String,
         voiceId: String,
-        speed: Double
+        speed: Double,
+        legacy: Boolean = false
     ): File? {
         val normalizedText = text.trim()
         if (normalizedText.isBlank()) return null
@@ -90,7 +102,10 @@ class AacSpeechCache(private val context: Context) {
         val normalizedVoice = normalizeVoiceId(voiceId)
         val normalizedSpeed = normalizeSpeed(speed)
         val normalizedHashText = normalizeTextForHash(normalizedText)
-        val hash = sha256("$normalizedLanguage|$normalizedVoice|$normalizedSpeed|$normalizedHashText")
+        val legacyIdentity = "$normalizedLanguage|$normalizedVoice|$normalizedSpeed|$normalizedHashText"
+        val cacheIdentity = if (legacy) legacyIdentity else
+            AacSpeechPronunciationPolicy.cacheIdentity(normalizedLanguage, legacyIdentity)
+        val hash = sha256(cacheIdentity)
         val audioDir = File(
             context.filesDir,
             "NovaRehab2/aac/audio/generated/$normalizedLanguage/$normalizedVoice"
