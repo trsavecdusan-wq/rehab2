@@ -14,7 +14,7 @@
         android:paddingBottom="24dp">
 
     <Button android:id="@+id/btnLiveTestStop" android:layout_width="match_parent"
-        android:layout_height="56dp" android:gravity="start|center_vertical"
+        android:layout_height="wrap_content" android:minHeight="64dp" android:gravity="start|center_vertical"
         android:text="USTAVI PREIZKUS / ЗУПИНИТИ" android:textSize="18sp"
         android:backgroundTint="#B53A24" android:textColor="#FFFFFF" android:visibility="gone" />
     <LinearLayout

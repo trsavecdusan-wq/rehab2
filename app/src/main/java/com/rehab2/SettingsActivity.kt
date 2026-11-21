@@ -2501,11 +2501,11 @@ class SettingsActivity : AppCompatActivity() {
     private fun refreshKeywordListenerSection() {
         val settings = AacKeywordListenerSettings.load(this)
         val settingsPath = AacKeywordListenerSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
-        txtKeywordListenerStatus.text = "Poslu\u0161alec klju\u010dnih besed: IZKLOPLJENO"
+        txtKeywordListenerStatus.text = "Stari poslušalec: ločen od živega spremljanja"
         editKeywordListenerInfo.setText(
             buildString {
-                appendLine("Funkcija je pripravljena za kasnej\u0161e testiranje.")
-                appendLine("Trenutno ne poslu\u0161a, ne snema in ne uporablja interneta.")
+                appendLine("Novi mikrofon in kamera: PREIZKUS, NOVA MREŽA IN GOVOR → MIKROFON, KAMERA IN INDIVIDUALNI PROFIL.")
+                appendLine("Stanje novega spremljanja: ${com.rehab2.aac.LiveCapture.status}")
                 appendLine("Stanje: ${if (settings.enabled) "TESTNO" else "IZKLOPLJENO"}")
                 appendLine("Na\u010din: ${settings.mode}")
                 appendLine("Mikrofon: IZKLOPLJEN")
@@ -2544,7 +2544,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun refreshAiObservationSection() {
         txtAiObservationStatus.text = "AI FOUNDATION — ODPRI ADMIN PREGLED (PIN)"
         editAiObservationInfo.setText("Lokalno beleženje AAC dogodkov je privzeto izklopljeno. Nastavitev in predlogi so v admin pregledu. " +
-            "Odobritev ne spreminja pacientkinega AAC. Brez mikrofona, kamere in omrežja.")
+            "Odobritev ne spreminja pacientkinega AAC. Ta admin analiza je lokalna. Mikrofon in kamera se upravljata ločeno v PREIZKUS, NOVA MREŽA IN GOVOR.")
     }
 
     private fun saveSpeechApiSettings(showSavedToast: Boolean): Boolean {

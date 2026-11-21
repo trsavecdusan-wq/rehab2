@@ -15,7 +15,8 @@ object AacObservation {
     @Volatile var enabled = false
         private set
     private val sessionId = UUID.randomUUID().toString()
-    fun directory(context: Context) = File(context.noBackupFilesDir, "aac_ai_v1")
+    fun directory(context: Context) = File(File(context.noBackupFilesDir, "aac_ai_v1"),
+        com.rehab2.aac.AacPatientImages.store(context).currentPatientId())
     fun initialize(context: Context) {
         val app = context.applicationContext
         runCatching { worker.execute { runCatching {
@@ -30,13 +31,15 @@ object AacObservation {
     }
     fun record(context: Context, screen: String, type: AacEventType, itemId: String? = null,
                pageId: String, gridSize: Int, languageCode: String, sentenceIds: List<String> = emptyList()) {
+        com.rehab2.aac.LiveTestSession.record("communicator_event", "$screen $type item=$itemId page=$pageId language=$languageCode")
         if (!enabled) return
         runCatching {
             val app = context.applicationContext
+            val patientDirectory = directory(app)
             val event = AacInteractionEvent(sessionId = sessionId, sourceScreen = screen, itemId = itemId,
                 pageId = pageId, gridSize = gridSize, languageCode = languageCode,
                 isFixedRow = itemId in AacFixedTopRow.rowIds(gridSize), eventType = type, itemIdsInSentence = sentenceIds.toList())
-            worker.execute { runCatching { if (enabled) AacEventRepository(directory(app)).append(event) } }
+            worker.execute { runCatching { if (enabled) AacEventRepository(patientDirectory).append(event) } }
         }
     }
 }

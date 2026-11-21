@@ -338,6 +338,7 @@ class AacAudioPlayer(
                 if (mediaPlayer !== prepared || serial != speechRequestSerial || released) return@setOnPreparedListener
                 try {
                     applySpeechLoudness(prepared)
+                    com.rehab2.aac.LiveTestSession.record("speech_will_start")
                     prepared.start()
                     notifySpeechStarted()
                 } catch (_: Exception) {
@@ -417,6 +418,7 @@ class AacAudioPlayer(
             putString(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC.toString())
         }
         val utteranceId = "aac_${speechRequestSerial}"
+        com.rehab2.aac.LiveTestSession.record("speech_will_start")
         val result = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
         when (result) {
             TextToSpeech.SUCCESS -> {

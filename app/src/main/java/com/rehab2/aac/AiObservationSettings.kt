@@ -52,11 +52,11 @@ object AiObservationSettings {
             }
             val safeSettings = sanitize(settings)
             val json = JSONObject()
-                .put("allowMicrophoneAnalysis", false)
-                .put("allowCameraAnalysis", false)
-                .put("allowMimicLearning", false)
-                .put("allowDailyLearning", false)
-                .put("allowCompanionSuggestions", false)
+                .put("allowMicrophoneAnalysis", safeSettings.allowMicrophoneAnalysis)
+                .put("allowCameraAnalysis", safeSettings.allowCameraAnalysis)
+                .put("allowMimicLearning", safeSettings.allowMimicLearning)
+                .put("allowDailyLearning", safeSettings.allowDailyLearning)
+                .put("allowCompanionSuggestions", safeSettings.allowCompanionSuggestions)
                 .put("requireYesNoConfirmation", safeSettings.requireYesNoConfirmation)
                 .put("lastUpdatedAt", safeSettings.lastUpdatedAt.coerceAtLeast(0L))
             file.writeText(json.toString(2), Charsets.UTF_8)
@@ -73,11 +73,6 @@ object AiObservationSettings {
 
     private fun sanitize(settings: Settings): Settings {
         return settings.copy(
-            allowMicrophoneAnalysis = false,
-            allowCameraAnalysis = false,
-            allowMimicLearning = false,
-            allowDailyLearning = false,
-            allowCompanionSuggestions = false,
             requireYesNoConfirmation = true,
             lastUpdatedAt = settings.lastUpdatedAt.coerceAtLeast(0L)
         )

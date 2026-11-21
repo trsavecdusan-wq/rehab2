@@ -46,7 +46,7 @@ class MediaPlayer {
  fun setOnErrorListener(action:(MediaPlayer,Int,Int)->Boolean){error=action}
  fun prepareAsync(){}
  fun setOnPreparedListener(action:(MediaPlayer)->Unit){prepared=action}
- fun start(){starts++}
+ fun start(){check(com.rehab2.aac.LiveTestSession.last=="speech_will_start");starts++}
  fun release(){releases++}
 }
 class TextToSpeech {
@@ -61,7 +61,7 @@ class TextToSpeech {
  var stops=0;var shutdowns=0
  fun setLanguage(locale:Locale):Int {voice=Voice("fake",locale);return languages[locale.language]?:LANG_NOT_SUPPORTED}
  fun setOnUtteranceProgressListener(value:UtteranceProgressListener?){listener=value}
- fun speak(text:String,mode:Int,params:Bundle,id:String):Int {spoken.add(Spoken(text,voice!!.locale.language,id));return SUCCESS}
+ fun speak(text:String,mode:Int,params:Bundle,id:String):Int {check(com.rehab2.aac.LiveTestSession.last=="speech_will_start");spoken.add(Spoken(text,voice!!.locale.language,id));return SUCCESS}
  fun stop(){stops++}
  fun shutdown(){shutdowns++}
 }
@@ -152,7 +152,8 @@ assert any('compiler-embeddable' in p.name for p in jars),'Kotlin compiler missi
 stdlib=next(p for p in jars if p.name.startswith('kotlin-stdlib-'))
 out=Path(tempfile.mkdtemp(prefix='novarehab-tts-lifecycle-'))
 source=out/'Lifecycle.kt';source.write_text(code,encoding='utf-8')
+capture=out/'Capture.kt';capture.write_text('package com.rehab2.aac\nobject LiveTestSession {var last="";fun record(kind:String){last=kind}}',encoding='utf-8')
 policy=R/'app/src/main/java/com/rehab2/aac/AacSpeechRequestPolicy.java'
 subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',str(out),str(policy)],check=True)
-subprocess.run(['java','-cp',os.pathsep.join(map(str,jars)),'org.jetbrains.kotlin.cli.jvm.K2JVMCompiler','-nowarn','-no-stdlib','-no-reflect','-classpath',os.pathsep.join([str(out),str(stdlib)]),'-d',str(out),str(source)],check=True)
+subprocess.run(['java','-cp',os.pathsep.join(map(str,jars)),'org.jetbrains.kotlin.cli.jvm.K2JVMCompiler','-nowarn','-no-stdlib','-no-reflect','-classpath',os.pathsep.join([str(out),str(stdlib)]),'-d',str(out),str(source),str(capture)],check=True)
 subprocess.run(['java','-cp',os.pathsep.join([str(out),str(stdlib)]),'LifecycleKt'],check=True)

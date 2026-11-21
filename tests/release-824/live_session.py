@@ -13,6 +13,7 @@ source('View.kt','package android.view\nopen class View {companion object {const
 source('Button.kt','package android.widget\nclass Button:android.view.View(){var text=""}')
 source('R.kt','package com.rehab2\nobject R {object id {const val btnLiveTestStop=1}}')
 source('Patient.kt','package com.rehab2.aac\nobject AacPatientImages {var patient="one";fun store(c:android.content.Context)=this;fun currentPatientId()=patient}')
+source('Capture.kt','package com.rehab2.aac\nobject LiveCapture {fun stop(){};fun manualStop(){};fun speechEvent(kind:String){};fun indicator()="USTAVI"}')
 source('Test.kt','''import com.rehab2.aac.*
 import android.os.SystemClock
 fun main(){

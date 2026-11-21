@@ -42,7 +42,8 @@ class LiveTestActivity : AppCompatActivity() {
         fun button(value: String, action: () -> Unit) = Button(this).apply {
             text = value; textSize = 18f; minHeight = 64; setOnClickListener { action() }; root.addView(this)
         }
-        text("PREIZKUS NA TABLICI • 1.2.826")
+        text("PREIZKUS NA TABLICI • 1.2.828")
+        button("MIKROFON, KAMERA IN INDIVIDUALNI PROFIL") { startActivity(Intent(this, LiveCaptureActivity::class.java)) }
         text("Nova prva stran 5 × 5 je prikaz nad shranjeno postavitvijo. Osebne slike in podikone ostanejo povezane. Prejšnjo postavitev lahko ponovno prikažete.")
         button("UPORABI NOVO MREŽO 5 × 5") {
             if (AacHomeLayout.backup(this)) { AacHomeLayout.setEnabled(this, true); toast("Nova mreža je vključena.") }
@@ -83,7 +84,7 @@ class LiveTestActivity : AppCompatActivity() {
         }
         button("USTAVI PREIZKUS / ЗУПИНИТИ") { LiveTestSession.stop() }
         status = text("")
-        text("AI poslušanje in opazovanje kamere NISTA NA VOLJO. Manjkajo preverjen HTTPS-backend za zvok/video, avtentikacija naprave, model analize in pogodba za soglasje, hrambo ter izbris. Govorni API ni ta backend. Mikrofon in kamera zato ostajata izključena; aplikacija ne sklepa o čustvih ali strinjanju.")
+        text("Mikrofon, kamera, povezava AI in nastavitve ob zagonu so na ločenem zaslonu zgoraj. Brez nastavljenega backenda je možen le lokalni zajem; AI analiza ni na voljo.")
         val note = EditText(this).apply { hint = "Kratek zapis skrbnika (brez osebnih podatkov)"; root.addView(this) }
         button("DODAJ OPAŽANJE • NEPOTRJENO") {
             if (LiveTestSession.active) { LiveTestSession.record("note_observed", note.text.toString()); note.text.clear() }

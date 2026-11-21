@@ -71,9 +71,9 @@ object AacKeywordListenerSettings {
             val json = JSONObject()
                 .put("enabled", safeSettings.enabled)
                 .put("mode", safeSettings.mode)
-                .put("allowMicrophone", false)
-                .put("allowBackgroundListening", false)
-                .put("allowNetwork", false)
+                .put("allowMicrophone", safeSettings.allowMicrophone)
+                .put("allowBackgroundListening", safeSettings.allowBackgroundListening)
+                .put("allowNetwork", safeSettings.allowNetwork)
                 .put("wakeWords", JSONArray(safeSettings.wakeWords))
                 .put("keywords", JSONArray(safeSettings.keywords))
                 .put("maxSuggestions", safeSettings.maxSuggestions)
@@ -124,10 +124,7 @@ object AacKeywordListenerSettings {
         return settings.copy(
             enabled = enabled,
             mode = normalizedMode,
-            allowMicrophone = false,
-            allowBackgroundListening = false,
-            allowNetwork = false,
-            wakeWords = emptyList(),
+            wakeWords = settings.wakeWords.map { it.trim() }.filter { it.isNotBlank() }.distinct(),
             keywords = safeKeywords,
             maxSuggestions = settings.maxSuggestions.coerceIn(1, DEFAULT_MAX_SUGGESTIONS),
             lastUpdatedAt = settings.lastUpdatedAt.coerceAtLeast(0L)

@@ -41,8 +41,8 @@ assert 'events.size >= 2000' in session and '24 * 60 * 60 * 1000L' in session
 assert 'note_observed' in (J/'LiveTestActivity.kt').read_text(encoding='utf-8')
 assert not any(s in session for s in ['MediaRecorder','CameraManager','OkHttpClient','writeText','FileOutputStream'])
 manifest_xml=(R/'app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
-assert 'android.permission.CAMERA' not in manifest_xml and 'android.permission.RECORD_AUDIO' not in manifest_xml
-gradle=(R/'app/build.gradle').read_text();assert 'versionCode 11014' in gradle and 'versionName "1.2.826"' in gradle
+assert 'android.permission.CAMERA' in manifest_xml and 'android.permission.RECORD_AUDIO' in manifest_xml
+gradle=(R/'app/build.gradle').read_text();assert 'versionCode 11016' in gradle and 'versionName "1.2.828"' in gradle
 out=R/'tests/release-824';sheet.save(out/'home-grid.png')
 (out/'home-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8')
 print('PASS: 25 distinct images, exact bilingual grid, runtime wiring, stale response guard, async playback, bounded local observation and release version')
