@@ -21,53 +21,9 @@ object AacCoreV2HomeRepair {
     private const val KEY_AAC_HOME_LAYOUT_VERSION = "aac_home_layout_version"
     private const val CORE_V2_HOME_LAYOUT_VERSION = "core_v2"
 
-    private val lockedIds = AacFixedTopRow.ids + listOf(
-        "wc",
-        "pain",
-        "thirsty",
-        "hungry",
-        "tired",
-        "i_want",
-        "need",
-        "people",
-        "miss_someone",
-        "call",
-        "feeling",
-        "place_group",
-        "care",
-        "health",
-        "dont_want",
-        "please",
-        "wait",
-        "repeat",
-        "pogovor",
-        "activity_group"
-    )
-
-    private val fixedPositions = AacFixedTopRow.positions
-
-    private val mainPositions = mapOf(
-        "wc" to 6,
-        "pain" to 7,
-        "thirsty" to 8,
-        "hungry" to 9,
-        "tired" to 10,
-        "i_want" to 11,
-        "need" to 12,
-        "people" to 13,
-        "miss_someone" to 14,
-        "call" to 15,
-        "feeling" to 16,
-        "place_group" to 17,
-        "care" to 18,
-        "health" to 19,
-        "dont_want" to 20,
-        "please" to 21,
-        "wait" to 22,
-        "repeat" to 23,
-        "pogovor" to 24,
-        "activity_group" to 25
-    )
+    private val lockedIds = AacHomeLayout.ids
+    private val fixedPositions = AacHomeLayout.ids.take(5).mapIndexed { i, id -> id to i + 1 }.toMap()
+    private val mainPositions = AacHomeLayout.ids.drop(5).mapIndexed { i, id -> id to i + 6 }.toMap()
 
     private val homePageIds = setOf("page_1", "page_2", "page_3", "page_4")
 

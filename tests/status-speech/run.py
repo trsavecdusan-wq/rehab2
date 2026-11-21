@@ -43,7 +43,15 @@ class Coordinator {
  fun getOrGenerateSpeechFile(text:String,languageCode:String,voiceId:String):File?=if(available) File("fake.wav") else null
 }
 object AacPatientVoiceSettings {fun voice(context:Any, guide:Boolean)="test"}
+object AacSpeechApiConfig { fun read(c:Any)=this; fun normalizedSpeed()=0.88 }
+class Cache {
+ var cached:File?=null;var legacy:File?=null
+ fun getGeneratedSpeechFile(t:String,l:String,v:String,s:Double)=cached
+ fun getLegacyGeneratedSpeechFile(t:String,l:String,v:String,s:Double)=legacy
+}
 class Audio {
+ val speechCache=Cache();var isTtsReady=false
+ fun configureTtsLanguage(s:String)=isTtsReady
  val context=Any()
  val TAG="test";val mainHandler=Handler();var speechRequestSerial=1
  val speechCoordinator=Coordinator();var plays=0;var fallbacks=0
@@ -88,6 +96,9 @@ fun main(){
   Clock.reset();Clock.delay=2500;val stale=Status();stale.speakStatusOrientation();Clock.post(100){stale.statusOrientationRequestSerial++};Clock.run();verify(stale.aacAudioPlayer.spoken.isEmpty())
  }
  Clock.reset();StatusOrientationSettings.speakWeather=false;val date=Status();date.speakStatusOrientation();Clock.run();verify(date.aacAudioPlayer.spoken==listOf("date"));StatusOrientationSettings.speakWeather=true
+ Clock.reset();Clock.delay=2500;val responsive=Audio();responsive.isTtsReady=true;responsive.start(true);Clock.run();verify(responsive.plays==0&&responsive.fallbacks==1)
+ Clock.reset();Clock.delay=31000;val hit=Audio();hit.speechCache.cached=File("cache.wav");hit.start(true);verify(hit.plays==1&&Clock.queue.isEmpty())
+ Clock.reset();Clock.delay=31000;val legacy=Audio();legacy.speechCache.legacy=File("old.wav");legacy.start(true);Clock.run();verify(legacy.plays==1&&legacy.fallbacks==0)
  println("PASS: $checks deterministic callback checks using actual source bodies; listener/invalidation source checks passed. Android playback NOT tested.")
 }
 '''

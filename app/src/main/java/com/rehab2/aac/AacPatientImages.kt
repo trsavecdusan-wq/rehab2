@@ -28,6 +28,15 @@ object AacPatientImages {
         val inheritContactPhoto = !item.userEdited && !item.locked && item.iconSource == IconSource.SYSTEM &&
             item.imagePath == AacAuditedIcons.defaultPaths[item.id]
         personalFile(context, item.id, includeAliases = inheritContactPhoto)?.let { return it }
+        if (AacHomeLayout.enabled(context) && item.id in AacHomeLayout.ids && !item.userEdited && !item.locked &&
+            item.iconSource == IconSource.SYSTEM && (item.imagePath == AacAuditedIcons.defaultPaths[item.id] ||
+                item.imagePath == "system/home824_${item.id}.png" || AacAuditedIcons.variant(item, false) != null)) {
+            AacHomeLayout.systemImage(item.id)?.let { path ->
+                val selected = if (path.startsWith("system/home824_")) path else
+                    AacAuditedIcons.variant(item, AacPatientVoiceSettings.male(context)) ?: path
+                AacStoragePaths.resolveIconFile(context, selected, IconSource.SYSTEM)?.takeIf { it.isFile }?.let { return it }
+            }
+        }
         AacAuditedIcons.variant(item, AacPatientVoiceSettings.male(context))?.let { path ->
             AacStoragePaths.resolveIconFile(context, path, IconSource.SYSTEM)
                 ?.takeIf { it.isFile }?.let { return it }

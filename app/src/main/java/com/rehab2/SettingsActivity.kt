@@ -516,6 +516,9 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+        findViewById<Button>(R.id.btnLiveTestSettings).setOnClickListener {
+            showAdminPinDialog { startActivity(Intent(this, LiveTestActivity::class.java)) }
+        }
         prefs = getSharedPreferences(PREFS_FILE, MODE_PRIVATE)
 
         btnPowerOff = findViewById(R.id.btnPowerModeOff)

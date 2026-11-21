@@ -1,0 +1,202 @@
+[
+  {
+    "position": 1,
+    "id": "yes",
+    "sl": "DA",
+    "uk": "ТАК",
+    "image": "system/yes.png",
+    "sha256": "287fe28f385cb1b2c339b47d7498919e646c42884eedb89326a26513f931c6fa"
+  },
+  {
+    "position": 2,
+    "id": "no",
+    "sl": "NE",
+    "uk": "НІ",
+    "image": "system/no.png",
+    "sha256": "82e5714f4f6ada3711ecf81d5fbe34f7873132d9a27e65437da15600c82519bd"
+  },
+  {
+    "position": 3,
+    "id": "thank_you",
+    "sl": "HVALA",
+    "uk": "ДЯКУЮ",
+    "image": "system/full816_pair_thanks_female_e64cfe12.png",
+    "sha256": "e64cfe123f9c67a962a640cd4074bddc5cb6e4e8fdde663a7e6d1ca3ee0c416c"
+  },
+  {
+    "position": 4,
+    "id": "understand",
+    "sl": "RAZUMEM",
+    "uk": "РОЗУМІЮ",
+    "image": "system/home824_understand.png",
+    "sha256": "98105382945aa207019afbefdbb823d2b12c798d0369db10d458c6f38a942c7c"
+  },
+  {
+    "position": 5,
+    "id": "dont_understand",
+    "sl": "NE RAZUMEM",
+    "uk": "НЕ РОЗУМІЮ",
+    "image": "system/daily_dont_understand_798.png",
+    "sha256": "a54dfeb9fb181243f5e9928cdead07c397539dd0aaa11e602b8e19e4247721bd"
+  },
+  {
+    "position": 6,
+    "id": "wc",
+    "sl": "TOALETA",
+    "uk": "ТУАЛЕТ",
+    "image": "system/toilet_general.png",
+    "sha256": "cea817c3c8c9a4e1fb9c142157dd0035381c0b7a87773f45906b6614a4627d7d"
+  },
+  {
+    "position": 7,
+    "id": "pain",
+    "sl": "BOLI ME",
+    "uk": "БОЛИТЬ",
+    "image": "system/review_pain_general_e8a89094.png",
+    "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+  },
+  {
+    "position": 8,
+    "id": "cold",
+    "sl": "MRZLO",
+    "uk": "ХОЛОДНО",
+    "image": "system/full816_pair_cold_female_174136df.png",
+    "sha256": "174136dfe4e3ef58d1b1f5949e236cde38da41a227ab81de8cea25eee2bd4474"
+  },
+  {
+    "position": 9,
+    "id": "bad",
+    "sl": "SLABO",
+    "uk": "ПОГАНО",
+    "image": "system/full816_pair_uncomfortable_female_b6c402a0.png",
+    "sha256": "b6c402a0d66527ef820058e51699b7bce7852966d7c782944a02e2d000e82c11"
+  },
+  {
+    "position": 10,
+    "id": "tired",
+    "sl": "UTRUJENA",
+    "uk": "ВТОМЛЕНА",
+    "image": "system/full816_pair_tired_female_a1ba376b.png",
+    "sha256": "a1ba376b6fe13274f89f4818d95ec242b43fa44aa5a18bbe5b438446b0b2abe3"
+  },
+  {
+    "position": 11,
+    "id": "thirsty",
+    "sl": "PIJAČA",
+    "uk": "НАПОЇ",
+    "image": "system/review_drink_category_7141f96c.png",
+    "sha256": "7141f96c1324746fc7b6e92deb03016f56abfe38197e42728efc6cb48e5d510f"
+  },
+  {
+    "position": 12,
+    "id": "hungry",
+    "sl": "HRANA",
+    "uk": "ЇЖА",
+    "image": "system/home824_hungry.png",
+    "sha256": "a842bb239a908f61172b418afd46c20c4461d7e9daf3f493915e05cb3177bccd"
+  },
+  {
+    "position": 13,
+    "id": "hot",
+    "sl": "VROČE",
+    "uk": "СПЕКОТНО",
+    "image": "system/full816_pair_hot_female_d25c712d.png",
+    "sha256": "d25c712d0b9cdf6e00ceeabe7fc85e6877f59271a03272f7f71a934c287c2d15"
+  },
+  {
+    "position": 14,
+    "id": "good",
+    "sl": "DOBRO",
+    "uk": "ДОБРЕ",
+    "image": "system/full816_pair_happy_female_5af4f42a.png",
+    "sha256": "5af4f42aad8a9d38609842287a1f85d12a323464c94597e7044675e0db3fa825"
+  },
+  {
+    "position": 15,
+    "id": "sleepy",
+    "sl": "SPATI",
+    "uk": "СПАТИ",
+    "image": "system/full816_pair_sleepy_female_c3e9dc1c.png",
+    "sha256": "c3e9dc1c1d23227db673b69bea122564513706393d23565d0b3bf63e07fcca20"
+  },
+  {
+    "position": 16,
+    "id": "family_group",
+    "sl": "DRUŽINA",
+    "uk": "РОДИНА",
+    "image": "system/daily_family_group_798.png",
+    "sha256": "8d507b0cee0285bea9fd3f6978a0748f030b76e97013214dddb8b7946ed9cac4"
+  },
+  {
+    "position": 17,
+    "id": "friends_group",
+    "sl": "PRIJATELJI",
+    "uk": "ДРУЗІ",
+    "image": "system/daily_friends_group_798.png",
+    "sha256": "b339aaccdff3129242269d6883a30df9e63095964fed19a04ac3e6aae5eede81"
+  },
+  {
+    "position": 18,
+    "id": "wait",
+    "sl": "POČAKAJ",
+    "uk": "ЗАЧЕКАЙ",
+    "image": "system/wait.png",
+    "sha256": "cf2f6d11e3e0dae9f482559c1348d3d0ed5621a06ac616db74ecc7e2985ebf0c"
+  },
+  {
+    "position": 19,
+    "id": "slower",
+    "sl": "POČASNEJE",
+    "uk": "ПОВІЛЬНІШЕ",
+    "image": "system/full816_pair_slow_female_0586a7eb.png",
+    "sha256": "0586a7eb5712b41c2ee5f47abf647467f67d9f4c3a6799cbc1b8ab7a6b4664f5"
+  },
+  {
+    "position": 20,
+    "id": "faster",
+    "sl": "HITREJE",
+    "uk": "ШВИДШЕ",
+    "image": "system/home824_faster.png",
+    "sha256": "060265c915ad23318e48119580758000127bef4cb537f920b16a48c3b14f7718"
+  },
+  {
+    "position": 21,
+    "id": "need",
+    "sl": "RABIM",
+    "uk": "ПОТРІБНО",
+    "image": "system/home824_need.png",
+    "sha256": "ac4c3ebed5961424a96259f962e6bfab43e9ae5c43aa25f446f1421fccd90908"
+  },
+  {
+    "position": 22,
+    "id": "i_want",
+    "sl": "ŽELIM",
+    "uk": "ХОЧУ",
+    "image": "system/daily_i_want_798.png",
+    "sha256": "cedbfff4d65829af7d7def2726c771e5693052f9140dfa5eb49079d46a4b1fee"
+  },
+  {
+    "position": 23,
+    "id": "correct_message",
+    "sl": "POPRAVI",
+    "uk": "ВИПРАВ",
+    "image": "system/home824_correct_message.png",
+    "sha256": "29f93fc77dea7a5cbccc11c1a9e49c023db56dce55f7ada90f58753d7dfc3146"
+  },
+  {
+    "position": 24,
+    "id": "lets_go",
+    "sl": "GREMO",
+    "uk": "ХОДІМО",
+    "image": "system/home824_lets_go.png",
+    "sha256": "175b0d68f8d28cee06e2477fb5333425de95d7a5a8f71c365d5c84a85ca5cbaf"
+  },
+  {
+    "position": 25,
+    "id": "angry",
+    "sl": "JEZNA",
+    "uk": "СЕРДИТА",
+    "image": "system/review_angry_623b3507.png",
+    "sha256": "623b35070edc2020b2ff987eec32ab26ec6e5f364e5b6da81ea67eca55183153"
+  }
+]

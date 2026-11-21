@@ -1,8 +1,9 @@
-﻿package com.rehab2
+package com.rehab2
 
 import com.rehab2.aac.ai.AacObservation
 import com.rehab2.aac.ai.AacEventType
 
+import com.rehab2.aac.AacHomeLayout
 import com.rehab2.aac.AacFixedTopRow
 
 import android.Manifest
@@ -635,7 +636,7 @@ class MainActivity : AppCompatActivity() {
                 "${teaId}_honey_lemon" to 17
             )
         }
-        private val CORE_V2_FIXED_TOP_ROW_POSITIONS = AacFixedTopRow.positions
+        private val CORE_V2_FIXED_TOP_ROW_POSITIONS get() = AacFixedTopRow.positions
         private val CORE_V2_HOME_PAGE_POSITIONS = mapOf(
             "wc" to 6,
             "pain" to 7,
@@ -865,6 +866,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AacHomeLayout.initialize(this)
         com.rehab2.aac.AacPatientVoiceSettings.bind(this)
         AacObservation.initialize(applicationContext)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -1002,6 +1004,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        AacHomeLayout.initialize(this)
+        com.rehab2.aac.LiveTestSession.attach(this)
         setVolumeControlStream(AudioManager.STREAM_MUSIC)
         syncVolumeSlider()
         refreshRadioTiles()
@@ -1016,6 +1020,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        cancelMainAacVoiceAssistantQuestion()
+        cancelMainAacGuidedAutoComplete()
+        mainAacQuestionRevealRunnable?.let(mainHandler::removeCallbacks)
+        mainAacQuestionRevealRunnable = null
+        aacAudioPlayer.interruptCurrentSpeechForNewInput()
+        mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
+        mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
+        mainAacTapId += 1
         statusOrientationRequestSerial += 1
         radioPlayerController.stop()
         activeStationKey = null
@@ -1287,7 +1299,7 @@ class MainActivity : AppCompatActivity() {
             binding.view.visibility = View.VISIBLE
             item?.let {
                 binding.view.background = mainAacTileBackgroundFor(it)
-                binding.view.isEnabled = !isMainAacInputLocked
+                binding.view.isEnabled = true
                 bindMainAacItemLabel(binding, it, languageCode, topSuggestionItemId)
                 bindMainAacIcon(binding, it)
                 binding.view.setOnClickListener(null)
@@ -1320,6 +1332,7 @@ class MainActivity : AppCompatActivity() {
                 visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
             )
         }
+        com.rehab2.aac.LiveTestSession.record("page_shown")
         observeMainPageOpened()
     }
 
@@ -1409,7 +1422,7 @@ class MainActivity : AppCompatActivity() {
             binding.view.visibility = View.VISIBLE
             item?.let {
                 binding.view.background = mainAacTileBackgroundFor(it)
-                binding.view.isEnabled = !isMainAacInputLocked
+                binding.view.isEnabled = true
                 bindMainAacItemLabel(binding, it, languageCode, topSuggestionItemId)
                 bindMainAacIcon(binding, it)
                 binding.view.setOnClickListener(null)
@@ -1453,6 +1466,7 @@ class MainActivity : AppCompatActivity() {
                 visibleTileCount = mainAacTileBindings.count { it.view.visibility == View.VISIBLE }
             )
         }
+        com.rehab2.aac.LiveTestSession.record("page_shown")
         observeMainPageOpened()
     }
 
@@ -1465,6 +1479,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun unlockMainAacInput() {
+        com.rehab2.aac.LiveTestSession.record("input_ready")
         recordLastAudioEvent("AAC input unlocked")
         mainHandler.removeCallbacks(mainAacInputUnlockRunnable)
         isMainAacInputLocked = false
@@ -1489,7 +1504,7 @@ class MainActivity : AppCompatActivity() {
         if (!::mainAacTileBindings.isInitialized) return
         mainAacTileBindings.forEach { binding ->
             if (binding.item != null) {
-                binding.view.isEnabled = !isMainAacInputLocked
+                binding.view.isEnabled = true
                 val isSelected = selectedMainAacItemId != null && binding.item?.id == selectedMainAacItemId
                 binding.view.alpha = when {
                     isSelected -> 1f
@@ -1539,10 +1554,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleMainAacTileTouch(event: MotionEvent, item: AacItem): Boolean {
-        if (isMainAacInputLocked) {
-            recordLastAudioEvent("AAC click blocked locked itemId=${item.id}")
-            return true
-        }
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 mainAacTouchStartX = event.rawX
@@ -1550,6 +1561,7 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             MotionEvent.ACTION_UP -> {
+                val previousSelectedItemId = selectedMainAacItemId
                 val deltaX = event.rawX - mainAacTouchStartX
                 val deltaY = event.rawY - mainAacTouchStartY
                 val absDeltaX = if (deltaX < 0) -deltaX else deltaX
@@ -1564,11 +1576,23 @@ class MainActivity : AppCompatActivity() {
                     }
                     return true
                 }
+                com.rehab2.aac.LiveTestSession.record("tap", item.id)
+                cancelMainAacVoiceAssistantQuestion()
+                cancelMainAacGuidedAutoComplete()
+                mainAacQuestionRevealRunnable?.let(mainHandler::removeCallbacks)
+                mainAacQuestionRevealRunnable = null
+                mainHandler.removeCallbacks(mainAacAutoSentenceSpeakRunnable)
+                mainHandler.removeCallbacks(mainAacSentenceClearRunnable)
+                aacAudioPlayer.interruptCurrentSpeechForNewInput()
+                shouldResetMainAacRootAfterSpeech = false
+                isMainAacTerminalSelectionAccepted = false
+                pendingMainAacHelpShortcuts = false
+                unlockMainAacInput()
                 statusOrientationRequestSerial += 1
                 mainAacTapId += 1
                 mainAacSpeakCallNumberForTap = 0
-                selectedMainAacItemIdBeforeTap = selectedMainAacItemId
-                hadMainAacSelectionBeforeTap = selectedMainAacItemId != null ||
+                selectedMainAacItemIdBeforeTap = previousSelectedItemId
+                hadMainAacSelectionBeforeTap = previousSelectedItemId != null ||
                     currentMainAacConversationItems.isNotEmpty()
                 selectedMainAacItemId = item.id
                 val languageCode = getActiveSpeechLanguage()
@@ -1620,6 +1644,10 @@ class MainActivity : AppCompatActivity() {
         fixed.forEachIndexed { index, item -> slots[index] = item }
         val fixedIds = fixed.map { it.id }.toSet()
         val content = visibleItems.filter { it.id !in fixedIds }.map { it.copy(fixedTopRowPosition = null) }
+        if (AacHomeLayout.enabled(this) && mainAacHistory.isEmpty()) {
+            content.forEachIndexed { index, item -> if (index + gridSize < slots.size) slots[index + gridSize] = item }
+            return slots
+        }
         if (applyDefaultVisualSlots(slots, content, gridSize)) return slots
         val rows = if (mainAacHistory.isEmpty()) 1 until gridSize else gridSize - 1 downTo 1
         val contentSlots = rows.flatMap { row -> (0 until gridSize).map { column -> row * gridSize + column } }
@@ -2795,6 +2823,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun translateMainAacItemForAction(item: AacItem, languageCode: String) {
         val normalizedLanguage = languageCode.trim().lowercase(Locale.ROOT)
+        val translationTap = mainAacTapId
         val translationKey = "${item.id}:$normalizedLanguage"
         synchronized(pendingMainAacTranslationKeys) {
             if (!pendingMainAacTranslationKeys.add(translationKey)) {
@@ -2811,6 +2840,7 @@ class MainActivity : AppCompatActivity() {
                 synchronized(pendingMainAacTranslationKeys) {
                     pendingMainAacTranslationKeys.remove(translationKey)
                 }
+                if (translationTap != mainAacTapId || isFinishing || isDestroyed) return@post
                 if (translation == null) {
                     val resolvedSpeech = AacLocalizedTextResolver.resolveSpeakTextResult(item, normalizedLanguage)
                     handleMainAacResolvedSpeech(
@@ -2944,7 +2974,7 @@ class MainActivity : AppCompatActivity() {
         }
         val extraLoadedItems = loadedItems.filter { it.id !in fallbackIds }
             .map { it.copy(fixedTopRowPosition = AacFixedTopRow.positions[it.id]) }
-        return mergedFallbackItems + extraLoadedItems
+        return AacHomeLayout.catalog(this, mergedFallbackItems + extraLoadedItems)
     }
 
     private fun mergeMainAacFallbackItem(
@@ -3011,6 +3041,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun enforceCoreV2SinglePatientHomePage() {
+        if (AacHomeLayout.enabled(this)) return
         getSharedPreferences(PREFS_AAC_PATIENT_PAGES, MODE_PRIVATE)
             .edit()
             .putString(KEY_PATIENT_PAGES, CORE_V2_HOME_PAGE_ID + PATIENT_PAGE_FIELD_SEPARATOR + "DOM")
@@ -3046,7 +3077,7 @@ class MainActivity : AppCompatActivity() {
         items: List<AacItem>,
         coreV2HomeLayoutActive: Boolean = isCoreV2HomeLayoutActive(items)
     ): List<AacItem> {
-        val defaultPageId = if (coreV2HomeLayoutActive) {
+        val defaultPageId = if (AacHomeLayout.enabled(this) || coreV2HomeLayoutActive) {
             CORE_V2_HOME_PAGE_ID
         } else {
             getSharedPreferences(PREFS_AAC_PATIENT_PAGES, MODE_PRIVATE)
@@ -3073,6 +3104,7 @@ class MainActivity : AppCompatActivity() {
             .getString(KEY_DEFAULT_PATIENT_PAGE_ID, "").orEmpty().trim()
         val isHome = normalizedPageId == CORE_V2_HOME_PAGE_ID ||
             normalizedPageId == MAIN_AAC_HOME_PAGE_ID || normalizedPageId == configuredHome
+        if (isHome && AacHomeLayout.enabled(this)) return AacHomeLayout.homeItems(items)
         val pageCatalog = if (isHome) items.filterNot(::isMainAacPainDetail) else items
         val itemsById = pageCatalog.associateBy { it.id }
         val fixedItems = fixedTopRowItems(items)
@@ -3157,6 +3189,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacSelectedGridSize(): Int {
+        if (AacHomeLayout.enabled(this)) return 5
         if (coreV2HomeLayoutCurrentlyActive || isCoreV2HomeRepairMarked()) {
             return 5
         }
@@ -3605,6 +3638,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fixedMainAacAnswerDisplayMode(item: AacItem): String? {
+        if (AacHomeLayout.enabled(this) && mainAacHistory.isEmpty() && item.id in AacHomeLayout.ids) return "both"
         if (item.id != "yes" && item.id != "no") return null
         return getSharedPreferences("aac_fixed_answer_display", MODE_PRIVATE)
             .getString(item.id, "both")

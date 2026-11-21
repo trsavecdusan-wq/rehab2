@@ -503,7 +503,7 @@ object AacStarterContentV1 {
         starter("vending_photo_step_1", "KORAK 1", "Poglejte sliko prvega koraka.", "scenario.vending_photo_step_1", "SCENARIO", "scenario", listOf("foto", "korak", "avtomat"), visibleUnderIds = listOf("vending_coffee_tea")),
         starter("vending_photo_step_2", "KORAK 2", "Poglejte sliko drugega koraka.", "scenario.vending_photo_step_2", "SCENARIO", "scenario", listOf("foto", "korak", "avtomat"), visibleUnderIds = listOf("vending_coffee_tea")),
         starter("move_me", "PREMAKNITE ME", "Prosim, premaknite me.", "mobility.move_me", "NEED", "mobility", listOf("premik", "pomoč"))
-    )
+    ) + AacHomeLayout.additions()
 
     private fun starter(
         id: String,
@@ -566,7 +566,7 @@ object AacStarterContentV1 {
             canAppearInMultipleParents = true,
             children = children,
             placements = placements,
-            protectedPlacement = fixedTopRowPosition != null || id in CORE_V2_PROTECTED_MAIN_IDS,
+            protectedPlacement = id in AacFixedTopRow.positions || id in CORE_V2_PROTECTED_MAIN_IDS,
             questionByLanguage = effectiveQuestionByLanguage,
             labelByLanguage = effectiveLabelByLanguage,
             speechTextByLanguage = effectiveSpeechTextByLanguage,
@@ -577,7 +577,7 @@ object AacStarterContentV1 {
             meaningId = meaningId,
             meaningType = meaningType,
             meaningGroup = meaningGroup,
-            fixedTopRowPosition = fixedTopRowPosition,
+            fixedTopRowPosition = AacFixedTopRow.positions[id],
             semanticTags = semanticTags,
             searchKeywordsByLanguage = mapOf("sl" to semanticTags),
             priority = START_PRIORITY + STARTER_IDS.indexOf(id).takeIf { it >= 0 }.orZero()

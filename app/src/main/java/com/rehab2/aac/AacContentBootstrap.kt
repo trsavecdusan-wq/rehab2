@@ -1,4 +1,4 @@
-﻿package com.rehab2.aac
+package com.rehab2.aac
 
 import android.content.Context
 import android.util.Log
@@ -484,6 +484,15 @@ object AacContentBootstrap {
     )
 
     fun ensurePatientStartupContent(context: Context, fallbackItems: List<AacItem>): Result {
+        AacHomeLayout.initialize(context)
+        if (AacHomeLayout.enabled(context) && AacStoragePaths.getAacItemsFile(context)?.isFile == true) {
+            if (!AacHomeLayout.backup(context)) {
+                AacHomeLayout.setEnabled(context, false)
+                return Result(0, currentPatientPages(context).size, false, "", 0, 0, false, 0, 0, true, "home_backup_failed")
+            }
+            seedBundledSystemIcons(context)
+            return Result(0, currentPatientPages(context).size, false, "", 0, 0, false, 5, 20, true, "home_824_overlay_preserves_storage")
+        }
         // Snapshot existing data before this reviewed content repair, including preference/profile writes.
         try {
             val store = AacPatientImages.store(context)
@@ -624,7 +633,7 @@ object AacContentBootstrap {
 
         var seeded = 0
         val availableAssets = availableBundledSystemIconFiles(context)
-        BUNDLED_SYSTEM_ICON_FILES.forEach { fileName ->
+        (BUNDLED_SYSTEM_ICON_FILES + listOf("home824_faster.png", "home824_correct_message.png", "home824_lets_go.png", "home824_understand.png", "home824_hungry.png", "home824_need.png")).forEach { fileName ->
             if (fileName !in availableAssets) return@forEach
             val targetFile = File(systemDir, fileName)
             val assetPath = "$SYSTEM_ICON_ASSET_DIR/$fileName"

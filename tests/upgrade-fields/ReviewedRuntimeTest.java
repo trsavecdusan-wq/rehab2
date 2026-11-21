@@ -7,7 +7,7 @@ import java.util.*;
 public final class ReviewedRuntimeTest {
  public static void main(String[] args) throws Exception {
   List<AacItem> items=AacStarterContentV1.INSTANCE.items();
-  if(items.size()!=487) throw new AssertionError("Item count");
+  if(items.size()!=490) throw new AssertionError("Item count");
   Map<String,AacItem> byId=new HashMap<>();
   for(AacItem item:items) byId.put(item.getId(),item);
   JSONArray rows=new JSONObject(Files.readString(Path.of(args[0]))).getJSONArray("entries");
@@ -31,11 +31,11 @@ public final class ReviewedRuntimeTest {
   }
   for(String parent:new String[]{"wc","please"})
    if(!byId.get(parent).getChildren().contains("wc_diaper_change")) throw new AssertionError("Shared diaper record "+parent);
-  String[] fixed={"yes","dont_understand","no","thank_you","help"};
+  String[] fixed={"yes","no","thank_you","understand","dont_understand"};
   for(int i=0;i<fixed.length;i++) {
    if(!Objects.equals(byId.get(fixed[i]).getFixedTopRowPosition(),i+1)) throw new AssertionError("Fixed row "+fixed[i]);
   }
   if(byId.get("wc").getPlacements().stream().noneMatch(p -> p.getPageId().equals("page_1") && p.getPosition5x5()==6)) throw new AssertionError("Toilet slot 6");
-  System.out.println("PASS: 487 runtime items, "+rows.length()+" effective image paths/sources, fixed row");
+  System.out.println("PASS: 490 runtime items, "+rows.length()+" effective image paths/sources, fixed row");
  }
 }

@@ -5,12 +5,14 @@ import org.json.JSONArray
 
 /** Motor-memory invariant. Suggestions may only receive non-fixed content. */
 object AacFixedTopRow {
-    val ids: List<String> = Collections.unmodifiableList(listOf("yes", "dont_understand", "no", "thank_you", "help"))
-    val positions: Map<String, Int> = Collections.unmodifiableMap(ids.mapIndexed { index, id -> id to index + 1 }.toMap())
+    @Volatile var reviewedLayout = true
+    val ids: List<String> get() = if (reviewedLayout) listOf("yes", "no", "thank_you", "understand", "dont_understand")
+        else listOf("yes", "dont_understand", "no", "thank_you", "help")
+    val positions: Map<String, Int> get() = Collections.unmodifiableMap(ids.mapIndexed { index, id -> id to index + 1 }.toMap())
 
     // Existing Core V2 HOME placement: wc -> slot 6. Never infer this from ranked page content.
     const val HOME_SLOT_SIX_ID = "wc"
-    val protectedIds: Set<String> = Collections.unmodifiableSet((ids + HOME_SLOT_SIX_ID).toSet())
+    val protectedIds: Set<String> get() = Collections.unmodifiableSet((ids + HOME_SLOT_SIX_ID).toSet())
 
     fun rowIds(columns: Int): List<String> {
         require(columns in 3..6)

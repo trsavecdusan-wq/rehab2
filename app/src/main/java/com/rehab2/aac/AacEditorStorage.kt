@@ -56,7 +56,7 @@ object AacEditorStorage {
     }
 
     fun loadItems(context: Context): List<AacItem> {
-        return AacLocalJsonLoader.loadItems(context, AacStarterContentV1.items())
+        return (AacHomeLayout.additions() + AacLocalJsonLoader.loadItems(context, AacStarterContentV1.items())).associateBy { it.id }.values.toList()
     }
 
     fun hiddenItemIds(context: Context): Set<String> {

@@ -40,12 +40,13 @@ object AacLanguageResolver {
 class MediaPlayer {
  var duration=1500;var completion:((MediaPlayer)->Unit)?=null
  var error:((MediaPlayer,Int,Int)->Boolean)?=null
- var releases=0
+ var releases=0;var starts=0;var prepared:((MediaPlayer)->Unit)?=null
  fun setDataSource(path:String){}
  fun setOnCompletionListener(action:(MediaPlayer)->Unit){completion=action}
  fun setOnErrorListener(action:(MediaPlayer,Int,Int)->Boolean){error=action}
- fun prepare(){}
- fun start(){}
+ fun prepareAsync(){}
+ fun setOnPreparedListener(action:(MediaPlayer)->Unit){prepared=action}
+ fun start(){starts++}
  fun release(){releases++}
 }
 class TextToSpeech {
@@ -132,6 +133,8 @@ fun main(){
  verify(media.playAudioFileIfAvailable(file));val current=media.mediaPlayer!!
  old.completion!!(old);verify(media.mediaPlayer===current && current.releases==0 && media.completions==0)
  verify(old.error!!(old,1,1));verify(media.mediaPlayer===current && media.errors==0)
+ old.prepared!!(old);verify(old.starts==0 && media.starts==0)
+ current.duration=200;current.prepared!!(current);verify(current.starts==1 && media.starts==1)
  current.completion!!(current);verify(media.mediaPlayer==null && current.releases==1 && media.completions==1)
  file.delete()
  println("PASS: $checks Kotlin lifecycle checks executing real application bodies; Android playback not tested")

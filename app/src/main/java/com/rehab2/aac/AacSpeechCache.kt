@@ -5,6 +5,7 @@ import java.io.File
 import java.security.MessageDigest
 
 class AacSpeechCache(private val context: Context) {
+    internal val namespace: String get() = context.filesDir.absolutePath
     fun getCacheMp3File(itemId: String): File? = getCacheFile(itemId, "mp3")
 
     fun getCacheWavFile(itemId: String): File? = getCacheFile(itemId, "wav")

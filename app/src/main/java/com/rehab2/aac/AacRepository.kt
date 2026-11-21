@@ -175,6 +175,9 @@ class AacRepository(private val context: Context) {
     }
 
     private fun buildProfileHomePage(items: List<AacItem>): AacPage? {
+        if (AacHomeLayout.enabled(context) && AacProfileStore.getActiveAacProfile(context).id == "dom") {
+            return AacPage("home", "DOM", AacHomeLayout.catalog(context, items))
+        }
         val itemsById = items.associateBy { it.id }
         val rootItems = AacProfileStore.loadItemsForProfile(context, itemsById)
         if (rootItems.isEmpty()) {

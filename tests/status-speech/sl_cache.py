@@ -69,7 +69,25 @@ fun main(args:Array<String>) {
  check(cache.getGeneratedSpeechFile("Kaj te boli?","sl","coral",0.88)==null)
  check(cache.getGeneratedSpeechFile("Kaj te boli?","sl","onyx",1.0)==null)
  check(AacSpeechCoordinator(cache,missingClient).getOrGenerateSpeechFile(" ","sl","onyx",0.88)==null)
- println("PASS: 10 checks of real cache/coordinator — Slovenian regeneration, legacy fallback, Ukrainian cache, voice/speed separation and blank input")
+ val start=java.util.concurrent.CountDownLatch(1)
+ val finish=java.util.concurrent.CountDownLatch(1)
+ val count=java.util.concurrent.atomic.AtomicInteger()
+ val slowClient=object:AacSpeechApiClient {
+  override fun generateSpeech(text:String,languageCode:String,voiceId:String,speed:Double):ByteArray? {
+   count.incrementAndGet();start.countDown();finish.await();return byteArrayOf(9,9)
+  }
+ }
+ val pool=java.util.concurrent.Executors.newFixedThreadPool(2)
+ val one=pool.submit<File?> { AacSpeechCoordinator(cache,slowClient).getOrGenerateSpeechFile("shared","sl","onyx",0.88) }
+ start.await()
+ val two=pool.submit<File?> { AacSpeechCoordinator(cache,slowClient).getOrGenerateSpeechFile("shared","sl","onyx",0.88) }
+ finish.countDown()
+ check(one.get()==two.get());check(count.get()==1);pool.shutdown()
+ val throwing=object:AacSpeechApiClient {
+  override fun generateSpeech(text:String,languageCode:String,voiceId:String,speed:Double):ByteArray?=throw IllegalStateException("offline")
+ }
+ check(AacSpeechCoordinator(cache,throwing).getOrGenerateSpeechFile("Boli me.","sl","coral",0.88)==secondOld)
+ println("PASS: 13 checks of real cache/coordinator — Slovenian regeneration, legacy fallback, Ukrainian cache, voice/speed separation and blank input")
 }
 ''')
 subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',str(classes),str(source/'AacSpeechPronunciationPolicy.java')],check=True)

@@ -6,6 +6,10 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <Button android:id="@+id/btnLiveTestStop" android:layout_width="match_parent"
+        android:layout_height="56dp" android:gravity="start|center_vertical"
+        android:text="USTAVI PREIZKUS / ЗУПИНИТИ" android:textSize="18sp"
+        android:backgroundTint="#B53A24" android:textColor="#FFFFFF" android:visibility="gone" />
     <TextView
         android:id="@+id/txtAacTitle"
         android:layout_width="match_parent"

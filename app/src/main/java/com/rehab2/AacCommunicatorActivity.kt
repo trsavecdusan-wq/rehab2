@@ -3,6 +3,7 @@ package com.rehab2
 import com.rehab2.aac.ai.AacObservation
 import com.rehab2.aac.ai.AacEventType
 
+import com.rehab2.aac.AacHomeLayout
 import com.rehab2.aac.AacFixedTopRow
 
 import android.app.AlertDialog
@@ -122,6 +123,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AacHomeLayout.initialize(this)
+        com.rehab2.aac.AacContentBootstrap.ensurePatientStartupContent(this, com.rehab2.aac.AacStarterContentV1.items())
         com.rehab2.aac.AacPatientVoiceSettings.bind(this)
         AacObservation.initialize(applicationContext)
         setContentView(R.layout.activity_aac_communicator)
@@ -147,6 +150,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             override fun onSpeechCompleted() {
+                com.rehab2.aac.LiveTestSession.record("input_ready")
                 val completedMode = activeSpeechMode
                 lastSpeechEndedAt = System.currentTimeMillis()
                 Log.d(TAG, "AAC_INPUT speech_completed inputLocked=false mode=$completedMode")
@@ -267,8 +271,10 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        AacHomeLayout.initialize(this)
+        com.rehab2.aac.LiveTestSession.attach(this)
         val updatedLabelMode = readAacLabelMode()
-        val updatedPersonalContentStamp = com.rehab2.aac.AacPatientVoiceSettings.stamp(this)
+        val updatedPersonalContentStamp = com.rehab2.aac.AacPatientVoiceSettings.stamp(this) + ":layout=" + AacHomeLayout.enabled(this)
         val updatedLanguageCode = AacLanguageResolver.readSelectedLanguageCode(this)
         val updatedSpeechTimingSettings = AacSpeechTimingSettings.read(this)
         val updatedGuidedFollowUpSettings = AacGuidedFollowUpSettings.read(this)
@@ -306,7 +312,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             realWorldHelpersEnabled = updatedRealWorldHelpersEnabled
             applyAacGridSize()
             if (currentVisibleItems.isNotEmpty()) {
-                showItems(currentVisibleItems)
+                showPage(repository.loadHomePage())
             }
             updateSentenceBar()
         }
@@ -321,6 +327,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        cancelPendingSpeech()
+        audioPlayer.stopCurrentSpeech()
         cancelPendingPartialAutoReturn()
         super.onPause()
     }
@@ -367,7 +375,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         recycler.adapter = AacAdapter(
             items = displayedItems,
             gridSize = getAacGridSize(),
-            labelMode = labelMode,
+            labelMode = if (AacHomeLayout.enabled(this) && currentV2VisibleHistory.isEmpty() && currentPageId == "home") AacLabelMode.NORMAL else labelMode,
             languageCode = languageCode,
             suggestionIds = currentContextSuggestionIds.toSet(),
             onItemClick = { item ->
@@ -381,6 +389,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
         )
         updateNavigationChrome(txtTitle.text.toString().lineSequence().firstOrNull().orEmpty())
+        com.rehab2.aac.LiveTestSession.record("page_shown")
         observeAacPageOpened(displayedItems)
     }
 
@@ -450,6 +459,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun handleItemClick(item: AacItem) {
+        com.rehab2.aac.LiveTestSession.record("tap", item.id)
         Log.d(
             TAG,
             "AAC_INPUT handle_click item=${item.id} inputLocked=false " +
@@ -858,6 +868,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun recordBackCorrection() {
+        com.rehab2.aac.LiveTestSession.record("correction")
         AacUsageStats.recordBackCorrection(this)
         Log.d(TAG, "AAC_CORRECTION BACK count=${AacUsageStats.backCorrectionCount(this)}")
     }
@@ -905,6 +916,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun getV2RootItems(items: List<AacItem>): List<AacItem> {
+        if (currentPageId == "home" && AacHomeLayout.enabled(this) && AacProfileStore.getActiveAacProfile(this).id == "dom") return AacHomeLayout.homeItems(items)
         val explicitRootItems = items
             .filter { it.isRootItem && !it.isHiddenUntilParent }
             .sortedBy { it.priority }
@@ -918,6 +930,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun readAacGridSize() {
+        if (AacHomeLayout.enabled(this)) { aacGridSize = 5; return }
         val prefs = getSharedPreferences(AAC_PREFS_FILE, MODE_PRIVATE)
         aacGridSize = normalizeAacGridSize(
             prefs.getInt(PREF_AAC_GRID_SIZE, DEFAULT_AAC_GRID_SIZE)
@@ -942,6 +955,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun getAacGridSize(): Int {
+        if (AacHomeLayout.enabled(this)) return 5
         return normalizeAacGridSize(aacGridSize)
     }
 

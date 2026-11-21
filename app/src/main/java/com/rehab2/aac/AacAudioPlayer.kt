@@ -123,6 +123,8 @@ class AacAudioPlayer(
             return
         }
 
+        if (speechLanguageCode == "sl" && item.audioSl.isNotBlank() &&
+            playAudioFileIfAvailable(File(item.audioSl))) return
         playGeneratedSpeechOrFallback(
             text = fallbackText,
             languageCode = speechLanguageCode,
@@ -236,15 +238,21 @@ class AacAudioPlayer(
         timeoutMs: Long = SPEECH_GENERATION_TIMEOUT_MS,
         fallback: () -> Unit
     ) {
+        val speed = AacSpeechApiConfig.read(context).normalizedSpeed()
+        val cached = speechCache.getGeneratedSpeechFile(text, languageCode, voiceId, speed)
+        if (playAudioFileIfAvailable(cached)) return
+        val legacy = speechCache.getLegacyGeneratedSpeechFile(text, languageCode, voiceId, speed)
+        val hasFallback = legacy != null || (isTtsReady && configureTtsLanguage(languageCode))
+        val responsiveTimeout = if (hasFallback) minOf(timeoutMs, SPEECH_GENERATION_TIMEOUT_MS) else timeoutMs
         showSpeechApiConfigIssueIfNeeded()
         traceAudio("speech generation requested serial=$requestSerial")
         val handled = AtomicBoolean(false)
         mainHandler.postDelayed({
             if (requestSerial == speechRequestSerial && handled.compareAndSet(false, true)) {
                 traceAudio("speech generation timeout -> Android TTS fallback")
-                fallback()
+                if (!playAudioFileIfAvailable(legacy)) fallback()
             }
-        }, timeoutMs)
+        }, responsiveTimeout)
         Thread {
             val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
                 text = text,
@@ -311,36 +319,37 @@ class AacAudioPlayer(
         }
 
         return try {
-            traceAudio("play audio file=${audioFile.absolutePath}")
-            mediaPlayer = MediaPlayer().apply {
-                setDataSource(audioFile.absolutePath)
-                setOnCompletionListener { completed ->
-                    if (mediaPlayer !== completed) return@setOnCompletionListener
-                    releaseMediaPlayer()
-                    notifySpeechCompleted()
-                }
-                setOnErrorListener { failed, what, extra ->
-                    if (mediaPlayer !== failed) return@setOnErrorListener true
-                    Log.e(TAG, "SPEECH_ERROR media what=$what extra=$extra")
+            val serial = speechRequestSerial
+            val player = MediaPlayer()
+            mediaPlayer = player
+            player.setDataSource(audioFile.absolutePath)
+            player.setOnCompletionListener { completed ->
+                if (mediaPlayer !== completed || serial != speechRequestSerial || released) return@setOnCompletionListener
+                releaseMediaPlayer()
+                notifySpeechCompleted()
+            }
+            player.setOnErrorListener { failed, _, _ ->
+                if (mediaPlayer !== failed || serial != speechRequestSerial || released) return@setOnErrorListener true
+                releaseMediaPlayer()
+                notifySpeechError()
+                true
+            }
+            player.setOnPreparedListener { prepared ->
+                if (mediaPlayer !== prepared || serial != speechRequestSerial || released) return@setOnPreparedListener
+                try {
+                    applySpeechLoudness(prepared)
+                    prepared.start()
+                    notifySpeechStarted()
+                } catch (_: Exception) {
                     releaseMediaPlayer()
                     notifySpeechError()
-                    true
                 }
-                prepare()
-                if (duration in 1 until MIN_AUDIO_DURATION_MS) {
-                    release()
-                    mediaPlayer = null
-                    return false
-                }
-                applySpeechLoudness(this)
-                start()
-                notifySpeechStarted()
             }
+            player.prepareAsync()
             true
         } catch (error: Exception) {
-            traceAudio("audio file play error=${error.javaClass.simpleName}: ${error.message}")
+            traceAudio("audio file play error=${error.javaClass.simpleName}")
             releaseMediaPlayer()
-            notifySpeechError()
             false
         }
     }
@@ -546,6 +555,7 @@ class AacAudioPlayer(
     }
 
     private fun notifySpeechStarted() {
+        com.rehab2.aac.LiveTestSession.record("sound_start")
         isSpeechActive = true
         runCatching { RadioDuckingCoordinator.duckForSpeech(context) }
         Log.d(TAG, "SPEECH_STARTED")
@@ -554,6 +564,7 @@ class AacAudioPlayer(
     }
 
     private fun notifySpeechCompleted() {
+        com.rehab2.aac.LiveTestSession.record("playback_end")
         if (!isSpeechActive) return
         isSpeechActive = false
         abandonMusicAudioFocus()
@@ -564,6 +575,7 @@ class AacAudioPlayer(
     }
 
     private fun notifySpeechCancelled() {
+        com.rehab2.aac.LiveTestSession.record("speech_cancelled")
         if (!isSpeechActive) return
         isSpeechActive = false
         abandonMusicAudioFocus()
@@ -574,6 +586,7 @@ class AacAudioPlayer(
     }
 
     private fun notifySpeechError() {
+        com.rehab2.aac.LiveTestSession.record("speech_error")
         isSpeechActive = false
         abandonMusicAudioFocus()
         runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
@@ -623,7 +636,6 @@ class AacAudioPlayer(
 
     private companion object {
         const val TAG = "AacAudioPlayer"
-        const val MIN_AUDIO_DURATION_MS = 700
         const val MAX_LOUDNESS_GAIN_MB = 400
         const val SPEECH_GENERATION_TIMEOUT_MS = 1800L
         const val STATUS_SPEECH_GENERATION_TIMEOUT_MS = 30_000L
