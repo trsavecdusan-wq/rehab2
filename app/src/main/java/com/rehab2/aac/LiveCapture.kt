@@ -39,7 +39,8 @@ object LiveCapture : Application.ActivityLifecycleCallbacks {
     private var app: Context? = null
     private var visible = WeakReference<Activity>(null)
     @Volatile private var generation = 0
-    @Volatile private var captureGeneration = 0
+    private val resources=CaptureResourceGate()
+    private val captureGeneration get()=resources.generation
     @Volatile private var remoteId = ""
     @Volatile private var remoteToken = ""
     @Volatile private var mic = false
@@ -160,8 +161,7 @@ object LiveCapture : Application.ActivityLifecycleCallbacks {
             main.postDelayed(this,1000)
         }})
     }
-    private fun stopCapture() {
-        captureGeneration++
+    private fun stopCapture() = resources.stop {
         val rec=recording;recording=null;runCatching { rec?.stop() }
         runCatching { cameraSession?.close() };cameraSession=null
         runCatching { cameraDevice?.close() };cameraDevice=null
@@ -174,16 +174,20 @@ object LiveCapture : Application.ActivityLifecycleCallbacks {
             try {
                 val min=AudioRecord.getMinBufferSize(16000,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT)
                 check(min>0)
-                rec=AudioRecord(MediaRecorder.AudioSource.MIC,16000,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT,maxOf(min,8192))
-                check(rec.state==AudioRecord.STATE_INITIALIZED)
-                if(!valid(epoch))return@execute
-                recording=rec; rec.startRecording(); check(rec.recordingState==AudioRecord.RECORDSTATE_RECORDING)
+                resources.open(epoch) {
+                    if(valid(epoch)) {
+                        val created=AudioRecord(MediaRecorder.AudioSource.MIC,16000,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT,maxOf(min,8192))
+                        rec=created;check(created.state==AudioRecord.STATE_INITIALIZED)
+                        recording=created;created.startRecording();check(created.recordingState==AudioRecord.RECORDSTATE_RECORDING)
+                    }
+                }
+                val recorder=rec ?: return@execute
                 val buffer=ByteArray(4096)
                 while(valid(epoch)) {
                     val start=LiveTestSession.elapsedMs();val speech=audioGate.begin()
                     val data=ByteArrayOutputStream()
                     while(valid(epoch) && data.size()<384000) {
-                        val n=rec.read(buffer,0,minOf(buffer.size,384000-data.size()));check(n>0)
+                        val n=recorder.read(buffer,0,minOf(buffer.size,384000-data.size()));check(n>0)
                         data.write(buffer,0,n)
                     }
                     if(!valid(epoch))break
@@ -197,12 +201,13 @@ object LiveCapture : Application.ActivityLifecycleCallbacks {
                         .put("appSpeechOverlap",false).put("startMs",start).put("endMs",LiveTestSession.elapsedMs()))
                 }
             } catch(_:Exception) { if(valid(epoch)) { audioVerified=false;status="Napaka mikrofona; komunikator ostaja uporaben."; LiveTestSession.record("capture_error","microphone") } }
-            finally { runCatching { rec?.stop() };runCatching { rec?.release() };if(recording===rec)recording=null }
+            finally { resources.release { runCatching { rec?.stop() };runCatching { rec?.release() };if(recording===rec)recording=null } }
         }
     }
     @Suppress("DEPRECATION", "MissingPermission")
     private fun startCamera(c:Context,epoch:Int) {
         try {
+            resources.open(epoch) {
             val manager=c.getSystemService(Context.CAMERA_SERVICE) as CameraManager
             val id=manager.cameraIdList.firstOrNull { manager.getCameraCharacteristics(it).get(CameraCharacteristics.LENS_FACING)==CameraCharacteristics.LENS_FACING_FRONT }
                 ?: throw IllegalStateException("Sprednja kamera ni na voljo")
@@ -227,10 +232,12 @@ object LiveCapture : Application.ActivityLifecycleCallbacks {
             },handler)
             manager.openCamera(id,object:CameraDevice.StateCallback(){
                 override fun onOpened(device:CameraDevice){
-                    if(!valid(epoch)){device.close();return};cameraDevice=device
+                    if(!resources.open(epoch) { runCatching {
+                    cameraDevice=device
                     device.createCaptureSession(listOf(images.surface),object:CameraCaptureSession.StateCallback(){
                         override fun onConfigured(session:CameraCaptureSession){
-                            if(!valid(epoch)){session.close();return};cameraSession=session
+                            if(!resources.open(epoch) { runCatching {
+                            cameraSession=session
                             val request=device.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE).apply {
                                 addTarget(images.surface);set(CaptureRequest.JPEG_QUALITY,60.toByte())
                                 set(CaptureRequest.JPEG_ORIENTATION,chars.get(CameraCharacteristics.SENSOR_ORIENTATION)?:0)
@@ -238,16 +245,19 @@ object LiveCapture : Application.ActivityLifecycleCallbacks {
                             handler.post(object:Runnable{override fun run(){
                                 if(!valid(epoch))return
                                 frames.clear()
-                                for(i in 0..2)handler.postDelayed({if(valid(epoch))runCatching { session.capture(request,null,handler) }},i*500L)
+                                for(i in 0..2)handler.postDelayed({resources.open(epoch){runCatching { session.capture(request,null,handler) }}},i*500L)
                                 handler.postDelayed(this,20000)
                             }})
+                            }.onFailure{session.close();device.close();cameraVerified=false;status="Napaka priprave kamere."} })session.close()
                         }
                         override fun onConfigureFailed(session:CameraCaptureSession){session.close();device.close();if(valid(epoch)){cameraVerified=false;status="Napaka: kamera ni pripravljena."}}
-                    },handler)
+                    },main)
+                    }.onFailure{device.close();cameraVerified=false;status="Napaka odpiranja kamere."} })device.close()
                 }
                 override fun onDisconnected(device:CameraDevice){device.close();if(valid(epoch)){cameraVerified=false;status="Napaka: kamera odklopljena."}}
                 override fun onError(device:CameraDevice,error:Int){device.close();if(valid(epoch)){cameraVerified=false;status="Napaka kamere; komunikator ostaja uporaben."}}
-            },handler)
+            },main)
+            }
         }catch(_:Exception){cameraVerified=false;status="Napaka: kamera ni dosegljiva; komunikator ostaja uporaben.";LiveTestSession.record("capture_error","camera")}
     }
     private fun submit(epoch:Int,kind:String,body:JSONObject) {

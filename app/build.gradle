@@ -21,8 +21,8 @@ android {
         // Normal releases use even versionCode values only, for example 170, 172, 174.
         // Rollback releases use odd versionCode values only, for example 171, 173, 175.
         // A rollback APK may contain older stable code, but it must use a higher odd versionCode so Android allows install.
-        versionCode 11016
-        versionName "1.2.828"
+        versionCode 11018
+        versionName "1.2.830"
     }
 
     // Explicitly consented public test package for this release only.

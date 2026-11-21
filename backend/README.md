@@ -1,6 +1,6 @@
 # NovaRehab observation backend (protocol 1)
 
-Deploy this code separately from the Android APK. No hosting or provider account was supplied for release 1.2.828. The repository does **not** contain a deployed endpoint, provider secret, or production device credential. HTTP contract tests use simulated provider replies; they do not prove microphone/camera operation.
+Deploy this code separately from the Android APK. No hosting or provider account was supplied for release 1.2.830. The repository does **not** contain a deployed endpoint, provider secret, or production device credential. HTTP contract tests use simulated provider replies; they do not prove microphone/camera operation.
 
 ## Required configuration
 

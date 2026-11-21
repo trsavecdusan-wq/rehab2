@@ -47,7 +47,7 @@ class LiveCaptureActivity:AppCompatActivity(){
         pendingPermission=savedInstanceState?.getString("permission").orEmpty();pendingPatient=savedInstanceState?.getString("patient").orEmpty()
         exportText=savedInstanceState?.getString("exportText").orEmpty()
         root=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(24,16,24,16)}
-        text("SPREMLJANJE POSAMEZNEGA PACIENTA • 1.2.828")
+        text("SPREMLJANJE POSAMEZNEGA PACIENTA • 1.2.830")
         button("USTAVI SPREMLJANJE / ЗУПИНИТИ"){LiveTestSession.stop()}
         status=text("")
         text("Zajem poteka samo, ko je v ospredju komunikator ali zaslon preizkusa. V ozadju se mikrofon in kamera sprostita. Vračanje iz nastavitev ne prekliče ročne ustavitve. Nov zagon aplikacije upošteva spodnji izbiri trenutnega pacienta.")

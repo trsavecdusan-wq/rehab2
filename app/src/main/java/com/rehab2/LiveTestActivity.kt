@@ -42,7 +42,7 @@ class LiveTestActivity : AppCompatActivity() {
         fun button(value: String, action: () -> Unit) = Button(this).apply {
             text = value; textSize = 18f; minHeight = 64; setOnClickListener { action() }; root.addView(this)
         }
-        text("PREIZKUS NA TABLICI • 1.2.828")
+        text("PREIZKUS NA TABLICI • 1.2.830")
         button("MIKROFON, KAMERA IN INDIVIDUALNI PROFIL") { startActivity(Intent(this, LiveCaptureActivity::class.java)) }
         text("Nova prva stran 5 × 5 je prikaz nad shranjeno postavitvijo. Osebne slike in podikone ostanejo povezane. Prejšnjo postavitev lahko ponovno prikažete.")
         button("UPORABI NOVO MREŽO 5 × 5") {

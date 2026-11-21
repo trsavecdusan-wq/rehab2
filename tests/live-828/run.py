@@ -30,6 +30,17 @@ import android.content.Context
 import java.io.File
 fun main(args:Array<String>){
  var n=0;fun verify(v:Boolean){n++;check(v){"Check $n"}}
+ val ownership=CaptureResourceGate();val oldEpoch=ownership.generation
+ val acquired=java.util.concurrent.CountDownLatch(1);val proceed=java.util.concurrent.CountDownLatch(1);val stopped=java.util.concurrent.CountDownLatch(1)
+ var resource=false
+ val opener=Thread{ownership.open(oldEpoch){acquired.countDown();proceed.await();resource=true}}
+ opener.start();acquired.await()
+ val stopper=Thread{ownership.stop{resource=false};stopped.countDown()};stopper.start()
+ verify(!stopped.await(30,java.util.concurrent.TimeUnit.MILLISECONDS));proceed.countDown();opener.join(2000);stopper.join(2000)
+ verify(!opener.isAlive && !stopper.isAlive && !resource)
+ verify(!ownership.open(oldEpoch){resource=true});verify(!resource)
+ verify(ownership.open(ownership.generation){resource=true});verify(resource)
+ ownership.stop{resource=false};verify(!resource)
  var clock=1000L;val gate=CaptureAudioGate{clock}
  val clean=gate.begin();verify(gate.accepts(clean))
  gate.event("speech_will_start");verify(!gate.accepts(clean));verify(gate.begin()==null)
@@ -64,7 +75,7 @@ fun main(args:Array<String>){
  println("PASS: $n launch, foreground, stop latch, independent permission and persistent settings checks")
 }
 ''')
-for name in ['CaptureAudioGate','CaptureLaunchPolicy','LiveCaptureSettings','AiObservationSettings','AacKeywordListenerSettings']:
+for name in ['CaptureResourceGate','CaptureAudioGate','CaptureLaunchPolicy','LiveCaptureSettings','AiObservationSettings','AacKeywordListenerSettings']:
  files.append(str(R/f'app/src/main/java/com/rehab2/aac/{name}.kt'))
 cache=Path(os.environ['USERPROFILE'])/'.gradle/caches/modules-2/files-2.1';jars=[]
 for a in ['kotlin-compiler-embeddable','kotlin-stdlib','kotlin-script-runtime','kotlin-daemon-embeddable']:
