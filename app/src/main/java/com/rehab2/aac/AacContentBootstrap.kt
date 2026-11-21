@@ -627,13 +627,17 @@ object AacContentBootstrap {
         return result
     }
 
+    @Volatile private var seededSystemIconsPath: String? = null
     private fun seedBundledSystemIcons(context: Context): Int {
         val systemDir = AacStoragePaths.getIconsSystemDir(context) ?: return 0
+        // Returning HOME after speech must not reread the entire bundled image library.
+        if (seededSystemIconsPath == systemDir.absolutePath) return 0
         if (!systemDir.exists() && !systemDir.mkdirs()) return 0
 
         var seeded = 0
         val availableAssets = availableBundledSystemIconFiles(context)
-        (BUNDLED_SYSTEM_ICON_FILES + listOf("home824_faster.png", "home824_correct_message.png", "home824_lets_go.png", "home824_understand.png", "home824_hungry.png", "home824_need.png")).forEach { fileName ->
+        val filesToSeed = (BUNDLED_SYSTEM_ICON_FILES + listOf("home824_faster.png", "home824_correct_message.png", "home824_lets_go.png", "home824_understand.png", "home824_hungry.png", "home824_need.png")).filter { it in availableAssets }.distinct()
+        filesToSeed.forEach { fileName ->
             if (fileName !in availableAssets) return@forEach
             val targetFile = File(systemDir, fileName)
             val assetPath = "$SYSTEM_ICON_ASSET_DIR/$fileName"
@@ -654,6 +658,7 @@ object AacContentBootstrap {
                 Log.w(TAG, "AAC_BOOTSTRAP_SYSTEM_ICON_SEED_FAILED asset=$assetPath", error)
             }
         }
+        if (seeded == filesToSeed.size && filesToSeed.isNotEmpty()) seededSystemIconsPath = systemDir.absolutePath
         return seeded
     }
 

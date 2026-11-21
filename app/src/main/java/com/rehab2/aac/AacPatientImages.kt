@@ -66,6 +66,7 @@ object AacPatientImages {
         val store = store(context)
         require(store.currentPatientId() == patientId)
         val item = AacEditorStorage.loadItems(context).firstOrNull { it.id == itemId }
+            ?: AacHomeLayout.additions().firstOrNull { it.id == itemId }
         require(item != null && !item.locked)
         val extension = when (context.contentResolver.getType(uri)) {
             "image/jpeg" -> "jpg"
@@ -87,6 +88,7 @@ object AacPatientImages {
         val store = store(context)
         require(store.currentPatientId() == patientId)
         val item = AacEditorStorage.loadItems(context).firstOrNull { it.id == itemId }
+            ?: AacHomeLayout.additions().firstOrNull { it.id == itemId }
         require(item != null && !item.locked)
         store.clearBinding(patientId, itemId)
         true

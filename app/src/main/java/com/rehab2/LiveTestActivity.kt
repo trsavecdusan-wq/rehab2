@@ -5,12 +5,23 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.rehab2.aac.*
 
 /** Caregiver tools, entered from the existing PIN-protected settings path. */
 class LiveTestActivity : AppCompatActivity() {
+    private var photoItem: String? = null
+    private var photoPatient: String? = null
+    private val photoPicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        val id = photoItem; val patient = photoPatient
+        photoItem = null; photoPatient = null
+        if (uri != null && id != null && patient != null) {
+            val saved = AacPatientImages.importPhoto(this, patient, id, uri)
+            toast(if (saved) "Osebna slika je shranjena samo pri tem pacientu." else "Slike ni bilo mogoče shraniti.")
+        }
+    }
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var status: TextView
     private lateinit var report: TextView
@@ -24,12 +35,14 @@ class LiveTestActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        photoItem = savedInstanceState?.getString("photoItem")
+        photoPatient = savedInstanceState?.getString("photoPatient")
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24, 16, 24, 16) }
         fun text(value: String) = TextView(this).apply { text = value; textSize = 18f; setPadding(0, 12, 0, 12); root.addView(this) }
         fun button(value: String, action: () -> Unit) = Button(this).apply {
             text = value; textSize = 18f; minHeight = 64; setOnClickListener { action() }; root.addView(this)
         }
-        text("PREIZKUS NA TABLICI • 1.2.824")
+        text("PREIZKUS NA TABLICI • 1.2.826")
         text("Nova prva stran 5 × 5 je prikaz nad shranjeno postavitvijo. Osebne slike in podikone ostanejo povezane. Prejšnjo postavitev lahko ponovno prikažete.")
         button("UPORABI NOVO MREŽO 5 × 5") {
             if (AacHomeLayout.backup(this)) { AacHomeLayout.setEnabled(this, true); toast("Nova mreža je vključena.") }
@@ -83,11 +96,22 @@ class LiveTestActivity : AppCompatActivity() {
         report = text("")
         text("Za skupni pregled: POPRAVI trenutno izgovori »Prosim, popravi to.«; RABIM in ŽELIM odpreta obstoječe izbire; GREMO izgovori »Gremo, prosim.«. Pomen POPRAVI in cilj GREMO še uskladimo s pacientko. Predloge za dodatne pojme umestimo na drugo stran ali podikone.")
         text("Za osebno fotografijo DRUŽINE ali PRIJATELJEV v urejevalniku izberite ustrezno ikono in uvozite fotografijo. Shranjena bo samo v zasebni shrambi trenutnega pacienta.")
-        button("ZAMENJAJ FOTOGRAFIJO IKONE") { startActivity(Intent(this, AacEditorActivity::class.java)) }
+        button("ZAMENJAJ FOTOGRAFIJO IKONE") {
+            AlertDialog.Builder(this).setTitle("Izberi ikono za zasebno fotografijo")
+                .setItems(AacHomeLayout.labels.toTypedArray()) { _, index ->
+                    photoItem = AacHomeLayout.ids[index]
+                    photoPatient = AacPatientImages.store(this).currentPatientId()
+                    photoPicker.launch("image/*")
+                }.setNegativeButton("PREKLIČI", null).show()
+        }
         button("OSEBNE SLIKE IN FOTOGRAFIJE") { startActivity(Intent(this, PatientPersonalizationActivity::class.java)) }
         button("IZBRIŠI PODATKE PREIZKUSA") { LiveTestSession.clear(); report.text = LiveTestSession.report() }
         button("NAZAJ") { finish() }
         setContentView(ScrollView(this).apply { addView(root) })
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("photoItem", photoItem); outState.putString("photoPatient", photoPatient)
+        super.onSaveInstanceState(outState)
     }
     override fun onResume() { super.onResume(); handler.post(refresh) }
     override fun onPause() { handler.removeCallbacks(refresh); super.onPause() }
