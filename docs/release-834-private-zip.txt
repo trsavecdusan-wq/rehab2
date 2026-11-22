@@ -46,3 +46,29 @@ označi potrjene povezave -> UVOZI POTRJENE POVEZAVE -> potrdi zamenjave ->
 ODPRI KOMUNIKATOR. ZIP mora biti dostopen Androidovemu izbirniku (npr. Prenosi).
 Dejanski uvoz na uporabnikovo tablico ni opravljen s samo namestitvijo APK-ja.
 POČUTJE ostaja predlog; razpored 25 ikon, govor in povezave so nespremenjeni.
+
+Preverjanja za izdajo:
+- 29 JVM preverjanj ZIP-a/serijskega uvoza: nevarne in podvojene poti,
+  napačni SHA, omejitve, neuspešna druga slika brez delnega zapisa,
+  potrditev zamenjav, kopija indeksa, obnova .bak, UUID in ponovni zagon.
+- 103 obstoječa preverjanja zasebnih slik, migracije in preklopa profilov.
+- 186 preverjanj dejanske prevedene postavitve/kataloga ter 13 preverjanj
+  dejanskega govornega predpomnilnika in koordinatorja.
+- Android 9 / API 28 emulator 1280 x 800: podpisana nadgradnja 832 -> 834,
+  Androidov izbirnik ZIP-a, izključen Wi-Fi in mobilni podatki, predogled,
+  neoznačene začetne izbire, izključena neznani ID in correct_message,
+  potrjeni dve testni povezavi, ponovni zagon aplikacije, ohranjen drugi
+  profil, bitno enaki izvirniki, alfa in nove prikazne kopije.
+- Ponoven uvoz zazna osebno zamenjavo; preklic ohrani povezavo, potrditev
+  ustvari nov izvirnik in ohrani starega ter varnostno kopijo.
+- Ohranjen uporabniški testni dokument in spremenjena sistemska datoteka.
+- Podpis enak 832; vsi javni vsebinski asseti enaki 832. Gradlov profil
+  optimizacije DEX se pričakovano spremeni z novo programsko kodo.
+- CI d33511c: razvojni APK, podpisani APK in backend pogodba uspešni.
+  Prva priprava Gradla je dobila HTTP 403; ponovitev opravila je uspela.
+
+Preizkus na dejanski pacientkini tablici in prepoznavanje osebnih podob
+ostajata za skupni pregled. Emulator uporablja izključno nadomestne
+geometrijske testne slike. Dejanski uvoz osebnega paketa ni označen kot opravljen.
+
+Po ponovnem zagonu emulatorja: izbrani UUID in uvožene povezave ohranjeni; komunikator se ponovno odpre.
