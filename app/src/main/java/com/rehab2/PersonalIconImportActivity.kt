@@ -18,9 +18,11 @@ class PersonalIconImportActivity : AppCompatActivity() {
     private lateinit var status: TextView
     private var pack: PersonalIconZip? = null
     private var busy = false
+    private var pickerPending = false
     @Volatile private var closed = false
     private val choices = linkedMapOf<CheckBox, Pair<String, PersonalIconZip.Entry>>()
     private val picker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        pickerPending = false
         if (uri != null && !busy) {
             busy = true; status.text = "Preverjam ZIP, kontrolne vsote in slike …"
             val app = applicationContext
@@ -28,7 +30,7 @@ class PersonalIconImportActivity : AppCompatActivity() {
                 val result = runCatching {
                     check(AacPatientImages.store(app).currentPatientId() == patient) { "Pacient se je spremenil. Uvoz začni znova." }
                     val prepared = app.contentResolver.openInputStream(uri)!!.use {
-                        PersonalIconZip.read(it, File(app.noBackupFilesDir, "icon-zip-staging"))
+                        PersonalIconZip.read(it, File(app.noBackupFilesDir, "aac-patients/$patient/import-staging"))
                     }
                     try {
                         prepared.entries.forEach { entry ->
@@ -53,12 +55,16 @@ class PersonalIconImportActivity : AppCompatActivity() {
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
         patient = state?.getString("patient") ?: AacPatientImages.store(this).currentPatientId()
+        pickerPending = state?.getBoolean("pickerPending") ?: false
         content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24,16,24,24) }
         setContentView(ScrollView(this).apply { addView(content) })
         header()
-        status = text(if (state != null) "Prejšnji pregled ni bil potrjen. Znova izberi ZIP; že dokončan uvoz ostane shranjen." else "Pripravljeni PNG-ji se uvozijo brez interneta ali storitve za izdelavo slik.")
+        status = text(if (state != null) "Za nov pregled znova izberi ZIP; že dokončan uvoz ostane shranjen." else "Pripravljeni PNG-ji se uvozijo brez interneta ali storitve za izdelavo slik.")
         button("IZBERI ZIP Z OSEBNIMI IKONAMI") {
-            if (!busy && samePatient()) picker.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream"))
+            if (!busy && !pickerPending && samePatient()) {
+                pickerPending = true
+                picker.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream"))
+            }
         }
     }
     private fun header() {
@@ -93,6 +99,8 @@ class PersonalIconImportActivity : AppCompatActivity() {
                 "ne", "pocakaj" -> "ZA PREGLED: podobni kretnji NE in POČAKAJ."
                 "rabim", "zelim" -> "ZA PREGLED: razlikovanje RABIM in ŽELIM."
                 "hitreje", "gremo" -> "ZA PREGLED: razlikovanje HITREJE in GREMO; preveri levo roko in voziček."
+                "hvala" -> "ZA PREGLED: nasmeh sam ne določa pomena zahvale."
+                "dobro", "da" -> "ZA PREGLED: podoben palec navzgor pri DOBRO in DA."
                 else -> "Potrdi podobnost in pomen s pacientko oziroma skrbnikom."
             }
             text(warning)
@@ -100,6 +108,12 @@ class PersonalIconImportActivity : AppCompatActivity() {
                 val item = catalog[id]
                 if (item == null || item.locked || id == "correct_message") text("Brez uvoza: $id (neznan, zaščiten ali neustrezen ID).")
                 else {
+                    AacPatientImages.resolve(this,item)?.let { current ->
+                        content.addView(ImageView(this).apply {
+                            contentDescription = "Trenutna ikona ${item.labelSl}"
+                            setImageBitmap(BitmapFactory.decodeFile(current.path, BitmapFactory.Options().apply { inSampleSize = 8 }))
+                        }, LinearLayout.LayoutParams(90,90))
+                    }
                     val existing = AacPatientImages.store(this).hasBinding(patient,id) || AacPatientImages.personalFile(this,id,false) != null
                     val choice = CheckBox(this).apply {
                         text = "POTRJUJEM: ${item.labelSl} · $id\n${item.speakTextSl.orEmpty()}${if(existing) "\nZAMENJAVA OSEBNE SLIKE" else ""}"
@@ -149,6 +163,6 @@ class PersonalIconImportActivity : AppCompatActivity() {
     }
     private fun text(value: String,size: Float=17f) = TextView(this).apply { text=value;textSize=size;setPadding(0,12,0,12);content.addView(this) }
     private fun button(label:String,action:()->Unit) { content.addView(Button(this).apply { text=label;minHeight=64;setOnClickListener { action() } }) }
-    override fun onSaveInstanceState(out: Bundle) { out.putString("patient",patient);super.onSaveInstanceState(out) }
+    override fun onSaveInstanceState(out: Bundle) { out.putString("patient",patient);out.putBoolean("pickerPending",pickerPending);super.onSaveInstanceState(out) }
     override fun onDestroy() { closed=true;if(!busy){pack?.close();pack=null};super.onDestroy() }
 }
