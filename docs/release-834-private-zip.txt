@@ -1,0 +1,48 @@
+NovaRehab 1.2.834 — zasebni uvoz pripravljenih ikon
+
+Paket: 23 PNG, vse SHA-256 skladne s priloženim seznamom, 1254 x 1254,
+RGBA. Pregled je lokalni; osebne datoteke in kontaktni list niso vključeni
+v repozitorij ali APK. 490 zapisov pomeni 487 osnovnih ID-jev + 3 dodatke
+AacHomeLayout. Uvoz preveri vsak predlagani ID proti dejanskemu lokalnemu
+katalogu. Neznanih ali zaklenjenih ID-jev ne uvaža. Ni samodejnega povezovanja
+po podobnosti imen in ni predhodno označenih potrditev.
+
+Pregled pomenov:
+- GREMO: električni voziček, dvignjena leva roka (desno na sliki).
+- RAZUMEM / NE RAZUMEM: pripravljeni različni gesti; pomen potrdi uporabnik.
+- POPRAVI: položaj/blazina; pregled samo pri fix_me in body_position.
+  correct_message je pri ZIP-uvozu izključen. Glavna POPRAVI ostane enaka.
+- NE / POČAKAJ: podobni dvignjeni dlani, potrebno preverjanje razlikovanja.
+- HITREJE / GREMO in RABIM / ŽELIM: pomen ni samoumeven iz same kretnje.
+- BOLI ME: roka na trebuhu lahko nakazuje trebušno bolečino.
+- SLABO: posoda in roka pred usti lahko pomenita slabost/bruhanje.
+- HVALA: nasmeh sam ne zagotavlja razumevanja pomena zahvale.
+- DOBRO / DA: podoben palec navzgor, preveriti razlikovanje.
+
+Na zmanjšanem pregledu ni velikih belih pravokotnikov. Svetli robovi las in
+oblačil ostajajo del končnega pregleda; prosojnost sama ne potrjuje izreza.
+Izvirne slike niso predelane. Predogled na tablici omogoča svetlo in temno
+ozadje. Podobnost s pacientko in njeno prepoznavanje sporočil nista klinično
+preverjena. Fotografije svojcev in izvirna referenca niso del paketa.
+
+Shramba in varnost:
+- Dokument izbere Androidov izbirnik. Brez omrežja in brez generatorja.
+- UUID se zajame ob začetku in shrani za vrnitev iz izbirnika. Sprememba
+  aktivnega pacienta prekine uvoz; kritični zapis je pod ključavnico shrambe.
+- Omejitve: ZIP 80 MiB, 300 zapisov, posamezna datoteka 12 MiB, skupaj
+  100 MiB, največ 100 slik, največ 4096 na stran / 8 milijonov pik.
+- Preverjeni CRC, SHA-256, mere, PNG-dekodiranje in predlagani ID-ji.
+- ZIP-poti se nikoli ne uporabijo kot ciljne poti; zavrnjeni so prehodi,
+  absolutne poti in podvojena imena (tudi razlika velikosti črk).
+- Vsi novi izvirniki se pripravijo pred enim zapisom povezav. Pred zapisom
+  se trajno shrani zasebna kopija prejšnjih povezav. Prekinjeno menjavo
+  indeksa obnovi obstoječi mehanizem .bak; delna serija ni objavljena.
+- Nova UUID-imena izvirnikov zagotavljajo nove prikazne kopije. Stari
+  izvirniki ostanejo. Podatki, govorni predpomnilnik in katalog niso prepisani.
+
+Pot na tablici: nastavitve osebnih ikon -> UVOZI OSEBNE IKONE IZ ZIP-a ->
+IZBERI ZIP Z OSEBNIMI IKONAMI -> preveri profil, slike, besedila in ID-je ->
+označi potrjene povezave -> UVOZI POTRJENE POVEZAVE -> potrdi zamenjave ->
+ODPRI KOMUNIKATOR. ZIP mora biti dostopen Androidovemu izbirniku (npr. Prenosi).
+Dejanski uvoz na uporabnikovo tablico ni opravljen s samo namestitvijo APK-ja.
+POČUTJE ostaja predlog; razpored 25 ikon, govor in povezave so nespremenjeni.

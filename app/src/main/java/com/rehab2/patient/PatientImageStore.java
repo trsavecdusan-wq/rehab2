@@ -91,6 +91,50 @@ public final class PatientImageStore {
         }
     }
 
+    /** One recoverable index commit for the whole reviewed batch. Originals are immutable.
+     * Interrupted staging leaves the previous bindings intact. Interrupted index replacement
+     * is recovered by read(); the durable backup also remains available for inspection.
+     */
+    public File importBatch(String patientId, java.util.Map<String, File> sources,
+                            java.util.Map<String, String> checksums, boolean replace,
+                            Validator validator) throws IOException {
+        synchronized (LOCK) {
+            if (!patientId.equals(currentPatientId())) throw new IOException("Patient changed");
+            if (sources.isEmpty() || sources.size() > 100) throw new IOException("Invalid batch size");
+            File dir = patientDir(patientId);
+            File index = new File(dir, "images.properties");
+            Properties bindings = read(index);
+            File originals = new File(dir, "originals");
+            ensureDir(originals);
+            java.util.List<File> staged = new java.util.ArrayList<>();
+            boolean commitStarted = false;
+            try {
+            for (java.util.Map.Entry<String, File> entry : sources.entrySet()) {
+                String id = entry.getKey(); checkItem(id);
+                if (!replace && bindings.containsKey(id)) throw new IOException("Replacement not confirmed");
+                String hash = checksums.get(id);
+                if (hash == null || !hash.matches("[0-9a-f]{64}")) throw new IOException("Missing checksum");
+                File target = new File(originals, UUID.randomUUID() + ".png");
+                staged.add(target);
+                try (InputStream input = new FileInputStream(entry.getValue())) { copy(input, target); }
+                if (!digest(target).equals(hash) || !validator.valid(target)) {
+                    target.delete(); throw new IOException("Image validation failed");
+                }
+                bindings.setProperty(id, target.getName());
+            }
+            File backup = backupLegacy(patientId, index);
+            // Includes an empty index for a new profile, so its pre-import state is explicit.
+            write(new File(backup, "before.properties"), read(index));
+            commitStarted = true;
+            write(index, bindings);
+            return backup;
+            } finally {
+                // Never delete an original once index publication could have referenced it.
+                if (!commitStarted) for (File file : staged) file.delete();
+            }
+        }
+    }
+
     public String confirmedSeedPatient(String packId) throws IOException {
         synchronized (LOCK) {
             checkPack(packId);
