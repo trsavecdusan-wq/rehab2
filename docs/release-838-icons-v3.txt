@@ -1,0 +1,90 @@
+NovaRehab 1.2.838 — paket v3, prikaz brez napisov in obnova slik
+
+Osnova: v1.2.836 / 11024, dejanski commit
+f70f30a0bd8ee745ea20c61258cc8cae4f09d348.
+Preverjena oddaljena oznaka in najnovejša redna izdaja; naslednja prosta
+normalna različica 1.2.838 / 11026. Main in obstoječe oznake niso premaknjeni.
+PR #4 je pregledan samo kot referenca: temelji na 794 in vodi v 804 ter
+spreminja govor, katalog, slike in profile. Njegove prekrivajoče se spremembe
+niso združene prek novejših preverjenih izvedb 836.
+
+Novi javni paket, ločen od APK in git zgodovine:
+https://github.com/trsavecdusan-wq/rehab2/releases/download/v1.2.836/Lana_25_ikon_v3_Codex.zip
+Velikost: 32280055 bajtov.
+SHA-256: 60faa8b8d55cfd84f05c9b7deb0c68389dae892da03ec136e07a0e4d802c05c8
+25 PNG / 25 povezav, položaji in ID-ji skladni z AacHomeLayout.ids.
+Preverjeni CRC, SHA-256 vseh slik, mere, RGBA, prosojni piksli in privzeto
+neizbrane povezave. Oba JSON-manifesta imata enako vsebino; staro ime
+Pripravljene_slike_23.json ostaja združljivo, čeprav je zapisov 25.
+
+GREMO uporablja izključno priložene bajte slike/lets_go.png:
+328c19aedc80b93032a9af785850e4e12380593b48938fc2575caa9bb2a0af84
+Ni regeneriranja, preoblikovanja postave ali spreminjanja gest.
+Vizualni pregled vseh 25 slik na svetlem in temnem ozadju pri 150 px:
+predmeti ostanejo celi; GREMO ohrani voziček, naslon, vrata in počivajoči
+roki. Pri osebnih podobah je aktivna leva roka oziroma roki počivata/sta
+prekriti; pri SPATI roke niso vidne. Na povečavi GREMO ostanejo drobni svetli
+robovi pri vratih/izrezu; potrjene datoteke nismo spreminjali. Potrditev
+videza ni dokaz razumevanja. Predlogi zahtevajo pregled s pacientko.
+
+Predogled v aplikaciji kaže trenutno in predlagano sliko drugo ob drugi.
+Tap na predlog preklopi ozadje primerjave. Napisi in opozorila ostanejo za
+spremljevalca. Neoznačena povezava ohrani trenutno sliko. Vse so neoznačene.
+POPRAVI za correct_message je dovoljen samo iz preverjenega paketa v3 in
+za točno njegov hash slike; zahteva dodatno vsebinsko potrditev. Stara slika
+POPRAVI (telesni položaj) ostane izključena iz correct_message. RABIM in ŽELIM
+imata dodatno potrditev zaradi dvoumnosti. Prikazane so opombe manifesta za
+abstraktne simbole, družino/prijatelje, bolečino v roki, slabost, zaspanost
+ter povezavo živali s hitrostjo. POČUTJE ni aktiviran.
+
+BREZ NAPISOV (POSKUSNO) je ločena nastavitev obstoječega UUID; privzeto
+izključena. Svetlo ozadje je prav tako poskusno in velja samo v tem načinu.
+Main in komunikator uporabljata FIT_CENTER brez rezanja motiva. Mreža,
+radio, GPS/status in spodnje dejavnosti se ne premikajo. Opisi za dostopnost
+ostanejo lokalizirani; govor in podatki ikon ostanejo nespremenjeni.
+Novi profil ne podeduje te nastavitve ali osebnih slik.
+
+VRNI PREJŠNJE SLIKE odpre izbor zasebnih varnostnih kopij ter primerjavo.
+Po izrecni potrditvi obnovi samo slike v zajetem UUID. Trenutna zbirka se
+pred obnovo ponovno varnostno shrani (možna je vrnitev tudi po obnovi).
+Noben izvirnik se ne izbriše; ni brisanja govornega predpomnilnika, sprememb
+besedil, postavitve, mikrofona/kamere ali drugih nastavitev. Poškodovana
+kopija oziroma manjkajoč izvirnik obnovo ustavita pred spremembo povezav.
+
+Prvo odprtje po nadgradnji ponudi v3 tudi po uporabi starega paketa, ker
+je ponudba vezana na novi hash. Če je stari paket že potrjen za Lanin UUID,
+novi paket ne more biti pripet drugemu profilu. Preverjanja UUID so pred
+prenosom, pred prikazom in pred uvozom. Izpad omrežja/prekinitev omogoča
+ponovitev brez spremembe slik; dejanski javni prenos novega paketa in branje
+25 zapisov sta preverjena. Uvoz lokalnega ZIP-a ostaja na voljo brez AI.
+
+Stari in novi javni osebni paket ostaneta dostopna do uporabnikove potrditve
+uspešnega uvoza ustrezne zbirke na fizični tablici. Uspeh na emulatorju ali
+potrditev videza GREMO nista ta potrditev. APK in izdaje ostanejo dostopni.
+Osebni PNG, zasebni kontaktni listi in ZIP niso vključeni v git ali APK.
+
+Preverjanja: 17 testov obnove (preklic napačnega profila, napačna kopija,
+veljavnost izvirnikov, ohranitev drugih datotek, ponovni zagon, obnovitev
+prazne zbirke in vrnitev obnovitve); 29 testov ZIP/serijskega uvoza; 18 testov
+prenosa in dejanski javni prenos/novi SHA-256; 103 obstoječi testi zasebnih
+slik, migracij ter preklopa profilov. Osebni izvirniki ostanejo nedotaknjeni.
+Fizična tablica in Lanino dejansko razumevanje slik nista preverjena.
+
+Dodatna preverjanja podpisanega kandidata na izoliranem Android 28 emulatorju:
+- Nadgradnja 836 -> 838 z install -r; prva ponudba v3 tudi po starem paketu.
+- Androidov izbirnik ZIP, predogled 25 slik, vse privzeto neizbrane.
+- Dodatne potrditve POPRAVI/RABIM/ZELIM, preklic koncnega dialoga brez sprememb.
+- Potrjen testni uvoz vseh 25; vsi zasebni izvirniki imajo SHA-256 iz manifesta,
+  vkljucno z natancno potrjenim GREMO; prejsnji izvirniki ostanejo na mestu.
+- Obnova prek uporabniskega predogleda vrne natancno prejsnji dve povezavi;
+  naslednja obnova vrne vseh 25. Prikaz brez napisov ostane nastavljen.
+- Temni in svetli prikaz pregledana pri 1280x800; 25 mest ostane enakih,
+  brez rezanja motivov; radio, status in spodnji gumbi ostanejo na mestih.
+- Brez omrezja so uvozene slike prikazane. Ponovno odprtje ohrani nastavitve.
+- Androidov spletni prenos: brez omrezja jasna napaka in ohranitev slik;
+  ponovitev z omrezjem preveri novi javni paket in odpre vseh 25 predogledov.
+- Preklop na drugi profil ohrani njegovi prejsnji sliki in privzeto vkljucene
+  napise. Prenos Laninega paketa je v tem profilu zavrnjen.
+- Testi govornega predpomnilnika: 13; kataloga/postavitve: 186.
+To so tehnicni preizkusi na emulatorju, ne potrditev razumevanja slik ali
+uspesnega uvoza na uporabnikovi fizicni tablici. Hitrost na njej ni izmerjena.
