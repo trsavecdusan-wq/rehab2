@@ -1,6 +1,6 @@
-NovaRehab — slikovni pregled za naslednjo izdajo (DELOVNI OSNUTEK)
+NovaRehab 1.2.832 — slikovni pregled in preverjanje
 
-Osnova: izdaja 1.2.830. Ta dokument ne potrjuje pripravljenosti izdaje.
+Osnova: preverjena izdaja 1.2.830. Podpisana redna posodobitev: versionCode 11020.
 
 POČUTJE — samo predlog za skupni pregled
 Trenutna prva stran ima 25 mest; v tej spremembi se razpored ne spreminja.
@@ -43,9 +43,11 @@ Stanje slikovne obdelave
 Vgrajeni slikovni generator je bil preizkušen za HRANA. Rezultati so imeli
 bele ostanke oziroma siv sij in niso bili vključeni. Uporabnik je nato
 izrecno odobril lokalno čiščenje alfa kanala (22. 11. 2026).
-Vključenih je 245 alfa popravkov iz 232 različnih motivov. Barvni kanali
-vseh 245 slik so nespremenjeni; ohranjeni so beli deli predmetov.
-Preostalih 762 slik je alfa kanal že imelo. Preverjenih je vseh 1007 PNG.
+Popravljenih je 763 sistemskih datotek. Pri 742 se spremenijo samo alfa
+kanali, RGB ostane nespremenjen. Pri 21 neuporabnih izrezih je ponovno
+uporabljen ustrezen obstoječi sistemski motiv oziroma izdelana nova slika
+očal z generatorjem in lokalnim čiščenjem. Preverjenih je vseh 1007 PNG.
+Pregled je zajel tudi bele pravokotnike znotraj že obstoječega alfa kanala.
 Pri sestavljenih motivih so bili posebej obnovljeni krožniki, skodelice,
 postelje, puščice in drugi deli, ki jih model ni pravilno izločil.
 Pregled: tests/alpha832/background-review.png in tests/release-824/home-grid.png.
@@ -66,10 +68,24 @@ Izdelava novih osebnih različic zahteva pravo zasebno predlogo, nastavljen
 HTTPS naslov namenske storitve ter potrditev pošiljanja in vsakega rezultata.
 
 Opravljena tehnična preverjanja
-Uspešna Androidova debug gradnja. 1007 alfa PNG in 245 kontrolnih vsot.
+Uspešna Androidova debug in podpisana release gradnja za kodo profila.
+1007 alfa PNG in 763 kontrolnih vsot. Končni razširjeni slikovni paket se preveri še v objavljeni gradnji.
 26 preverjanj strani telesa in oznak jakosti. 186 preverjanj razporeda.
 103 preverjanja zasebne shrambe, uvoza, varnostne kopije, sistemske nadgradnje in preklopa pacientov.
 13 preverjanj govornega predpomnilnika in 29 preverjanj življenjskega cikla.
 Prva stran ima istih 25 mest. Predlog POČUTJE ni aktiviran.
-Podpisani APK, OTA in prikaz v emulatorju so še v zaključnem preverjanju.
+Na Androidu 9 (API 28, 1280 x 800) je preverjena podpisana nadgradnja
+830 -> 832 brez odstranitve aplikacije: sistemska slika se osveži, namensko
+zamenjana sistemska slika in uporabniška testna datoteka ostaneta nespremenjeni.
+Prek dejanskega izbirnika je ustvarjen nov UUID s splošno HVALA; vrnitev
+obnovi testno osebno sliko prvotnega UUID. Uporabljena je neosebna testna
+slika hrane, nikoli pacientova fotografija. Preverjen je prikaz prve strani
+in navigacija med podikonami. Končni APK in OTA se preverita po gradnji.
 Fizična uporabnikova tablica ni priključena.
+
+Obseg starejših datotek
+Stari neuporabljeni izrezi iz prvotnih atlasov niso v celoti pomensko
+rekonstruirani. Čiščenje ozadja ne popravi njihovih že prej odrezanih motivov.
+Aktivni pregledani katalog ohranja obstoječe ID-je in povezave. Sistem ne
+prepisuje neznanih osebnih zamenjav samo zaradi videza ozadja.
+Dodatni pregled podikon: tests/alpha832/subicon-review.png.

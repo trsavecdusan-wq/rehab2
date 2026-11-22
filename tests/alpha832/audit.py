@@ -15,8 +15,9 @@ for row in manifest['entries']:
     path=icons/row['path']
     assert hashlib.sha256(path.read_bytes()).hexdigest()==row['sha256'],path
     assert row['previousSha256'] in previous[path.name]
-    assert row['rgbPreserved']
-assert len(manifest['entries'])==245 and manifest['uniqueCandidates']==232
+    assert row['rgbPreserved'] or (row['method']=='reviewed-system-motif-repair' and row.get('source'))
+assert len(manifest['entries'])==763 and manifest['uniqueCandidates']==742
+assert sum(row['rgbPreserved'] for row in manifest['entries'])==742
 plate=Image.open(icons/'system/home824_hungry.png').convert('RGBA')
 assert plate.getpixel((int(plate.width*.5),int(plate.height*.13)))[3]>240,'White plate lost'
 preview=Image.new('RGB',(1200,800),'white');draw=ImageDraw.Draw(preview)
@@ -29,4 +30,4 @@ for row,bg in enumerate(['#263746','#e5edf4']):
         preview.paste(im,(col*200,row*400+20),im)
         draw.text((col*200+4,row*400+365),name[:24],fill='white' if row==0 else 'black')
 preview.save(root/'tests/alpha832/background-review.png')
-print('PASS: 1007 alpha PNGs; 245 revision hashes; 232 reviewed candidates; opaque white plate; two background preview')
+print('PASS: 1007 alpha PNGs; 763 revision hashes; 742 alpha-only changes; 21 reviewed motif repairs; opaque white plate; two background preview')

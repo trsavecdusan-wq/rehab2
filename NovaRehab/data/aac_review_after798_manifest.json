@@ -362,7 +362,7 @@
       "id": "dressing",
       "imagePath": "system/review_reuse_toilet_dress_97089135.png",
       "sourceMeaning": "@toilet_dress.png",
-      "sha256": "9708913522bef28a063f7427378393c27eba0c2de791aa65cab5e263ec6b7097"
+      "sha256": "b07b6a181838885c2d072be5ec9aeb50e2c90c17bc9de788722877c4281b8e40"
     },
     {
       "id": "drink",
@@ -584,7 +584,7 @@
       "id": "help_to_wc",
       "imagePath": "system/review_reuse_toilet_general_cea817c3.png",
       "sourceMeaning": "@toilet_general.png",
-      "sha256": "cea817c3c8c9a4e1fb9c142157dd0035381c0b7a87773f45906b6614a4627d7d"
+      "sha256": "61d2c8d8349d10f2e405ccd1679803cd42b2676d6479a950a62d3c7377ed5355"
     },
     {
       "id": "horse",
@@ -1568,7 +1568,7 @@
       "id": "washing_help",
       "imagePath": "system/review_reuse_toilet_wash_4982e59c.png",
       "sourceMeaning": "@toilet_wash.png",
-      "sha256": "4982e59c90d173e07b31f4a6af61a0a9a101a875671b6743ff35ae794eb193a8"
+      "sha256": "397bbed37c56ee83a66658ecfb6ecf7524fb7d1ff3c1a4451b1018e2809b10cf"
     },
     {
       "id": "water",

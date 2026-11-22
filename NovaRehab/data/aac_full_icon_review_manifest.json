@@ -1328,7 +1328,7 @@
       "labelSl": "TOALETA",
       "speechSl": "Moram v toaleto.",
       "imagePath": "system/toilet_general.png",
-      "sha256": "cea817c3c8c9a4e1fb9c142157dd0035381c0b7a87773f45906b6614a4627d7d",
+      "sha256": "61d2c8d8349d10f2e405ccd1679803cd42b2676d6479a950a62d3c7377ed5355",
       "previousImagePath": "system/toilet_general.png",
       "starterPreviousImagePath": "system/wc.png",
       "parents": [
@@ -2447,7 +2447,7 @@
       "labelSl": "OBLAČENJE",
       "speechSl": "Potrebujem pomoč pri oblačenju.",
       "imagePath": "system/review_reuse_toilet_dress_97089135.png",
-      "sha256": "9708913522bef28a063f7427378393c27eba0c2de791aa65cab5e263ec6b7097",
+      "sha256": "b07b6a181838885c2d072be5ec9aeb50e2c90c17bc9de788722877c4281b8e40",
       "previousImagePath": "system/review_reuse_toilet_dress_97089135.png",
       "starterPreviousImagePath": "system/review_reuse_toilet_dress_97089135.png",
       "parents": [
@@ -2881,7 +2881,7 @@
         },
         "male": {
           "imagePath": "system/pain_chest.png",
-          "sha256": "205ff3b987229302bee141e1786aebaadc6d5ff83bca828a776d73261f14f33f"
+          "sha256": "7e9169b423ce62dc74511061a0f46a5f849b0482deca4452d9044d3fae8ac73f"
         }
       }
     },
@@ -4408,7 +4408,7 @@
       "labelSl": "HLADNA",
       "speechSl": "Rada bi mrzlo vodo.",
       "imagePath": "system/drink_water_cold.png",
-      "sha256": "ee61ed141ce1c1b0c2f1e7be9c964497c2e6217a3e29c18e9d0ed500c0bb6c87",
+      "sha256": "7363be490023cc6fe0eaf87136a66b5046caa20afe39506bcee96895ae059a7c",
       "previousImagePath": "system/drink_water_cold.png",
       "starterPreviousImagePath": "system/aac_drink_cold_water.png",
       "parents": [
@@ -4514,7 +4514,7 @@
       "labelSl": "ČAJ",
       "speechSl": "Prosim, rada bi čaj.",
       "imagePath": "system/drink_tea.png",
-      "sha256": "d10d4f9094dd860c10d8c75a054cd25f82032c8a61e229541637527447209bcf",
+      "sha256": "9a07b1d465f36cee6742a3fed84e8c936ff643173c03d783ad971a38327dc1be",
       "previousImagePath": "system/drink_tea.png",
       "starterPreviousImagePath": "system/aac_drink_tea.png",
       "parents": [
@@ -4540,7 +4540,7 @@
       "labelSl": "SOK",
       "speechSl": "Rada bi sok.",
       "imagePath": "system/drink_juice.png",
-      "sha256": "2d32172d40c85d93516fe20ea999260b25a06de164ad488cfbff84068eb81c72",
+      "sha256": "80a7ae74f46ada711ee00daa79c3f7a0f2b436663805b803a694d3ec136db440",
       "previousImagePath": "system/drink_juice.png",
       "starterPreviousImagePath": "system/aac_drink_juice.png",
       "parents": [
@@ -4659,7 +4659,7 @@
       "labelSl": "MLEČNI NAPITKI",
       "speechSl": "Prosim, rada bi mlečni napitek.",
       "imagePath": "system/drink_milk.png",
-      "sha256": "1b28faa669b440fe9cbf39fddd178ec1e2367403b8027bac194a2675f7c93666",
+      "sha256": "b485d5dee66c651deac3d0f9f8014b7dad352905427cf7466c6b22565a537069",
       "previousImagePath": "system/drink_milk.png",
       "starterPreviousImagePath": "system/aac_drink_milk.png",
       "parents": [
@@ -4716,7 +4716,7 @@
       "labelSl": "MLEKO",
       "speechSl": "Prosim, rada bi mleko.",
       "imagePath": "system/drink_milk.png",
-      "sha256": "1b28faa669b440fe9cbf39fddd178ec1e2367403b8027bac194a2675f7c93666",
+      "sha256": "b485d5dee66c651deac3d0f9f8014b7dad352905427cf7466c6b22565a537069",
       "previousImagePath": "system/review_reuse_aac_drink_milk_440d1a3e.png",
       "starterPreviousImagePath": "system/review_reuse_aac_drink_milk_440d1a3e.png",
       "parents": [
@@ -4826,7 +4826,7 @@
       "labelSl": "NAVADNA",
       "speechSl": "Prosim, rada bi navadno kavo.",
       "imagePath": "system/coffee_black.png",
-      "sha256": "fe181f71450c4c32c0e708b10bc6aeeb748a72b299b970baac3a8a16a87df048",
+      "sha256": "72b6d87101686c6d459d35c44c5b1b6b8a96b0315c30dbdbaf2c785868dfff72",
       "previousImagePath": "system/coffee_black.png",
       "starterPreviousImagePath": "system/coffee_black.png",
       "parents": [
@@ -4843,7 +4843,7 @@
       "labelSl": "Z MLEKOM",
       "speechSl": "Prosim, rada bi kavo z mlekom.",
       "imagePath": "system/coffee_milk.png",
-      "sha256": "0b3fb7cb8370f7fda8c6227e10667d8d8d7e0bc60997153c433a4401e6f932ee",
+      "sha256": "838c37833be2a5cbfc95dd423da63eda13c422dd5790e56c7f8f5fed9cab79dd",
       "previousImagePath": "system/coffee_milk.png",
       "starterPreviousImagePath": "system/coffee_milk.png",
       "parents": [
@@ -4877,7 +4877,7 @@
       "labelSl": "KAMILIČNI",
       "speechSl": "Prosim, rada bi kamilični čaj.",
       "imagePath": "system/tea_chamomile.png",
-      "sha256": "4417ed30b060fb1d44da3164b75ecdbca4ff218ab4dc02a5fc5f6fb25f429315",
+      "sha256": "f2e3e556d4b19f804a21b5aaa6e94d2bc91b75543d62fd7960b601003270b308",
       "previousImagePath": "system/tea_chamomile.png",
       "starterPreviousImagePath": "system/tea_chamomile.png",
       "parents": [
@@ -4898,7 +4898,7 @@
       "labelSl": "Z LIMONO",
       "speechSl": "Prosim, rada bi kamilični čaj z limono.",
       "imagePath": "system/tea_add_lemon.png",
-      "sha256": "9f59e8794c110244a2123e9d046db3c25b8a6d1c3e32918c08592915b40c869e",
+      "sha256": "75815271de4ed6f60949a34a0a5d5cc7f238acaf9f33417249c254fb9aa2393a",
       "previousImagePath": "system/tea_add_lemon.png",
       "starterPreviousImagePath": "system/tea_add_lemon.png",
       "parents": [
@@ -4915,7 +4915,7 @@
       "labelSl": "Z MEDOM",
       "speechSl": "Prosim, rada bi kamilični čaj z medom.",
       "imagePath": "system/tea_add_honey.png",
-      "sha256": "99150a10deedf98e48180be57917b543f0dfcb734e4199f07a5c8fb8907ba83a",
+      "sha256": "55dbffe910c761dbe8d7cfdfee411eed9e74091398e119a9bd442e97140ccbb9",
       "previousImagePath": "system/tea_add_honey.png",
       "starterPreviousImagePath": "system/tea_add_honey.png",
       "parents": [
@@ -4949,7 +4949,7 @@
       "labelSl": "SADNI",
       "speechSl": "Prosim, rada bi sadni čaj.",
       "imagePath": "system/tea_fruit.png",
-      "sha256": "2aa631ce87dc6312013ded5d7dc7af34008d2756e923f24b432644ef6d7cea62",
+      "sha256": "357bd4583ba3dcace66461ad6ad4511440d8bf934f1212f65b6050969e23b0f3",
       "previousImagePath": "system/tea_fruit.png",
       "starterPreviousImagePath": "system/tea_fruit.png",
       "parents": [
@@ -4970,7 +4970,7 @@
       "labelSl": "Z LIMONO",
       "speechSl": "Prosim, rada bi sadni čaj z limono.",
       "imagePath": "system/tea_add_lemon.png",
-      "sha256": "9f59e8794c110244a2123e9d046db3c25b8a6d1c3e32918c08592915b40c869e",
+      "sha256": "75815271de4ed6f60949a34a0a5d5cc7f238acaf9f33417249c254fb9aa2393a",
       "previousImagePath": "system/tea_add_lemon.png",
       "starterPreviousImagePath": "system/tea_add_lemon.png",
       "parents": [
@@ -4987,7 +4987,7 @@
       "labelSl": "Z MEDOM",
       "speechSl": "Prosim, rada bi sadni čaj z medom.",
       "imagePath": "system/tea_add_honey.png",
-      "sha256": "99150a10deedf98e48180be57917b543f0dfcb734e4199f07a5c8fb8907ba83a",
+      "sha256": "55dbffe910c761dbe8d7cfdfee411eed9e74091398e119a9bd442e97140ccbb9",
       "previousImagePath": "system/tea_add_honey.png",
       "starterPreviousImagePath": "system/tea_add_honey.png",
       "parents": [
@@ -5021,7 +5021,7 @@
       "labelSl": "ZELENI",
       "speechSl": "Prosim, rada bi zeleni čaj.",
       "imagePath": "system/tea_green.png",
-      "sha256": "947af8029136dcbd0de3d792dba06cf634c4bcc208eef2804efbe058f638dd3e",
+      "sha256": "db428035be0c4eaaf6ea7bfbc97aa8f57c1e35dffd9f431e46e27713073d2eb3",
       "previousImagePath": "system/tea_green.png",
       "starterPreviousImagePath": "system/tea_green.png",
       "parents": [
@@ -5042,7 +5042,7 @@
       "labelSl": "Z LIMONO",
       "speechSl": "Prosim, rada bi zeleni čaj z limono.",
       "imagePath": "system/tea_add_lemon.png",
-      "sha256": "9f59e8794c110244a2123e9d046db3c25b8a6d1c3e32918c08592915b40c869e",
+      "sha256": "75815271de4ed6f60949a34a0a5d5cc7f238acaf9f33417249c254fb9aa2393a",
       "previousImagePath": "system/tea_add_lemon.png",
       "starterPreviousImagePath": "system/tea_add_lemon.png",
       "parents": [
@@ -5059,7 +5059,7 @@
       "labelSl": "Z MEDOM",
       "speechSl": "Prosim, rada bi zeleni čaj z medom.",
       "imagePath": "system/tea_add_honey.png",
-      "sha256": "99150a10deedf98e48180be57917b543f0dfcb734e4199f07a5c8fb8907ba83a",
+      "sha256": "55dbffe910c761dbe8d7cfdfee411eed9e74091398e119a9bd442e97140ccbb9",
       "previousImagePath": "system/tea_add_honey.png",
       "starterPreviousImagePath": "system/tea_add_honey.png",
       "parents": [
@@ -5093,7 +5093,7 @@
       "labelSl": "ČRNI",
       "speechSl": "Prosim, rada bi črni čaj.",
       "imagePath": "system/tea_black.png",
-      "sha256": "6730d9cc42094ee724f04ddd5f48747c1fc6d5e453cf082c954b1d1f0db48108",
+      "sha256": "31d2b4084537bce6eddf0d6bd1e50dac44e15e061f7bd0588c459f1fc7b65902",
       "previousImagePath": "system/tea_black.png",
       "starterPreviousImagePath": "system/tea_black.png",
       "parents": [
@@ -5114,7 +5114,7 @@
       "labelSl": "Z LIMONO",
       "speechSl": "Prosim, rada bi črni čaj z limono.",
       "imagePath": "system/tea_add_lemon.png",
-      "sha256": "9f59e8794c110244a2123e9d046db3c25b8a6d1c3e32918c08592915b40c869e",
+      "sha256": "75815271de4ed6f60949a34a0a5d5cc7f238acaf9f33417249c254fb9aa2393a",
       "previousImagePath": "system/tea_add_lemon.png",
       "starterPreviousImagePath": "system/tea_add_lemon.png",
       "parents": [
@@ -5131,7 +5131,7 @@
       "labelSl": "Z MEDOM",
       "speechSl": "Prosim, rada bi črni čaj z medom.",
       "imagePath": "system/tea_add_honey.png",
-      "sha256": "99150a10deedf98e48180be57917b543f0dfcb734e4199f07a5c8fb8907ba83a",
+      "sha256": "55dbffe910c761dbe8d7cfdfee411eed9e74091398e119a9bd442e97140ccbb9",
       "previousImagePath": "system/tea_add_honey.png",
       "starterPreviousImagePath": "system/tea_add_honey.png",
       "parents": [
@@ -5165,7 +5165,7 @@
       "labelSl": "METIN",
       "speechSl": "Prosim, rada bi metin čaj.",
       "imagePath": "system/tea_mint.png",
-      "sha256": "7d8585bfb02cfb3477c8d1429ba583697b52178ec3c8fb02e678f455445b0b72",
+      "sha256": "3a8a122e36a2924c9501eebef6d709589496cd8e782f88658d096cd0d93e3a77",
       "previousImagePath": "system/tea_mint.png",
       "starterPreviousImagePath": "system/tea_mint.png",
       "parents": [
@@ -5186,7 +5186,7 @@
       "labelSl": "Z LIMONO",
       "speechSl": "Prosim, rada bi metin čaj z limono.",
       "imagePath": "system/tea_add_lemon.png",
-      "sha256": "9f59e8794c110244a2123e9d046db3c25b8a6d1c3e32918c08592915b40c869e",
+      "sha256": "75815271de4ed6f60949a34a0a5d5cc7f238acaf9f33417249c254fb9aa2393a",
       "previousImagePath": "system/tea_add_lemon.png",
       "starterPreviousImagePath": "system/tea_add_lemon.png",
       "parents": [
@@ -5203,7 +5203,7 @@
       "labelSl": "Z MEDOM",
       "speechSl": "Prosim, rada bi metin čaj z medom.",
       "imagePath": "system/tea_add_honey.png",
-      "sha256": "99150a10deedf98e48180be57917b543f0dfcb734e4199f07a5c8fb8907ba83a",
+      "sha256": "55dbffe910c761dbe8d7cfdfee411eed9e74091398e119a9bd442e97140ccbb9",
       "previousImagePath": "system/tea_add_honey.png",
       "starterPreviousImagePath": "system/tea_add_honey.png",
       "parents": [
@@ -5258,7 +5258,7 @@
       "labelSl": "Z LIMONO",
       "speechSl": "Prosim, rada bi šipkov čaj z limono.",
       "imagePath": "system/tea_add_lemon.png",
-      "sha256": "9f59e8794c110244a2123e9d046db3c25b8a6d1c3e32918c08592915b40c869e",
+      "sha256": "75815271de4ed6f60949a34a0a5d5cc7f238acaf9f33417249c254fb9aa2393a",
       "previousImagePath": "system/tea_add_lemon.png",
       "starterPreviousImagePath": "system/tea_add_lemon.png",
       "parents": [
@@ -5275,7 +5275,7 @@
       "labelSl": "Z MEDOM",
       "speechSl": "Prosim, rada bi šipkov čaj z medom.",
       "imagePath": "system/tea_add_honey.png",
-      "sha256": "99150a10deedf98e48180be57917b543f0dfcb734e4199f07a5c8fb8907ba83a",
+      "sha256": "55dbffe910c761dbe8d7cfdfee411eed9e74091398e119a9bd442e97140ccbb9",
       "previousImagePath": "system/tea_add_honey.png",
       "starterPreviousImagePath": "system/tea_add_honey.png",
       "parents": [
@@ -5309,7 +5309,7 @@
       "labelSl": "POMARANČNI",
       "speechSl": "Rada bi pomarančni sok.",
       "imagePath": "system/drink_juice_orange.png",
-      "sha256": "95a6952ace7f86310aaceb47bde86fa70e12c6b23a9f26b0cad78dc02e14c954",
+      "sha256": "8dcf2db05856d2527e4859c908ad6528c5482e57c12ba4d236867947c0dbb7f3",
       "previousImagePath": "system/drink_juice_orange.png",
       "starterPreviousImagePath": "system/aac_drink_juice.png",
       "parents": [
@@ -5326,7 +5326,7 @@
       "labelSl": "JABOLČNI",
       "speechSl": "Rada bi jabolčni sok.",
       "imagePath": "system/drink_juice_apple.png",
-      "sha256": "46c4f8cc91ac9f3b4190c5193a86b614fa3668c08a0767284955e83e7d2e5191",
+      "sha256": "5833441bfc7b9696d9689c999f9b80f273aa4011f13621a6d9cb362a610df492",
       "previousImagePath": "system/drink_juice_apple.png",
       "starterPreviousImagePath": "system/aac_drink_juice.png",
       "parents": [
@@ -5343,7 +5343,7 @@
       "labelSl": "BOROVNIČEV",
       "speechSl": "Rada bi sok iz borovnic.",
       "imagePath": "system/drink_juice_blueberry.png",
-      "sha256": "cd492eb3a3dc3f004e8f2201773ff929d82043ec2150890e7eb853c9346dfcf7",
+      "sha256": "8b7e746484bbb17f9eb55c67de608aa3cc87b1ba17e33d980153ec46d5614320",
       "previousImagePath": "system/drink_juice_blueberry.png",
       "starterPreviousImagePath": "system/aac_drink_juice.png",
       "parents": [
@@ -5360,7 +5360,7 @@
       "labelSl": "JAGODNI",
       "speechSl": "Rada bi jagodni sok.",
       "imagePath": "system/drink_juice_strawberry.png",
-      "sha256": "93637e3533a6acde31651bd9cf5a065955c1df50eb830163870227019277ee56",
+      "sha256": "bf0b74e3e7ce2259740c65bcf9d926b65301b9b64baef0871baef3c380db9280",
       "previousImagePath": "system/drink_juice_strawberry.png",
       "starterPreviousImagePath": "system/aac_drink_juice.png",
       "parents": [
@@ -5377,7 +5377,7 @@
       "labelSl": "CEDEVITA",
       "speechSl": "Rada bi Cedevito.",
       "imagePath": "system/drink_cedevita.png",
-      "sha256": "2635b31c0dffb91f61a3c23e9f80252677a8df0bab391e65479ba1b58b553043",
+      "sha256": "34e7e3a148262ebadbed36bea238fe92d7d1ebbc452e9d236690aff760f41b80",
       "previousImagePath": "system/drink_cedevita.png",
       "starterPreviousImagePath": "system/aac_drink_juice.png",
       "parents": [
@@ -5854,7 +5854,7 @@
       "labelSl": "ZELENJAVA",
       "speechSl": "Prosim, rada bi zelenjavo.",
       "imagePath": "system/food_vegetables.png",
-      "sha256": "6aa8ec4d794c2dc91edf8a676c153f1f98412ec262be712d6ca5f2260e91a8bb",
+      "sha256": "e509e7c08af96364cc08f13d3fe1fd011fb5997de71ccc50b656cbef09225001",
       "previousImagePath": "system/food_vegetables.png",
       "starterPreviousImagePath": "system/food_vegetables.png",
       "parents": [
@@ -6347,7 +6347,7 @@
       "labelSl": "KRUH",
       "speechSl": "Želim jesti kruh",
       "imagePath": "system/food_bread.png",
-      "sha256": "e0cca642d747cf10ce823cad26f3501f0611044234a451248187f6766fbd1d48",
+      "sha256": "79cd269431de1a78a3220aaa6388ae67ef8e7af9dc0fc86f3cd02d14ce3f754f",
       "previousImagePath": "system/food_bread.png",
       "starterPreviousImagePath": "system/food_bread.png",
       "parents": [
@@ -6654,7 +6654,7 @@
       "labelSl": "KMALU",
       "speechSl": "Kmalu moram v toaleto.",
       "imagePath": "system/toilet_soon.png",
-      "sha256": "5980f7ce386504c899c2af943c43447d7a50b2f8921254f407f9040a560b4939",
+      "sha256": "7b1a7c93ca232749039866d0e413737be34cdc126271ff8b6e9719b2dce9e017",
       "previousImagePath": "system/toilet_soon.png",
       "starterPreviousImagePath": "system/aac_soon.png",
       "parents": [],
@@ -6711,7 +6711,7 @@
       "labelSl": "UMIVANJE",
       "speechSl": "Potrebujem pomoč pri umivanju.",
       "imagePath": "system/review_reuse_toilet_wash_4982e59c.png",
-      "sha256": "4982e59c90d173e07b31f4a6af61a0a9a101a875671b6743ff35ae794eb193a8",
+      "sha256": "397bbed37c56ee83a66658ecfb6ecf7524fb7d1ff3c1a4451b1018e2809b10cf",
       "previousImagePath": "system/review_reuse_toilet_wash_4982e59c.png",
       "starterPreviousImagePath": "system/review_reuse_toilet_wash_4982e59c.png",
       "parents": [
@@ -6746,7 +6746,7 @@
       "labelSl": "MOKRA",
       "speechSl": "Prosim, zamenjajte mi plenico. Mokra sem.",
       "imagePath": "system/toilet_wet.png",
-      "sha256": "27080c53905c16e81373e9f214d84a158679a3d57ece866fd4d320d263893718",
+      "sha256": "f1df8da6858c025a03cd1c3a8125174b1c861655263302df74be3ec64034cd07",
       "previousImagePath": "system/toilet_wet.png",
       "starterPreviousImagePath": "system/aac_wc_wet.png",
       "parents": [
@@ -6763,7 +6763,7 @@
       "labelSl": "UMAZANA",
       "speechSl": "Prosim, zamenjajte mi plenico. Umazana sem.",
       "imagePath": "system/toilet_dirty.png",
-      "sha256": "ca1eefc4513d376248872274521cea38f687a85ebbaa902813f8996a7ce9bc48",
+      "sha256": "d7ece9010d7603f5a7e0db52f75feb1095575a19ee0c22f6477c019abd948c30",
       "previousImagePath": "system/toilet_dirty.png",
       "starterPreviousImagePath": "system/aac_wc_dirty.png",
       "parents": [
@@ -6780,7 +6780,7 @@
       "labelSl": "OBOJE",
       "speechSl": "Prosim, zamenjajte mi plenico. Mokra in umazana sem.",
       "imagePath": "system/toilet_both.png",
-      "sha256": "1c1cc56d0c0e1c926b876f9ac990b036c286fb0972fc576084b0d3ff462f27b9",
+      "sha256": "ebf2d620f223c40b33be23aab81f393318c2a793a6d532ab622b980e9000cee1",
       "previousImagePath": "system/toilet_both.png",
       "starterPreviousImagePath": "system/aac_wc_both.png",
       "parents": [
@@ -6797,7 +6797,7 @@
       "labelSl": "SESTRA",
       "speechSl": "Potrebujem medicinsko sestro.",
       "imagePath": "system/toilet_nurse.png",
-      "sha256": "5830c8c1aa0f7a39b4e03600ae415c5cd9b07e1c92ab6289bdebdeb7e58b08a9",
+      "sha256": "fbdca8ae477ac292cad0bc80403b2901ee676aaf2339a750248bd5099c623e03",
       "previousImagePath": "system/toilet_nurse.png",
       "starterPreviousImagePath": "system/aac_nurse.png",
       "parents": [
@@ -6819,7 +6819,7 @@
       "labelSl": "OBLAČENJE",
       "speechSl": "Rabim pomoč pri oblačenju.",
       "imagePath": "system/toilet_dress.png",
-      "sha256": "9708913522bef28a063f7427378393c27eba0c2de791aa65cab5e263ec6b7097",
+      "sha256": "b07b6a181838885c2d072be5ec9aeb50e2c90c17bc9de788722877c4281b8e40",
       "previousImagePath": "system/toilet_dress.png",
       "starterPreviousImagePath": "system/aac_toilet_dressing.png",
       "parents": [
@@ -6836,7 +6836,7 @@
       "labelSl": "UMIVANJE",
       "speechSl": "Rabim pomoč pri umivanju.",
       "imagePath": "system/toilet_wash.png",
-      "sha256": "4982e59c90d173e07b31f4a6af61a0a9a101a875671b6743ff35ae794eb193a8",
+      "sha256": "397bbed37c56ee83a66658ecfb6ecf7524fb7d1ff3c1a4451b1018e2809b10cf",
       "previousImagePath": "system/toilet_wash.png",
       "starterPreviousImagePath": "system/aac_toilet_washing.png",
       "parents": [
@@ -6853,7 +6853,7 @@
       "labelSl": "TUŠ",
       "speechSl": "Rabim pomoč pri tuširanju.",
       "imagePath": "system/toilet_shower.png",
-      "sha256": "ffb71cc0eeb0c2cf5bddf35a34ecb6eb93822772ceab09b8f020383623327ac3",
+      "sha256": "32ab8780edf5e3fdc5d8377cf511864ef87c9f573449e3f9a003376bd132bfb8",
       "previousImagePath": "system/toilet_shower.png",
       "starterPreviousImagePath": "system/aac_toilet_shower.png",
       "parents": [
@@ -7549,7 +7549,7 @@
         },
         "male": {
           "imagePath": "system/pain_head.png",
-          "sha256": "74e006703f5efefe5168e3d064b56ede21aac2d7011755c4cd178d6382f46b9d"
+          "sha256": "ee601328d8952e73a4d4482df8a282567ec2c82ef4d1f1286afdbcd5f1c64204"
         }
       }
     },
@@ -7682,7 +7682,7 @@
         },
         "male": {
           "imagePath": "system/pain_back.png",
-          "sha256": "f0af32e8f7fb1d536989d8d60a6f91fdfffd5785732b3aa73cf35130591b2db9"
+          "sha256": "53c2eb289a284af86cf6fdb484430e0c9836a24e9119ea8b9dc6685cc756d794"
         }
       }
     },
@@ -7749,7 +7749,7 @@
         },
         "male": {
           "imagePath": "system/pain_chest.png",
-          "sha256": "205ff3b987229302bee141e1786aebaadc6d5ff83bca828a776d73261f14f33f"
+          "sha256": "7e9169b423ce62dc74511061a0f46a5f849b0482deca4452d9044d3fae8ac73f"
         }
       }
     },
