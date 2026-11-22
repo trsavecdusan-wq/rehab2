@@ -147,7 +147,23 @@ class PersonalIconImportActivity : AppCompatActivity() {
                 contentDescription = "Predogled ${entry.motif}"
                 setOnClickListener { setBackgroundColor(if (tag == true) 0xff35404b.toInt() else 0xfff4f4f4.toInt()); tag = tag != true }
             }
-            content.addView(preview, LinearLayout.LayoutParams(180,180))
+            if (entry.candidates.size == 1) {
+                val target = catalog[entry.candidates[0]]
+                text("LEVO: TRENUTNA SLIKA · DESNO: NOVI PREDLOG")
+                val comparison=LinearLayout(this)
+                val oldFile=target?.let { AacPatientImages.resolve(this,it) }
+                comparison.addView(ImageView(this).apply {
+                    scaleType=ImageView.ScaleType.FIT_CENTER;setBackgroundColor(0xff35404b.toInt())
+                    contentDescription="Trenutna slika ${target?.labelSl.orEmpty()}"
+                    oldFile?.let { setImageBitmap(BitmapFactory.decodeFile(it.path,BitmapFactory.Options().apply{inSampleSize=8})) }
+                },LinearLayout.LayoutParams(180,180))
+                comparison.addView(preview,LinearLayout.LayoutParams(180,180))
+                preview.setOnClickListener {
+                    val color=if(preview.tag==true)0xff35404b.toInt() else 0xffeeeeee.toInt();preview.tag=preview.tag!=true
+                    for(i in 0 until comparison.childCount)comparison.getChildAt(i).setBackgroundColor(color)
+                }
+                content.addView(comparison)
+            } else content.addView(preview, LinearLayout.LayoutParams(180,180))
             text("Dotakni se slike za svetlo/temno ozadje. Preveri robove in razumljivost na majhnem gumbu.")
             val warning = when(entry.motif) {
                 "popravi" -> "ZA PREGLED: telesni položaj/blazina. Ne povezujemo s POPRAVI SPOROČILO (correct_message)."
@@ -166,7 +182,7 @@ class PersonalIconImportActivity : AppCompatActivity() {
                 if (item == null || item.locked || (id == "correct_message" &&
                     (pack!!.archiveSha256 != com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256 || entry.sha256 != "ad879cca02e4cbd147baf02f2f2e743a65dda445a84a43a661f2c1f0cf571093"))) text("Brez uvoza: $id (neznan, zaščiten ali neustrezen ID).")
                 else {
-                    AacPatientImages.resolve(this,item)?.let { current ->
+                    if (entry.candidates.size > 1) AacPatientImages.resolve(this,item)?.let { current ->
                         content.addView(ImageView(this).apply {
                             contentDescription = "Trenutna ikona ${item.labelSl}"
                             setImageBitmap(BitmapFactory.decodeFile(current.path, BitmapFactory.Options().apply { inSampleSize = 8 }))

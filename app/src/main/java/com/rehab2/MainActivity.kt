@@ -1314,6 +1314,7 @@ class MainActivity : AppCompatActivity() {
                 binding.view.alpha = 0.45f
                 binding.view.scaleX = 1f
                 binding.view.scaleY = 1f
+                binding.view.findViewWithTag<ImageView>("aac-no-label-image")?.apply { setImageDrawable(null);visibility=View.GONE }
                 bindMainAacOverlayLabel(binding.label, "")
                 binding.icon?.apply {
                     setCompoundDrawables(null, null, null, null)
@@ -1438,6 +1439,7 @@ class MainActivity : AppCompatActivity() {
                 binding.view.alpha = 0.45f
                 binding.view.scaleX = 1f
                 binding.view.scaleY = 1f
+                binding.view.findViewWithTag<ImageView>("aac-no-label-image")?.apply { setImageDrawable(null);visibility=View.GONE }
                 bindMainAacOverlayLabel(binding.label, "")
                 binding.icon?.apply {
                     setCompoundDrawables(null, null, null, null)
