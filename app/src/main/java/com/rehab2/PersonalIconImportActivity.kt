@@ -11,7 +11,7 @@ import com.rehab2.aac.*
 import com.rehab2.patient.PersonalIconZip
 import java.io.File
 
-/** Offline review. No generator, network, shared storage or catalogue writes. */
+/** Private review; optional consented HTTPS package download. No generator or catalogue writes. */
 class PersonalIconImportActivity : AppCompatActivity() {
     private lateinit var patient: String
     private lateinit var content: LinearLayout
@@ -20,37 +20,70 @@ class PersonalIconImportActivity : AppCompatActivity() {
     private var busy = false
     private var pickerPending = false
     @Volatile private var closed = false
+    @Volatile private var cancelled = false
     private val choices = linkedMapOf<CheckBox, Pair<String, PersonalIconZip.Entry>>()
     private val picker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         pickerPending = false
-        if (uri != null && !busy) {
-            busy = true; status.text = "Preverjam ZIP, kontrolne vsote in slike …"
-            val app = applicationContext
-            Thread {
-                val result = runCatching {
-                    check(AacPatientImages.store(app).currentPatientId() == patient) { "Pacient se je spremenil. Uvoz začni znova." }
-                    val prepared = app.contentResolver.openInputStream(uri)!!.use {
-                        PersonalIconZip.read(it, File(app.noBackupFilesDir, "aac-patients/$patient/import-staging"))
-                    }
-                    try {
-                        prepared.entries.forEach { entry ->
-                            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                            BitmapFactory.decodeFile(entry.file.path, options)
-                            check(options.outMimeType == "image/png" && options.outWidth == entry.width && options.outHeight == entry.height) { "Napačen format ali mere: ${entry.motif}" }
-                            val bitmap = BitmapFactory.decodeFile(entry.file.path, BitmapFactory.Options().apply { inSampleSize = 4 })
-                            check(bitmap != null) { "Slike ni mogoče odpreti: ${entry.motif}" }
-                            bitmap.recycle()
-                        }
-                        prepared
-                    } catch (e: Exception) { prepared.close(); throw e }
-                }
-                runOnUiThread {
-                    busy = false
-                    if (closed) result.getOrNull()?.close()
-                    else result.fold({ pack?.close(); pack = it; review() }, { status.text = "Uvoz ni izveden: ${it.message}" })
-                }
-            }.start()
+        if (uri != null && !busy) prepare {
+            applicationContext.contentResolver.openInputStream(uri)!!.use { readPackage(it) }
         }
+    }
+    private fun readPackage(input: java.io.InputStream): PersonalIconZip = PersonalIconZip.read(input,
+        File(applicationContext.noBackupFilesDir, "aac-patients/$patient/import-staging"))
+    private fun prepare(load: () -> PersonalIconZip) {
+        busy = true; cancelled = false; status.text = "Preverjam paket, kontrolne vsote in slike …"
+        val app = applicationContext
+        Thread {
+            val result = runCatching {
+                check(AacPatientImages.store(app).currentPatientId() == patient) { "Pacient se je spremenil. Uvoz začni znova." }
+                val prepared = load()
+                try {
+                    prepared.entries.forEach { entry ->
+                        check(!closed && !cancelled) { "Prenos preklican." }
+                        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                        BitmapFactory.decodeFile(entry.file.path, options)
+                        check(options.outMimeType == "image/png" && options.outWidth == entry.width && options.outHeight == entry.height) { "Napačen format ali mere: ${entry.motif}" }
+                        val bitmap = BitmapFactory.decodeFile(entry.file.path, BitmapFactory.Options().apply { inSampleSize = 4 })
+                        check(bitmap != null) { "Slike ni mogoče odpreti: ${entry.motif}" }; bitmap.recycle()
+                    }
+                    check(AacPatientImages.store(app).currentPatientId() == patient) { "Pacient se je spremenil. Slike niso uvožene." }
+                    prepared
+                } catch (e: Exception) { prepared.close(); throw e }
+            }
+            runOnUiThread {
+                busy = false
+                if (closed) result.getOrNull()?.close()
+                else result.fold({ pack?.close(); pack = it; review() }, { status.text = "Uvoz ni izveden: ${it.message}\nObstoječe slike so ohranjene. Prenos lahko ponoviš." })
+            }
+        }.start()
+    }
+    private fun downloadLana() {
+        if (busy || pickerPending || !samePatient()) return
+        val store = AacPatientImages.store(this)
+        val hash = com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256
+        val owner = store.confirmedSeedPatient(hash)
+        if (owner != null && owner != patient) {
+            status.text = "Ta osebni paket je potrjen za drug profil. Preklopi na potrjeni Lanin profil; slike se drugim pacientom ne dodajo."
+            return
+        }
+        val profile = org.json.JSONObject(String(AacPatientImages.profiles(this).profileFor(patient), Charsets.UTF_8))
+        AlertDialog.Builder(this).setTitle("Je izbran Lanin profil?")
+            .setMessage("${profile.optString("firstName")} ${profile.optString("lastName")}\nUUID: $patient\nPotrjujem, da ta profil pripada Lani. Preneslo se bo približno 44 MB z GitHuba. Paket je začasno javno dostopen. Prenos ne spremeni ikon; povezave in zamenjave potrdiš pozneje. POPRAVI ostane neizbran.")
+            .setNegativeButton("PREKLIČI",null)
+            .setPositiveButton("POTRJUJEM PROFIL IN PRENOS") { _, _ ->
+                if (!busy && samePatient()) {
+                    runCatching { store.confirmSeedPatient(hash,patient) }.onFailure { status.text = "Profila ni mogoče potrditi: ${it.message}" }.onSuccess {
+                        prepare {
+                            val file = com.rehab2.patient.VerifiedPackageDownload().download(
+                                com.rehab2.patient.VerifiedPackageDownload.LANA_URL,hash,
+                                com.rehab2.patient.VerifiedPackageDownload.LANA_BYTES,
+                                File(applicationContext.noBackupFilesDir,"aac-patients/$patient/downloads"),
+                                { closed || cancelled }, { bytes,total -> runOnUiThread { if (!closed) status.text = "Prenašam Lanine ikone: ${bytes * 100 / total} % — nato preverim SHA-256." } })
+                            try { file.inputStream().use { readPackage(it) } } finally { file.delete() }
+                        }
+                    }
+                }
+            }.show()
     }
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
@@ -60,6 +93,9 @@ class PersonalIconImportActivity : AppCompatActivity() {
         setContentView(ScrollView(this).apply { addView(content) })
         header()
         status = text(if (state != null) "Za nov pregled znova izberi ZIP; že dokončan uvoz ostane shranjen." else "Pripravljeni PNG-ji se uvozijo brez interneta ali storitve za izdelavo slik.")
+        button("PRENESI LANINE OSEBNE IKONE") { downloadLana() }
+        button("PREKLIČI PRENOS") { cancelled = true }
+        if (state == null && intent.getBooleanExtra("offerLana",false)) content.post { if (!closed) downloadLana() }
         button("IZBERI ZIP Z OSEBNIMI IKONAMI") {
             if (!busy && !pickerPending && samePatient()) {
                 pickerPending = true

@@ -1017,6 +1017,7 @@ class MainActivity : AppCompatActivity() {
         refreshInitialPowerState()
         startPowerMonitoring()
         resetMainAacRootOnResume()
+        com.rehab2.patient.LanaIconOffer.showOnce(this)
     }
 
     override fun onPause() {
