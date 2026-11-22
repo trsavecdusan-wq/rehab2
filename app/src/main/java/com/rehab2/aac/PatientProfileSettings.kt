@@ -22,6 +22,7 @@ data class PatientProfileSettings(
         const val GENDER_MALE = "MALE"
 
         fun load(context: Context): PatientProfileSettings {
+            AacPatientImages.store(context) // Complete an interrupted UUID/profile switch first.
             val file = AacStoragePaths.getPatientProfileFile(context) ?: return PatientProfileSettings()
             if (!file.exists() || !file.isFile) {
                 save(context, PatientProfileSettings())
@@ -53,7 +54,7 @@ data class PatientProfileSettings(
             return try {
                 file.parentFile?.let { parent -> if (!parent.exists()) parent.mkdirs() }
                 val normalized = settings.normalized()
-                val json = JSONObject()
+                val json = (if (file.isFile) JSONObject(file.readText(Charsets.UTF_8)) else JSONObject())
                     .put("firstName", normalized.firstName)
                     .put("lastName", normalized.lastName)
                     .put("gender", normalized.gender)

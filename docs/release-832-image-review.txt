@@ -25,6 +25,12 @@ skrbnik potrdi razumljivost posameznega motiva za konkretnega pacienta.
 Slika ni dokaz pacientovega počutja ali razumevanja.
 
 Zasebna pot v aplikaciji
+Osebne ikone in glasova -> IZBERI ALI DODAJ PACIENTA omogoča preklop
+obstoječih UUID in nov profil. Preklop ustavi spremljanje in obnovi osebne
+podatke izbranega pacienta. Novi profil nima osebnih slik in ima spremljanje
+izključeno. Prekinjen preklop se obnovi skladno z aktivnim UUID. Urejanje
+osnovnih in kliničnih podatkov ohranja ostala že shranjena polja.
+
 Osebne ikone in glasova -> UPORABI OSEBNO HVALA KOT PREDLOGO,
 ali IZBERI FOTOGRAFIJO IZ GALERIJE. Uporaba HVALA zahteva potrditev
 prave osebe. Izvirnik ostane nespremenjen. Predloga ostane v zasebni
@@ -62,7 +68,7 @@ HTTPS naslov namenske storitve ter potrditev pošiljanja in vsakega rezultata.
 Opravljena tehnična preverjanja
 Uspešna Androidova debug gradnja. 1007 alfa PNG in 245 kontrolnih vsot.
 26 preverjanj strani telesa in oznak jakosti. 186 preverjanj razporeda.
-81 preverjanj zasebne shrambe, uvoza, varnostne kopije in sistemske nadgradnje.
+103 preverjanja zasebne shrambe, uvoza, varnostne kopije, sistemske nadgradnje in preklopa pacientov.
 13 preverjanj govornega predpomnilnika in 29 preverjanj življenjskega cikla.
 Prva stran ima istih 25 mest. Predlog POČUTJE ni aktiviran.
 Podpisani APK, OTA in prikaz v emulatorju so še v zaključnem preverjanju.

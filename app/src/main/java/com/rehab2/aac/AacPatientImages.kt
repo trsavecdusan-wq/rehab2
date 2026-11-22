@@ -11,7 +11,15 @@ import java.io.File
 
 /** Separate from AacProfile (DOM/TRGOVINA). No global AAC item or patient JSON is rewritten. */
 object AacPatientImages {
-    fun store(context: Context) = PatientImageStore(File(context.noBackupFilesDir, "aac-patients"))
+    fun store(context: Context): PatientImageStore {
+        if (File(context.noBackupFilesDir, "aac-patients/profile-switch.pending").exists()) profiles(context).recover()
+        return PatientImageStore(File(context.noBackupFilesDir, "aac-patients"))
+    }
+
+    fun profiles(context: Context) = com.rehab2.patient.PatientProfileSwitcher(
+        File(context.noBackupFilesDir, "aac-patients"),
+        AacStoragePaths.getPatientProfileFile(context) ?: error("Shramba pacienta ni dosegljiva.")
+    ) { source, target -> android.system.Os.rename(source.absolutePath, target.absolutePath) }
 
     fun personalFile(context: Context, itemId: String, includeAliases: Boolean = true): File? = try {
         val store = store(context)

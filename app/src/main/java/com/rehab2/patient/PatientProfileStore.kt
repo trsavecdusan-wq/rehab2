@@ -6,6 +6,7 @@ import org.json.JSONObject
 
 object PatientProfileStore {
     fun load(context: Context): PatientProfile {
+        com.rehab2.aac.AacPatientImages.store(context)
         val file = AacStoragePaths.getPatientProfileFile(context) ?: return PatientProfile()
         if (!file.isFile) return PatientProfile()
 
@@ -32,7 +33,10 @@ object PatientProfileStore {
         if (!parent.exists() && !parent.mkdirs()) return false
 
         return try {
-            file.writeText(profile.toJson().toString(2), Charsets.UTF_8)
+            val json = if (file.isFile) JSONObject(file.readText(Charsets.UTF_8)) else JSONObject()
+            val updates = profile.toJson()
+            updates.keys().forEach { key -> json.put(key, updates.get(key)) }
+            file.writeText(json.toString(2), Charsets.UTF_8)
             true
         } catch (_: Exception) {
             false

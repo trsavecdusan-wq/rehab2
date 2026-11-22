@@ -51,6 +51,8 @@ class PatientPersonalizationActivity : AppCompatActivity() {
         setContentView(ScrollView(this).apply { addView(content) })
         text("OSEBNE IKONE IN GLASOVA", 24f)
         button("NAZAJ") { finish() }
+        button("IZBERI ALI DODAJ PACIENTA") { if (!busy && candidate == null) choosePatient() }
+        text("Aktivni profil: ${patientId().take(8)}. Osebne slike in podatki pripadajo temu profilu.")
         text("Izberi pacientovo fotografijo in ikone. Sistem ostane nespremenjen; nove slike se uporabijo samo pri tem pacientu po tvoji potrditvi.")
         button("SPOL PACIENTA: ${if (AacPatientVoiceSettings.male(this)) "Moški" else "Ženska"}") {
             if (busy) return@button
@@ -80,6 +82,55 @@ class PatientPersonalizationActivity : AppCompatActivity() {
         if (service.configuration().optString("endpoint").isBlank()) status.text = "Storitev za izdelavo slik še ni nastavljena. Galerija in nastavitev spola/glasov sta na voljo."
     }
     private fun patientId() = AacPatientImages.store(this).currentPatientId()
+    private fun choosePatient() {
+        runCatching {
+            val profiles = AacPatientImages.profiles(this)
+            val ids = profiles.listPatients()
+            val current = patientId()
+            val labels = ids.map { id ->
+                val data = org.json.JSONObject(String(profiles.profileFor(id), Charsets.UTF_8))
+                val name = listOf(data.optString("firstName"), data.optString("lastName")).filter { it.isNotBlank() }.joinToString(" ")
+                "${name.ifBlank { "Pacient" }} · ${id.take(8)}${if (id == current) " (aktiven)" else ""}"
+            }
+            AlertDialog.Builder(this).setTitle("Pacient")
+                .setItems(labels.toTypedArray()) { _, which ->
+                    if (ids[which] != current) AlertDialog.Builder(this).setTitle("Preklopi pacienta?")
+                        .setMessage("${labels[which]}\nSpremljanje se ustavi. Osebne slike, glasova in podatki se preklopijo na izbrani profil.")
+                        .setPositiveButton("PREKLOPI") { _, _ -> switchPatient(ids[which], null) }
+                        .setNegativeButton("PREKLIČI", null).show()
+                }
+                .setNeutralButton("NOV PACIENT") { _, _ ->
+                    val name = EditText(this).apply { hint = "Ime ali oznaka pacienta"; maxLines = 1; filters = arrayOf(android.text.InputFilter.LengthFilter(100)) }
+                    AlertDialog.Builder(this).setTitle("Nov pacient").setView(name)
+                        .setMessage("Nov profil dobi splošne slike in izključeno spremljanje. Obstoječe osebne slike se ohranijo pri prvotnem pacientu.")
+                        .setPositiveButton("USTVARI") { _, _ -> switchPatient(null, name.text.toString().trim()) }
+                        .setNegativeButton("PREKLIČI", null).show()
+                }.setNegativeButton("ZAPRI", null).show()
+        }.onFailure { status.text = "Profilov ni mogoče prebrati: ${it.message}" }
+    }
+    private fun switchPatient(id: String?, name: String?) {
+        LiveTestSession.stop()
+        generationSerial++; service.cancel(); queue.clear(); clearCandidate(); audio.release()
+        busy = true; status.text = "Preklapljam pacienta …"
+        Thread {
+            val result = runCatching {
+                val profiles = AacPatientImages.profiles(this)
+                val selected = id ?: profiles.createPatient(org.json.JSONObject().put("firstName", name.orEmpty())
+                    .put("gender", "FEMALE").toString().toByteArray(Charsets.UTF_8))
+                profiles.selectPatient(selected)
+            }
+            runOnUiThread {
+                if (!closed) {
+                    busy = false
+                    result.fold({
+                        startActivity(android.content.Intent(this, MainActivity::class.java)
+                            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                        finish()
+                    }, { audio = AacAudioPlayer(this); status.text = "Preklop ni uspel: ${it.message}" })
+                }
+            }
+        }.start()
+    }
     private fun text(value: String, size: Float = 17f): TextView = TextView(this).apply {
         text = value; textSize = size; setPadding(0, 12, 0, 12); content.addView(this)
     }

@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $testOutput = Join-Path ([IO.Path]::GetTempPath()) ('NovaRehab-patient-tests-' + [guid]::NewGuid())
 New-Item -ItemType Directory -Path $testOutput | Out-Null
-& java -m jdk.compiler/com.sun.tools.javac.Main -encoding UTF-8 -d $testOutput (Join-Path $repoRoot 'app/src/main/java/com/rehab2/patient/PatientImageStore.java') (Join-Path $repoRoot 'app/src/main/java/com/rehab2/aac/SystemIconUpgrade.java') (Join-Path $PSScriptRoot 'PatientImageStoreTest.java') (Join-Path $PSScriptRoot 'SeedImportTest.java') (Join-Path $PSScriptRoot 'MigrationBackupTest.java') (Join-Path $PSScriptRoot 'SystemIconUpgradeTest.java')
+& java -m jdk.compiler/com.sun.tools.javac.Main -encoding UTF-8 -d $testOutput (Join-Path $repoRoot 'app/src/main/java/com/rehab2/patient/PatientImageStore.java') (Join-Path $repoRoot 'app/src/main/java/com/rehab2/patient/PatientProfileSwitcher.java') (Join-Path $PSScriptRoot 'PatientProfileSwitcherTest.java') (Join-Path $repoRoot 'app/src/main/java/com/rehab2/aac/SystemIconUpgrade.java') (Join-Path $PSScriptRoot 'PatientImageStoreTest.java') (Join-Path $PSScriptRoot 'SeedImportTest.java') (Join-Path $PSScriptRoot 'MigrationBackupTest.java') (Join-Path $PSScriptRoot 'SystemIconUpgradeTest.java')
 if ($LASTEXITCODE -ne 0) { throw 'Test compilation failed' }
 & java -cp $testOutput PatientImageStoreTest
 if ($LASTEXITCODE -ne 0) { throw 'Patient image tests failed' }
@@ -12,3 +12,6 @@ if ($LASTEXITCODE -ne 0) { throw 'Seed import tests failed' }
 if ($LASTEXITCODE -ne 0) { throw 'Migration backup tests failed' }
 & java -cp $testOutput SystemIconUpgradeTest
 if ($LASTEXITCODE -ne 0) { throw 'System icon upgrade tests failed' }
+
+& java -cp $testOutput PatientProfileSwitcherTest
+if ($LASTEXITCODE -ne 0) { throw 'Patient profile switch tests failed' }
