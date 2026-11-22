@@ -3249,7 +3249,7 @@ class MainActivity : AppCompatActivity() {
         val noLabels = com.rehab2.aac.AacIconPresentation.hidden(this)
         val frame = binding.view as? FrameLayout
         var fitImage = frame?.findViewWithTag<ImageView>("aac-no-label-image")
-        fitImage?.visibility = View.GONE
+        fitImage?.apply { visibility = View.GONE;setImageDrawable(null) }
         if (noLabels && frame != null) {
             val file = com.rehab2.aac.AacPatientImages.resolve(this,item)
             val bitmap = file?.let { BitmapFactory.decodeFile(it.path) }
@@ -3259,6 +3259,7 @@ class MainActivity : AppCompatActivity() {
                     frame.addView(fitImage,FrameLayout.LayoutParams(-1,-1).apply { setMargins(dp(2),dp(2),dp(2),dp(2)) })
                 }
                 fitImage.setImageBitmap(bitmap);fitImage.visibility=View.VISIBLE
+                iconView.setCompoundDrawables(null,null,null,null);iconView.text=""
                 iconView.visibility=View.GONE
                 return
             }
