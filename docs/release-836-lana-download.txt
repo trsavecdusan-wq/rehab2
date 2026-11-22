@@ -1,0 +1,63 @@
+NovaRehab 1.2.836 — potrjeni prenos osebnega paketa
+
+Osnova: popolna preverjena izdaja v1.2.834 (02b52c1).
+Ob prvem odprtju glavne strani po nadgradnji se enkrat na namestitev ponudi
+PRENESI LANINE OSEBNE IKONE. Prenos se ne izvaja med Androidovo namestitvijo.
+POZNEJE ohrani možnost v nastavitvah: OSEBNE IKONE IN GLASOVA ->
+UVOZI OSEBNE IKONE IZ ZIP-a -> PRENESI LANINE OSEBNE IKONE.
+
+Pred prenosom aplikacija pokaže ime in UUID izbranega profila in zahteva
+potrditev, da pripada Lani. Potrditev paketa se veže na ta UUID; drugi
+profili ga po tej poti ne morejo prevzeti. Ob spremembi profila je pregled
+zavrnjen; pri zapisu ostaja dodatna zaščita obstoječe shrambe.
+
+Paket je po uporabnikovem izrecnem dovoljenju začasno javna priponka izdaje
+v1.2.834, ločena od APK-ja in git zgodovine:
+Lana_23_osebnih_ikon_in_pregled_490.zip
+Velikost: 44229921 bajtov.
+SHA-256: cda03ddc17619b2122499bbf2cabaa6047760f194da004fd16dc754e85439f70
+URL: https://github.com/trsavecdusan-wq/rehab2/releases/download/v1.2.834/Lana_23_osebnih_ikon_in_pregled_490.zip
+
+Priponka se NE odstrani ob objavi nove različice, testnem uvozu, odpiranju
+predogleda ali uspešnem uvozu na emulatorju. Odstrani se šele po uporabnikovi
+potrditvi uspešnega uvoza na fizični tablici. APK in izdaja ostaneta dostopna.
+Poznejši izbris javne priponke ne odstrani že prenesenih tujih kopij.
+
+Prenos uporablja HTTPS, omejeno število dovoljenih preusmeritev GitHuba,
+časovno omejitev, točno velikost in v aplikacijo vgrajeno SHA-256.
+Nedokončana datoteka se ob obravnavani napaki odstrani. Uspešna datoteka
+se preveri z obstoječim pregledovalnikom ZIP-a, nato se začasni ZIP odstrani.
+Vse lokalno pripravljeno gradivo je v zasebni mapi zajetega pacientovega UUID.
+Prenos ne spreminja povezav ikon. Napake ohranijo obstoječe slike in omogočajo
+ponovitev. PREKLIČI PRENOS prekine ob naslednjem bloku ali izteku omrežnega
+čakanja (največ 20 sekund za branje).
+
+Obstoječi predogled pokaže vseh 23 slik in posamezne predlagane povezave.
+Nobena povezava ni predhodno označena. POPRAVI ostane neizbran in se ne
+povezuje s correct_message. Povezave ter zamenjave potrdi uporabnik.
+Po uvozu zasebni izvirniki in prikazne kopije delujejo brez interneta.
+Splošni slikovni asseti, razpored, govor, podatki in pravila OTA/rollback
+se ne spreminjajo. Osebni PNG-ji niso del APK-ja ali git zgodovine.
+
+Preverjanja: 18 preizkusov prenosa (napake HTTP, napačen SHA/velikost,
+prekinitev, preklic, preusmeritve, čiščenje), dejanski javni prenos s SHA-256
+in branjem vseh 23 zapisov, 29 preizkusov ZIP/serijskega uvoza ter 103
+obstoječi preizkusi slik, migracij in pacientovih profilov.
+Dejanski uvoz na uporabnikovi fizični tablici ni opravljen.
+
+Androidovo preverjanje kandidata be9ac58 (podpisan APK, API 28):
+- Nadgradnja 834 -> 836 ohrani podpis in vse splošne vsebinske assete.
+- Prvo odprtje pokaže zahtevano ponudbo; ponovno odprtje je ne ponavlja.
+- Potrditev pokaže zajeti UUID. Brez Wi-Fi/podatkov prenos javi napako,
+  obstoječa osebna povezava ostane nespremenjena; gumb omogoča ponovitev.
+- Po vklopu omrežja dejanski GitHub ZIP prestane SHA-256 in odpre 23
+  predogledov. Nobena povezava ni vnaprej označena.
+- V emulatorjevem testnem profilu potrjena ena povezava (understand).
+  Shranjeni zasebni izvirnik ima enak SHA-256 kot PNG v paketu.
+- Po izklopu omrežja in ponovnem zagonu aplikacije se uvožena slika pokaže
+  na nespremenjeni glavni strani. Stara osebna HVALA ostane nespremenjena.
+- Brez napak AndroidRuntime. CI razvojna/podpisana gradnja in backend
+  pogodba uspešni (45028126654).
+To je preizkus na emulatorju, ne uvoz na fizični pacientkini tablici.
+
+Po preklopu na drugi UUID aplikacija zavrne prenos potrjenega osebnega paketa; obstoječe povezave drugega profila ostanejo nespremenjene.
