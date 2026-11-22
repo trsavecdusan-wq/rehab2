@@ -635,22 +635,23 @@ object AacContentBootstrap {
         if (!systemDir.exists() && !systemDir.mkdirs()) return 0
 
         var seeded = 0
+        val previousHashes = try {
+            context.assets.open("NovaRehab/data/system_icon_previous_hashes.json").bufferedReader().use { JSONObject(it.readText()) }
+        } catch (_: Exception) { JSONObject() }
         val availableAssets = availableBundledSystemIconFiles(context)
-        val filesToSeed = (BUNDLED_SYSTEM_ICON_FILES + listOf("home824_faster.png", "home824_correct_message.png", "home824_lets_go.png", "home824_understand.png", "home824_hungry.png", "home824_need.png")).filter { it in availableAssets }.distinct()
+        val filesToSeed = (availableAssets + BUNDLED_SYSTEM_ICON_FILES + listOf("home824_faster.png", "home824_correct_message.png", "home824_lets_go.png", "home824_understand.png", "home824_hungry.png", "home824_need.png")).filter { it in availableAssets }.distinct()
         filesToSeed.forEach { fileName ->
             if (fileName !in availableAssets) return@forEach
             val targetFile = File(systemDir, fileName)
             val assetPath = "$SYSTEM_ICON_ASSET_DIR/$fileName"
             try {
                 val assetBytes = context.assets.open(assetPath).use { input -> input.readBytes() }
-                if (isRuntimeSystemIconUsable(targetFile, fileName, assetBytes)) {
-                    seeded++
-                    return@forEach
+                val known = previousHashes.optJSONArray(fileName)
+                val hashes = if (known == null) emptySet() else (0 until known.length()).map { known.getString(it) }.toSet()
+                val outcome = SystemIconUpgrade.install(targetFile, assetBytes, hashes) { source, target ->
+                    android.system.Os.rename(source.absolutePath, target.absolutePath)
                 }
-
-                targetFile.outputStream().use { output ->
-                    output.write(assetBytes)
-                }
+                if (outcome == "preserved_unknown") Log.i(TAG, "AAC_SYSTEM_ICON_PRESERVED file=$fileName")
                 if (targetFile.exists() && targetFile.length() > 0L) {
                     seeded++
                 }

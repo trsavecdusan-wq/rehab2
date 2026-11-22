@@ -1692,7 +1692,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 applyGridTileHeight(allowRetry = true)
                 tileColor = tileColorFor(item)
                 itemView.setBackgroundColor(tileColor)
-                image.setBackgroundColor(TILE_DEFAULT_COLOR)
+                image.setBackgroundColor(android.graphics.Color.TRANSPARENT)
                 if (isYesNoVisualItem(item)) {
                     image.setPadding(0, 0, 0, 0)
                     image.alpha = 1.0f

@@ -29,7 +29,7 @@
     "sl": "RAZUMEM",
     "uk": "РОЗУМІЮ",
     "image": "system/home824_understand.png",
-    "sha256": "98105382945aa207019afbefdbb823d2b12c798d0369db10d458c6f38a942c7c"
+    "sha256": "588592262d70f46065dc8eec24fed1a6c5b5c83be07fe382e5792a7f50e08c13"
   },
   {
     "position": 5,
@@ -37,7 +37,7 @@
     "sl": "NE RAZUMEM",
     "uk": "НЕ РОЗУМІЮ",
     "image": "system/daily_dont_understand_798.png",
-    "sha256": "a54dfeb9fb181243f5e9928cdead07c397539dd0aaa11e602b8e19e4247721bd"
+    "sha256": "e0572f2186adc5824611e462bae335723db5a60e317d727130eb88542b7366f8"
   },
   {
     "position": 6,
@@ -53,7 +53,7 @@
     "sl": "BOLI ME",
     "uk": "БОЛИТЬ",
     "image": "system/review_pain_general_e8a89094.png",
-    "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+    "sha256": "427357a3f8a9d2273f6223a51b9413de459d234ec51760c2bc1b1650231dac72"
   },
   {
     "position": 8,
@@ -85,7 +85,7 @@
     "sl": "PIJAČA",
     "uk": "НАПОЇ",
     "image": "system/review_drink_category_7141f96c.png",
-    "sha256": "7141f96c1324746fc7b6e92deb03016f56abfe38197e42728efc6cb48e5d510f"
+    "sha256": "554f79a3e2ae09a7e66dd27986960c4d309e24c0c06c388e08d4a014f3c51009"
   },
   {
     "position": 12,
@@ -93,7 +93,7 @@
     "sl": "HRANA",
     "uk": "ЇЖА",
     "image": "system/home824_hungry.png",
-    "sha256": "a842bb239a908f61172b418afd46c20c4461d7e9daf3f493915e05cb3177bccd"
+    "sha256": "b8f2c00f81875539f9f267d35062be55309e6b9cd0fdbd34b82b9145e4476117"
   },
   {
     "position": 13,
@@ -125,7 +125,7 @@
     "sl": "DRUŽINA",
     "uk": "РОДИНА",
     "image": "system/daily_family_group_798.png",
-    "sha256": "8d507b0cee0285bea9fd3f6978a0748f030b76e97013214dddb8b7946ed9cac4"
+    "sha256": "7062089d0a96c8efc41dd15995c9bbdce92d073f62febaf03d066bae92ab132e"
   },
   {
     "position": 17,
@@ -133,7 +133,7 @@
     "sl": "PRIJATELJI",
     "uk": "ДРУЗІ",
     "image": "system/daily_friends_group_798.png",
-    "sha256": "b339aaccdff3129242269d6883a30df9e63095964fed19a04ac3e6aae5eede81"
+    "sha256": "70f8b37a47d6e801742d3dc151ac4cebb7181921466ee4525c145f478a76782c"
   },
   {
     "position": 18,
@@ -157,7 +157,7 @@
     "sl": "HITREJE",
     "uk": "ШВИДШЕ",
     "image": "system/home824_faster.png",
-    "sha256": "060265c915ad23318e48119580758000127bef4cb537f920b16a48c3b14f7718"
+    "sha256": "08dd17abc6bc0edb4ee277a631d06a8a704485d90d1a5b2f7400cb7e5b9ff308"
   },
   {
     "position": 21,
@@ -165,7 +165,7 @@
     "sl": "RABIM",
     "uk": "ПОТРІБНО",
     "image": "system/home824_need.png",
-    "sha256": "ac4c3ebed5961424a96259f962e6bfab43e9ae5c43aa25f446f1421fccd90908"
+    "sha256": "b81553da251f36d6f44d109c2ad2da3e26b72c46549c3b5ce087999683051c41"
   },
   {
     "position": 22,
@@ -173,7 +173,7 @@
     "sl": "ŽELIM",
     "uk": "ХОЧУ",
     "image": "system/daily_i_want_798.png",
-    "sha256": "cedbfff4d65829af7d7def2726c771e5693052f9140dfa5eb49079d46a4b1fee"
+    "sha256": "03bcfce861e73e52ce6abc89ccfd7753d1f03f20e7982efc0e12d3c06064543b"
   },
   {
     "position": 23,
@@ -181,7 +181,7 @@
     "sl": "POPRAVI",
     "uk": "ВИПРАВ",
     "image": "system/home824_correct_message.png",
-    "sha256": "29f93fc77dea7a5cbccc11c1a9e49c023db56dce55f7ada90f58753d7dfc3146"
+    "sha256": "a8525c98a628ca0255f8afb5d9a8c95804ba41550939e4debd93933fd300304b"
   },
   {
     "position": 24,
@@ -189,7 +189,7 @@
     "sl": "GREMO",
     "uk": "ХОДІМО",
     "image": "system/home824_lets_go.png",
-    "sha256": "175b0d68f8d28cee06e2477fb5333425de95d7a5a8f71c365d5c84a85ca5cbaf"
+    "sha256": "954fec4ab1190efa20d9ad61febf5a717fc13822540dd6af4f20a8011e821392"
   },
   {
     "position": 25,
@@ -197,6 +197,6 @@
     "sl": "JEZNA",
     "uk": "СЕРДИТА",
     "image": "system/review_angry_623b3507.png",
-    "sha256": "623b35070edc2020b2ff987eec32ab26ec6e5f364e5b6da81ea67eca55183153"
+    "sha256": "be8a31ab9b4c327edf4524a1ec79c6cc0cdbc3a2066e77c6d09e0969f9790368"
   }
 ]

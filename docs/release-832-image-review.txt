@@ -1,0 +1,69 @@
+NovaRehab — slikovni pregled za naslednjo izdajo (DELOVNI OSNUTEK)
+
+Osnova: izdaja 1.2.830. Ta dokument ne potrjuje pripravljenosti izdaje.
+
+POČUTJE — samo predlog za skupni pregled
+Trenutna prva stran ima 25 mest; v tej spremembi se razpored ne spreminja.
+Predlog: na mestu 8 namesto MRZLO glavna ikona POČUTJE s podikonami
+MRZLO, VROČE, SLABO, DOBRO, UTRUJENA in JEZNA.
+Sprostilo bi se pet mest (številčenje od 1, po vrsticah):
+9 SLABO; 10 UTRUJENA; 13 VROČE; 14 DOBRO; 25 JEZNA.
+BOLI ME ostane neposredno na mestu 7. Predlog še ni aktiviran.
+ID-ji, povezave, govor in statistika se pri slikovni zamenjavi ne spreminjajo.
+
+Osebne slike — potrebna sta prava predloga in pregled skrbnika
+Prednostni pojmi: HVALA, RAZUMEM, NE RAZUMEM, BOLI ME, MRZLO,
+VROČE, SLABO, DOBRO, UTRUJENA, SPATI, JEZNA.
+Za vseh enajst je potrebna potrditev identitete in jasnosti pomena.
+Za novo izdelavo potrebujemo izvirnik iz zasebne galerije ali potrjeno
+osebno HVALA istega pacientovega UUID. Zgodovinska osebna slika iz
+posebnega testnega paketa ni dovoljenje za vključitev v javni APK.
+RAZUMEM in NE RAZUMEM morata biti jasno različna. UTRUJENA in SPATI
+ne smeta postati isti motiv. BOLI ME naj jasno označuje bolečino oziroma
+ustrezno mesto, brez spreminjanja strani telesa. Pri ostalih občutjih naj
+skrbnik potrdi razumljivost posameznega motiva za konkretnega pacienta.
+Slika ni dokaz pacientovega počutja ali razumevanja.
+
+Zasebna pot v aplikaciji
+Osebne ikone in glasova -> UPORABI OSEBNO HVALA KOT PREDLOGO,
+ali IZBERI FOTOGRAFIJO IZ GALERIJE. Uporaba HVALA zahteva potrditev
+prave osebe. Izvirnik ostane nespremenjen. Predloga ostane v zasebni
+shrambi pripadajočega UUID. Pošiljanje namenski storitvi se potrdi ločeno
+pred izdelavo; posamezna slika se uporabi šele po pregledu in potrditvi.
+Brez nastavljenega HTTPS naslova in dostopa izdelava ni razpoložljiva.
+Splošne sistemske slike ostanejo privzete za nov profil.
+
+Stanje slikovne obdelave
+Vgrajeni slikovni generator je bil preizkušen za HRANA. Rezultati so imeli
+bele ostanke oziroma siv sij in niso bili vključeni. Uporabnik je nato
+izrecno odobril lokalno čiščenje alfa kanala (22. 11. 2026).
+Vključenih je 245 alfa popravkov iz 232 različnih motivov. Barvni kanali
+vseh 245 slik so nespremenjeni; ohranjeni so beli deli predmetov.
+Preostalih 762 slik je alfa kanal že imelo. Preverjenih je vseh 1007 PNG.
+Pri sestavljenih motivih so bili posebej obnovljeni krožniki, skodelice,
+postelje, puščice in drugi deli, ki jih model ni pravilno izločil.
+Pregled: tests/alpha832/background-review.png in tests/release-824/home-grid.png.
+Seznam datotek in kontrolnih vsot: NovaRehab/data/alpha832_manifest.json.
+
+Nadgradnja sistemskih kopij
+Primerjava prejšnjih kontrolnih vsot prepozna sistemske kopije in jih
+atomsko osveži. Neznana zamenjava se ohrani. Zasebna shramba pacientov,
+izvirniki in povezave UUID/ID se ne prepisujejo. Simulirana prekinitev
+pred zamenjavo ohrani staro datoteko. Ozadje slikovnega pogleda je ločeno
+od ozadja gumba in napisa.
+
+Zasebnost
+Dve osebni sliki in osebni manifest iz zgodovinskega testnega paketa
+so odstranjeni iz naslednje javne revizije; lokalne kopije ostanejo.
+Stara zgodovina Git s tem ni izbrisana. Ta izdaja ne vsebuje osebnih slik.
+Izdelava novih osebnih različic zahteva pravo zasebno predlogo, nastavljen
+HTTPS naslov namenske storitve ter potrditev pošiljanja in vsakega rezultata.
+
+Opravljena tehnična preverjanja
+Uspešna Androidova debug gradnja. 1007 alfa PNG in 245 kontrolnih vsot.
+26 preverjanj strani telesa in oznak jakosti. 186 preverjanj razporeda.
+81 preverjanj zasebne shrambe, uvoza, varnostne kopije in sistemske nadgradnje.
+13 preverjanj govornega predpomnilnika in 29 preverjanj življenjskega cikla.
+Prva stran ima istih 25 mest. Predlog POČUTJE ni aktiviran.
+Podpisani APK, OTA in prikaz v emulatorju so še v zaključnem preverjanju.
+Fizična uporabnikova tablica ni priključena.

@@ -33,3 +33,5 @@ google-services.json
 # Android Profiling
 *.hprof
 tools/personalization_service/__pycache__/
+# Private historical reference files remain local; never ship or recommit them.
+app/src/consentedPatientTest798/assets/private-patient-seed/

@@ -69,12 +69,15 @@ class PatientIconPersonalizer(private val context: Context) {
     }
 
     fun eligible(): List<AacItem> = AacEditorStorage.loadItems(context).filter {
-        it.id in personIds && !it.locked && !it.userEdited && it.fixedTopRowPosition == null
+        it.id in personIds && !it.locked && !it.userEdited &&
+            (it.fixedTopRowPosition == null || it.id in priorityIds)
     }
     private fun systemImage(itemId: String): File {
         // Always use the reviewed SYSTEM reference, never an existing patient overlay.
         val item = AacStarterContentV1.items().single { it.id == itemId }
-        val path = AacAuditedIcons.variant(item, AacPatientVoiceSettings.male(context)) ?: item.imagePath
+        val home = AacHomeLayout.systemImage(itemId).takeIf { AacHomeLayout.enabled(context) }
+        val path = home?.takeIf { it.startsWith("system/home824_") }
+            ?: AacAuditedIcons.variant(item, AacPatientVoiceSettings.male(context)) ?: home ?: item.imagePath
         return AacStoragePaths.resolveIconFile(context, path, item.iconSource)
             ?.takeIf { it.isFile } ?: error("Sistemska ikona ni dosegljiva.")
     }
@@ -168,7 +171,9 @@ class PatientIconPersonalizer(private val context: Context) {
         candidate.delete()
     }
     companion object {
-        val personIds = setOf("tired", "walk", "rest", "sleepy", "need_rest", "sad", "happy", "afraid", "bad", "good",
+        val priorityIds = listOf("thank_you", "understand", "dont_understand", "pain", "cold", "hot",
+            "bad", "good", "tired", "sleepy", "angry")
+        val personIds = priorityIds.toSet() + setOf("tired", "walk", "rest", "sleepy", "need_rest", "sad", "happy", "afraid", "bad", "good",
             "feeling", "love_you", "rada_te_imam", "choose_myself", "show_you", "not_this", "not_here", "i_want",
             "cannot", "cannot_speak", "cannot_eat", "cannot_drink", "cannot_stand", "cannot_move", "cannot_understand",
             "pain", "head", "arm", "leg", "belly", "back", "chest", "throat", "chest_pain", "cannot_breathe",

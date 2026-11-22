@@ -71,6 +71,8 @@ class PatientPersonalizationActivity : AppCompatActivity() {
         preview = ImageView(this).apply { adjustViewBounds = true; maxHeight = 360 }
         content.addView(preview, LinearLayout.LayoutParams(-1, 360))
         status = text("")
+        button("UPORABI OSEBNO HVALA KOT PREDLOGO") { if (!busy && candidate == null) useThankYouReference() }
+        text("Najprej preglej: HVALA, RAZUMEM, NE RAZUMEM, BOLI ME, MRZLO, VROČE, SLABO, DOBRO, UTRUJENA, SPATI in JEZNA. Preveri, da podoba jasno izraža izbrani pomen; podobnost obraza sama ne zadostuje.")
         button("IZBERI IKONE ZA IZDELAVO") { if (!busy && candidate == null) chooseIcons() }
         button("PREKLIČI IZDELAVO") { generationSerial++; queue.clear(); service.cancel(); busy = false; clearCandidate(); status.text = "Izdelava preklicana." }
         button("NASTAVITEV STORITVE ZA SLIKE") { if (!busy) configureService() }
@@ -95,11 +97,38 @@ class PatientPersonalizationActivity : AppCompatActivity() {
         }
     }
     private fun showReference() { preview.setImageURI(android.net.Uri.fromFile(service.reference(patientId()))) }
+    private fun useThankYouReference() {
+        val patient = patientId()
+        val source = AacPatientImages.personalFile(this, "thank_you", includeAliases = false)
+        if (source == null) {
+            status.text = "Ta pacient še nima zasebne slike HVALA. Uvozi njegov izvirnik iz galerije."
+            return
+        }
+        val image = ImageView(this).apply { adjustViewBounds = true; setImageURI(android.net.Uri.fromFile(source)) }
+        AlertDialog.Builder(this).setTitle("Je to prava oseba?").setView(image)
+            .setMessage("Potrdi, da osebna HVALA pripada trenutno izbranemu pacientu. Slika bo lokalna predloga; pošiljanje storitvi potrdiš ločeno pred izdelavo. Če podobnost ni ustrezna, uporabi izvirno fotografijo iz galerije.")
+            .setPositiveButton("UPORABI PREDLOGO") { _, _ ->
+                if (patient != patientId()) { status.text = "Pacient je spremenjen. Ponovi izbiro."; return@setPositiveButton }
+                busy = true
+                Thread {
+                    val result = runCatching { service.importReference(patient, android.net.Uri.fromFile(source)) }
+                    runOnUiThread {
+                        if (!closed) {
+                            busy = false
+                            result.fold({ status.text = "Zasebna predloga je pripravljena."; showReference() },
+                                { status.text = "Predloge ni mogoče uvoziti: ${it.message}" })
+                        }
+                    }
+                }.start()
+            }.setNegativeButton("PREKLIČI", null).show()
+    }
     private fun chooseIcons() {
         if (!service.reference(patientId()).isFile) { status.text = "Najprej izberi fotografijo iz galerije."; return }
         if (service.configuration().optString("endpoint").isBlank()) { status.text = "Najprej nastavi storitev za izdelavo slik."; return }
         val patient = patientId()
-        val items = service.eligible().sortedBy { it.labelSl }
+        val items = service.eligible().sortedWith(compareBy<AacItem> {
+            PatientIconPersonalizer.priorityIds.indexOf(it.id).let { index -> if (index < 0) Int.MAX_VALUE else index }
+        }.thenBy { it.labelSl })
         val selected = BooleanArray(items.size)
         AlertDialog.Builder(this).setTitle("Izberi osebne ikone")
             .setMultiChoiceItems(items.map { it.labelSl }.toTypedArray(), selected) { _, which, checked -> selected[which] = checked }
@@ -154,7 +183,7 @@ class PatientPersonalizationActivity : AppCompatActivity() {
         comparison.addView(original, LinearLayout.LayoutParams(0, 320, 1f))
         comparison.addView(image, LinearLayout.LayoutParams(0, 320, 1f))
         AlertDialog.Builder(this).setTitle("SISTEMSKA  |  OSEBNA: $candidateItem").setView(comparison)
-            .setMessage("Preveri podobnost, slog, pomen in stran telesa. Uporaba zamenja samo to osebno ikono; stara datoteka ostane shranjena.")
+            .setMessage("Preveri podobnost, slog, pomen in stran telesa. RAZUMEM in NE RAZUMEM morata biti jasno različna; BOLI ME naj kaže mesto bolečine, SPATI spanec in UTRUJENA utrujenost. Če pomen ni jasen, sliko zavrni. Uporaba zamenja samo to osebno ikono; stara datoteka ostane shranjena.")
             .setPositiveButton("UPORABI") { _, _ ->
                 runCatching { service.approve(requireNotNull(candidatePatient), requireNotNull(candidateItem), file) }
                     .fold({ clearCandidate(); next() }, { queue.clear(); clearCandidate(); status.text = "Ikone ni mogoče uporabiti: ${it.message}" })

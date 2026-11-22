@@ -11,7 +11,15 @@ assert len(rows)==479 and sum(len(r['children']) for r in rows.values())==650
 assert not M['pendingGeneration']
 assert dict(re.findall(r'"([^"]+)" to "([^"]+)"',S))=={k:r['imagePath'] for k,r in rows.items()}
 graph=runpy.run_path(str(R/'tests/daily-tree/audit_catalog.py'))
-assert graph['edges']=={k:r['children'] for k,r in rows.items()}
+# The 816 image manifest predates the verified WC/PROSIM additions in 830.
+# Preserve all its links and pin the existing extensions, without changing data.
+legacy_edges={k:r['children'] for k,r in rows.items()}
+assert set(graph['edges'])-set(legacy_edges)=={'please_blanket','please_blanket_laundry','wc_pee','please_cigarettes','please_more','please_buy_cigarettes','wc_poop','please_blanket_bed'}
+for k,children in legacy_edges.items():
+ if k in {'wc','please'}: assert set(children)<=set(graph['edges'][k]),k
+ else: assert graph['edges'][k]==children,k
+assert graph['edges']['wc']==['wc_pee','nurse_help','wc_poop','wc_diaper_change','wc_wet','wc_wet_and_dirty','wc_dirty']
+assert graph['edges']['please']==['wc_diaper_change','please_more','pogovor','socialno','help','wait','repeat','slower','come_to_me','look_at_me','turn_me','fix_me']
 visited=set()
 def visit(k,active):
  assert k not in active,('Cycle',k)

@@ -24,7 +24,7 @@ for i,(id,label) in enumerate(zip(ids,labels)):
     if id in new: assert Path(path).name in boot
     manifest.append(dict(position=i+1,id=id,sl=label,uk=uk[i],image=path,sha256=hashlib.sha256(file.read_bytes()).hexdigest()))
     im=im.convert('RGBA');im.thumbnail((222,222));x=(i%5)*240;y=(i//5)*270
-    tile=Image.new('RGBA',(230,230),'white');tile.alpha_composite(im,((230-im.width)//2,(230-im.height)//2))
+    tile=Image.new('RGBA',(230,230),'#34414D');tile.alpha_composite(im,((230-im.width)//2,(230-im.height)//2))
     sheet.paste(tile.convert('RGB'),(x+5,y+5));draw.text((x+8,y+241),f'{i+1}. {label}',font=font,fill='white')
 assert len({r['sha256'] for r in manifest})==25
 main=(J/'MainActivity.kt').read_text(encoding='utf-8');other=(J/'AacCommunicatorActivity.kt').read_text(encoding='utf-8')
@@ -42,7 +42,7 @@ assert 'note_observed' in (J/'LiveTestActivity.kt').read_text(encoding='utf-8')
 assert not any(s in session for s in ['MediaRecorder','CameraManager','OkHttpClient','writeText','FileOutputStream'])
 manifest_xml=(R/'app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
 assert 'android.permission.CAMERA' in manifest_xml and 'android.permission.RECORD_AUDIO' in manifest_xml
-gradle=(R/'app/build.gradle').read_text();assert 'versionCode 11018' in gradle and 'versionName "1.2.830"' in gradle
+gradle=(R/'app/build.gradle').read_text();assert 'versionCode 11020' in gradle and 'versionName "1.2.832"' in gradle
 out=R/'tests/release-824';sheet.save(out/'home-grid.png')
 (out/'home-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8')
 print('PASS: 25 distinct images, exact bilingual grid, runtime wiring, stale response guard, async playback, bounded local observation and release version')

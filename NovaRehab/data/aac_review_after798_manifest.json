@@ -8,73 +8,73 @@
       "id": "about_me",
       "imagePath": "system/review_profile_card_bef437f2.png",
       "sourceMeaning": "profile_card",
-      "sha256": "bef437f24ac972ad65d3fae7b4956dcd9934c85a186c349a35d6dc0ac5c68bac"
+      "sha256": "387bea6306ad01383e43c478caaa69651c77c229a949a3265beb00026a76c1b5"
     },
     {
       "id": "activity_group",
       "imagePath": "system/review_activity_group_789fd08c.png",
       "sourceMeaning": "activity_group",
-      "sha256": "789fd08c71ff986c72eac4df62bd82e5bc9df325e2af0c6cc9339093b3e6fc72"
+      "sha256": "cc1f65506065bc082ac71589cea6edb4416a34aa4c2c7d5de61ec54719f03556"
     },
     {
       "id": "afternoon",
       "imagePath": "system/review_afternoon_647d55e1.png",
       "sourceMeaning": "afternoon",
-      "sha256": "647d55e1eec945cf6643d00836f35389fe53a23a628c2c83d44882b66d8a5003"
+      "sha256": "0a38137f2530080f18cc7ff7df4655d95addba0ddb0828f7b09be8fc9de81d2a"
     },
     {
       "id": "angry",
       "imagePath": "system/review_angry_623b3507.png",
       "sourceMeaning": "angry",
-      "sha256": "623b35070edc2020b2ff987eec32ab26ec6e5f364e5b6da81ea67eca55183153"
+      "sha256": "be8a31ab9b4c327edf4524a1ec79c6cc0cdbc3a2066e77c6d09e0969f9790368"
     },
     {
       "id": "animals",
       "imagePath": "system/review_animals_9720a58c.png",
       "sourceMeaning": "animals",
-      "sha256": "9720a58c20de28ddbafcf56b8386e58f822d6cc4f12971489dcf43d678724613"
+      "sha256": "87ad6a58a998e4f6afd12e66ec2ba3e87948e5cdf6154de274ccdb7067d6750c"
     },
     {
       "id": "arm",
       "imagePath": "system/review_arm_9d268d88.png",
       "sourceMeaning": "arm",
-      "sha256": "9d268d88d8ead4643e8d1021a7a50e53866af3c4d623b390d17868694d7de8be"
+      "sha256": "88d0f17c86c81e8729392649294d8803e7a95b1fa6b5b07907097ecb9e361859"
     },
     {
       "id": "arm_fingers",
       "imagePath": "system/review_arm_fingers_3501fb16.png",
       "sourceMeaning": "arm_fingers",
-      "sha256": "3501fb160f7e595b4a7debb9b120d1b6cab99c077d8bec25eecffb744b02c86c"
+      "sha256": "cc7e0c2b6b5a1c0adc3894fb2032fe08eeabe4f5df38eb7db5ac87e5d9448576"
     },
     {
       "id": "arm_forearm",
       "imagePath": "system/review_arm_forearm_4ee76471.png",
       "sourceMeaning": "arm_forearm",
-      "sha256": "4ee76471ff9567c7c2bdaddc0992eaad2199a884c58b74c3d0cadc1dafe1c248"
+      "sha256": "64e4805138f0692e2f299989184388bc259ac20255d68810be9a8a78ca145b63"
     },
     {
       "id": "arm_upper",
       "imagePath": "system/review_arm_upper_54755159.png",
       "sourceMeaning": "arm_upper",
-      "sha256": "5475515971dbbe1a3e55131aa8d98eea19f65e809ee82d725a3250c7af789652"
+      "sha256": "edadb622b06e55b69309d49b307c254c0425607e303996848461ec0bbc3754d9"
     },
     {
       "id": "ashtray",
       "imagePath": "system/review_ashtray_2b64d580.png",
       "sourceMeaning": "ashtray",
-      "sha256": "2b64d5805205ddf4bf18b24f132ab46f6cc173c9d1fc59a124cf902d9f212ef4"
+      "sha256": "e847f8875ff0cec97b84e29ca8098274ff6558e994781c795592e216b9f40f6b"
     },
     {
       "id": "back_lower",
       "imagePath": "system/review_back_lower_d6712fdd.png",
       "sourceMeaning": "back_lower",
-      "sha256": "d6712fdd76b172d23718a49eb0270ab37ed1291df5f954131f9d0b8a1cd7e0ee"
+      "sha256": "64babea5f9a42d7cbff73cdfbc9647b804d34fa68771c88e06c36f374e3c7924"
     },
     {
       "id": "back_middle",
       "imagePath": "system/review_back_middle_fe8f72c3.png",
       "sourceMeaning": "back_middle",
-      "sha256": "fe8f72c3621b0b8cdf2c5a8a7f6d2a7cbe2c649a302472f6783cffac22cc2b43"
+      "sha256": "735427dfe95d79cfade7f2c988e9ab4bfeb4fd7cd990155d26c9e36953d650bb"
     },
     {
       "id": "back_to_main",
@@ -86,19 +86,19 @@
       "id": "back_upper",
       "imagePath": "system/review_back_upper_232e7330.png",
       "sourceMeaning": "back_upper",
-      "sha256": "232e7330ac0e58671c1e3a9be768a90396bda4291ba2178c275b72aec872c6e8"
+      "sha256": "81c111753c1e8fa85799277b4318477cefe03834a8d2378a65c0a61d0e6a1eb7"
     },
     {
       "id": "balcony",
       "imagePath": "system/review_balcony_5cde31d6.png",
       "sourceMeaning": "balcony",
-      "sha256": "5cde31d6c3a7b1334c556a0c9a82177ab9a3047beeba7ea6ea0cc02712431c49"
+      "sha256": "f818d0de84c118a69c5609d95aba9ff6f2ac725a9d6f377a2e52f7956956ba7d"
     },
     {
       "id": "bathroom",
       "imagePath": "system/review_bathroom_4f990427.png",
       "sourceMeaning": "bathroom",
-      "sha256": "4f990427dff35ba3d70a5b522fb904d267767ffc7d9594a83d3f2b3aa8b52d82"
+      "sha256": "3f2733043857ccf4bcf5a7314961a09f511f74cc41d1ade23dccf3207dd30533"
     },
     {
       "id": "be_patient",
@@ -110,49 +110,49 @@
       "id": "bed",
       "imagePath": "system/review_bed_f302e2c2.png",
       "sourceMeaning": "bed",
-      "sha256": "f302e2c2346b2e53ee565db22ec161ca890ec4aecdab76d0f6447b6c667a77d0"
+      "sha256": "429dd9e19c62132f3d18b2cfd6c44884ea7f146cfc501263ec33745480fb5ad5"
     },
     {
       "id": "belly",
       "imagePath": "system/review_belly_23aaf562.png",
       "sourceMeaning": "belly",
-      "sha256": "23aaf5621e637686540e4b159a031210fa1f0ec162fbb60bf4b93992078845df"
+      "sha256": "6e3162650331f8ce16c5122d2f1851750c22ce3da94fe94ddbfb6e633ed00489"
     },
     {
       "id": "belly_left",
       "imagePath": "system/review_belly_left_624068af.png",
       "sourceMeaning": "belly_left",
-      "sha256": "624068af87869bb601706884f099cacd7dfb321fc856854c0f0d673e9f7e30be"
+      "sha256": "a38ffb828eadb3c70359ef57e0f0f3fc52dbdde5e7a09746655cedcf64907387"
     },
     {
       "id": "belly_lower",
       "imagePath": "system/review_belly_lower_3c91803d.png",
       "sourceMeaning": "belly_lower",
-      "sha256": "3c91803d8fc32aa43483244412a0ea7d599a8b35a2c6526691e8a7c98ee69163"
+      "sha256": "fbeb68277d0f9da76b6abba2bc8233dc92656bd822e28d140d3be0a55169a989"
     },
     {
       "id": "belly_right",
       "imagePath": "system/review_belly_right_8bae9bd0.png",
       "sourceMeaning": "belly_right",
-      "sha256": "8bae9bd081eef62fdf2aa62b1b2b0bfce0775a32d42923f0f8de99a1cc6e4293"
+      "sha256": "f9f5ba21113a81fa2876d8179628c15e8294560cdeadccdff70a8c66094e8377"
     },
     {
       "id": "belly_upper",
       "imagePath": "system/review_belly_upper_8568f18b.png",
       "sourceMeaning": "belly_upper",
-      "sha256": "8568f18be639be9b0b6c05f17299e45b6a486b9ddee1b7382c5a38051a0b3ce9"
+      "sha256": "fdd62e7ffa1e68eb2f19f7147911a37fbb5debe95ee97c63400a8df29b0f4c78"
     },
     {
       "id": "bird",
       "imagePath": "system/review_bird_06e6451c.png",
       "sourceMeaning": "bird",
-      "sha256": "06e6451c8bfb66ff69af072f556ab8f6154a6294b74c0f60d7466182b14984c6"
+      "sha256": "6b12deb5c7d9470b672c79d128348d94bc85175b5567e06b07a1e49e6976c346"
     },
     {
       "id": "blanket",
       "imagePath": "system/review_blanket_8994e8c4.png",
       "sourceMeaning": "blanket",
-      "sha256": "8994e8c43408d19ba9fbe894acda3e097ec0a5bad67a7d3b79646c72136b0750"
+      "sha256": "a179e012ad985d9993985111e0a6554ae86047786ac7f45abf0b53a30bb6fc41"
     },
     {
       "id": "call_doctor",
@@ -164,19 +164,19 @@
       "id": "call_me",
       "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
       "sourceMeaning": "@daily_call_798.png",
-      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+      "sha256": "ac2711df285e8ad160d43f27fd7cfef37c726d86d1b1d68cf1105c80e603819c"
     },
     {
       "id": "call_my_caregiver",
       "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
       "sourceMeaning": "@daily_call_798.png",
-      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+      "sha256": "ac2711df285e8ad160d43f27fd7cfef37c726d86d1b1d68cf1105c80e603819c"
     },
     {
       "id": "call_my_therapist",
       "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
       "sourceMeaning": "@daily_call_798.png",
-      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+      "sha256": "ac2711df285e8ad160d43f27fd7cfef37c726d86d1b1d68cf1105c80e603819c"
     },
     {
       "id": "call_nurse",
@@ -188,103 +188,103 @@
       "id": "cannot",
       "imagePath": "system/review_cannot_da19e481.png",
       "sourceMeaning": "cannot",
-      "sha256": "da19e48153dea7b0095a9a2a5cad2d267c9976bcb264447b21449cac76b825ac"
+      "sha256": "57d379fa0a33b4409b5112d37041a01373501e37f86bb44f9f9b4e77cadbc737"
     },
     {
       "id": "cannot_breathe",
       "imagePath": "system/review_cannot_breathe_6aacfefd.png",
       "sourceMeaning": "cannot_breathe",
-      "sha256": "6aacfefdc6312e0484c2db7d6b8f4eca680f386230ee29cb78915cab3231e816"
+      "sha256": "6dd30ba4e10efb0e25a6d6e3d135acbaf9c1ffa8437b81fd23680f4bcc712ac3"
     },
     {
       "id": "cannot_drink",
       "imagePath": "system/review_cannot_drink_93b295a9.png",
       "sourceMeaning": "cannot_drink",
-      "sha256": "93b295a9fb6a1af0e07a86d8f88dfc985d0e33c0cacfa84c1b18caca5a966419"
+      "sha256": "50b2bcfadfb47f2c93a37436de2078530d51617a26c79f40251da67a8238dde7"
     },
     {
       "id": "cannot_eat",
       "imagePath": "system/review_cannot_eat_7d601048.png",
       "sourceMeaning": "cannot_eat",
-      "sha256": "7d601048b76256dc88955d4330b24e0ee0a26cae80c4a6562b882dc27a9788a3"
+      "sha256": "4d599776db11b0371f437a345d5f393d7ec0062a525f115b98dfa12ca18cce68"
     },
     {
       "id": "cannot_move",
       "imagePath": "system/review_cannot_move_08ec742e.png",
       "sourceMeaning": "cannot_move",
-      "sha256": "08ec742e52626e604502182a993dde054856cfbde7f53ee58a4d60aaff1fb8dd"
+      "sha256": "e6dd3aac0e4c878f9bda08986ca2b9adba77df092417cc107e758d6b88087564"
     },
     {
       "id": "cannot_speak",
       "imagePath": "system/review_cannot_speak_d2293812.png",
       "sourceMeaning": "cannot_speak",
-      "sha256": "d2293812adebeb362f857a47a6e5520bc6b26c60c2487b4c4b760f6dd3204060"
+      "sha256": "ff9be788af79c5d014dd9ca76164c4d0ec330e4009a28ea659cd85e0d3e0b806"
     },
     {
       "id": "cannot_stand",
       "imagePath": "system/review_cannot_stand_022017fc.png",
       "sourceMeaning": "cannot_stand",
-      "sha256": "022017fcc48ee1ead8174fd58566d010ce94f0859cc239801b09ca8ec74a4800"
+      "sha256": "261a9705b52b75621d311991ea671fb1bba123ae81720c3aa3a8958b7df02d21"
     },
     {
       "id": "cannot_understand",
       "imagePath": "system/review_cannot_understand_a408604a.png",
       "sourceMeaning": "cannot_understand",
-      "sha256": "a408604aa0ecfb74ecf943b5f7fdf3f0205bbe68d395220f81a0b1afdf30c8f6"
+      "sha256": "45320bbd0cecd9af0d695ec936c1d406e6650057a444c97efc228e0a7beb7bab"
     },
     {
       "id": "cat",
       "imagePath": "system/review_cat_e12e3ec2.png",
       "sourceMeaning": "cat",
-      "sha256": "e12e3ec226cbb4f3abd55ebf4a45ad638a578800d6343615f98b07701e8c8ab7"
+      "sha256": "1a568d1be7a68bcccb7467172d31cc981f346619fed4ab98c9d1dab8ac9bf4b5"
     },
     {
       "id": "chocolate_milk",
       "imagePath": "system/review_chocolate_milk_3f300eb6.png",
       "sourceMeaning": "chocolate_milk",
-      "sha256": "3f300eb687a14437958ed378472364b48d01d2d36e1885c6500ca1a31c73e3d5"
+      "sha256": "ecd9c768d6716f9dda0a40ff9b225d0ced7356bdfde6e6f9b608dbe38a423331"
     },
     {
       "id": "cigarette",
       "imagePath": "system/review_cigarette_b52176f1.png",
       "sourceMeaning": "cigarette",
-      "sha256": "b52176f155dcfe1bae3b26cdebc639c0f22d28e0d213f9f5b051e73df8ad25fa"
+      "sha256": "5437e7a1ee962b62d223bf5784300c41e21328249969bf382661b13b1ca57da0"
     },
     {
       "id": "close_window",
       "imagePath": "system/review_close_window_c9ab05a7.png",
       "sourceMeaning": "close_window",
-      "sha256": "c9ab05a75eecb97ef8d7ba60d5d6e41362ab24423939d4fe7bfa660e08affdd7"
+      "sha256": "c033dbd001bc6427d0dea6bcf00bcefe4b7087368b8013e8a83e006dff7d4885"
     },
     {
       "id": "clothing",
       "imagePath": "system/review_clothing_2e385270.png",
       "sourceMeaning": "clothing",
-      "sha256": "2e38527006f657807a0f1cac483197cbaaf905306d78be84a0ce43989fffc912"
+      "sha256": "04f90fcdc9a44fc4e5670d395758903468d516bd8719e1362f4c85339a9dcb1d"
     },
     {
       "id": "cocoa_drink",
       "imagePath": "system/review_cocoa_drink_f1c6de67.png",
       "sourceMeaning": "cocoa_drink",
-      "sha256": "f1c6de672928d7e553f0fd06d23ac9743f65d91e7fd105fa3ed29735f5676614"
+      "sha256": "cbbb71caa75fac953dde578765e1050665f69bf6c61d15ae8be39dca9e3179b3"
     },
     {
       "id": "coffee_no_sugar",
       "imagePath": "system/review_coffee_no_sugar_1c9fdcce.png",
       "sourceMeaning": "coffee_no_sugar",
-      "sha256": "1c9fdcce2be069c9456910ff76a49cb2e24bbbb8a2fecf08b61c591aa74249e4"
+      "sha256": "a444efe324379906ed433572ae581614d56354178de4219123be85f8ce13f83e"
     },
     {
       "id": "cold_hot",
       "imagePath": "system/review_cold_hot_8d74dc65.png",
       "sourceMeaning": "cold_hot",
-      "sha256": "8d74dc656b6719d08f3b2bf286f937a96164864fc2476879cab4966515e2f7e6"
+      "sha256": "bbb50d92adaf65858ebed330e84933a55bdb8bb5af029bb90d4a5091b87c2a8e"
     },
     {
       "id": "contact_call",
       "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
       "sourceMeaning": "@daily_call_798.png",
-      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+      "sha256": "ac2711df285e8ad160d43f27fd7cfef37c726d86d1b1d68cf1105c80e603819c"
     },
     {
       "id": "contact_help",
@@ -296,19 +296,19 @@
       "id": "contact_message",
       "imagePath": "system/review_message_e9abde7b.png",
       "sourceMeaning": "message",
-      "sha256": "e9abde7b1c1934e2de0e583f1ff94d63e81f6a283a3d4097679226edbb9cf3a9"
+      "sha256": "6b06d80ba3665b2cb9bca56277e02aadcd353249404bcd59fe50384ff2b41b9c"
     },
     {
       "id": "courtyard",
       "imagePath": "system/review_courtyard_54e768cb.png",
       "sourceMeaning": "courtyard",
-      "sha256": "54e768cb9e7ab1c90d1329282eea84b59ab48c9db4add6df0d1e44a2e551a4a9"
+      "sha256": "4e0a4c39b610694ca039eb460d187a0628f100a04aaf0ad7e882912249688973"
     },
     {
       "id": "crutch",
       "imagePath": "system/review_crutch_0e61d767.png",
       "sourceMeaning": "crutch",
-      "sha256": "0e61d767ec1423536e929c9b4171909ac39c33901b8eb0a799c4ce0ee35d61b1"
+      "sha256": "6cf1c941d45364b9b30924a3f4baca07e25f046e8187e037d779949729a7d7e8"
     },
     {
       "id": "dajte_mi_cas",
@@ -320,43 +320,43 @@
       "id": "diaper",
       "imagePath": "system/review_diaper_da07c79b.png",
       "sourceMeaning": "diaper",
-      "sha256": "da07c79b747bb5fc4e2cd39805b0af8f395797dda87348f2990cf5dd865631d8"
+      "sha256": "feb0016a5206d78fae23937d8765ff0d7eb4a10fcea210e5a5f7fee6d9c0f8ae"
     },
     {
       "id": "dining_room",
       "imagePath": "system/review_restaurant_93d462e8.png",
       "sourceMeaning": "restaurant",
-      "sha256": "93d462e89569b08c03f87506c31281685db89686146cbd50af15e15abe90486a"
+      "sha256": "dd5f0782776c8d323540844c493db72e737bb1e7eace1b4c6fedaf5c03dacdf4"
     },
     {
       "id": "dober_dan",
       "imagePath": "system/review_visit_4e09043f.png",
       "sourceMeaning": "visit",
-      "sha256": "4e09043f22319110db8e55343fd7b00f697be2ea566ee641e9ef86c6e16b61e4"
+      "sha256": "561dad0385e658658580108f5f119a5cea8c06d346f78098b083a704bdacdf92"
     },
     {
       "id": "dober_vecer",
       "imagePath": "system/review_evening_1d6216b2.png",
       "sourceMeaning": "evening",
-      "sha256": "1d6216b2a93712e968a6d4ed94dbc634424112e1d84bb5a85316fa9eed718c09"
+      "sha256": "44ddd18465d97c15a99505ac903fa4854174560e03663a3da905a44d5ddff119"
     },
     {
       "id": "dobro_jutro",
       "imagePath": "system/review_morning_b865300c.png",
       "sourceMeaning": "morning",
-      "sha256": "b865300c1f23a1314f3ee71e303866c646c8df1f4542434e1ab1487a359bed67"
+      "sha256": "c015c50fce7556b780ec7cdd11c5d0eba738a754cdf2fc685f95eaec34de0500"
     },
     {
       "id": "dog",
       "imagePath": "system/review_dog_8251da9f.png",
       "sourceMeaning": "dog",
-      "sha256": "8251da9f9b2a64dc0d8338fa9c86e978ec66b7f0405341c29329f5ed347c7837"
+      "sha256": "fd615d065213c49c032ca89093b96c2c4ec9fea11af5c8cc532ce2765334514e"
     },
     {
       "id": "dont_know_problem",
       "imagePath": "system/review_reuse_daily_dont_understand_798_a54dfeb9.png",
       "sourceMeaning": "@daily_dont_understand_798.png",
-      "sha256": "a54dfeb9fb181243f5e9928cdead07c397539dd0aaa11e602b8e19e4247721bd"
+      "sha256": "e0572f2186adc5824611e462bae335723db5a60e317d727130eb88542b7366f8"
     },
     {
       "id": "dressing",
@@ -368,19 +368,19 @@
       "id": "drink",
       "imagePath": "system/review_drink_category_7141f96c.png",
       "sourceMeaning": "drink_category",
-      "sha256": "7141f96c1324746fc7b6e92deb03016f56abfe38197e42728efc6cb48e5d510f"
+      "sha256": "554f79a3e2ae09a7e66dd27986960c4d309e24c0c06c388e08d4a014f3c51009"
     },
     {
       "id": "drink_cold",
       "imagePath": "system/review_drink_cold_aa93522e.png",
       "sourceMeaning": "drink_cold",
-      "sha256": "aa93522e174ebaffa8812b56e1159caf320315db3b0fa7d922df38b84b827bcc"
+      "sha256": "bb5ac55a259487d6d56a876252012698c12d34946dd164d6ce57906785a28ef3"
     },
     {
       "id": "drink_milk",
       "imagePath": "system/review_reuse_aac_drink_milk_440d1a3e.png",
       "sourceMeaning": "@aac_drink_milk.png",
-      "sha256": "440d1a3e4e37fb7de28c6ea78f621d3f54d76f545f94d4b7a6d394c187771fd3"
+      "sha256": "b485d5dee66c651deac3d0f9f8014b7dad352905427cf7466c6b22565a537069"
     },
     {
       "id": "drink_more",
@@ -392,49 +392,49 @@
       "id": "drink_no_additive",
       "imagePath": "system/review_drink_no_additive_ec382f9f.png",
       "sourceMeaning": "drink_no_additive",
-      "sha256": "ec382f9ff9206ce117e0e9658ae220e6625eb0331d2982ef50c439ff4633d1b1"
+      "sha256": "3376b1c725c8bcdc026982e68ebb4381ddcd33beaba7bcd146fd28a7b392486f"
     },
     {
       "id": "drink_small",
       "imagePath": "system/review_drink_small_7903bc91.png",
       "sourceMeaning": "drink_small",
-      "sha256": "7903bc9123a66983cffb8fe71eba21733a8b8ce6cbdf2ccfd6ec16feef1617a6"
+      "sha256": "611c92b5b58cf75e851a54de973b67feb971560357d111275dd7b53fa1bd9d16"
     },
     {
       "id": "drink_warm",
       "imagePath": "system/review_drink_warm_bfa4d0e1.png",
       "sourceMeaning": "drink_warm",
-      "sha256": "bfa4d0e1e74eb8bdb90b806dcab864b2b73cf233879d4881b9b2426b79e8e55d"
+      "sha256": "ac68d34f0114057950683564ceae06661ed8570dba746e157a1ae22835262221"
     },
     {
       "id": "drink_yogurt",
       "imagePath": "system/review_drink_yogurt_e73c91db.png",
       "sourceMeaning": "drink_yogurt",
-      "sha256": "e73c91dbbb6e5f0e13a65a031a8c5a2de640cb60963acb93739b8f59eff01582"
+      "sha256": "3c7a989a6cb4dd1392a5bf1f02ab3695beb2eb0d8dc24f17d1443c3faa29aceb"
     },
     {
       "id": "ear",
       "imagePath": "system/review_ear_78650fb4.png",
       "sourceMeaning": "ear",
-      "sha256": "78650fb40fda76cc23e2c45d2267bdbc1d0575f36a5eea20785b49f6709875ff"
+      "sha256": "2e374a2597ef740194ba78fb5a0c3fa013b0e526edf3bba15d616f523048c3b5"
     },
     {
       "id": "ear_both",
       "imagePath": "system/review_ear_both_f398e4d5.png",
       "sourceMeaning": "ear_both",
-      "sha256": "f398e4d5aa95dbc477f0829cc51c5bcc11ec47797fe3689974cb7849e288b081"
+      "sha256": "05e76a546edf15b36e7af61ea4cdb04aae023f8c4fed8475f2719ef4226b8f4e"
     },
     {
       "id": "ear_left",
       "imagePath": "system/review_ear_left_e2ec8c61.png",
       "sourceMeaning": "ear_left",
-      "sha256": "e2ec8c617a9c29e39974cdb7db51f3bb56bbd39dea80f4c5c8f8167e7cfb20e0"
+      "sha256": "376d3d0d9d4b978f8d270d4aa14561862777ce327e4f68214958b611b53aa2ce"
     },
     {
       "id": "ear_right",
       "imagePath": "system/review_ear_right_d9334f55.png",
       "sourceMeaning": "ear_right",
-      "sha256": "d9334f55ec3aac41e136ac6921d18760702f423ba59f0480464fcd8b168bfeba"
+      "sha256": "4f14d961c09c04631c563cc67957c9394273d8efc65360df0562d2d0d931d596"
     },
     {
       "id": "emergency",
@@ -446,43 +446,43 @@
       "id": "environment_group",
       "imagePath": "system/review_room_b2c12416.png",
       "sourceMeaning": "room",
-      "sha256": "b2c12416c4c8bf2c7405e8991f968295c56e6dbc551d53dad10e08949ef70db7"
+      "sha256": "c4d8f1f4919101a8f7ae03ed333dc41713bab57117bc893cce89066e972cc356"
     },
     {
       "id": "evening",
       "imagePath": "system/review_evening_1d6216b2.png",
       "sourceMeaning": "evening",
-      "sha256": "1d6216b2a93712e968a6d4ed94dbc634424112e1d84bb5a85316fa9eed718c09"
+      "sha256": "44ddd18465d97c15a99505ac903fa4854174560e03663a3da905a44d5ddff119"
     },
     {
       "id": "eye",
       "imagePath": "system/review_eye_501a27aa.png",
       "sourceMeaning": "eye",
-      "sha256": "501a27aa4e1e314c5eef9343ce15b49cf36554c9c9fb2d0cf56854071eba7fa9"
+      "sha256": "283e7569a7dbcdc79cc9fbad88e68961710eae5e1d558a7045235e604e10fea7"
     },
     {
       "id": "eye_both",
       "imagePath": "system/review_eye_both_150c4cbd.png",
       "sourceMeaning": "eye_both",
-      "sha256": "150c4cbd222b5b348e1e4c738e74c7417dd41e35bb8f521151d105f1dc189ea7"
+      "sha256": "31e7f0421da6571ae040d248f747a56e750ddf55a698890491e8ac9a370abbd6"
     },
     {
       "id": "eye_left",
       "imagePath": "system/review_eye_left_ab6c29c5.png",
       "sourceMeaning": "eye_left",
-      "sha256": "ab6c29c5581804c2c0482fc7cffab1c6c11dd217c7a3260f6855709c614b8ee6"
+      "sha256": "a97d63fa8337d1084701a9eeb96bd153892b2ca13e1e43ff7a4c68ca346485f5"
     },
     {
       "id": "eye_right",
       "imagePath": "system/review_eye_right_dcd7e866.png",
       "sourceMeaning": "eye_right",
-      "sha256": "dcd7e866ab0dced27aa12ef84acd0f4c72e4c1212d144747787de100115d02c0"
+      "sha256": "fd5ac14151fdc13db60f150175c17a98896453339649e1df90b30c45f4ae51da"
     },
     {
       "id": "fear_falling",
       "imagePath": "system/review_fear_falling_83667395.png",
       "sourceMeaning": "fear_falling",
-      "sha256": "836673950ef332d36e628a178f85f814310ac1740f745413a48cf43703dfdaae"
+      "sha256": "6e5332368158a8afc04934393ded34c02b2584ab0184af1884ab0e995c99df5f"
     },
     {
       "id": "feel_bad",
@@ -494,7 +494,7 @@
       "id": "fish",
       "imagePath": "system/review_fish_b713ff74.png",
       "sourceMeaning": "fish",
-      "sha256": "b713ff7454a901644bc13c9d9efcf81464af0383df0718cdbfb8ac8185fe691f"
+      "sha256": "d83e265feb2ce56fb290c2f10168708ff7f9738f074ccb2b78237ff76817a262"
     },
     {
       "id": "fix_me",
@@ -506,7 +506,7 @@
       "id": "flavored_water",
       "imagePath": "system/review_flavored_water_4cf92a98.png",
       "sourceMeaning": "flavored_water",
-      "sha256": "4cf92a984470209e63812af75348247bb323a5fa1d7dcb759e500b55bc9a1db2"
+      "sha256": "5b88385dee4490f8f8741cd28a9ce123e8997be59705a86c1145823c5f2aa5bb"
     },
     {
       "id": "food_enough",
@@ -524,7 +524,7 @@
       "id": "food_little",
       "imagePath": "system/review_food_little_3d607c54.png",
       "sourceMeaning": "food_little",
-      "sha256": "3d607c5452ed6ff1e3b0e20a17eab5666800cf210802bdda8626374c85834d03"
+      "sha256": "b5120b1007ff6f7a08839744e1a531a48180f79b7d37bc3c64a80cb9943983c0"
     },
     {
       "id": "food_more",
@@ -536,25 +536,25 @@
       "id": "food_yogurt",
       "imagePath": "system/review_plain_yogurt_7d5b945b.png",
       "sourceMeaning": "plain_yogurt",
-      "sha256": "7d5b945b5f5bd49d49b1fcba0cedc1b451f97f05994ebbb614a64dbf216c62a6"
+      "sha256": "e618a80bb13f80f322607d92b50bdcd5fc1bb3bb941c1c2c277046ddf4bb409f"
     },
     {
       "id": "gloves",
       "imagePath": "system/review_gloves_2762d93a.png",
       "sourceMeaning": "gloves",
-      "sha256": "2762d93a405d7f3c4fc5355a182a4e1ce234cb4d2900d79bb61517de3ae45b2c"
+      "sha256": "5b5648b92ae43f12b9dd77de6f82201bbbc386a964dedeb0e6045bf248bd6d89"
     },
     {
       "id": "go_inside",
       "imagePath": "system/review_room_b2c12416.png",
       "sourceMeaning": "room",
-      "sha256": "b2c12416c4c8bf2c7405e8991f968295c56e6dbc551d53dad10e08949ef70db7"
+      "sha256": "c4d8f1f4919101a8f7ae03ed333dc41713bab57117bc893cce89066e972cc356"
     },
     {
       "id": "go_outside_with_wheelchair",
       "imagePath": "system/review_wheelchair_46e4c622.png",
       "sourceMeaning": "wheelchair",
-      "sha256": "46e4c62274e737b37f1f76f22da890f9a2f785d0fae5ee31659cbb325958bac8"
+      "sha256": "bfba8a95eb6ab4dae6c5b0602194bf980d17810b56b24d5ada313e9c5138e105"
     },
     {
       "id": "govori_pocasneje",
@@ -566,19 +566,19 @@
       "id": "hat",
       "imagePath": "system/review_hat_37588d00.png",
       "sourceMeaning": "hat",
-      "sha256": "37588d00d334e4376512f900a5d82dca64485a4895fb5f698db03645c4697e5e"
+      "sha256": "f47faa0f17172c1e995081cb04c8bd4570328780a3f1b01945ad08a1fd208a20"
     },
     {
       "id": "help_drinking",
       "imagePath": "system/review_help_drinking_cba9d2fd.png",
       "sourceMeaning": "help_drinking",
-      "sha256": "cba9d2fdc9ccc9b0dc68694911cabbd3590e5ffe9fc50792ec2309b92beaac01"
+      "sha256": "e51f93e119725536595fb27a84a137d0917e3c8e638ceb3838287df1e03f13fb"
     },
     {
       "id": "help_feeding",
       "imagePath": "system/review_help_feeding_3591d4bb.png",
       "sourceMeaning": "help_feeding",
-      "sha256": "3591d4bb09e3d68f81548ab00951650b066f65b7a1f44c1cc3ab8d62b80ee520"
+      "sha256": "603b9f8d50550fb370b03d6b3038941fd53228a0381ad1ba93bfad39f686282a"
     },
     {
       "id": "help_to_wc",
@@ -590,127 +590,127 @@
       "id": "horse",
       "imagePath": "system/review_horse_c61c243e.png",
       "sourceMeaning": "horse",
-      "sha256": "c61c243eb0f0477b4f02d537d96deb730973c1ec3c9008a8addf6f15ff858977"
+      "sha256": "34a0ac1d11f31e12b9473fc21ba6b7c1313a037d3e79d7d8770362f4428029da"
     },
     {
       "id": "hungry_beef",
       "imagePath": "system/review_hungry_beef_b6758afc.png",
       "sourceMeaning": "hungry_beef",
-      "sha256": "b6758afc3848d08084b708c76911bd41f72062f4fb0fdf5f0f479962ad88fbce"
+      "sha256": "231c79ff4869faa2dfc78111f53489438e8166111b9aab1e792ee9b2f97212f5"
     },
     {
       "id": "hungry_burek",
       "imagePath": "system/review_hungry_burek_b29734c8.png",
       "sourceMeaning": "hungry_burek",
-      "sha256": "b29734c82d95742bba2984cecd505943973091021df5be7ed6665c100ce976e8"
+      "sha256": "807a05e446b95bcf898f862dd2663c105fdd78aa52ed0f5b7ffbbede426bf2cc"
     },
     {
       "id": "hungry_cevapcici",
       "imagePath": "system/review_hungry_cevapcici_983f8191.png",
       "sourceMeaning": "hungry_cevapcici",
-      "sha256": "983f8191218015b519205015a9e0ddd7d800ce67223d89454cd038d1dc100245"
+      "sha256": "79e1a9abbb780f947dbb31c350f8e3acf55a9f1334c55078274e9c84217a746f"
     },
     {
       "id": "hungry_chips",
       "imagePath": "system/review_hungry_chips_0cf95a3c.png",
       "sourceMeaning": "hungry_chips",
-      "sha256": "0cf95a3c65040d2f523f4823b0963358a999ea308ae79770f09b5d9c3984f662"
+      "sha256": "614d78710fa3c8afd098885ac4ac0a4c3faa0e81f6412bf855e2379e24a4bac6"
     },
     {
       "id": "hungry_cookies",
       "imagePath": "system/review_hungry_cookies_8346c61e.png",
       "sourceMeaning": "hungry_cookies",
-      "sha256": "8346c61e58e2309caddc2442f3280d4c673e0743b429a82afee2b1cd5df0ccd3"
+      "sha256": "9465cb04a58bf911067fac6118ebdf4b912e28bab3f36c5ba3c9792174a20172"
     },
     {
       "id": "hungry_crackers",
       "imagePath": "system/review_hungry_crackers_4dbe5f92.png",
       "sourceMeaning": "hungry_crackers",
-      "sha256": "4dbe5f92fed0f330406f897cab358354ba6f716f7b50e3c80443639adff1a5a8"
+      "sha256": "9d433de4a9d6cd04bd4303aadf5ceae8a33ae9fb2a924073b91c470a55d287fd"
     },
     {
       "id": "hungry_fries",
       "imagePath": "system/review_hungry_fries_e17ac9a5.png",
       "sourceMeaning": "hungry_fries",
-      "sha256": "e17ac9a5626a31cc2c19c6aec9245c7d989f1576c876285d837b34609de11a77"
+      "sha256": "81ad2d232755bf1071a983f6435c3c620a824dff5e4d2291801d9c5e037a6e21"
     },
     {
       "id": "hungry_fruit_yogurt",
       "imagePath": "system/review_hungry_fruit_yogurt_663f5f94.png",
       "sourceMeaning": "hungry_fruit_yogurt",
-      "sha256": "663f5f941c3379f2bda996cc81a83106c8fae440ae7d9625ecbb441fdf135d07"
+      "sha256": "45105a12593191643dd7ba8b1731fbf046766814f75307282546a5c28e820ff6"
     },
     {
       "id": "hungry_hotdog",
       "imagePath": "system/review_hungry_hotdog_92e83d09.png",
       "sourceMeaning": "hungry_hotdog",
-      "sha256": "92e83d09ed10511ce720c9f6d08465b58f9eb57af386cdfd903fb6efe1828b92"
+      "sha256": "d9be323eea44fa7eb6d7cbb381fab078891648fddfd25a1129c7e169a0c42cc4"
     },
     {
       "id": "hungry_kid_goat",
       "imagePath": "system/review_hungry_kid_goat_db014e54.png",
       "sourceMeaning": "hungry_kid_goat",
-      "sha256": "db014e545d2f6af78b93f8142bc02ff2ea35a566085ca593895075597d391409"
+      "sha256": "069225cfa477140182a2e5efc6285654013c900038cec60ee3a3e829fd4c7828"
     },
     {
       "id": "hungry_kremsnita",
       "imagePath": "system/review_hungry_kremsnita_0314f714.png",
       "sourceMeaning": "hungry_kremsnita",
-      "sha256": "0314f71461ad77e0ee5e94365a6be8bd8fd0442f081d99e7df29841a49b1f2f3"
+      "sha256": "2269657925a8be490fb6a27bebb07a0f4488ccfed9eb318d87bff4bc18035b00"
     },
     {
       "id": "hungry_lamb",
       "imagePath": "system/review_hungry_lamb_671a508a.png",
       "sourceMeaning": "hungry_lamb",
-      "sha256": "671a508ab3c1c6514cb7094a46385ded925f2eb3039ffeb5e99fdec6eb6d0fd0"
+      "sha256": "d9e0eee3b9cb190c8263ae2868a1673baf318d7b8af94c7de33a28da06555219"
     },
     {
       "id": "hungry_pleskavica",
       "imagePath": "system/review_hungry_pleskavica_a54902fd.png",
       "sourceMeaning": "hungry_pleskavica",
-      "sha256": "a54902fd48513ab2f30e90dc94cf088470c89d5b8449d45b3d40c3e0459873c0"
+      "sha256": "a3026eb63d1ff0a41138270fbadd7ef56a18453a384f98b3a6a2a5c037c6d9b4"
     },
     {
       "id": "hungry_pork",
       "imagePath": "system/review_hungry_pork_a639d7f8.png",
       "sourceMeaning": "hungry_pork",
-      "sha256": "a639d7f83c73c8cedb3c316cf7eb64c79b1aab48a548b4c3bfaea19f3311a055"
+      "sha256": "8c1d37211c8a650f33ed32e719243363df1efbfb5fa1c06c4fef466fea8f56d7"
     },
     {
       "id": "hungry_roasted_potato",
       "imagePath": "system/review_hungry_roasted_potato_2f16e051.png",
       "sourceMeaning": "hungry_roasted_potato",
-      "sha256": "2f16e0512fa4f7721eadc21e6533354f427f3447817a9cba1e3e9a175f843efd"
+      "sha256": "0576b5335c10aa74b440c2c8b4726d5b18b0574ac370af63ac8d4dc97dde46c6"
     },
     {
       "id": "hungry_snack",
       "imagePath": "system/review_hungry_chips_0cf95a3c.png",
       "sourceMeaning": "hungry_chips",
-      "sha256": "0cf95a3c65040d2f523f4823b0963358a999ea308ae79770f09b5d9c3984f662"
+      "sha256": "614d78710fa3c8afd098885ac4ac0a4c3faa0e81f6412bf855e2379e24a4bac6"
     },
     {
       "id": "hungry_toast",
       "imagePath": "system/review_hungry_toast_93cd9c3e.png",
       "sourceMeaning": "hungry_toast",
-      "sha256": "93cd9c3e95a1fd07c51622fb8dc8050dead2af4d6ef05cf614b60661d4fbc176"
+      "sha256": "90149cff1ca75b3a119f3aacdd3f7399c6cafb0c0dcf30e0c0d73f7d9da39da7"
     },
     {
       "id": "hungry_veal",
       "imagePath": "system/review_hungry_veal_d20cff1a.png",
       "sourceMeaning": "hungry_veal",
-      "sha256": "d20cff1a554ca066a0d19a636979b97836413fae3135e9a31993f162b03a8411"
+      "sha256": "434d61435e80377acbabba7b81b75a46a224e8f34eae156eb5442da4ac54b3cd"
     },
     {
       "id": "hungry_vegetable_soup",
       "imagePath": "system/review_hungry_vegetable_soup_288340a1.png",
       "sourceMeaning": "hungry_vegetable_soup",
-      "sha256": "288340a1944fdf650298f4b64b8076b031d36fba1f44e71ed5ef37aca2c6a0e1"
+      "sha256": "e30b80751c00e40a8c95c44e58a648db26c29071a7830846061166f965f853ad"
     },
     {
       "id": "hungry_yogurt",
       "imagePath": "system/review_plain_yogurt_7d5b945b.png",
       "sourceMeaning": "plain_yogurt",
-      "sha256": "7d5b945b5f5bd49d49b1fcba0cedc1b451f97f05994ebbb614a64dbf216c62a6"
+      "sha256": "e618a80bb13f80f322607d92b50bdcd5fc1bb3bb941c1c2c277046ddf4bb409f"
     },
     {
       "id": "i_understand",
@@ -728,19 +728,19 @@
       "id": "inside",
       "imagePath": "system/review_room_b2c12416.png",
       "sourceMeaning": "room",
-      "sha256": "b2c12416c4c8bf2c7405e8991f968295c56e6dbc551d53dad10e08949ef70db7"
+      "sha256": "c4d8f1f4919101a8f7ae03ed333dc41713bab57117bc893cce89066e972cc356"
     },
     {
       "id": "jacket",
       "imagePath": "system/review_jacket_45676639.png",
       "sourceMeaning": "jacket",
-      "sha256": "456766396427eeeba5deb5d0bd0a9984841168ac3a7ef35827da773f7098128d"
+      "sha256": "6b6e257060c529aa6db35ac72c987908040e8a92674f39d1265d398d1eeff805"
     },
     {
       "id": "lahko_noc",
       "imagePath": "system/review_night_e59109c7.png",
       "sourceMeaning": "night",
-      "sha256": "e59109c721a35f2dcf7ba89370fc502b64ada35d06a28e52a4740938a30f28c7"
+      "sha256": "ece9fc2348fa9139b5d2ff1bb794eabd717a85972d324b40a72de2ced48b7ace"
     },
     {
       "id": "later",
@@ -752,49 +752,49 @@
       "id": "left_side",
       "imagePath": "system/review_left_side_dfb32e05.png",
       "sourceMeaning": "left_side",
-      "sha256": "dfb32e05ac9f827af87217c3707c463941f65c8d9227739d25320905d3efe20a"
+      "sha256": "881f4397f20c88383f1b92d00d0c5906721183a2becf8f07ac790aa79379da13"
     },
     {
       "id": "leg",
       "imagePath": "system/review_leg_59abc145.png",
       "sourceMeaning": "leg",
-      "sha256": "59abc14581992aed30b6f67804f37d256659b180df5bb33e425ca03777db3c5b"
+      "sha256": "44054f1b943d4f6aed85e1e241ae071b9f3c7332b4579e4f3454fb3274dfd4db"
     },
     {
       "id": "leg_shin",
       "imagePath": "system/review_leg_shin_57057237.png",
       "sourceMeaning": "leg_shin",
-      "sha256": "57057237d41baec01f77eabf7d45e09298aa09ce2cae6603fd320a37a23cf83e"
+      "sha256": "ff1679cf354d534e9d6f7edd23ebd9b0871fcf391354182c6c242039f8d70fb5"
     },
     {
       "id": "leg_thigh",
       "imagePath": "system/review_leg_thigh_68a96a40.png",
       "sourceMeaning": "leg_thigh",
-      "sha256": "68a96a40cdeca56bc0f31d5e457d66143ff3de08a83eaaab0477114f5713854f"
+      "sha256": "ec642bc77dd50b9a82361164b4c7e6f7570331bcf8010cd7464ffea0dbd441be"
     },
     {
       "id": "leg_toes",
       "imagePath": "system/review_leg_toes_3447f7ca.png",
       "sourceMeaning": "leg_toes",
-      "sha256": "3447f7ca370c682514ee9c74f769291d7153fa939396e126b5b94793bf605057"
+      "sha256": "36fb25003eecdc5066639c90124613ad34d50effc72a8055698308344d10ddbc"
     },
     {
       "id": "lie_down",
       "imagePath": "system/review_lie_down_f9dfaf9b.png",
       "sourceMeaning": "lie_down",
-      "sha256": "f9dfaf9b33d843601463e63cb61c0bab1d18d54132e7b83b9ab684891661c9e6"
+      "sha256": "ba5941e41dca1fd2f0ba8effe5c391263cefff8c76bcd813f4cdcfc996f78f9a"
     },
     {
       "id": "lighter",
       "imagePath": "system/review_lighter_dfdf6815.png",
       "sourceMeaning": "lighter",
-      "sha256": "dfdf6815d5e5f7f289879aa2a426054af00eaaca795905d62bc14caa0ff17d74"
+      "sha256": "74245a1832f8299451c06e7c39caf233fa008122c2b78cff696c16f6fd43d429"
     },
     {
       "id": "look_at_me",
       "imagePath": "system/review_look_at_me_37f02789.png",
       "sourceMeaning": "look_at_me",
-      "sha256": "37f027892536c94767ccfc069f8b8a8e790e15a5fd6c8853c5bbc8c363ee3e41"
+      "sha256": "fd9b470de99140a204f6acc3e4a25082755b99934b11e0346339ceb217ff174c"
     },
     {
       "id": "love_you",
@@ -806,79 +806,79 @@
       "id": "medicine",
       "imagePath": "system/review_medicine_1346ce92.png",
       "sourceMeaning": "medicine",
-      "sha256": "1346ce9227bd525a9be3fac0f139a80152ed6f074e971a9057c219d1c8c4cc56"
+      "sha256": "b79167612e57b64d8bfec3ed5b0b0d349610751ab1fd793fa030ccc8115b60bf"
     },
     {
       "id": "message",
       "imagePath": "system/review_message_e9abde7b.png",
       "sourceMeaning": "message",
-      "sha256": "e9abde7b1c1934e2de0e583f1ff94d63e81f6a283a3d4097679226edbb9cf3a9"
+      "sha256": "6b06d80ba3665b2cb9bca56277e02aadcd353249404bcd59fe50384ff2b41b9c"
     },
     {
       "id": "mineral_water",
       "imagePath": "system/review_radenska_b37bdf84.png",
       "sourceMeaning": "radenska",
-      "sha256": "b37bdf8460363f3b099c751c6383b5e2627fe7a7eb99eb14a22bcac831e3a0c8"
+      "sha256": "e77c7ccac974ac7ba013cdfce69538fe00c7782c17cf9b10f7b782caa46b2676"
     },
     {
       "id": "miss_little",
       "imagePath": "system/review_miss_little_96025b95.png",
       "sourceMeaning": "miss_little",
-      "sha256": "96025b95cd974c393877ab11f6cf97cf09bcfd798efa5484dd0f07348be7fc71"
+      "sha256": "b7946f878a1a3a3cf1c6fd94a1dca78082149346b163094cc731f3f168857be8"
     },
     {
       "id": "miss_very",
       "imagePath": "system/review_miss_very_ac11f20f.png",
       "sourceMeaning": "miss_very",
-      "sha256": "ac11f20f6b100177ddecd04ffe0765f89430578632de88dbded4203e3e1b212a"
+      "sha256": "73863bc013ab73de2372efa097c97bd18c214178b6971a82bb6cf6e6aba5cc5c"
     },
     {
       "id": "morning",
       "imagePath": "system/review_morning_b865300c.png",
       "sourceMeaning": "morning",
-      "sha256": "b865300c1f23a1314f3ee71e303866c646c8df1f4542434e1ab1487a359bed67"
+      "sha256": "c015c50fce7556b780ec7cdd11c5d0eba738a754cdf2fc685f95eaec34de0500"
     },
     {
       "id": "mouth",
       "imagePath": "system/review_mouth_0ae0696b.png",
       "sourceMeaning": "mouth",
-      "sha256": "0ae0696b46a32233abb79cb3230d7e6e9c9dc480a1d5dd98c79329d05171ffa3"
+      "sha256": "fdd714864812e0ef379909f49961ae011908efd488f78831381511c763854f65"
     },
     {
       "id": "move_me",
       "imagePath": "system/review_wheelchair_46e4c622.png",
       "sourceMeaning": "wheelchair",
-      "sha256": "46e4c62274e737b37f1f76f22da890f9a2f785d0fae5ee31659cbb325958bac8"
+      "sha256": "bfba8a95eb6ab4dae6c5b0602194bf980d17810b56b24d5ada313e9c5138e105"
     },
     {
       "id": "movement_pain",
       "imagePath": "system/review_pain_general_e8a89094.png",
       "sourceMeaning": "pain_general",
-      "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+      "sha256": "427357a3f8a9d2273f6223a51b9413de459d234ec51760c2bc1b1650231dac72"
     },
     {
       "id": "music",
       "imagePath": "system/review_music_93adcb0a.png",
       "sourceMeaning": "music",
-      "sha256": "93adcb0abbd74ce8b78b9022f932fb9c8f5418a3a6793f39ada742ff3694b1c1"
+      "sha256": "eb7b8078d5ae75bc6f5b28ae79cde9e1ff81b040e50d1980b9f3c294fa5eaa79"
     },
     {
       "id": "my_age",
       "imagePath": "system/review_birthday_a4d10ce0.png",
       "sourceMeaning": "birthday",
-      "sha256": "a4d10ce0ae2754a08f8ac48d19ff103a0a42f732d68b7e3ddb64f0e26d3a3f37"
+      "sha256": "57ededa0e8d028045da78b361ea2e1c898965e8d5181f449eb7c0538e6a281e1"
     },
     {
       "id": "my_birth_date",
       "imagePath": "system/review_birthday_a4d10ce0.png",
       "sourceMeaning": "birthday",
-      "sha256": "a4d10ce0ae2754a08f8ac48d19ff103a0a42f732d68b7e3ddb64f0e26d3a3f37"
+      "sha256": "57ededa0e8d028045da78b361ea2e1c898965e8d5181f449eb7c0538e6a281e1"
     },
     {
       "id": "my_caregiver",
       "imagePath": "system/review_reuse_daily_care_798_760fc0a6.png",
       "sourceMeaning": "@daily_care_798.png",
-      "sha256": "760fc0a66c3d61b0de1a81996c1634f285a7ca78bd05fb27e1227534a17f93a3"
+      "sha256": "cf8300c18a60405ff6770225a162703b00d82fbacf120816c36cc9b50fa5488f"
     },
     {
       "id": "my_country",
@@ -902,49 +902,49 @@
       "id": "my_name",
       "imagePath": "system/review_profile_card_bef437f2.png",
       "sourceMeaning": "profile_card",
-      "sha256": "bef437f24ac972ad65d3fae7b4956dcd9934c85a186c349a35d6dc0ac5c68bac"
+      "sha256": "387bea6306ad01383e43c478caaa69651c77c229a949a3265beb00026a76c1b5"
     },
     {
       "id": "my_therapist",
       "imagePath": "system/review_therapy_4ea445a8.png",
       "sourceMeaning": "therapy",
-      "sha256": "4ea445a80064517721135b3f795519f662e44cfe2c7af21bf226f7beae40bbaf"
+      "sha256": "42fa75a9c6aca1d2a27b3a0f076e045c6a5e4b4299caab194f3ec165aa2df456"
     },
     {
       "id": "napisi_mi",
       "imagePath": "system/review_napisi_mi_a9b35c6e.png",
       "sourceMeaning": "napisi_mi",
-      "sha256": "a9b35c6e07836ef213ae8ad4f35025d93d4f1e601aebb498ff9c85f3e8f10381"
+      "sha256": "2723d6b78bcc46e6acad6a4d3ae1bc109c37acde1c7caace1eded978d66ccb97"
     },
     {
       "id": "neck",
       "imagePath": "system/review_neck_36c79e1f.png",
       "sourceMeaning": "neck",
-      "sha256": "36c79e1fbb3fbdaebb1850b797af576dbf8d0c1b3b5d85623c8e834cdab2af21"
+      "sha256": "fd6720fe614d743b56c15faecc0a12c8e8871e8a09cf54472abfebaf93b61020"
     },
     {
       "id": "night",
       "imagePath": "system/review_night_e59109c7.png",
       "sourceMeaning": "night",
-      "sha256": "e59109c721a35f2dcf7ba89370fc502b64ada35d06a28e52a4740938a30f28c7"
+      "sha256": "ece9fc2348fa9139b5d2ff1bb794eabd717a85972d324b40a72de2ced48b7ace"
     },
     {
       "id": "nisem_koncala",
       "imagePath": "system/review_nisem_koncala_759115e5.png",
       "sourceMeaning": "nisem_koncala",
-      "sha256": "759115e590dca527b2d54647bd09ad9098b144590bc0a39bc9e234244bb93a62"
+      "sha256": "446e6c31222a6462deb7c5c49bcf6a88623bd523d455d20f46c8c1b302572d5b"
     },
     {
       "id": "nose",
       "imagePath": "system/review_nose_c9d2275a.png",
       "sourceMeaning": "nose",
-      "sha256": "c9d2275acc98668709a59376ed6c19be9d5d6b2562c160f2af9cbaab627b335f"
+      "sha256": "34a2bc3d4bf03936bf8ca38960fbb178277a80c6d9d25a15d881abd989eecb3b"
     },
     {
       "id": "not_hungry",
       "imagePath": "system/review_not_hungry_bc078ea1.png",
       "sourceMeaning": "not_hungry",
-      "sha256": "bc078ea1a3c785508ccd879092887e80e1db859768af4574e82dffe60532400e"
+      "sha256": "2aee43dcc7d7c0b5c23029dff8f0b3ae71353dc79a06f410ca7c775abdf8f884"
     },
     {
       "id": "not_safe",
@@ -956,19 +956,19 @@
       "id": "not_thirsty",
       "imagePath": "system/review_not_thirsty_5f3a1827.png",
       "sourceMeaning": "not_thirsty",
-      "sha256": "5f3a18276359e56e4ee4dfcfaddccfdee9e28a6bfadb93aea1890db8f43338d1"
+      "sha256": "6a7e6b398a69ce2ab2a345f190e63bfdd31187aed95d4b830740799cf589795f"
     },
     {
       "id": "now",
       "imagePath": "system/review_now_eb4b343c.png",
       "sourceMeaning": "now",
-      "sha256": "eb4b343c8d29f54875cd59b0ab5476b26469422ae5552fccf651ef633252d636"
+      "sha256": "4475f968ca224299532c12460f5c104c36aa51fef783ddd0e32181fe92ab4a43"
     },
     {
       "id": "open_window",
       "imagePath": "system/review_open_window_7da2ab3a.png",
       "sourceMeaning": "open_window",
-      "sha256": "7da2ab3ac3a80364077740bb62156a700a1d48d8407c037b9e25159464636997"
+      "sha256": "f9614169c25f0b2246b05ec9ddc2909cc11972fdbb6b2ebd99b84970e91a26e8"
     },
     {
       "id": "oprosti_social",
@@ -980,13 +980,13 @@
       "id": "other",
       "imagePath": "system/review_other_18728943.png",
       "sourceMeaning": "other",
-      "sha256": "1872894343cdc5f2b0a8fdb704ee6e37a69f5f8b3ce79d9e512a9089e94a74d8"
+      "sha256": "9f9f666712127461ece65ae3503756e0a410959511490780107c48b2344499c9"
     },
     {
       "id": "other_body",
       "imagePath": "system/review_other_body_05ae2ec8.png",
       "sourceMeaning": "other_body",
-      "sha256": "05ae2ec86d51d446b6aaa4a3ec880b65744c731effd9a203382ac2395f8da88f"
+      "sha256": "b2c0e3209789d2219c96d23f08b219d592dbd93f08a99bdf32fc083f9b4179e4"
     },
     {
       "id": "other_food",
@@ -998,145 +998,145 @@
       "id": "outside",
       "imagePath": "system/review_courtyard_54e768cb.png",
       "sourceMeaning": "courtyard",
-      "sha256": "54e768cb9e7ab1c90d1329282eea84b59ab48c9db4add6df0d1e44a2e551a4a9"
+      "sha256": "4e0a4c39b610694ca039eb460d187a0628f100a04aaf0ad7e882912249688973"
     },
     {
       "id": "pain",
       "imagePath": "system/review_pain_general_e8a89094.png",
       "sourceMeaning": "pain_general",
-      "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+      "sha256": "427357a3f8a9d2273f6223a51b9413de459d234ec51760c2bc1b1650231dac72"
     },
     {
       "id": "pain_area",
       "imagePath": "system/review_pain_general_e8a89094.png",
       "sourceMeaning": "pain_general",
-      "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+      "sha256": "427357a3f8a9d2273f6223a51b9413de459d234ec51760c2bc1b1650231dac72"
     },
     {
       "id": "pain_light",
       "imagePath": "system/review_pain_light_11f05cd6.png",
       "sourceMeaning": "pain_light",
-      "sha256": "11f05cd65c1a94088ce0dc286adb34faafd95699380f967ef460951b24c463fb"
+      "sha256": "c9833decdbe809e0abd00dd9979070d9e3cade9baa0f520d6568570f7af46e4e"
     },
     {
       "id": "pain_many_days",
       "imagePath": "system/review_many_days_4fabc567.png",
       "sourceMeaning": "many_days",
-      "sha256": "4fabc567b134b1638f78410dbbad030d69efc96045e1cc08cf83dcd4bc37cd37"
+      "sha256": "5d9724795ec21078a942499130190e87838a59a630013e5adfb86bb37e3672aa"
     },
     {
       "id": "pain_medium",
       "imagePath": "system/review_pain_medium_34262fd7.png",
       "sourceMeaning": "pain_medium",
-      "sha256": "34262fd79ed305ebccf8962a527b635ec2d69981ecf93ddae2b70fec0b0df40a"
+      "sha256": "feba26a8a0b2d83caa92127300bd93e6870ed095ad7a5bc9d349f0f60c5d9edc"
     },
     {
       "id": "pain_now",
       "imagePath": "system/review_now_eb4b343c.png",
       "sourceMeaning": "now",
-      "sha256": "eb4b343c8d29f54875cd59b0ab5476b26469422ae5552fccf651ef633252d636"
+      "sha256": "4475f968ca224299532c12460f5c104c36aa51fef783ddd0e32181fe92ab4a43"
     },
     {
       "id": "pain_since_evening",
       "imagePath": "system/review_evening_1d6216b2.png",
       "sourceMeaning": "evening",
-      "sha256": "1d6216b2a93712e968a6d4ed94dbc634424112e1d84bb5a85316fa9eed718c09"
+      "sha256": "44ddd18465d97c15a99505ac903fa4854174560e03663a3da905a44d5ddff119"
     },
     {
       "id": "pain_since_long",
       "imagePath": "system/review_many_days_4fabc567.png",
       "sourceMeaning": "many_days",
-      "sha256": "4fabc567b134b1638f78410dbbad030d69efc96045e1cc08cf83dcd4bc37cd37"
+      "sha256": "5d9724795ec21078a942499130190e87838a59a630013e5adfb86bb37e3672aa"
     },
     {
       "id": "pain_since_morning",
       "imagePath": "system/review_morning_b865300c.png",
       "sourceMeaning": "morning",
-      "sha256": "b865300c1f23a1314f3ee71e303866c646c8df1f4542434e1ab1487a359bed67"
+      "sha256": "c015c50fce7556b780ec7cdd11c5d0eba738a754cdf2fc685f95eaec34de0500"
     },
     {
       "id": "pain_since_today",
       "imagePath": "system/review_today_1e80e967.png",
       "sourceMeaning": "today",
-      "sha256": "1e80e96793ce7a96fc1f5b24c38546b11de29b66962beb3c1f8c332c0e089642"
+      "sha256": "263e71f904ad388c48dbedb1942a4918e52512719e95f096dece34ddfb5dfe48"
     },
     {
       "id": "pain_since_yesterday",
       "imagePath": "system/review_yesterday_2c5f8fef.png",
       "sourceMeaning": "yesterday",
-      "sha256": "2c5f8fef056e29d4efa7421d33320782ed7868e03fad0af3ad54e2d72c2cc394"
+      "sha256": "2d0ec1fd7c5ea9efb15cfe5f40654126c7f49cf080d68ec3d6130c13bb9aaee6"
     },
     {
       "id": "pain_strong",
       "imagePath": "system/review_pain_strong_7d453f64.png",
       "sourceMeaning": "pain_strong",
-      "sha256": "7d453f649457f37530ee152161c22f418e134f79d40d3323745f40b1e207c792"
+      "sha256": "e478af9b5f842f9c6998cf3677ae23cc3990fc16ec5b4cdf440d71aaff176f09"
     },
     {
       "id": "pain_today",
       "imagePath": "system/review_today_1e80e967.png",
       "sourceMeaning": "today",
-      "sha256": "1e80e96793ce7a96fc1f5b24c38546b11de29b66962beb3c1f8c332c0e089642"
+      "sha256": "263e71f904ad388c48dbedb1942a4918e52512719e95f096dece34ddfb5dfe48"
     },
     {
       "id": "pain_very",
       "imagePath": "system/review_pain_very_strong_ec6c4eca.png",
       "sourceMeaning": "pain_very_strong",
-      "sha256": "ec6c4eca181ec1d116afff9a5bd5f75fe8f38be9cf95966b0dfa27ed1d183d0e"
+      "sha256": "ad1fd0c33a2705b420c9b3e63834e8c78939ddb0814238274919d65432fb9285"
     },
     {
       "id": "pain_very_strong",
       "imagePath": "system/review_pain_very_strong_ec6c4eca.png",
       "sourceMeaning": "pain_very_strong",
-      "sha256": "ec6c4eca181ec1d116afff9a5bd5f75fe8f38be9cf95966b0dfa27ed1d183d0e"
+      "sha256": "ad1fd0c33a2705b420c9b3e63834e8c78939ddb0814238274919d65432fb9285"
     },
     {
       "id": "pain_when_gripping",
       "imagePath": "system/review_pain_when_gripping_238a5c56.png",
       "sourceMeaning": "pain_when_gripping",
-      "sha256": "238a5c56d02473d4b61058cc125f785e36c3d0de192b59933babde6125816201"
+      "sha256": "12b5284108924594cd670696643c4f732f73d8861ee90c21498d7decd5838fe8"
     },
     {
       "id": "pain_when_lifting",
       "imagePath": "system/review_pain_when_lifting_f76eee32.png",
       "sourceMeaning": "pain_when_lifting",
-      "sha256": "f76eee322f55c7a0eeaf353a9e7789a400c4127732d8347a68131d25e0167f83"
+      "sha256": "b0c95c7beb8fbb8455ad363358da5fc34b45263b3a44ab26bc45fcbeec1670c4"
     },
     {
       "id": "pain_when_moving",
       "imagePath": "system/review_pain_when_moving_b9997028.png",
       "sourceMeaning": "pain_when_moving",
-      "sha256": "b9997028e12fca3f458085115455e8d0718cc67ba258e1176ebcef96cd961e9d"
+      "sha256": "a3bea9991fb07df0a20329a8b417ff65357758d1c15a2d61ed3d02d4a6ec06a9"
     },
     {
       "id": "pain_when_sitting",
       "imagePath": "system/review_pain_when_sitting_2fb7bb7f.png",
       "sourceMeaning": "pain_when_sitting",
-      "sha256": "2fb7bb7f709c1a401daf8688cfcadc6639ae467e1cc303568650a9feb1c681ab"
+      "sha256": "304e8f61787252a1a267026960106722b02088f5ae41b8bae5976ed378fe7d98"
     },
     {
       "id": "pain_when_standing",
       "imagePath": "system/review_pain_when_standing_8af3061f.png",
       "sourceMeaning": "pain_when_standing",
-      "sha256": "8af3061f78f1adba0f34993bc5469cffa432efd898a48f51cecbddf2201ac241"
+      "sha256": "4edd9dfd13098bfa7eaa7c5ed3f840be4fa8f5260a053c64a55a3eff3334eb7c"
     },
     {
       "id": "pain_when_walking",
       "imagePath": "system/review_pain_when_walking_94ab5dcc.png",
       "sourceMeaning": "pain_when_walking",
-      "sha256": "94ab5dcc4efe891fb1a737ebb6978a4b4f0382cdba8ed8b6cf9ba2ed1b134a18"
+      "sha256": "66e54a31859ebf2e5e0c4ccd8c88bea8677cbfbb68e1c3ab4bf578a85b619aac"
     },
     {
       "id": "pajamas",
       "imagePath": "system/review_pajamas_35669362.png",
       "sourceMeaning": "pajamas",
-      "sha256": "3566936292573708f5d9f1b5e2c7159ff67116dab8af04d343ecddbc1bd1ad71"
+      "sha256": "d1c3ee8cb701ca62519cca679e0abf0e2f97a19460082086fd9f0c2b2ab9bd85"
     },
     {
       "id": "pants",
       "imagePath": "system/review_pants_bda97047.png",
       "sourceMeaning": "pants",
-      "sha256": "bda970478d6972d4b524ee0b7d9785a937daf4f8368f3c9dffb9961c034b1a7b"
+      "sha256": "38f262d9dd597bdaf2bbb5b7bec177158ce9f8a51b7b01398e4076721caedcf9"
     },
     {
       "id": "person_come",
@@ -1148,13 +1148,13 @@
       "id": "person_see",
       "imagePath": "system/review_eye_501a27aa.png",
       "sourceMeaning": "eye",
-      "sha256": "501a27aa4e1e314c5eef9343ce15b49cf36554c9c9fb2d0cf56854071eba7fa9"
+      "sha256": "283e7569a7dbcdc79cc9fbad88e68961710eae5e1d558a7045235e604e10fea7"
     },
     {
       "id": "person_tell",
       "imagePath": "system/review_pogovor_6b62dd63.png",
       "sourceMeaning": "pogovor",
-      "sha256": "6b62dd637290a0bf59241d0e13c3729d4b6f22fa614884706d0637a9f482f209"
+      "sha256": "9ebae1758fcf7683ddb1c3d829c048c2f01b104bf3a0a37d982fc325cc9dfccc"
     },
     {
       "id": "person_where_is",
@@ -1166,7 +1166,7 @@
       "id": "pillow",
       "imagePath": "system/review_pillow_9350f7ce.png",
       "sourceMeaning": "pillow",
-      "sha256": "9350f7ceaa04a6019b91a1acf7fa1c18e952211ee79af01ec4241667a565184e"
+      "sha256": "2f836ae008b8d19eecad7d11787424bf1ba61b549aed2a1ec93714fa9ccdbb54"
     },
     {
       "id": "pocakaj",
@@ -1178,7 +1178,7 @@
       "id": "pogovor",
       "imagePath": "system/review_pogovor_6b62dd63.png",
       "sourceMeaning": "pogovor",
-      "sha256": "6b62dd637290a0bf59241d0e13c3729d4b6f22fa614884706d0637a9f482f209"
+      "sha256": "9ebae1758fcf7683ddb1c3d829c048c2f01b104bf3a0a37d982fc325cc9dfccc"
     },
     {
       "id": "pogresam_te",
@@ -1214,7 +1214,7 @@
       "id": "rabbit",
       "imagePath": "system/review_rabbit_b116e137.png",
       "sourceMeaning": "rabbit",
-      "sha256": "b116e137cf2260d9a3e7c1424ff517188a1f1b35aec22196b5899a42d216b8b6"
+      "sha256": "248fd042eea5f4385bcd84d4580a19aace1006c48e76b10ec1de8f9dc438bd1d"
     },
     {
       "id": "rada_te_imam",
@@ -1226,79 +1226,79 @@
       "id": "radenska",
       "imagePath": "system/review_radenska_b37bdf84.png",
       "sourceMeaning": "radenska",
-      "sha256": "b37bdf8460363f3b099c751c6383b5e2627fe7a7eb99eb14a22bcac831e3a0c8"
+      "sha256": "e77c7ccac974ac7ba013cdfce69538fe00c7782c17cf9b10f7b782caa46b2676"
     },
     {
       "id": "restaurant",
       "imagePath": "system/review_restaurant_93d462e8.png",
       "sourceMeaning": "restaurant",
-      "sha256": "93d462e89569b08c03f87506c31281685db89686146cbd50af15e15abe90486a"
+      "sha256": "dd5f0782776c8d323540844c493db72e737bb1e7eace1b4c6fedaf5c03dacdf4"
     },
     {
       "id": "right_side",
       "imagePath": "system/review_right_side_3ca944e1.png",
       "sourceMeaning": "right_side",
-      "sha256": "3ca944e1d04b06a1aac5bf33d49ec5bcb55c329f06bb55b03acf8e36369ac7ed"
+      "sha256": "6a532d4a74c88e81ac4d1d34d7d9e08ff60710f3a1718af3731e7de3b3716bf3"
     },
     {
       "id": "room",
       "imagePath": "system/review_room_b2c12416.png",
       "sourceMeaning": "room",
-      "sha256": "b2c12416c4c8bf2c7405e8991f968295c56e6dbc551d53dad10e08949ef70db7"
+      "sha256": "c4d8f1f4919101a8f7ae03ed333dc41713bab57117bc893cce89066e972cc356"
     },
     {
       "id": "scarf",
       "imagePath": "system/review_scarf_79b38ef3.png",
       "sourceMeaning": "scarf",
-      "sha256": "79b38ef3a501eafcbf2219146ef717c1c4d2f8b40be48b42e391a8f3a6a3bf46"
+      "sha256": "4ac1a1883667e3eeb8b476c2d27c77060c247085975442b57dd382158b8f9343"
     },
     {
       "id": "shirt",
       "imagePath": "system/review_shirt_809d7ca9.png",
       "sourceMeaning": "shirt",
-      "sha256": "809d7ca997276296f6f4ad1844a307c565d3bd96454d2c9e89b3977de9b945fc"
+      "sha256": "9e07203869a15d109ea18aa539ff8fe9da397e0a9236987d6fd8d32ec73408f8"
     },
     {
       "id": "shoes",
       "imagePath": "system/review_shoes_d9fe64b1.png",
       "sourceMeaning": "shoes",
-      "sha256": "d9fe64b122d0a4cd2e4a5aa809f5ada07de4b0917620900f42f2cc39ca9abd29"
+      "sha256": "3cc24488e67e350d55c297e4d2e74f54bdcd0df4493831863955e6d90d145391"
     },
     {
       "id": "sit_up",
       "imagePath": "system/review_sit_up_6bffe97d.png",
       "sourceMeaning": "sit_up",
-      "sha256": "6bffe97d1548d0fbd3d3749b7e219205fe8cf17635d05c75809b68771c5998f2"
+      "sha256": "1030913e3aacf7c67f4876b05cff0ae2b7df8df0ef1993d820a8dea00db2d7a0"
     },
     {
       "id": "smoking",
       "imagePath": "system/review_smoking_0c3ff876.png",
       "sourceMeaning": "smoking",
-      "sha256": "0c3ff876e8adaf7293e5017d569e74238dc4077a77e06c6e0e0f79a408724fdb"
+      "sha256": "3b4256477a97e5e36ee4fec162865f10d2bdfcf7ee4f11a944cff42584039611"
     },
     {
       "id": "socialno",
       "imagePath": "system/review_pogovor_6b62dd63.png",
       "sourceMeaning": "pogovor",
-      "sha256": "6b62dd637290a0bf59241d0e13c3729d4b6f22fa614884706d0637a9f482f209"
+      "sha256": "9ebae1758fcf7683ddb1c3d829c048c2f01b104bf3a0a37d982fc325cc9dfccc"
     },
     {
       "id": "socks",
       "imagePath": "system/review_socks_ec1cdfb3.png",
       "sourceMeaning": "socks",
-      "sha256": "ec1cdfb37724c05b96f66c243d1bbd42262832b944d92f5196ae0d56236fd4e5"
+      "sha256": "fd4f3bd9d0081c031127d1ede7fe2acefdcc0cbfccb161ba403d320514539a02"
     },
     {
       "id": "sparkling_drink",
       "imagePath": "system/review_sparkling_drink_a152a547.png",
       "sourceMeaning": "sparkling_drink",
-      "sha256": "a152a54792fd8865e4d715f9f48a7b94fe87315fe826b616a0b5a2237b5085de"
+      "sha256": "f966e6152fa80c364ffef18a6c24d274d270a76818c652334274bda16018a11c"
     },
     {
       "id": "sparkling_water",
       "imagePath": "system/review_radenska_b37bdf84.png",
       "sourceMeaning": "radenska",
-      "sha256": "b37bdf8460363f3b099c751c6383b5e2627fe7a7eb99eb14a22bcac831e3a0c8"
+      "sha256": "e77c7ccac974ac7ba013cdfce69538fe00c7782c17cf9b10f7b782caa46b2676"
     },
     {
       "id": "speak_slowly",
@@ -1310,7 +1310,7 @@
       "id": "speech_difficulty",
       "imagePath": "system/review_cannot_speak_d2293812.png",
       "sourceMeaning": "cannot_speak",
-      "sha256": "d2293812adebeb362f857a47a6e5520bc6b26c60c2487b4c4b760f6dd3204060"
+      "sha256": "ff9be788af79c5d014dd9ca76164c4d0ec330e4009a28ea659cd85e0d3e0b806"
     },
     {
       "id": "stop_movement",
@@ -1322,199 +1322,199 @@
       "id": "stroke_info",
       "imagePath": "system/review_stroke_info_2d89372c.png",
       "sourceMeaning": "stroke_info",
-      "sha256": "2d89372cec1c89de777166d81e945e0e011ae82f9092783e519762d17cef9f5b"
+      "sha256": "903523f2b466c54c72e0def1f0a0b1561a7fc4752c4b2556a4eb9d4264b6be08"
     },
     {
       "id": "sweet",
       "imagePath": "system/review_hungry_cookies_8346c61e.png",
       "sourceMeaning": "hungry_cookies",
-      "sha256": "8346c61e58e2309caddc2442f3280d4c673e0743b429a82afee2b1cd5df0ccd3"
+      "sha256": "9465cb04a58bf911067fac6118ebdf4b912e28bab3f36c5ba3c9792174a20172"
     },
     {
       "id": "tea_black_honey_lemon",
       "imagePath": "system/review_tea_honey_lemon_902e1510.png",
       "sourceMeaning": "tea_honey_lemon",
-      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+      "sha256": "906fb2f0425ffc222b0b0e8d474d244dfed930a13c57460bd729139a9b5e296c"
     },
     {
       "id": "tea_chamomile_honey_lemon",
       "imagePath": "system/review_tea_honey_lemon_902e1510.png",
       "sourceMeaning": "tea_honey_lemon",
-      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+      "sha256": "906fb2f0425ffc222b0b0e8d474d244dfed930a13c57460bd729139a9b5e296c"
     },
     {
       "id": "tea_fruit_honey_lemon",
       "imagePath": "system/review_tea_honey_lemon_902e1510.png",
       "sourceMeaning": "tea_honey_lemon",
-      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+      "sha256": "906fb2f0425ffc222b0b0e8d474d244dfed930a13c57460bd729139a9b5e296c"
     },
     {
       "id": "tea_green_honey_lemon",
       "imagePath": "system/review_tea_honey_lemon_902e1510.png",
       "sourceMeaning": "tea_honey_lemon",
-      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+      "sha256": "906fb2f0425ffc222b0b0e8d474d244dfed930a13c57460bd729139a9b5e296c"
     },
     {
       "id": "tea_mint_honey_lemon",
       "imagePath": "system/review_tea_honey_lemon_902e1510.png",
       "sourceMeaning": "tea_honey_lemon",
-      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+      "sha256": "906fb2f0425ffc222b0b0e8d474d244dfed930a13c57460bd729139a9b5e296c"
     },
     {
       "id": "tea_rosehip",
       "imagePath": "system/review_tea_rosehip_15d754be.png",
       "sourceMeaning": "tea_rosehip",
-      "sha256": "15d754be72fd467ac90520ec70d0c8d23261ce60c8053bb3b0194b8ff88908ef"
+      "sha256": "be6f21f37b3e419c1abc22ba6e59995fe5163bb01fce0d17b5b8ed9eee369129"
     },
     {
       "id": "tea_rosehip_honey_lemon",
       "imagePath": "system/review_tea_honey_lemon_902e1510.png",
       "sourceMeaning": "tea_honey_lemon",
-      "sha256": "902e15103709ba4258b55c80acd8f2afd10dbd3869c582a0afffc870c95ec680"
+      "sha256": "906fb2f0425ffc222b0b0e8d474d244dfed930a13c57460bd729139a9b5e296c"
     },
     {
       "id": "terrace",
       "imagePath": "system/review_terrace_13e17ef8.png",
       "sourceMeaning": "terrace",
-      "sha256": "13e17ef8e7ff6bb5795d5c5f90153705c0bc9f41adff4f44224a1abca1395fdb"
+      "sha256": "d38401e262942fd95caf7de94ab18e405a12dafc5909dc4bbc987e12a97a067e"
     },
     {
       "id": "therapist",
       "imagePath": "system/review_therapy_4ea445a8.png",
       "sourceMeaning": "therapy",
-      "sha256": "4ea445a80064517721135b3f795519f662e44cfe2c7af21bf226f7beae40bbaf"
+      "sha256": "42fa75a9c6aca1d2a27b3a0f076e045c6a5e4b4299caab194f3ec165aa2df456"
     },
     {
       "id": "therapy",
       "imagePath": "system/review_therapy_4ea445a8.png",
       "sourceMeaning": "therapy",
-      "sha256": "4ea445a80064517721135b3f795519f662e44cfe2c7af21bf226f7beae40bbaf"
+      "sha256": "42fa75a9c6aca1d2a27b3a0f076e045c6a5e4b4299caab194f3ec165aa2df456"
     },
     {
       "id": "thirsty",
       "imagePath": "system/review_drink_category_7141f96c.png",
       "sourceMeaning": "drink_category",
-      "sha256": "7141f96c1324746fc7b6e92deb03016f56abfe38197e42728efc6cb48e5d510f"
+      "sha256": "554f79a3e2ae09a7e66dd27986960c4d309e24c0c06c388e08d4a014f3c51009"
     },
     {
       "id": "throat",
       "imagePath": "system/review_throat_341cf27b.png",
       "sourceMeaning": "throat",
-      "sha256": "341cf27b136d4f1c981d116074a4bf67876941b4e057537226554f2255709e77"
+      "sha256": "be6c1c9580c91629edaff4d3c641986793ef7daabea0c9cce2a9014febe43117"
     },
     {
       "id": "today",
       "imagePath": "system/review_today_1e80e967.png",
       "sourceMeaning": "today",
-      "sha256": "1e80e96793ce7a96fc1f5b24c38546b11de29b66962beb3c1f8c332c0e089642"
+      "sha256": "263e71f904ad388c48dbedb1942a4918e52512719e95f096dece34ddfb5dfe48"
     },
     {
       "id": "tomorrow",
       "imagePath": "system/review_tomorrow_172b5ae0.png",
       "sourceMeaning": "tomorrow",
-      "sha256": "172b5ae0ea9865d15709908d7f65a6bf975f2f25b711f597e8c1c51993c7622f"
+      "sha256": "84958c083352983bbc9279203720cd7db5b1d2ff15a9155fc47668b7b5cd599e"
     },
     {
       "id": "tooth",
       "imagePath": "system/review_tooth_add82ec1.png",
       "sourceMeaning": "tooth",
-      "sha256": "add82ec136e3c6a62d79c9d1f6a1807b426b385d3b0087823ac89b104a4c7cf7"
+      "sha256": "d8a4090a80dc84e7017240c3451169f606d46d6577ef671d1389bd2e9f2652f8"
     },
     {
       "id": "tooth_left",
       "imagePath": "system/review_tooth_left_ee8eb450.png",
       "sourceMeaning": "tooth_left",
-      "sha256": "ee8eb450593fcb06c265cdaa67e061d93febe4215b71e7c2cdd163b94220aac6"
+      "sha256": "e98f9b06afa545a08b3cec4d4e003ee64a36d856698dac612db6b19677ef54b9"
     },
     {
       "id": "tooth_lower",
       "imagePath": "system/review_tooth_lower_a615ff58.png",
       "sourceMeaning": "tooth_lower",
-      "sha256": "a615ff58bca87dc80c8d6539a9f7ca7ab80f37895f375e66dd16ff5e6e2b4fb0"
+      "sha256": "d49907309278e7955fe803e1d00e514e71f5ac17070e2b42a9fb0c248165e2b9"
     },
     {
       "id": "tooth_right",
       "imagePath": "system/review_tooth_right_0ec048e3.png",
       "sourceMeaning": "tooth_right",
-      "sha256": "0ec048e3b0f8eb727182e9eb131e4770fdd25be267fac7862ad22412dabfabf6"
+      "sha256": "6026fd1149ae36b48637861c7f65838171965348e5e4b8995464fd1a56a37ff0"
     },
     {
       "id": "tooth_upper",
       "imagePath": "system/review_tooth_upper_dad53014.png",
       "sourceMeaning": "tooth_upper",
-      "sha256": "dad53014d1d14342848c8dad54975dd498d72fc9548c31e5d382259959a87842"
+      "sha256": "7b206a59738b2be87f99a65f451fc325e69816eb0f5a07e9d025f875fb825df0"
     },
     {
       "id": "transport",
       "imagePath": "system/review_transport_cb3e5a9b.png",
       "sourceMeaning": "transport",
-      "sha256": "cb3e5a9bdf72653fbfdf9f0c2fa4f5a2695a7406805cfb29ce458751d804504b"
+      "sha256": "216278ad2da05953bd6cdfad88b1ee4a43d8cd19510adad93570b821810555e2"
     },
     {
       "id": "turn_back",
       "imagePath": "system/review_turn_back_15c7f796.png",
       "sourceMeaning": "turn_back",
-      "sha256": "15c7f79631af19bc0f9d3946419fb2e3c3de97a0521865bc3dfb572c7a1f5c0b"
+      "sha256": "8d8c168564e600a64e2aff23b9b0126e8da032fb15075bc77bc61293eb72185f"
     },
     {
       "id": "turn_left",
       "imagePath": "system/review_turn_left_4f39ba6d.png",
       "sourceMeaning": "turn_left",
-      "sha256": "4f39ba6d894a241b9b5e870c6ee1bcb530384c250d85ebbbfa82e62d88def839"
+      "sha256": "c6a02dc004b5f550146ada5082198a80fbd60ed76b77c971bb1b93bf155a111a"
     },
     {
       "id": "turn_off_light",
       "imagePath": "system/review_turn_off_light_1c0d62c3.png",
       "sourceMeaning": "turn_off_light",
-      "sha256": "1c0d62c3ccc0a955fd114045bb99b2d54e90db82007538d69c9633ee0f9e72a9"
+      "sha256": "c85fdc266ea5d01fe158ab88593a93c6f461d493036aaa617d029ef78937719b"
     },
     {
       "id": "turn_off_tv",
       "imagePath": "system/review_turn_off_tv_ac0396ae.png",
       "sourceMeaning": "turn_off_tv",
-      "sha256": "ac0396ae15d0e651045a43e369d164c1398803e8385d46ee50b0b0baf8b43b21"
+      "sha256": "506d75723fdc2a5540c91549898a02b5186b4f49669805abd355ec2bfc1f40af"
     },
     {
       "id": "turn_on_light",
       "imagePath": "system/review_turn_on_light_cd5e65b9.png",
       "sourceMeaning": "turn_on_light",
-      "sha256": "cd5e65b990704e5060d009d68a41097c1beac8591603b2bc3e58151e914245cf"
+      "sha256": "e2e84223feebf6739ccd571a68c996b3e9222facdfd10ab7497c977422aa2437"
     },
     {
       "id": "turn_on_tv",
       "imagePath": "system/review_turn_on_tv_9d53fc58.png",
       "sourceMeaning": "turn_on_tv",
-      "sha256": "9d53fc580423170d66ca8cad627b59ea1936a435debe7077ad875989dda2f995"
+      "sha256": "c43d9f78199ed42aebbf46c15365243621bd0e478fd050441f473a8ae9771552"
     },
     {
       "id": "turn_right",
       "imagePath": "system/review_turn_right_011ebb78.png",
       "sourceMeaning": "turn_right",
-      "sha256": "011ebb7894cb7e8c4f9e9f699e846bf840643c81a686f30e0b1fa7211a1ad866"
+      "sha256": "570981cc557cc701902a528cf897d9f0f492550a50eefebb210e35a378941f8c"
     },
     {
       "id": "turn_side",
       "imagePath": "system/review_turn_side_c5d4b3e7.png",
       "sourceMeaning": "turn_side",
-      "sha256": "c5d4b3e7f4cdb5112ad80fe251fbcb95821281f57fad3ee3928a67cede7df0e6"
+      "sha256": "6386600644cb64e0621a8edf44b240ac2e9e9aea74c65a481ff336f48074f201"
     },
     {
       "id": "tv",
       "imagePath": "system/review_tv_7d6f1850.png",
       "sourceMeaning": "tv",
-      "sha256": "7d6f185063821962039567f27aeec8f2ffcddddfb4f49c2b0b98c5daddb943ff"
+      "sha256": "83ec24090fdb71b431b8bf442ab716a7eccf4080cd8dff5b9843e8283de543a8"
     },
     {
       "id": "uncomfortable",
       "imagePath": "system/review_pain_light_11f05cd6.png",
       "sourceMeaning": "pain_light",
-      "sha256": "11f05cd65c1a94088ce0dc286adb34faafd95699380f967ef460951b24c463fb"
+      "sha256": "c9833decdbe809e0abd00dd9979070d9e3cade9baa0f520d6568570f7af46e4e"
     },
     {
       "id": "underwear",
       "imagePath": "system/review_underwear_95de2ae5.png",
       "sourceMeaning": "underwear",
-      "sha256": "95de2ae5f66ce5e49cf6fb5833dd5dc66864234d5b81e5abc6df44a18a1a0e95"
+      "sha256": "190363d375bd0b6120c3c3af47cc68035af1d3c890fe82c0cab5ab87416e4dd7"
     },
     {
       "id": "urgent_help",
@@ -1532,37 +1532,37 @@
       "id": "vending_coffee_tea",
       "imagePath": "system/review_vending_coffee_tea_497114b6.png",
       "sourceMeaning": "vending_coffee_tea",
-      "sha256": "497114b6f487bc9e65ed2dea35cf7f5a26d6ad3262e00f526492017ec9d1b101"
+      "sha256": "28c16659bdc2fca9638a76242a51b001d24ec04cec0fc34a2753de0659df472a"
     },
     {
       "id": "vending_drinks",
       "imagePath": "system/review_vending_e8948e89.png",
       "sourceMeaning": "vending",
-      "sha256": "e8948e8932b8fc5ea84e863267c92d100a38dd538b7fce6944bec81ad892211a"
+      "sha256": "dc0a50516befdd8eecaf09ae91f22f6ab5c9c3e4ba825c6b7f659c3244b7a2f3"
     },
     {
       "id": "vending_photo_step_1",
       "imagePath": "system/review_photo_placeholder_dde1d737.png",
       "sourceMeaning": "photo_placeholder",
-      "sha256": "dde1d737b5e30d69b4a561edd279a343efee1d87f28aa89315419fbf308f58c4"
+      "sha256": "0ea136a217ff0de26782f8eaf565e96be8b2d8e0d680a186de204476ac98d6c9"
     },
     {
       "id": "vending_photo_step_2",
       "imagePath": "system/review_photo_placeholder_dde1d737.png",
       "sourceMeaning": "photo_placeholder",
-      "sha256": "dde1d737b5e30d69b4a561edd279a343efee1d87f28aa89315419fbf308f58c4"
+      "sha256": "0ea136a217ff0de26782f8eaf565e96be8b2d8e0d680a186de204476ac98d6c9"
     },
     {
       "id": "visit",
       "imagePath": "system/review_visit_4e09043f.png",
       "sourceMeaning": "visit",
-      "sha256": "4e09043f22319110db8e55343fd7b00f697be2ea566ee641e9ef86c6e16b61e4"
+      "sha256": "561dad0385e658658580108f5f119a5cea8c06d346f78098b083a704bdacdf92"
     },
     {
       "id": "walk",
       "imagePath": "system/review_walk_4cc7bd3b.png",
       "sourceMeaning": "walk",
-      "sha256": "4cc7bd3babe8c856f33ad8b24db43ac01ddc5cefe0a22be0c55e69b4e8b6303d"
+      "sha256": "88f375f5ba53499b0e9c5a70dee1ba33cbb9cd3136fbf8bf0aa196960e9aad79"
     },
     {
       "id": "washing_help",
@@ -1592,7 +1592,7 @@
       "id": "wc_burning",
       "imagePath": "system/review_wc_burning_e11e546b.png",
       "sourceMeaning": "wc_burning",
-      "sha256": "e11e546bae2198a96c432af9a9a5c4db902e464b73272f181843b6d7180006da"
+      "sha256": "22e0e45e07d00700134f555e0a2209c7a352435d6d48455f44fdca2bedd538e7"
     },
     {
       "id": "wc_call_nurse",
@@ -1604,19 +1604,19 @@
       "id": "wc_diaper_change",
       "imagePath": "system/review_diaper_da07c79b.png",
       "sourceMeaning": "diaper",
-      "sha256": "da07c79b747bb5fc4e2cd39805b0af8f395797dda87348f2990cf5dd865631d8"
+      "sha256": "feb0016a5206d78fae23937d8765ff0d7eb4a10fcea210e5a5f7fee6d9c0f8ae"
     },
     {
       "id": "wc_itching",
       "imagePath": "system/review_wc_itching_4926ec8a.png",
       "sourceMeaning": "wc_itching",
-      "sha256": "4926ec8a6f421a683c7f6b23c7bd6452fe6ee91e3d1ad26a3e71aa84aecad095"
+      "sha256": "70b46e804f607ccac1b00f1273dabd7fb2360940a67227043874103f6ea22e10"
     },
     {
       "id": "wc_pain",
       "imagePath": "system/review_pain_general_e8a89094.png",
       "sourceMeaning": "pain_general",
-      "sha256": "e8a89094f1bfd7fd96a15fc389259722b5774f81c2f0d8f7b760fad7c80881e3"
+      "sha256": "427357a3f8a9d2273f6223a51b9413de459d234ec51760c2bc1b1650231dac72"
     },
     {
       "id": "wc_very_urgent",
@@ -1628,79 +1628,80 @@
       "id": "what_did_i_say",
       "imagePath": "system/review_pogovor_6b62dd63.png",
       "sourceMeaning": "pogovor",
-      "sha256": "6b62dd637290a0bf59241d0e13c3729d4b6f22fa614884706d0637a9f482f209"
+      "sha256": "9ebae1758fcf7683ddb1c3d829c048c2f01b104bf3a0a37d982fc325cc9dfccc"
     },
     {
       "id": "what_do",
       "imagePath": "system/review_activity_group_789fd08c.png",
       "sourceMeaning": "activity_group",
-      "sha256": "789fd08c71ff986c72eac4df62bd82e5bc9df325e2af0c6cc9339093b3e6fc72"
+      "sha256": "cc1f65506065bc082ac71589cea6edb4416a34aa4c2c7d5de61ec54719f03556"
     },
     {
       "id": "wheelchair",
       "imagePath": "system/review_wheelchair_46e4c622.png",
       "sourceMeaning": "wheelchair",
-      "sha256": "46e4c62274e737b37f1f76f22da890f9a2f785d0fae5ee31659cbb325958bac8"
+      "sha256": "bfba8a95eb6ab4dae6c5b0602194bf980d17810b56b24d5ada313e9c5138e105"
     },
     {
       "id": "when_come",
       "imagePath": "system/review_when_come_5fa9375d.png",
       "sourceMeaning": "when_come",
-      "sha256": "5fa9375d51558a5d52ea04276081e85a3da605803b08186dc4b7b1e173e06322"
+      "sha256": "98cb08b09b061e777b10dce6cd6b378fddd4f8d0fb43a1b7e2b6f5cfe0f68d25"
     },
     {
       "id": "when_eat",
       "imagePath": "system/review_when_eat_75a5e488.png",
       "sourceMeaning": "when_eat",
-      "sha256": "75a5e488d4325b501ff7d375a446400dc171451d5529c8e4c9fdd1eaf7f7dc4f"
+      "sha256": "bbaf91459acdfec3d739255a355d0a7ced3c2d30faedf4d78b91fa2f3781d7b7"
     },
     {
       "id": "when_go",
       "imagePath": "system/review_when_go_ea9b7bad.png",
       "sourceMeaning": "when_go",
-      "sha256": "ea9b7badeba75e7d4199dbfc96eee963472916916450eca88328bac16a15f11e"
+      "sha256": "edb4d6ab83105776d549a3c02371bd4beeeafe04c190b343dffa4e88f9a79f15"
     },
     {
       "id": "when_home",
       "imagePath": "system/review_when_home_fd1bba6d.png",
       "sourceMeaning": "when_home",
-      "sha256": "fd1bba6d1d1180ad42f31db032806bdb0a6725e4827fd1f522b086f5a83df69b"
+      "sha256": "542e97e245455d3513cf1ebb1f010cbc2ff7ddeef1360e181a6755961097ba11"
     },
     {
       "id": "when_therapy",
       "imagePath": "system/review_when_therapy_12890474.png",
       "sourceMeaning": "when_therapy",
-      "sha256": "128904749fbcec72d3e0d803feb0561c71a27e0e1dbfd892883855794c01bbc5"
+      "sha256": "dd722bd402dab52ac55e66c44e736d9eaa497614694551efdbe3d111cc55731a"
     },
     {
       "id": "where_are_we",
       "imagePath": "system/review_reuse_daily_place_group_798_12986d00.png",
       "sourceMeaning": "@daily_place_group_798.png",
-      "sha256": "12986d002b70041a6d1339917571cc03e73d8e21bc28b686a64df96adc34e57e"
+      "sha256": "2b5529688c9c494084308af868dcf1b61aab4a5248e1ccf07d4ad17e39bdccba"
     },
     {
       "id": "where_phone",
       "imagePath": "system/review_reuse_daily_call_798_85433d19.png",
       "sourceMeaning": "@daily_call_798.png",
-      "sha256": "85433d1908cb11daffca90e8c02a77a25ec581e1b5ffcb2d6a2b3080933b60e9"
+      "sha256": "ac2711df285e8ad160d43f27fd7cfef37c726d86d1b1d68cf1105c80e603819c"
     },
     {
       "id": "where_wheelchair",
       "imagePath": "system/review_wheelchair_46e4c622.png",
       "sourceMeaning": "wheelchair",
-      "sha256": "46e4c62274e737b37f1f76f22da890f9a2f785d0fae5ee31659cbb325958bac8"
+      "sha256": "bfba8a95eb6ab4dae6c5b0602194bf980d17810b56b24d5ada313e9c5138e105"
     },
     {
       "id": "who_is_coming",
       "imagePath": "system/review_visit_4e09043f.png",
       "sourceMeaning": "visit",
-      "sha256": "4e09043f22319110db8e55343fd7b00f697be2ea566ee641e9ef86c6e16b61e4"
+      "sha256": "561dad0385e658658580108f5f119a5cea8c06d346f78098b083a704bdacdf92"
     },
     {
       "id": "yesterday",
       "imagePath": "system/review_yesterday_2c5f8fef.png",
       "sourceMeaning": "yesterday",
-      "sha256": "2c5f8fef056e29d4efa7421d33320782ed7868e03fad0af3ad54e2d72c2cc394"
+      "sha256": "2d0ec1fd7c5ea9efb15cfe5f40654126c7f49cf080d68ec3d6130c13bb9aaee6"
     }
-  ]
+  ],
+  "alphaRevision": "1.2.832"
 }
