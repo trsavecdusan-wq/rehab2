@@ -14,7 +14,7 @@ object LanaIconOffer {
         if (prefs.getBoolean(key,false)) return
         if (!prefs.edit().putBoolean(key,true).commit()) return
         AlertDialog.Builder(activity).setTitle("PRENESI LANINE OSEBNE IKONE")
-            .setMessage("Pripravljen je paket 23 osebnih slik. Prenos je ločen od namestitve. V naslednjem koraku preveri, da je izbran Lanin profil. Slike in zamenjave potrdiš v predogledu. Pozneje je prenos na voljo v nastavitvah osebnih ikon.")
+            .setMessage("Pripravljen je novi paket v3 s 25 slikami. Prenos je ločen od namestitve. V naslednjem koraku preveri, da je izbran Lanin profil. Slike in zamenjave potrdiš v predogledu. Pozneje je prenos na voljo v nastavitvah osebnih ikon.")
             .setPositiveButton("PRENESI LANINE OSEBNE IKONE") { _, _ ->
                 activity.startActivity(Intent(activity,PersonalIconImportActivity::class.java).putExtra("offerLana",true))
             }.setNegativeButton("POZNEJE",null).show()

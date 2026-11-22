@@ -34,6 +34,6 @@ public class VerifiedPackageDownloadTest {
   ok(dir.list().length==0);
   File redirect=new VerifiedPackageDownload(u->new Reply(u,data,u.getHost().equals("github.com")?302:200,"https://release-assets.githubusercontent.com/test","4")).download("https://github.com/test",hash,4,dir,()->false,(n,t)->{});ok(redirect.isFile());redirect.delete();
   System.out.println("PASS: "+count+" download checks");
-  if(args.length>0){File real=new VerifiedPackageDownload().download(VerifiedPackageDownload.LANA_URL,VerifiedPackageDownload.LANA_SHA256,VerifiedPackageDownload.LANA_BYTES,dir,()->false,(n,t)->{});ok(real.length()==44229921L);try(PersonalIconZip zip=PersonalIconZip.read(new FileInputStream(real),new File(root,"review"))){ok(zip.entries.size()==23);}real.delete();System.out.println("PASS: real public GitHub download / SHA256 / 23 entries");}
+  if(args.length>0){File real=new VerifiedPackageDownload().download(VerifiedPackageDownload.LANA_URL,VerifiedPackageDownload.LANA_SHA256,VerifiedPackageDownload.LANA_BYTES,dir,()->false,(n,t)->{});ok(real.length()==VerifiedPackageDownload.LANA_BYTES);try(PersonalIconZip zip=PersonalIconZip.read(new FileInputStream(real),new File(root,"review"))){ok(zip.entries.size()==25);}real.delete();System.out.println("PASS: real public GitHub download / SHA256 / 25 entries");}
  }
 }

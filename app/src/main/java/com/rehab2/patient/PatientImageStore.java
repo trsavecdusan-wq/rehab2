@@ -142,6 +142,58 @@ public final class PatientImageStore {
         }
     }
 
+    public java.util.Map<String, File> imageBindings(String patientId) throws IOException {
+        synchronized (LOCK) { return bindingFiles(patientId, read(new File(patientDir(patientId), "images.properties"))); }
+    }
+    private java.util.Map<String, File> bindingFiles(String patientId, Properties values) throws IOException {
+        java.util.Map<String, File> result = new java.util.TreeMap<>();
+        File originals = new File(patientDir(patientId), "originals");
+        for (String id : values.stringPropertyNames()) {
+            checkItem(id); String name = values.getProperty(id);
+            if (!name.matches("[0-9a-f-]{36}\\.(jpg|jpeg|png|webp)")) throw new IOException("Invalid original reference");
+            File file = new File(originals, name);
+            if (!file.getCanonicalFile().getParentFile().equals(originals.getCanonicalFile()) || !file.isFile())
+                throw new IOException("Backup original missing");
+            result.put(id, file);
+        }
+        return result;
+    }
+    private File imageBackup(String patientId, String backupId) throws IOException {
+        if (backupId == null || !backupId.matches("[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}")) throw new IOException("Invalid backup ID");
+        File dir = new File(patientDir(patientId), "backups/" + backupId);
+        File file = new File(dir, "before.properties");
+        if (!file.isFile()) throw new IOException("Backup unavailable");
+        return file;
+    }
+    public java.util.List<String> imageBackups(String patientId) throws IOException {
+        synchronized (LOCK) {
+            File[] dirs = new File(patientDir(patientId), "backups").listFiles();
+            java.util.List<File> matches = new java.util.ArrayList<>();
+            if (dirs != null) for (File dir : dirs) if (new File(dir, "before.properties").isFile()) matches.add(dir);
+            java.util.Collections.sort(matches, (a,b) -> Long.compare(new File(b,"before.properties").lastModified(),new File(a,"before.properties").lastModified()));
+            java.util.List<String> result = new java.util.ArrayList<>(); for (File file : matches) result.add(file.getName()); return result;
+        }
+    }
+    public long imageBackupTime(String patientId, String backupId) throws IOException {
+        synchronized (LOCK) { return imageBackup(patientId,backupId).lastModified(); }
+    }
+    public java.util.Map<String, File> imageBackupBindings(String patientId, String backupId) throws IOException {
+        synchronized (LOCK) { return bindingFiles(patientId, read(imageBackup(patientId,backupId))); }
+    }
+    /** Restore only image mappings. Snapshot the current mappings first so restoration is reversible. */
+    public void restoreImages(String patientId, String backupId, Validator validator) throws IOException {
+        synchronized (LOCK) {
+            if (!patientId.equals(currentPatientId())) throw new IOException("Patient changed");
+            Properties previous = read(imageBackup(patientId,backupId));
+            for (File original : bindingFiles(patientId,previous).values())
+                if (!validator.valid(original)) throw new IOException("Backup image invalid");
+            File index = new File(patientDir(patientId), "images.properties");
+            File backup = backupLegacy(patientId,index);
+            write(new File(backup,"before.properties"),read(index));
+            write(index,previous);
+        }
+    }
+
     /** Only call after an explicit local caregiver confirmation, never infer from a profile name. */
     public void confirmSeedPatient(String packId, String patientId) throws IOException {
         synchronized (LOCK) {

@@ -12,13 +12,14 @@ public final class PersonalIconZip implements Closeable {
     private static final long MAX_FILE = 12L * 1024 * 1024, MAX_TOTAL = 100L * 1024 * 1024;
     public final List<Entry> entries = new ArrayList<>();
     public final File directory;
+    public String archiveSha256;
     public static final class Entry {
-        public final String motif, sha256;
+        public final String motif, sha256, reviewNote;
         public final File file;
         public final List<String> candidates;
         public final int width, height;
-        Entry(String m, String h, File f, List<String> c, int w, int t) {
-            motif=m; sha256=h; file=f; candidates=Collections.unmodifiableList(c); width=w; height=t;
+        Entry(String m, String h, File f, List<String> c, int w, int t, String note) {
+            motif=m; sha256=h; reviewNote=note; file=f; candidates=Collections.unmodifiableList(c); width=w; height=t;
         }
     }
     private PersonalIconZip(File dir) { directory=dir; }
@@ -29,6 +30,7 @@ public final class PersonalIconZip implements Closeable {
         try {
             File archive = new File(dir,"package.zip");
             try (FileOutputStream out = new FileOutputStream(archive)) { transfer(source,out,MAX_ZIP); }
+            result.archiveSha256=sha256(archive);
             Map<String,File> files = new HashMap<>();
             long total=0; int count=0;
             try (ZipFile zip = new ZipFile(archive)) {
@@ -68,7 +70,8 @@ public final class PersonalIconZip implements Closeable {
                 if(candidates.length()>30) throw new IOException("Preveč predlaganih povezav.");
                 for(int j=0;j<candidates.length();j++) { String id=candidates.getString(j); if(!id.matches("[a-z0-9_]{1,100}") || ids.contains(id)) throw new IOException("Neveljaven ID."); ids.add(id); }
                 String motif=row.getString("motiv"); if(motif.length()>100) throw new IOException("Predolg naziv.");
-                result.entries.add(new Entry(motif,hash,image,ids,w,h));
+                String note=row.optString("review_note", ""); if(note.length()>2000) throw new IOException("Predolga opomba.");
+                result.entries.add(new Entry(motif,hash,image,ids,w,h,note));
             }
             archive.delete();
             for(File file:files.values()) { boolean keep=false; for(Entry e:result.entries) if(e.file.equals(file)) keep=true; if(!keep) file.delete(); }

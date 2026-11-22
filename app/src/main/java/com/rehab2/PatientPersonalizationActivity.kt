@@ -55,6 +55,7 @@ class PatientPersonalizationActivity : AppCompatActivity() {
         button("UVOZI OSEBNE IKONE IZ ZIP-a") {
             if (!busy && candidate == null) startActivity(android.content.Intent(this, PersonalIconImportActivity::class.java))
         }
+        button("PRIKAZ BREZ NAPISOV / VRNI PREJŠNJE SLIKE") { if (!busy && candidate == null) startActivity(android.content.Intent(this, PersonalIconDisplayActivity::class.java)) }
         text("Aktivni profil: ${patientId().take(8)}. Osebne slike in podatki pripadajo temu profilu.")
         text("Izberi pacientovo fotografijo in ikone. Sistem ostane nespremenjen; nove slike se uporabijo samo pri tem pacientu po tvoji potrditvi.")
         button("SPOL PACIENTA: ${if (AacPatientVoiceSettings.male(this)) "Moški" else "Ženska"}") {

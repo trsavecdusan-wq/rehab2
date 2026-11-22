@@ -35,6 +35,7 @@
         <activity android:name=".AacEditorActivity" />
         <activity android:name=".AacPackSettingsActivity" />
         <activity android:name=".PatientSetupWizardActivity" />
+        <activity android:name=".PersonalIconDisplayActivity" android:exported="false" />
         <activity android:name=".PatientPersonalizationActivity" android:exported="false" />
         <activity android:name=".PersonalIconImportActivity" android:exported="false" android:launchMode="singleTop" android:configChanges="orientation|screenSize" />
         <activity android:name=".LocalMusicActivity" />

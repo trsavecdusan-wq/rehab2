@@ -9,9 +9,10 @@ public final class VerifiedPackageDownload {
     public interface Cancelled { boolean get(); }
     public interface Progress { void update(long bytes, long total); }
     public interface Connections { HttpURLConnection open(URL url) throws IOException; }
-    public static final String LANA_URL = "https://github.com/trsavecdusan-wq/rehab2/releases/download/v1.2.834/Lana_23_osebnih_ikon_in_pregled_490.zip";
-    public static final String LANA_SHA256 = "cda03ddc17619b2122499bbf2cabaa6047760f194da004fd16dc754e85439f70";
-    public static final long LANA_BYTES = 44229921L;
+    public static final String PREVIOUS_LANA_SHA256 = "cda03ddc17619b2122499bbf2cabaa6047760f194da004fd16dc754e85439f70";
+    public static final String LANA_URL = "https://github.com/trsavecdusan-wq/rehab2/releases/download/v1.2.836/Lana_25_ikon_v3_Codex.zip";
+    public static final String LANA_SHA256 = "60faa8b8d55cfd84f05c9b7deb0c68389dae892da03ec136e07a0e4d802c05c8";
+    public static final long LANA_BYTES = 32280055L;
     private static final Set<String> HOSTS = new HashSet<>(Arrays.asList("github.com", "release-assets.githubusercontent.com", "objects.githubusercontent.com"));
     private final Connections connections;
     public VerifiedPackageDownload() { this(url -> (HttpURLConnection)url.openConnection()); }

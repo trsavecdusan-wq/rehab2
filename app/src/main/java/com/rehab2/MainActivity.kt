@@ -1310,6 +1310,7 @@ class MainActivity : AppCompatActivity() {
             } ?: run {
                 binding.view.background = mainAacTileBackgroundFor(null)
                 binding.view.isEnabled = false
+                binding.view.findViewWithTag<ImageView>("aac-no-label-image")?.apply { setImageDrawable(null);visibility=View.GONE }
                 binding.view.alpha = 0.45f
                 binding.view.scaleX = 1f
                 binding.view.scaleY = 1f
@@ -1355,7 +1356,7 @@ class MainActivity : AppCompatActivity() {
     private fun bindMainAacOverlayLabel(labelView: TextView, label: CharSequence) {
         val value = label.toString().trim()
         labelView.text = value
-        labelView.visibility = if (value.isBlank()) View.GONE else View.VISIBLE
+        labelView.visibility = if (value.isBlank() || com.rehab2.aac.AacIconPresentation.hidden(this)) View.GONE else View.VISIBLE
     }
 
     private fun bindMainAacItemLabel(
@@ -1364,6 +1365,7 @@ class MainActivity : AppCompatActivity() {
         languageCode: String,
         topSuggestionItemId: String?
     ) {
+        binding.view.contentDescription = mainAacDisplayLabel(item, languageCode, topSuggestionItemId)
         val mode = fixedMainAacAnswerDisplayMode(item)
         (binding.label.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
             val gravity = if (mode == "text") android.view.Gravity.CENTER else android.view.Gravity.BOTTOM
@@ -3242,7 +3244,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
         val iconView = binding.icon ?: return
-        if (fixedMainAacAnswerDisplayMode(item) == "text") {
+        val noLabels = com.rehab2.aac.AacIconPresentation.hidden(this)
+        val frame = binding.view as? FrameLayout
+        var fitImage = frame?.findViewWithTag<ImageView>("aac-no-label-image")
+        fitImage?.visibility = View.GONE
+        if (noLabels && frame != null) {
+            val file = com.rehab2.aac.AacPatientImages.resolve(this,item)
+            val bitmap = file?.let { BitmapFactory.decodeFile(it.path) }
+            if (bitmap != null) {
+                if (fitImage == null) {
+                    fitImage = ImageView(this).apply { tag="aac-no-label-image";scaleType=ImageView.ScaleType.FIT_CENTER;importantForAccessibility=View.IMPORTANT_FOR_ACCESSIBILITY_NO }
+                    frame.addView(fitImage,FrameLayout.LayoutParams(-1,-1).apply { setMargins(dp(2),dp(2),dp(2),dp(2)) })
+                }
+                fitImage.setImageBitmap(bitmap);fitImage.visibility=View.VISIBLE
+                iconView.visibility=View.GONE
+                return
+            }
+        }
+        if (!noLabels && fixedMainAacAnswerDisplayMode(item) == "text") {
             iconView.visibility = View.INVISIBLE
             iconView.setCompoundDrawables(null, null, null, null)
             iconView.text = ""
@@ -3287,6 +3306,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacTileBackgroundFor(item: AacItem?): GradientDrawable {
+        if (com.rehab2.aac.AacIconPresentation.hidden(this)) return GradientDrawable().apply {
+            val light=com.rehab2.aac.AacIconPresentation.light(this@MainActivity)
+            setColor(if(light) 0xffeeeeee.toInt() else 0xff34414d.toInt())
+            setStroke(dp(1),if(light) 0xff777777.toInt() else 0xff677581.toInt())
+        }
         val color = when (normalizeMainAacKey(item?.id.orEmpty())) {
             "help" -> 0xFF214A78.toInt()
             "stop", "stop_movement" -> 0xFF8B2E2E.toInt()

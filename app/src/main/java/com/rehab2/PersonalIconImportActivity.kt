@@ -44,9 +44,19 @@ class PersonalIconImportActivity : AppCompatActivity() {
                         BitmapFactory.decodeFile(entry.file.path, options)
                         check(options.outMimeType == "image/png" && options.outWidth == entry.width && options.outHeight == entry.height) { "Napačen format ali mere: ${entry.motif}" }
                         val bitmap = BitmapFactory.decodeFile(entry.file.path, BitmapFactory.Options().apply { inSampleSize = 4 })
-                        check(bitmap != null) { "Slike ni mogoče odpreti: ${entry.motif}" }; bitmap.recycle()
+                        check(bitmap != null) { "Slike ni mogoče odpreti: ${entry.motif}" }
+                        if (prepared.archiveSha256 == com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256) {
+                            check(bitmap.hasAlpha()) { "Slika v3 nima alfa kanala." }
+                            val pixels=IntArray(bitmap.width*bitmap.height);bitmap.getPixels(pixels,0,bitmap.width,0,0,bitmap.width,bitmap.height)
+                            check(pixels.any { (it ushr 24)==0 }) { "Slika v3 nima prosojnega ozadja." }
+                        }
+                        bitmap.recycle()
                     }
                     check(AacPatientImages.store(app).currentPatientId() == patient) { "Pacient se je spremenil. Slike niso uvožene." }
+                    if (prepared.archiveSha256 == com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256) {
+                        check(prepared.entries.map { it.candidates.singleOrNull() } == AacHomeLayout.ids) { "Povezave paketa v3 niso skladne s prvo stranjo." }
+                        checkLanaOwner()
+                    }
                     prepared
                 } catch (e: Exception) { prepared.close(); throw e }
             }
@@ -57,18 +67,27 @@ class PersonalIconImportActivity : AppCompatActivity() {
             }
         }.start()
     }
+    private fun lanaOwner(): String? {
+        val store=AacPatientImages.store(applicationContext)
+        return store.confirmedSeedPatient(com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256)
+            ?: store.confirmedSeedPatient(com.rehab2.patient.VerifiedPackageDownload.PREVIOUS_LANA_SHA256)
+    }
+    private fun checkLanaOwner() {
+        val owner=lanaOwner()
+        check(owner==null || owner==patient) { "Paket pripada drugemu potrjenemu Laninemu profilu." }
+    }
     private fun downloadLana() {
         if (busy || pickerPending || !samePatient()) return
         val store = AacPatientImages.store(this)
         val hash = com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256
-        val owner = store.confirmedSeedPatient(hash)
+        val owner = lanaOwner()
         if (owner != null && owner != patient) {
             status.text = "Ta osebni paket je potrjen za drug profil. Preklopi na potrjeni Lanin profil; slike se drugim pacientom ne dodajo."
             return
         }
         val profile = org.json.JSONObject(String(AacPatientImages.profiles(this).profileFor(patient), Charsets.UTF_8))
         AlertDialog.Builder(this).setTitle("Je izbran Lanin profil?")
-            .setMessage("${profile.optString("firstName")} ${profile.optString("lastName")}\nUUID: $patient\nPotrjujem, da ta profil pripada Lani. Preneslo se bo približno 44 MB z GitHuba. Paket je začasno javno dostopen. Prenos ne spremeni ikon; povezave in zamenjave potrdiš pozneje. POPRAVI ostane neizbran.")
+            .setMessage("${profile.optString("firstName")} ${profile.optString("lastName")}\nUUID: $patient\nPotrjujem, da ta profil pripada Lani. Preneslo se bo približno 32 MB z GitHuba. Paket je začasno javno dostopen. Novi paket v3 ima 25 slik. Prenos ne spremeni ikon; povezave in zamenjave potrdiš pozneje. POPRAVI ostane neizbran.")
             .setNegativeButton("PREKLIČI",null)
             .setPositiveButton("POTRJUJEM PROFIL IN PRENOS") { _, _ ->
                 if (!busy && samePatient()) {
@@ -93,7 +112,8 @@ class PersonalIconImportActivity : AppCompatActivity() {
         setContentView(ScrollView(this).apply { addView(content) })
         header()
         status = text(if (state != null) "Za nov pregled znova izberi ZIP; že dokončan uvoz ostane shranjen." else "Pripravljeni PNG-ji se uvozijo brez interneta ali storitve za izdelavo slik.")
-        button("PRENESI LANINE OSEBNE IKONE") { downloadLana() }
+        button("PRIKAZ BREZ NAPISOV / VRNI PREJŠNJE SLIKE") { if (!busy) startActivity(Intent(this,PersonalIconDisplayActivity::class.java)) }
+        button("PRENESI LANINE OSEBNE IKONE — NOVI PAKET v3") { downloadLana() }
         button("PREKLIČI PRENOS") { cancelled = true }
         if (state == null && intent.getBooleanExtra("offerLana",false)) content.post { if (!closed) downloadLana() }
         button("IZBERI ZIP Z OSEBNIMI IKONAMI") {
@@ -116,11 +136,12 @@ class PersonalIconImportActivity : AppCompatActivity() {
     }
     private fun review() {
         content.removeAllViews(); choices.clear(); header()
-        status = text("Preverjene slike: ${pack!!.entries.size}. Nič še ni uvoženo. Označi samo povezave, katerih pomen, podobnost in kretnjo potrjuješ. Nobena ni izbrana vnaprej. Izvirniki ostanejo zasebni. Razpored 25 ikon se ne spremeni.")
+        status = text("Preverjene slike: ${pack!!.entries.size}. Nič še ni uvoženo. Označi samo povezave, katerih pomen, podobnost in kretnjo potrjuješ. Nobena ni izbrana vnaprej. Neoznačena povezava ohrani trenutno sliko. Izvirniki ostanejo zasebni. Razpored 25 ikon se ne spremeni.")
         val catalog = AacHomeLayout.catalog(this, AacEditorStorage.loadItems(this)).associateBy { it.id }
         pack!!.entries.forEach { entry ->
             text(entry.motif.uppercase(), 21f)
             val preview = ImageView(this).apply {
+                scaleType = ImageView.ScaleType.FIT_CENTER
                 setBackgroundColor(0xff35404b.toInt()); adjustViewBounds = true
                 setImageBitmap(BitmapFactory.decodeFile(entry.file.path, BitmapFactory.Options().apply { inSampleSize = 8 }))
                 contentDescription = "Predogled ${entry.motif}"
@@ -139,10 +160,11 @@ class PersonalIconImportActivity : AppCompatActivity() {
                 "dobro", "da" -> "ZA PREGLED: podoben palec navzgor pri DOBRO in DA."
                 else -> "Potrdi podobnost in pomen s pacientko oziroma skrbnikom."
             }
-            text(warning)
+            text(entry.reviewNote.ifBlank { warning })
             entry.candidates.forEach { id ->
                 val item = catalog[id]
-                if (item == null || item.locked || id == "correct_message") text("Brez uvoza: $id (neznan, zaščiten ali neustrezen ID).")
+                if (item == null || item.locked || (id == "correct_message" &&
+                    (pack!!.archiveSha256 != com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256 || entry.sha256 != "ad879cca02e4cbd147baf02f2f2e743a65dda445a84a43a661f2c1f0cf571093"))) text("Brez uvoza: $id (neznan, zaščiten ali neustrezen ID).")
                 else {
                     AacPatientImages.resolve(this,item)?.let { current ->
                         content.addView(ImageView(this).apply {
@@ -152,8 +174,18 @@ class PersonalIconImportActivity : AppCompatActivity() {
                     }
                     val existing = AacPatientImages.store(this).hasBinding(patient,id) || AacPatientImages.personalFile(this,id,false) != null
                     val choice = CheckBox(this).apply {
-                        text = "POTRJUJEM: ${item.labelSl} · $id\n${item.speakTextSl.orEmpty()}${if(existing) "\nZAMENJAVA OSEBNE SLIKE" else ""}"
+                        text = "ZAMENJAJ — POTRJUJEM: ${item.labelSl} · $id\n${item.speakTextSl.orEmpty()}${if(existing) "\nZAMENJAVA OSEBNE SLIKE" else ""}"
                         minHeight = 72
+                    }
+                    if (pack!!.archiveSha256 == com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256 && id in setOf("correct_message","need","i_want")) {
+                        choice.setOnClickListener {
+                            if (choice.isChecked) {
+                                choice.isChecked=false
+                                AlertDialog.Builder(this).setTitle("Posebna potrditev pomena: ${item.labelSl}")
+                                    .setMessage(entry.reviewNote+"\nPotrjujem uporabo tega poskusnega predloga za ID $id. Pomen ni samodejno preverjen.")
+                                    .setNegativeButton("OHRANI TRENUTNO",null).setPositiveButton("POTRJUJEM TA POMEN"){_,_->choice.isChecked=true}.show()
+                            }
+                        }
                     }
                     choices[choice] = id to entry; content.addView(choice)
                 }
@@ -162,6 +194,7 @@ class PersonalIconImportActivity : AppCompatActivity() {
         button("UVOZI POTRJENE POVEZAVE") { if (!busy && samePatient()) confirm() }
     }
     private fun confirm() {
+        val isV3 = pack?.archiveSha256 == com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256
         val selected = choices.filterKeys { it.isChecked }.values.toList()
         if (selected.isEmpty()) { status.text = "Najprej označi potrjene povezave."; return }
         if (selected.map { it.first }.distinct().size != selected.size) { status.text = "Za isti ID izberi samo eno sliko."; return }
@@ -177,6 +210,10 @@ class PersonalIconImportActivity : AppCompatActivity() {
                         val result = runCatching {
                             val catalog = AacHomeLayout.catalog(app,AacEditorStorage.loadItems(app)).associateBy { it.id }
                             check(selected.all { catalog[it.first]?.locked == false }) { "Katalog se je spremenil." }
+                            if (isV3) {
+                                checkLanaOwner()
+                                AacPatientImages.store(app).confirmSeedPatient(com.rehab2.patient.VerifiedPackageDownload.LANA_SHA256,patient)
+                            }
                             AacPatientImages.store(app).importBatch(patient, selected.associate { it.first to it.second.file },
                                 selected.associate { it.first to it.second.sha256 }, true) { file ->
                                 val b = BitmapFactory.decodeFile(file.path,BitmapFactory.Options().apply { inSampleSize = 4 }); val ok = b != null; b?.recycle(); ok

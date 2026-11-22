@@ -1724,6 +1724,14 @@ class AacCommunicatorActivity : AppCompatActivity() {
                     )
                 }
 
+                itemView.contentDescription = resolvedLabel
+                if (com.rehab2.aac.AacIconPresentation.hidden(context)) {
+                    label.visibility=View.GONE
+                    image.scaleType=android.widget.ImageView.ScaleType.FIT_CENTER
+                    image.setPadding(2,2,2,2)
+                    tileColor=if(com.rehab2.aac.AacIconPresentation.light(context)) 0xffeeeeee.toInt() else 0xff34414d.toInt()
+                    itemView.setBackgroundColor(tileColor)
+                }
                 itemView.setOnClickListener {
                     debugLog("AAC_INPUT tile_tap_received item=${item.id}")
                     showPressedFeedback()
