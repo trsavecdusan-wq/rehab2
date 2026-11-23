@@ -38,6 +38,7 @@ class PersonalIconImportActivity : AppCompatActivity() {
                 check(AacPatientImages.store(app).currentPatientId() == patient) { "Pacient se je spremenil. Uvoz začni znova." }
                 val prepared = load()
                 try {
+                    check(prepared.archiveSha256 !in LanaGridImportActivity.HASHES) { "Paket v4 odpri z gumbom PRENESI LANINE OSEBNE IKONE — V4 in preveri oba paketa skupaj." }
                     prepared.entries.forEach { entry ->
                         check(!closed && !cancelled) { "Prenos preklican." }
                         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
