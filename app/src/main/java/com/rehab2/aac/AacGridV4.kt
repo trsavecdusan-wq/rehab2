@@ -11,7 +11,22 @@ object AacGridV4 {
     fun home(c:Context):List<String> { val a=spec(c).getJSONArray("home");return (0 until a.length()).map{a.getString(it)} }
     fun nodes(c:Context):List<JSONObject> { val a=spec(c).getJSONArray("nodes");return (0 until a.length()).map{a.getJSONObject(it)} }
     fun mode(c:Context,id:String):String? = if(enabled(c)) nodes(c).firstOrNull{it.getString("id")==id}?.getString("speech_mode") else null
-    fun previewCatalog(c:Context,stored:Collection<AacItem>):List<AacItem> = overlay(c,stored)
+    fun previewCatalog(c:Context,stored:Collection<AacItem>):List<AacItem> {
+        val result=overlay(c,stored);val byId=result.associateBy{it.id}
+        fun reaches(start:String,target:String,seen:MutableSet<String>):Boolean {
+            if(start==target)return true
+            if(!seen.add(start))return false
+            return byId[start]?.children.orEmpty().any{reaches(it,target,seen)}
+        }
+        for(n in nodes(c)) {
+            val id=n.getString("id");val children=n.getJSONArray("children")
+            for(i in 0 until children.length()) {
+                val child=children.getString(i)
+                check(child in byId && !reaches(child,id,mutableSetOf())) { "Lokalna povezava $id → $child bi ustvarila krog. Stari razpored ostane ohranjen." }
+            }
+        }
+        return result
+    }
     fun apply(c:Context,stored:Collection<AacItem>):List<AacItem> = if(enabled(c)) overlay(c,stored) else stored.toList()
     private fun overlay(c:Context,stored:Collection<AacItem>):List<AacItem> {
         val items=stored.associateBy{it.id}.toMutableMap();val roots=home(c)

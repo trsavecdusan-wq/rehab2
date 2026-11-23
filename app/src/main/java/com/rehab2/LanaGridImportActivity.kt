@@ -91,8 +91,9 @@ class LanaGridImportActivity:AppCompatActivity() {
                     val b=BitmapFactory.decodeFile(e.file.path,BitmapFactory.Options().apply{inSampleSize=8})?:error("Neveljavna slika")
                     try {check(b.hasAlpha());val px=IntArray(b.width*b.height);b.getPixels(px,0,b.width,0,0,b.width,b.height);check(px.any{it ushr 24==0})}finally{b.recycle()}
                 };identity()
+                AacGridV4.previewCatalog(this,AacHomeLayout.catalog(this,AacEditorStorage.loadItems(this)))
             }
-            runOnUiThread{busy=false;if(closed||result.isFailure){prepared.forEach{it.close()};if(!closed)status.text="Brez sprememb: ${result.exceptionOrNull()?.message}. Prenos lahko ponoviš."}else{packs.forEach{it.close()};packs=prepared;review()}}
+            runOnUiThread{busy=false;if(closed||result.isFailure){prepared.forEach{it.close()};if(!closed)status.text="Brez sprememb: ${result.exceptionOrNull()?.message}. Prenos lahko ponoviš."}else{packs.forEach{it.close()};packs=prepared;runCatching{review()}.onFailure{status.text="Predogled ni mogoč; brez sprememb: ${it.message}"}}}
         }.start()
     }
     private fun review(){
