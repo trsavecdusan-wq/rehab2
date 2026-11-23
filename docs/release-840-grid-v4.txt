@@ -1,0 +1,123 @@
+NovaRehab 1.2.840 / 11028 — mreža v4
+
+Osnova: v1.2.838, 5d0ac9c165cddeb277842c471af9046f401eefb0.
+Pred začetkom preverjene oddaljene veje, oznake, normalne izdaje in PR #4.
+838 je bila najnovejša normalna izdaja. PR #4 ostaja odprt na stari razvojni
+osnovi 804; njegove osebne slike/glasovne temelje novejša osnova že vsebuje.
+Ni bil združen; main in stare oznake ostajajo nespremenjeni.
+Razvojna veja: codex/lana-grid-v4. Normalna soda koda 11028.
+
+Glavna mreža za izrecno potrjeni Lanin UUID:
+DA | NE | HVALA | RAZUMEM | NE RAZUMEM
+TOALETA | BOLI ME | POČUTJE | HRANA | PIJAČA
+SAMA BOM | PRIDI SEM | NE VEM | POGLEJ | MOJE STVARI
+DRUŽINA | PRIJATELJI | DEJAVNOSTI | POČASNEJE | HITREJE
+RABIM | ŽELIM | POPRAVI | GREMO | POČAKAJ
+
+72 pojmov je razrešenih v docs/lana-v4-mapping.tsv. Tabela loči stabilne ID-je
+in predloge privzetega SL/UK govora. Predogled pokaže dejanski lokalni govor.
+Slike so poskusni predlogi; prepoznavnost in razumevanje s pacientko nista potrjena.
+Obstoječi isti pomeni ohranijo natančne govorne tekste in ključe predpomnilnika;
+ročne/zaščitene jezikovne spremembe ostanejo. Tired in home dobita dogovorjeni
+privzeti izjavi samo, kadar nimata ročne zaščite. Novi pojmi imajo SL in UK.
+Splošni SRBI ME ni wc_itching; SAMA BOM ni choose_myself; POGLEJ ni look_at_me.
+TRGOVINA ni stari shop (pomoč v trgovini). Novi TV/YouTube in klic/videoklic
+ne spreminjata starih ozkih pojmov tv/call. Slabost s posodo ima v4_nausea,
+prejšnji široki bad ostaja dostopen. Oblačila kot osebna stvar so ločena od
+stare negovalne kategorije clothing. Skupni OBJEM/OSTANI/POGREŠAM uporabljajo
+iste ID-je v obeh skupinah. Dodane povezave ne brišejo starih poddreves;
+novo povezavo, ki bi z lokalnimi spremembami ustvarila krog, predogled zavrne.
+
+Nobena mreža se ne vključi ob nadgradnji brez potrditve. Nov skupni uvoznik
+zajame UUID, preveri lastništvo že potrjenih paketov in oba ZIP-a, nato prikaže
+celotno mrežo ter primerjavo vsake slike. POPRAVI ni vnaprej potrjen in tudi
+skupinsko označevanje ga izpusti; zahteva svojo vsebinsko potrditev.
+Končni dialog navede UUID, 25 novih mest in vse izbrane zamenjave. Izvirniki
+se ne brišejo. Slike in vklop mreže varuje skupni trajni dnevnik obnovitve;
+prekinitev pred zaključkom povrne prejšnje povezave in stanje razporeda.
+VRNI PREJŠNJE SLIKE in VRNI PREJŠNJI RAZPORED sta ločeni, lokalni in povratni.
+Stari katalog, profilne datoteke, statistika in zvočni predpomnilnik niso prepisani.
+
+Prenos prek enega gumba prenese/verificira dva nova produkcijska paketa:
+https://github.com/trsavecdusan-wq/rehab2/releases/download/v1.2.838/Lana_v4_glavne_25.zip
+31993998 bajtov
+SHA256 0f2997864748e772489317c814cdecdd2d1b6f1fedc4d80076f9646bfad5a5d3
+https://github.com/trsavecdusan-wq/rehab2/releases/download/v1.2.838/Lana_v4_podikone_47.zip
+63291886 bajtov
+SHA256 722a02d39cc7c1a83b08a73900b1329a974a1e2c0b2b17648ec02819eab4661d
+
+PNG so bajtno nespremenjeni; razrešeni so manifesti, zato se končna hasha
+razlikujeta od pripravljalnih. Oba sta pod 80 MiB ZIP / 100 MiB razširjeno,
+vsaka datoteka pod 12 MiB; ohranjene omejitve vnosov, mer, CRC in manifestov.
+GREMO: 328c19aedc80b93032a9af785850e4e12380593b48938fc2575caa9bb2a0af84.
+Osebnih slik in ZIP-ov ni v APK-ju ali git zgodovini. Priponki sta novi,
+ločeni od APK-ja na obstoječi izdaji 838. Stari paketi so nespremenjeni.
+Po uspešnem prenosu ostaneta zasebni kopiji za odpiranje brez interneta in
+izvoz prek Androidovega izbirnika. Ponovna uporaba slik ne potrebuje URL-ja.
+Noben osebni paket se ne odstrani do Dušanove potrditve uvoza na fizični tablici.
+
+Vizualni pregled: vseh 72 izvirnikov v 150 px predogledu na svetli/temni
+podlagi; pravo prosojno ozadje, FIT_CENTER brez raztezanja obraza. HVALA je
+nov bližji izrez. GREMO se ujema z odobrenimi bajti. Posamezni svetli robovi
+in podrobnosti rok pri majhni velikosti niso dokaz anatomske popolnosti.
+Pri prikritih prstih njihovega števila ni mogoče zanesljivo potrditi.
+SAMA BOM lahko pomeni zapenjanje, MIR slušalke, POGLEJ smer pogleda;
+razlikovanje RABIM/ŽELIM, abstraktnih ikon in trgovin zahteva skupni pregled.
+Kraji in družina/prijatelji so generični, ne fotografije dejanskih ljudi/krajev.
+Za KDO? in druge temne motive je primerna svetla ploščica; prikaz v4 uporablja
+svetlo privzeto podlago, če profil še nima svoje shranjene izbire ozadja.
+BREZ NAPISOV ostaja profilna izbira, besedilo/dostopnost/govor ostanejo ločeni.
+
+Govor/navigacija: navigacijske skupine ne kličejo govora niti dodatnih vprašanj.
+UTRUJENA govori enkrat in odpre SPATI. NE RAZUMEM odpre tudi POKAŽI MI.
+Izbira osebe ne postane samodejni klic. Nobena nova slika ne sproži spletnega
+nakupa, klica, spletnega mesta, vozička ali igre na srečo. Nova navigacija je
+neodvisna od čakanja na govor. Mehanizem cache/API/lokalni nadomestni glas,
+jezik, glas, hitrost, preklic zastarelih zahtev in OTA/rollback niso zamenjani.
+
+Opravljena preverjanja:
+- 29 ZIP/batch, 17 slikovna obnova, 21 transakcijska mreža/obnova/prekinitev.
+- 103 regresijski testi slik, nadgradenj, izolacije/migracij profilov.
+- 18 testov prenosa (SHA, velikost, preklic, HTTP/HTTPS, preusmeritve, napake).
+- Dejanski HTTPS prenos obeh objavljenih paketov s produkcijskim Java
+  prenosnikom/bralnikom: SHA256/CRC/omejitve, 72 različnih razrešenih ID-jev.
+- 186 prevedenih testov starega kataloga/postavitve, 13 testov govornega cache.
+- test_grid.py: 72 ID-jev, točnih 25 mest, SL/UK in navigacija, brez novih ciklov.
+- Podpisana nadgradnja 838 -> kandidat 840 z install -r na izoliranem Android 28.
+- Prva ponudba v4, dejanski prenos v aplikaciji, prekinitev WiFi med prenosom,
+  napaka brez aktivacije, uspešna ponovitev, oba paketa preverjena pred pregledom.
+- Izhod iz pregleda in preklic končnega dialoga brez spremembe stare mreže.
+- Odpiranje zasebnih paketov in potrjeni uvoz 71 izbranih zamenjav brez interneta;
+  POPRAVI ohranjen. Vseh 72 uporabljenih PNG ustreza izvorni kontrolni vsoti.
+- Obnova starega razporeda in prejšnjih 25 slik, nato vrnitev v4 brez prenosa.
+- Drugi profil ohrani svoji dve sliki, Lanin paket je zanj zavrnjen.
+
+Meritve na emulatorju, niso meritve fizične tablice:
+Cache hit s sintetičnim enosekundnim testnim tonom (ne API govor):
+click -> onSpeechStarted 646 ms, 161 ms, 205 ms; konec -> input_ready 0–1 ms.
+Input pri teh izjavah ni bil zaklenjen (lock=false); ena zahteva na dotik.
+Cache miss brez API konfiguracije in lokalnega glasu: dotik 02:17:08.062,
+onSpeechError 02:17:08.557, input_ready 02:17:08.558 (496 ms); SPATI dosegljiv.
+API cache-miss generiranje in izgovarjava nista zvočno preverjena: testna
+namestitev nima API konfiguracije/ključa niti delujočega lokalnega SL glasu.
+Ni trditve, da so naglasi »Kaj te boli?«, »Boli me.« ali novih fraz popravljeni.
+Obstoječa storitev/podatki tablice so ohranjeni; po nadgradnji je potreben
+poslušni preizkus na njej. Nova nepredpomnjena API fraza brez interneta ni mogoča.
+
+Fizična oddaljena tablica ni bila priključena, uvoz nanjo ni potrjen. Lanino
+razumevanje in čustva niso bila ocenjevana iz slik ali mimike. Mikrofon/kamera,
+AI backend, radio, GPS/status, companion in pravila posodabljanja niso predmet
+te spremembe in niso označeni kot na novo preverjeni.
+
+Dodatno potrjeno: polni ponovni zagon brez WiFi ohrani v4 in osebne slike.
+Ob hladnem zagonu je emulator prikazal ponavljajoč se ANR za com.android.systemui
+(TIME_TICK broadcast), ne za com.rehab2. Po ponovnem zagonu System UI se prikaz
+in izbirnik obnovita. To omejuje sklepe o hitrosti in stabilnosti fizične tablice.
+Izvoz obeh zasebnih ZIP-ov prek Androidovega CreateDocument ima pravilna SHA256;
+ponovni izbor obeh z OpenMultipleDocuments brez WiFi odpre vseh 72 predogledov.
+Poskus install -r stare 838 je zavrnjen z INSTALL_FAILED_VERSION_DOWNGRADE.
+Končni podpisani kandidat f3bb65a01e0378ed721c7712682d8c0d55138ea3 ima uspešni
+Actions 45100031691 (debug, podpisani APK, backend contract s simuliranim ponudnikom).
+Njegov predogled potrjuje 72 slik, lokalne povezave in ohranjeni izvirni govor
+(npr. SL 'da' ostane natančno 'da'). Splošna sredstva APK-ja so bajtno enaka 838;
+dodana je samo besedilna specifikacija v4. Osebne slike niso vgrajene.
