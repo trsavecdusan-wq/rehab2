@@ -113,7 +113,8 @@ class PersonalIconImportActivity : AppCompatActivity() {
         header()
         status = text(if (state != null) "Za nov pregled znova izberi ZIP; že dokončan uvoz ostane shranjen." else "Pripravljeni PNG-ji se uvozijo brez interneta ali storitve za izdelavo slik.")
         button("PRIKAZ BREZ NAPISOV / VRNI PREJŠNJE SLIKE") { if (!busy) startActivity(Intent(this,PersonalIconDisplayActivity::class.java)) }
-        button("PRENESI LANINE OSEBNE IKONE — NOVI PAKET v3") { downloadLana() }
+        button("PRENESI LANINE OSEBNE IKONE — V4") { if(!busy) startActivity(Intent(this,LanaGridImportActivity::class.java)) }
+        button("PREJŠNJI PAKET v3") { downloadLana() }
         button("PREKLIČI PRENOS") { cancelled = true }
         if (state == null && intent.getBooleanExtra("offerLana",false)) content.post { if (!closed) downloadLana() }
         button("IZBERI ZIP Z OSEBNIMI IKONAMI") {

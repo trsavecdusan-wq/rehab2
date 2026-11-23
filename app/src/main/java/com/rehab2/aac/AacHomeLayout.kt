@@ -24,7 +24,7 @@ object AacHomeLayout {
         "understand" to "Я розумію.")
     private fun key(context: Context) = "reviewed_home_824_" + AacPatientImages.store(context).currentPatientId()
     fun enabled(context: Context): Boolean = runCatching {
-        context.getSharedPreferences("aac_home_layout", Context.MODE_PRIVATE).getBoolean(key(context), true)
+        AacGridV4.enabled(context) || context.getSharedPreferences("aac_home_layout", Context.MODE_PRIVATE).getBoolean(key(context), true)
     }.getOrDefault(false)
     fun setEnabled(context: Context, value: Boolean) {
         context.getSharedPreferences("aac_home_layout", Context.MODE_PRIVATE).edit().putBoolean(key(context), value).commit()
@@ -55,7 +55,7 @@ object AacHomeLayout {
 
     fun catalog(context: Context, stored: Collection<AacItem>): List<AacItem> {
         if (!enabled(context)) return stored.toList()
-        return (AacStarterContentV1.items() + stored).associateBy { it.id }.values.map(::decorate)
+        return AacGridV4.apply(context, (AacStarterContentV1.items() + stored).associateBy { it.id }.values.map(::decorate))
     }
     fun decorate(item: AacItem): AacItem {
         val index = ids.indexOf(item.id)

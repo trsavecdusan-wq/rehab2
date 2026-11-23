@@ -13,6 +13,7 @@ public final class PatientImageStore {
     private static final Object LOCK = new Object();
     private static final long MAX_BYTES = 25L * 1024 * 1024;
     private final File root;
+    private static boolean gridTransaction = false;
     public interface Validator { boolean valid(File file); }
     public interface Source { InputStream open() throws IOException; }
     public enum SeedResult { IMPORTED, RECOVERED, SKIPPED_EXISTING }
@@ -132,6 +133,64 @@ public final class PatientImageStore {
                 // Never delete an original once index publication could have referenced it.
                 if (!commitStarted) for (File file : staged) file.delete();
             }
+        }
+    }
+
+    /** Grid and image publication share a durable undo journal. Recovery always restores both. */
+    private static void recoverGrid(File dir) throws IOException {
+        File journal = new File(dir,"grid-pending.properties");
+        Properties undo = read(journal);
+        if (undo.isEmpty()) return;
+        Properties images = new Properties();
+        for(String key:undo.stringPropertyNames()) if(key.startsWith("image.")) images.setProperty(key.substring(6),undo.getProperty(key));
+        write(new File(dir,"images.properties"),images);
+        Properties grid = new Properties(); grid.setProperty("enabled",undo.getProperty("enabled","false"));
+        write(new File(dir,"grid-v4.properties"),grid);
+        if(!journal.delete()) throw new IOException("Cannot finish grid recovery");
+    }
+    public boolean gridV4(String patientId) throws IOException {
+        synchronized(LOCK) { return "true".equals(read(new File(patientDir(patientId),"grid-v4.properties")).getProperty("enabled")); }
+    }
+    public File importGridV4(String patientId, java.util.Map<String,File> sources,
+            java.util.Map<String,String> hashes, Validator validator) throws IOException {
+        synchronized(LOCK) {
+            if(!patientId.equals(currentPatientId())) throw new IOException("Patient changed");
+            File dir=patientDir(patientId), journal=new File(dir,"grid-pending.properties");
+            Properties undo=new Properties();undo.setProperty("enabled",Boolean.toString(gridV4(patientId)));
+            Properties old=read(new File(dir,"images.properties"));
+            for(String key:old.stringPropertyNames())undo.setProperty("image."+key,old.getProperty(key));
+            write(journal,undo);
+            gridTransaction=true;
+            try {
+                File backup=importBatch(patientId,sources,hashes,true,validator);
+                Properties prior=new Properties();prior.setProperty("enabled",undo.getProperty("enabled"));
+                write(new File(backup,"grid-before.properties"),prior);
+                Properties grid=new Properties();grid.setProperty("enabled","true");
+                write(new File(dir,"grid-v4.properties"),grid);
+                if(!journal.delete())throw new IOException("Cannot commit grid");
+                return backup;
+            } finally { gridTransaction=false;recoverGrid(dir); }
+        }
+    }
+    public java.util.List<String> gridBackups(String patientId) throws IOException {
+        synchronized(LOCK) {
+            java.util.List<String> result=new java.util.ArrayList<>();
+            for(String id:imageBackups(patientId))if(new File(patientDir(patientId),"backups/"+id+"/grid-before.properties").isFile())result.add(id);
+            return result;
+        }
+    }
+    public void restoreGrid(String patientId,String backupId) throws IOException {
+        synchronized(LOCK) {
+            if(!patientId.equals(currentPatientId()))throw new IOException("Patient changed");
+            imageBackup(patientId,backupId);
+            File dir=patientDir(patientId), previous=new File(dir,"backups/"+backupId+"/grid-before.properties");
+            if(!previous.isFile())throw new IOException("Grid backup unavailable");
+            Properties grid=read(previous);if(!grid.containsKey("enabled"))throw new IOException("Invalid grid backup");
+            File backup=backupLegacy(patientId,new File(dir,"images.properties"));
+            write(new File(backup,"before.properties"),read(new File(dir,"images.properties")));
+            Properties current=new Properties();current.setProperty("enabled",Boolean.toString(gridV4(patientId)));
+            write(new File(backup,"grid-before.properties"),current);
+            write(new File(dir,"grid-v4.properties"),grid);
         }
     }
 
@@ -355,6 +414,7 @@ public final class PatientImageStore {
         File dir = new File(root, id);
         if (!dir.isDirectory() || !dir.getCanonicalFile().getParentFile().equals(root.getCanonicalFile()))
             throw new IOException("Unknown patient");
+        if (!gridTransaction) recoverGrid(dir);
         return dir;
     }
 

@@ -29,8 +29,23 @@ class PersonalIconDisplayActivity : AppCompatActivity() {
         val save={ runCatching { AacIconPresentation.save(this,patient,hidden.isChecked,light.isChecked) }.fold({status.text="Shranjeno za ta profil. Napisi ostanejo v nastavitvah in opisih za dostopnost."},{status.text=it.message}) }
         hidden.setOnCheckedChangeListener { _,_->save() };light.setOnCheckedChangeListener { _,_->save() }
         button("VRNI PREJŠNJE SLIKE — PREDOGLED") { if(!busy) backups() }
+        button("VRNI PREJŠNJI RAZPORED") { if(!busy) gridBackups() }
         button("ODPRI KOMUNIKATOR") { openMain() }
         button("NAZAJ") { if(!busy)finish() }
+    }
+    private fun gridBackups() {
+        runCatching {
+            val store=AacPatientImages.store(this);val ids=store.gridBackups(patient)
+            if(ids.isEmpty()){status.text="Ni kopije prejšnjega razporeda.";return}
+            val labels=ids.map{java.text.DateFormat.getDateTimeInstance().format(java.util.Date(store.imageBackupTime(patient,it)))+" · "+it.take(8)}
+            AlertDialog.Builder(this).setTitle("Izberi kopijo razporeda").setItems(labels.toTypedArray()){_,which->
+                AlertDialog.Builder(this).setTitle("VRNI PREJŠNJI RAZPORED")
+                    .setMessage("Profil: $patient\nVrne se razpored pred izbrano spremembo. Slike in govor ostanejo shranjeni; slike lahko obnoviš ločeno.")
+                    .setNegativeButton("OHRANI TRENUTNEGA",null).setPositiveButton("POTRJUJEM VRNITEV"){_,_->
+                        runCatching{store.restoreGrid(patient,ids[which])}.fold({status.text="Razpored obnovljen. Odpri komunikator."},{status.text="Obnova ni izvedena: ${it.message}"})
+                    }.show()
+            }.setNegativeButton("PREKLIČI",null).show()
+        }.onFailure{status.text="Obnova ni izvedena: ${it.message}"}
     }
     private fun backups() {
         runCatching {

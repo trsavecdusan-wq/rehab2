@@ -1757,6 +1757,28 @@ class MainActivity : AppCompatActivity() {
             mainAacHistory.clear()
             isMainAacTerminalSelectionAccepted = false
         }
+        com.rehab2.aac.AacGridV4.mode(this,item.id)?.let { mode ->
+            aacAudioPlayer.interruptCurrentSpeechForNewInput()
+            clearMainAacConversationContext()
+            clearMainAacSentenceState()
+            val children=mainAacChildrenFor(item)
+            recordMainAacUsage(item)
+            if(children.isNotEmpty()) {
+                mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
+                currentMainAacPageDebugId="children:${item.id}"
+                isMainAacTerminalSelectionAccepted=false
+                showMainAacItems(children)
+            }
+            if(mode!="navigate_only") {
+                val language=getActiveSpeechLanguage()
+                val text=AacLocalizedTextResolver.resolveSpeakText(item,language)
+                if(text.isNotBlank()) {
+                    shouldLockMainAacInputOnSpeechStart=false
+                    speakMainAacTextOnce("v4_direct",item.id,text,language)
+                }
+            }
+            return
+        }
         val targetPageItems = mainAacPageItems(item.targetPageId)
         if (targetPageItems.isNotEmpty()) {
             val previousPage = currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap)
@@ -3109,7 +3131,7 @@ class MainActivity : AppCompatActivity() {
             .getString(KEY_DEFAULT_PATIENT_PAGE_ID, "").orEmpty().trim()
         val isHome = normalizedPageId == CORE_V2_HOME_PAGE_ID ||
             normalizedPageId == MAIN_AAC_HOME_PAGE_ID || normalizedPageId == configuredHome
-        if (isHome && AacHomeLayout.enabled(this)) return AacHomeLayout.homeItems(items)
+        if (isHome && AacHomeLayout.enabled(this)) return if (com.rehab2.aac.AacGridV4.enabled(this)) com.rehab2.aac.AacGridV4.ordered(this,items) else AacHomeLayout.homeItems(items)
         val pageCatalog = if (isHome) items.filterNot(::isMainAacPainDetail) else items
         val itemsById = pageCatalog.associateBy { it.id }
         val fixedItems = fixedTopRowItems(items)
@@ -3471,6 +3493,7 @@ class MainActivity : AppCompatActivity() {
             .filter { child -> item.id in child.visibleUnderIds && child.id !in item.children }
             .sortedBy { it.priority }
         val existingChildren = explicitChildren + visibleUnderChildren
+        if (com.rehab2.aac.AacGridV4.mode(this,item.id)!=null && item.id !in setOf("pain","thirsty","hungry")) return existingChildren.distinctBy { it.id }
         if (item.id == "wc" || item.id == "nurse_help") {
             return existingChildren.distinctBy { child -> child.id }
         }

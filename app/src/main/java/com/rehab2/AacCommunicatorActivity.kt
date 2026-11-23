@@ -466,6 +466,17 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 "isSpeakingSentence=$isSpeakingSentence isSpeakingSingleIcon=$isSpeakingSingleIcon"
         )
         cancelPendingPartialAutoReturn()
+        com.rehab2.aac.AacGridV4.mode(this,item.id)?.let { mode ->
+            cancelPendingSpeech()
+            interruptActiveSpeechForNewInput()
+            sentenceManager.clear()
+            clearPromptText()
+            val children=resolveV2ChildItems(item)
+            AacUsageStats.recordUse(this,item.id)
+            if(children.isNotEmpty()) { currentV2VisibleHistory.addLast(currentVisibleItems);showItems(children) }
+            if(mode!="navigate_only") audioPlayer.playOrSpeak(item,languageCode)
+            return
+        }
         confirmGuidedTopSuggestionIfYesItem(item)?.let { suggestedItem ->
             handleItemClick(suggestedItem)
             return
@@ -916,7 +927,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun getV2RootItems(items: List<AacItem>): List<AacItem> {
-        if (currentPageId == "home" && AacHomeLayout.enabled(this) && AacProfileStore.getActiveAacProfile(this).id == "dom") return AacHomeLayout.homeItems(items)
+        if (currentPageId == "home" && AacHomeLayout.enabled(this) && AacProfileStore.getActiveAacProfile(this).id == "dom") return if (com.rehab2.aac.AacGridV4.enabled(this)) com.rehab2.aac.AacGridV4.ordered(this,items) else AacHomeLayout.homeItems(items)
         val explicitRootItems = items
             .filter { it.isRootItem && !it.isHiddenUntilParent }
             .sortedBy { it.priority }
@@ -1285,6 +1296,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val explicitChildren = item.children.mapNotNull { childId ->
             currentV2ItemsById[childId]
         }
+        if (com.rehab2.aac.AacGridV4.mode(this,item.id)!=null) return (explicitChildren + currentV2ItemsById.values.filter { item.id in it.visibleUnderIds || it.parentId==item.id }).distinctBy { it.id }
         if (explicitChildren.isNotEmpty()) {
             return explicitChildren.sortedBy { it.priority }
         }

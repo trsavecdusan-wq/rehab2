@@ -3,10 +3,13 @@ $ErrorActionPreference='Stop'
 $root=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $out=Join-Path ([IO.Path]::GetTempPath()) ('NovaRehab-zip-tests-'+[guid]::NewGuid())
 New-Item -ItemType Directory $out | Out-Null
-& java -m jdk.compiler/com.sun.tools.javac.Main -encoding UTF-8 -cp $JsonJar -d $out (Join-Path $root 'app/src/main/java/com/rehab2/patient/PatientImageStore.java') (Join-Path $root 'app/src/main/java/com/rehab2/patient/PersonalIconZip.java') (Join-Path $PSScriptRoot 'PersonalIconZipTest.java') (Join-Path $PSScriptRoot 'ImageRestoreTest.java')
+& java -m jdk.compiler/com.sun.tools.javac.Main -encoding UTF-8 -cp $JsonJar -d $out (Join-Path $root 'app/src/main/java/com/rehab2/patient/PatientImageStore.java') (Join-Path $root 'app/src/main/java/com/rehab2/patient/PersonalIconZip.java') (Join-Path $PSScriptRoot 'PersonalIconZipTest.java') (Join-Path $PSScriptRoot 'ImageRestoreTest.java') (Join-Path $PSScriptRoot 'GridTransactionTest.java')
 if($LASTEXITCODE -ne 0){throw 'Compilation failed'}
 & java -cp "$out;$JsonJar" PersonalIconZipTest
 if($LASTEXITCODE -ne 0){throw 'ZIP tests failed'}
 
 & java -cp "$out;$JsonJar" ImageRestoreTest
 if($LASTEXITCODE -ne 0){throw 'Restore tests failed'}
+
+& java -cp "$out;$JsonJar" GridTransactionTest
+if($LASTEXITCODE -ne 0){throw "Grid transaction tests failed"}
