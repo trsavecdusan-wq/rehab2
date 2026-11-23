@@ -1308,6 +1308,7 @@ class MainActivity : AppCompatActivity() {
                     handleMainAacTileTouch(event, item)
                 }
             } ?: run {
+                binding.view.contentDescription = null
                 binding.view.background = mainAacTileBackgroundFor(null)
                 binding.view.isEnabled = false
                 binding.view.findViewWithTag<ImageView>("aac-no-label-image")?.apply { setImageDrawable(null);visibility=View.GONE }
@@ -1434,6 +1435,7 @@ class MainActivity : AppCompatActivity() {
                     handleMainAacTileTouch(event, item)
                 }
             } ?: run {
+                binding.view.contentDescription = null
                 binding.view.background = mainAacTileBackgroundFor(null)
                 binding.view.isEnabled = false
                 binding.view.alpha = 0.45f
@@ -1649,7 +1651,8 @@ class MainActivity : AppCompatActivity() {
         fixed.forEachIndexed { index, item -> slots[index] = item }
         val fixedIds = fixed.map { it.id }.toSet()
         val content = visibleItems.filter { it.id !in fixedIds }.map { it.copy(fixedTopRowPosition = null) }
-        if (AacHomeLayout.enabled(this) && mainAacHistory.isEmpty()) {
+        val v4Branch = com.rehab2.aac.AacGridV4.mode(this,currentMainAacPageDebugId.removePrefix("children:")) != null
+        if ((AacHomeLayout.enabled(this) && mainAacHistory.isEmpty()) || v4Branch) {
             content.forEachIndexed { index, item -> if (index + gridSize < slots.size) slots[index + gridSize] = item }
             return slots
         }

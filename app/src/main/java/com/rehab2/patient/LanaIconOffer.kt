@@ -14,7 +14,7 @@ object LanaIconOffer {
         if (prefs.getBoolean(key,false)) return
         if (!prefs.edit().putBoolean(key,true).commit()) return
         AlertDialog.Builder(activity).setTitle("PRENESI LANINE OSEBNE IKONE")
-            .setMessage("Pripravljen je nova mreža v4 z 72 slikovnimi predlogi v dveh paketih. Prenos je ločen od namestitve. V naslednjem koraku preveri, da je izbran Lanin profil. Mrežo, slike in zamenjave potrdiš v predogledu. Pozneje je prenos na voljo v nastavitvah osebnih ikon.")
+            .setMessage("Pripravljena je nova mreža v4 z 72 slikovnimi predlogi v dveh paketih. Prenos je ločen od namestitve. V naslednjem koraku preveri, da je izbran Lanin profil. Mrežo, slike in zamenjave potrdiš v predogledu. Pozneje je prenos na voljo v nastavitvah osebnih ikon.")
             .setPositiveButton("PRENESI LANINE OSEBNE IKONE") { _, _ ->
                 activity.startActivity(Intent(activity,LanaGridImportActivity::class.java).putExtra("offerLana",true))
             }.setNegativeButton("POZNEJE",null).show()
