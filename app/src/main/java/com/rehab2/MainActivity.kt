@@ -1757,7 +1757,10 @@ class MainActivity : AppCompatActivity() {
             mainAacHistory.clear()
             isMainAacTerminalSelectionAccepted = false
         }
-        com.rehab2.aac.AacGridV4.mode(this,item.id)?.let { mode ->
+        val v4PersonChoice = com.rehab2.aac.AacGridV4.enabled(this) &&
+            currentMainAacPageDebugId in setOf("children:family_group","children:friends_group") &&
+            item.id !in com.rehab2.aac.AacGridV4.home(this)
+        (com.rehab2.aac.AacGridV4.mode(this,item.id) ?: "speak_label".takeIf { v4PersonChoice })?.let { mode ->
             aacAudioPlayer.interruptCurrentSpeechForNewInput()
             clearMainAacConversationContext()
             clearMainAacSentenceState()
@@ -1771,7 +1774,7 @@ class MainActivity : AppCompatActivity() {
             }
             if(mode!="navigate_only") {
                 val language=getActiveSpeechLanguage()
-                val text=AacLocalizedTextResolver.resolveSpeakText(item,language)
+                val text=if(mode=="speak_label") AacLocalizedTextResolver.resolveLabel(item,language) else AacLocalizedTextResolver.resolveSpeakText(item,language)
                 if(text.isNotBlank()) {
                     shouldLockMainAacInputOnSpeechStart=false
                     speakMainAacTextOnce("v4_direct",item.id,text,language)

@@ -466,7 +466,9 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 "isSpeakingSentence=$isSpeakingSentence isSpeakingSingleIcon=$isSpeakingSingleIcon"
         )
         cancelPendingPartialAutoReturn()
-        com.rehab2.aac.AacGridV4.mode(this,item.id)?.let { mode ->
+        val v4PersonChoice = com.rehab2.aac.AacGridV4.enabled(this) &&
+            currentVisibleItems.any { it.id == "v4_hug" } && item.id !in com.rehab2.aac.AacGridV4.home(this)
+        (com.rehab2.aac.AacGridV4.mode(this,item.id) ?: "speak_label".takeIf { v4PersonChoice })?.let { mode ->
             cancelPendingSpeech()
             interruptActiveSpeechForNewInput()
             sentenceManager.clear()
@@ -474,7 +476,8 @@ class AacCommunicatorActivity : AppCompatActivity() {
             val children=resolveV2ChildItems(item)
             AacUsageStats.recordUse(this,item.id)
             if(children.isNotEmpty()) { currentV2VisibleHistory.addLast(currentVisibleItems);showItems(children) }
-            if(mode!="navigate_only") audioPlayer.playOrSpeak(item,languageCode)
+            if(mode=="speak_label") audioPlayer.speakPatientText(AacLocalizedTextResolver.resolveLabel(item,languageCode),languageCode)
+            else if(mode!="navigate_only") audioPlayer.playOrSpeak(item,languageCode)
             return
         }
         confirmGuidedTopSuggestionIfYesItem(item)?.let { suggestedItem ->

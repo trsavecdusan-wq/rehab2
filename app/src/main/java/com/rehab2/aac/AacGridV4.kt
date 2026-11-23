@@ -37,6 +37,7 @@ object AacGridV4 {
     }
     fun ordered(c:Context,items:Collection<AacItem>):List<AacItem> {
         val ids=home(c);val byId=items.associateBy{it.id}
-        return ids.mapNotNull{byId[it]}+AacHomeLayout.homeItems(items).filter{it.id !in ids}
+        val previous=AacHomeLayout.homeItems(items)
+        return ids.mapNotNull{byId[it]}+(previous.drop(25)+previous.take(25)).filter{it.id !in ids}
     }
 }
