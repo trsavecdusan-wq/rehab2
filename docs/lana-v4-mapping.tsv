@@ -1,49 +1,49 @@
-semantic_id	production_item_id	reason	speech_sl	speech_uk	mode
-yes	yes	Existing matching concept; profile-only overlay preserves custom speech	Da.	Так.	speak_once
-no	no	Existing matching concept; profile-only overlay preserves custom speech	Ne.	Ні.	speak_once
-thank_you	thank_you	Existing matching concept; profile-only overlay preserves custom speech	Hvala.	Дякую.	speak_once
-understand	understand	Existing matching concept; profile-only overlay preserves custom speech	Razumem.	Я розумію.	speak_once
-dont_understand	dont_understand	Existing matching concept; profile-only overlay preserves custom speech	Ne razumem.	Я не розумію.	speak_once_then_open_children
-wc	wc	Existing matching concept; profile-only overlay preserves custom speech	Moram na stranišče.	Мені потрібно в туалет.	speak_once
-pain	pain	Existing matching concept; profile-only overlay preserves custom speech	Boli me.	Мені болить.	speak_once
-cold	cold	Existing matching concept; profile-only overlay preserves custom speech	Zebe me.	Мені холодно.	speak_once
+semantic_id	production_item_id	reason	default_speech_sl	default_speech_uk	mode
+yes	yes	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Da.	Так.	speak_once
+no	no	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Ne.	Ні.	speak_once
+thank_you	thank_you	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Hvala.	Дякую.	speak_once
+understand	understand	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Razumem.	Я розумію.	speak_once
+dont_understand	dont_understand	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Ne razumem.	Я не розумію.	speak_once_then_open_children
+wc	wc	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Moram na stranišče.	Мені потрібно в туалет.	speak_once
+pain	pain	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Boli me.	Мені болить.	speak_once
+cold	cold	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Zebe me.	Мені холодно.	speak_once
 bad	v4_nausea	New stable ID; no existing same-meaning concept	Slabo mi je.	Мене нудить.	speak_once
-tired	tired	Existing matching concept; profile-only overlay preserves custom speech	Utrujena sem.	Я втомлена.	speak_once_then_open_children
-thirsty	thirsty	Existing matching concept; profile-only overlay preserves custom speech	Rada bi pila.	Я хочу пити.	speak_once
-hungry	hungry	Existing matching concept; profile-only overlay preserves custom speech	Rada bi jedla.	Я хочу їсти.	speak_once
-hot	hot	Existing matching concept; profile-only overlay preserves custom speech	Vroče mi je.	Мені жарко.	speak_once
-good	good	Existing matching concept; profile-only overlay preserves custom speech	Dobro sem.	Мені добре.	speak_once
-sleepy	sleepy	Existing matching concept; profile-only overlay preserves custom speech	Rada bi spala.	Я хочу спати.	speak_once
-family_group	family_group	Existing matching concept; profile-only overlay preserves custom speech			navigate_only
-friends_group	friends_group	Existing matching concept; profile-only overlay preserves custom speech			navigate_only
-wait	wait	Existing matching concept; profile-only overlay preserves custom speech	Prosim, počakaj.	Будь ласка, зачекай.	speak_once
-slower	slower	Existing matching concept; profile-only overlay preserves custom speech	Prosim, počasneje.	Будь ласка, повільніше.	speak_once
-faster	faster	Existing matching concept; profile-only overlay preserves custom speech	Prosim, hitreje.	Будь ласка, швидше.	speak_once
-need	need	Existing matching concept; profile-only overlay preserves custom speech			navigate_only
-i_want	i_want	Existing matching concept; profile-only overlay preserves custom speech			navigate_only
-correct_message	correct_message	Existing matching concept; profile-only overlay preserves custom speech			navigate_only
-lets_go	lets_go	Existing matching concept; profile-only overlay preserves custom speech			navigate_only
-angry	angry	Existing matching concept; profile-only overlay preserves custom speech	Jezna sem.	Я сердита.	speak_once
-feeling_group	feeling	Existing matching concept; profile-only overlay preserves custom speech			navigate_only
+tired	tired	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Utrujena sem.	Я втомлена.	speak_once_then_open_children
+thirsty	thirsty	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Rada bi pila.	Я хочу пити.	speak_once
+hungry	hungry	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Rada bi jedla.	Я хочу їсти.	speak_once
+hot	hot	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Vroče mi je.	Мені жарко.	speak_once
+good	good	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Dobro sem.	Мені добре.	speak_once
+sleepy	sleepy	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Rada bi spala.	Я хочу спати.	speak_once
+family_group	family_group	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview			navigate_only
+friends_group	friends_group	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview			navigate_only
+wait	wait	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Prosim, počakaj.	Будь ласка, зачекай.	speak_once
+slower	slower	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Prosim, počasneje.	Будь ласка, повільніше.	speak_once
+faster	faster	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Prosim, hitreje.	Будь ласка, швидше.	speak_once
+need	need	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview			navigate_only
+i_want	i_want	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview			navigate_only
+correct_message	correct_message	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview			navigate_only
+lets_go	lets_go	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview			navigate_only
+angry	angry	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Jezna sem.	Я сердита.	speak_once
+feeling_group	feeling	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview			navigate_only
 try_myself	v4_try_myself	New stable ID; no existing same-meaning concept	Sama bom.	Я зроблю сама.	speak_once
-come_here	come_to_me	Existing matching concept; profile-only overlay preserves custom speech	Prosim, pridi sem.	Будь ласка, підійди сюди.	speak_once
-dont_know	dont_know_problem	Existing matching concept; profile-only overlay preserves custom speech	Ne vem.	Я не знаю.	speak_once
+come_here	come_to_me	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Prosim, pridi sem.	Будь ласка, підійди сюди.	speak_once
+dont_know	dont_know_problem	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Ne vem.	Я не знаю.	speak_once
 look	v4_look	New stable ID; no existing same-meaning concept	Prosim, poglej.	Будь ласка, подивись.	speak_once
 my_things	v4_my_things	New stable ID; no existing same-meaning concept			navigate_only
-activities	activity_group	Existing matching concept; profile-only overlay preserves custom speech			navigate_only
-show_me	pokazi_mi	Existing matching concept; profile-only overlay preserves custom speech	Prosim, pokaži mi.	Будь ласка, покажи мені.	speak_once
+activities	activity_group	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview			navigate_only
+show_me	pokazi_mi	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Prosim, pokaži mi.	Будь ласка, покажи мені.	speak_once
 missing_symbol	v4_missing_symbol	New stable ID; no existing same-meaning concept	Manjka slika za to, kar želim povedati.	Немає картинки для того, що я хочу сказати.	speak_once
 changed_mind	v4_changed_mind	New stable ID; no existing same-meaning concept	Premislila sem si.	Я передумала.	speak_once
 not_what_meant	v4_not_what_meant	New stable ID; no existing same-meaning concept	Nisem tega mislila.	Я не це мала на увазі.	speak_once
 hug	v4_hug	New stable ID; no existing same-meaning concept	Rada bi objem.	Я хочу обіймів.	speak_once
 stay_with_me	v4_stay_with_me	New stable ID; no existing same-meaning concept	Prosim, ostani z mano.	Будь ласка, залишся зі мною.	speak_once
-miss_you	miss_you	Existing matching concept; profile-only overlay preserves custom speech	Pogrešam te.	Я сумую за тобою.	speak_once
-quiet	peace	Existing matching concept; profile-only overlay preserves custom speech	Rada bi mir.	Я хочу спокою.	speak_once
+miss_you	miss_you	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Pogrešam te.	Я сумую за тобою.	speak_once
+quiet	peace	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Rada bi mir.	Я хочу спокою.	speak_once
 itch	v4_itch	New stable ID; no existing same-meaning concept	Srbi me.	У мене свербить.	speak_once
 dizzy	v4_dizzy	New stable ID; no existing same-meaning concept	Vrti se mi.	У мене паморочиться голова.	speak_once
-sad	sad	Existing matching concept; profile-only overlay preserves custom speech	Žalostna sem.	Мені сумно.	speak_once
-afraid	afraid	Existing matching concept; profile-only overlay preserves custom speech	Strah me je.	Мені страшно.	speak_once
-return_home	home	Existing matching concept; profile-only overlay preserves custom speech	Želim, da gremo nazaj.	Я хочу, щоб ми повернулися назад.	speak_once
+sad	sad	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Žalostna sem.	Мені сумно.	speak_once
+afraid	afraid	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Strah me je.	Мені страшно.	speak_once
+return_home	home	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Želim, da gremo nazaj.	Я хочу, щоб ми повернулися назад.	speak_once
 shop	v4_shop	New stable ID; no existing same-meaning concept			navigate_only
 cake_shop	v4_cake_shop	New stable ID; no existing same-meaning concept	Rada bi šla v slaščičarno.	Я хочу піти до кондитерської.	speak_once
 casino	v4_casino	New stable ID; no existing same-meaning concept	Rada bi šla v casino.	Я хочу піти до казино.	speak_once
@@ -62,12 +62,12 @@ charger	v4_charger	New stable ID; no existing same-meaning concept	Potrebujem po
 keys	v4_keys	New stable ID; no existing same-meaning concept	Potrebujem ključe.	Мені потрібні ключі.	speak_once
 tablet	v4_tablet	New stable ID; no existing same-meaning concept	Rada bi svojo tablico.	Я хочу свій планшет.	speak_once
 tv	v4_tv_choice	New stable ID; no existing same-meaning concept	Rada bi gledala televizijo ali YouTube.	Я хочу дивитися телевізор або YouTube.	speak_once
-music	music	Existing matching concept; profile-only overlay preserves custom speech	Rada bi poslušala glasbo.	Я хочу слухати музику.	speak_once
+music	music	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Rada bi poslušala glasbo.	Я хочу слухати музику.	speak_once
 photo	v4_photo	New stable ID; no existing same-meaning concept	Rada bi gledala fotografije.	Я хочу дивитися фотографії.	speak_once
 call	v4_call_choice	New stable ID; no existing same-meaning concept	Rada bi telefonirala ali imela videoklic.	Я хочу зателефонувати або здійснити відеодзвінок.	speak_once
 game	v4_game	New stable ID; no existing same-meaning concept	Rada bi igrala igro.	Я хочу пограти в гру.	speak_once
 draw	v4_draw	New stable ID; no existing same-meaning concept	Rada bi risala.	Я хочу малювати.	speak_once
-talk	pogovor	Existing matching concept; profile-only overlay preserves custom speech			navigate_only
+talk	pogovor	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview			navigate_only
 who	v4_who	New stable ID; no existing same-meaning concept	Kdo?	Хто?	speak_once
-where	where_go	Existing matching concept; profile-only overlay preserves custom speech	Kam gremo?	Куди ми йдемо?	speak_once
-when	when_root	Existing matching concept; profile-only overlay preserves custom speech	Kdaj?	Коли?	speak_once
+where	where_go	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Kam gremo?	Куди ми йдемо?	speak_once
+when	when_root	Existing matching concept; keep stored same-meaning speech/cache key and custom overrides; defaults shown, final actual text in preview	Kdaj?	Коли?	speak_once

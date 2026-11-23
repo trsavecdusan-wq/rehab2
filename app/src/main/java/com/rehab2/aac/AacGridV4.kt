@@ -33,7 +33,13 @@ object AacGridV4 {
         for(n in nodes(c)) {
             val id=n.getString("id");val old=items[id]
             val custom=old?.let{it.locked||it.userEdited||it.translationManualOverride}==true
-            val sl=n.getString("speechSl");val uk=n.getString("speechUk")
+            val navigation=n.getString("speech_mode")=="navigate_only"
+            val explicitNewUtterance=id in setOf("tired","home")
+            // Image replacements must not create new cache keys for unchanged utterances.
+            val sl=if(!navigation&&!explicitNewUtterance&&old!=null) old.speechTextByLanguage["sl"]?.takeIf{it.isNotBlank()}
+                ?: old.speechText?.takeIf{it.isNotBlank()} ?: old.speakTextSl?.takeIf{it.isNotBlank()} ?: n.getString("speechSl") else n.getString("speechSl")
+            val uk=if(!navigation&&!explicitNewUtterance&&old!=null) old.speechTextByLanguage["uk"]?.takeIf{it.any{c->c in '\u0400'..'\u04ff'}}
+                ?: old.speakTextUk?.takeIf{it.any{c->c in '\u0400'..'\u04ff'}} ?: n.getString("speechUk") else n.getString("speechUk")
             val label=n.getString("motiv");val ukLabel=n.getString("labelUk")
             val base=old ?: AacItem(id=id,labelSl=label,imagePath="",actionType="speak",targetPageId="",isRootItem=false)
             val a=n.getJSONArray("children");val children=((0 until a.length()).map{a.getString(it)}+base.children).distinct()
