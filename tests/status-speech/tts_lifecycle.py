@@ -72,9 +72,9 @@ class TextToSpeech {
  fun setLanguage(locale:Locale):Int {voice=Voice("fake",locale);return languages[locale.language]?:LANG_NOT_SUPPORTED}
  fun setOnUtteranceProgressListener(value:UtteranceProgressListener?){listener=value}
  fun speak(text:String,mode:Int,params:Bundle,id:String):Int {check(com.rehab2.aac.LiveTestSession.last=="speech_will_start");spoken.add(Spoken(text,voice!!.locale.language,id));return SUCCESS}
- var rate=0f
- fun setSpeechRate(value:Float):Int {rate=value;return SUCCESS}
- fun synthesizeToFile(text:String,params:Bundle,file:File,id:String):Int {file.writeText("fake wav");spoken.add(Spoken(text,voice!!.locale.language,id));return SUCCESS}
+ var rate=0f;var rateResult=SUCCESS;var synthesisResult=SUCCESS
+ fun setSpeechRate(value:Float):Int {rate=value;return rateResult}
+ fun synthesizeToFile(text:String,params:Bundle,file:File,id:String):Int {file.writeText("fake wav");spoken.add(Spoken(text,voice!!.locale.language,id));return synthesisResult}
  fun stop(){stops++}
  fun shutdown(){shutdowns++}
 }
@@ -159,6 +159,12 @@ fun main(){
  current.duration=200;current.prepared!!(current);verify(current.starts==1 && media.starts==1)
  current.completion!!(current);verify(media.mediaPlayer==null && current.releases==1 && media.completions==1)
  file.delete()
+ val rateFailure=Audio();rateFailure.engine.languages["sl"]=0;rateFailure.onInit(0)
+ rateFailure.engine.rateResult=-1;rateFailure.speakAndroidFallback("test","sl")
+ verify(rateFailure.errors==1 && rateFailure.engine.spoken.isEmpty() && rateFailure.synthesisFiles.isEmpty())
+ val synthesisFailure=Audio();synthesisFailure.engine.languages["sl"]=0;synthesisFailure.onInit(0)
+ synthesisFailure.engine.synthesisResult=-1;synthesisFailure.speakAndroidFallback("test","sl")
+ verify(synthesisFailure.errors==1 && synthesisFailure.synthesisFiles.isEmpty())
  println("PASS: $checks Kotlin lifecycle checks executing real application bodies; Android playback not tested")
 }
 '''

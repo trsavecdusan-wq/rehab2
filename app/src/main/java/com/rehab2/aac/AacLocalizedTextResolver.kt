@@ -74,17 +74,17 @@ object AacLocalizedTextResolver {
 
     fun hasStoredLabelForLanguage(item: AacItem, languageCode: String): Boolean {
         val selectedCode = AacLanguageResolver.normalize(languageCode)
-        return item.toLocalizedTexts()[selectedCode]?.label.clean() != null
+        return AacTextCorrections842.resolve(item, selectedCode, "label", item.toLocalizedTexts()[selectedCode]?.label).clean() != null
     }
 
     fun hasStoredSpeakTextForLanguage(item: AacItem, languageCode: String): Boolean {
         val selectedCode = AacLanguageResolver.normalize(languageCode)
-        return item.toLocalizedTexts()[selectedCode]?.speakText.clean() != null
+        return AacTextCorrections842.resolve(item, selectedCode, "speech", item.toLocalizedTexts()[selectedCode]?.speakText).clean() != null
     }
 
     fun hasStoredQuestionForLanguage(item: AacItem, languageCode: String): Boolean {
         val selectedCode = AacLanguageResolver.normalize(languageCode)
-        return item.toLocalizedTexts()[selectedCode]?.question.clean() != null
+        return AacTextCorrections842.resolve(item, selectedCode, "question", item.toLocalizedTexts()[selectedCode]?.question).clean() != null
     }
 
     private fun resolveText(
