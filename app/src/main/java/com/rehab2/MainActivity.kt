@@ -428,21 +428,8 @@ class MainActivity : AppCompatActivity() {
             "right_arm" to 24
         )
         private val AAC_DEFAULT_VISUAL_SLOTS_BY_PARENT_ID = mapOf(
-            "wc" to mapOf(
-                "wc_pee" to 10,
-                "nurse_help" to 12,
-                "wc_poop" to 14,
-                "wc_diaper_change" to 17,
-                "wc_wet" to 20,
-                "wc_wet_and_dirty" to 22,
-                "wc_dirty" to 24
-            ),
-            "nurse_help" to mapOf(
-                "help_washing" to 11,
-                "help_showering" to 13,
-                "help_dressing" to 20,
-                "noticed_blood" to 24
-            ),
+            "wc" to com.rehab2.aac.AacCareLayout.toilet,
+            "nurse_help" to com.rehab2.aac.AacCareLayout.nurse,
             "hungry" to mapOf(
                 "hungry_main_dish" to 10,
                 "hungry_snack" to 12,
@@ -1652,6 +1639,8 @@ class MainActivity : AppCompatActivity() {
         val fixedIds = fixed.map { it.id }.toSet()
         val content = visibleItems.filter { it.id !in fixedIds }.map { it.copy(fixedTopRowPosition = null) }
         val v4Branch = com.rehab2.aac.AacGridV4.mode(this,currentMainAacPageDebugId.removePrefix("children:")) != null
+        if (currentMainAacPageDebugId in setOf("children:wc", "children:nurse_help") &&
+            applyDefaultVisualSlots(slots, content, gridSize)) return slots
         if ((AacHomeLayout.enabled(this) && mainAacHistory.isEmpty()) || v4Branch) {
             content.forEachIndexed { index, item -> if (index + gridSize < slots.size) slots[index + gridSize] = item }
             return slots
@@ -1671,18 +1660,22 @@ class MainActivity : AppCompatActivity() {
         if (gridSize != 5) {
             return false
         }
-        val parentId = normalizeMainAacKey(selectedMainAacItemId.orEmpty())
+        val parentId = if (currentMainAacPageDebugId.startsWith("children:"))
+            currentMainAacPageDebugId.removePrefix("children:") else normalizeMainAacKey(selectedMainAacItemId.orEmpty())
         val itemIds = items.map { item -> normalizeMainAacKey(item.id) }.toSet()
         val slotMap = AAC_DEFAULT_VISUAL_SLOTS_BY_PARENT_ID[parentId]
             ?: painSequentialSlotMapFor(items)
             ?: return false
-        if (itemIds != slotMap.keys) {
+        if (parentId !in setOf("wc", "nurse_help") && itemIds != slotMap.keys) {
             return false
         }
         items.forEach { item ->
             val slotIndex = slotMap[normalizeMainAacKey(item.id)] ?: return@forEach
             if (slotIndex in gridSize until slots.size) slots[slotIndex] = item
         }
+        val placed = slots.filterNotNull().map { it.id }.toSet()
+        val free = (gridSize until slots.size).filter { slots[it] == null }
+        items.filter { it.id !in placed }.zip(free).forEach { (item, slot) -> slots[slot] = item }
         return true
     }
 
@@ -1741,6 +1734,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleMainAacItemAction(item: AacItem) {
+        if (item.id == "no") {
+            aacAudioPlayer.interruptCurrentSpeechForNewInput()
+            cancelMainAacVoiceAssistantQuestion()
+            clearMainAacSentenceState()
+            unlockMainAacInput()
+            resetMainAacRoot()
+            return
+        }
         if (isMainAacInputLocked) {
             recordLastAudioEvent("AAC action ignored locked itemId=${item.id}")
             return
@@ -1763,11 +1764,13 @@ class MainActivity : AppCompatActivity() {
         val v4PersonChoice = com.rehab2.aac.AacGridV4.enabled(this) &&
             currentMainAacPageDebugId in setOf("children:family_group","children:friends_group") &&
             item.id !in com.rehab2.aac.AacGridV4.home(this)
-        (com.rehab2.aac.AacGridV4.mode(this,item.id) ?: "speak_label".takeIf { v4PersonChoice })?.let { mode ->
+        (com.rehab2.aac.AacGridV4.mode(this,item.id) ?: "speak_label".takeIf { v4PersonChoice }
+            ?: "speak".takeIf { item.id == "dont_understand" || com.rehab2.aac.AacGridV4.enabled(this) })?.let { mode ->
             aacAudioPlayer.interruptCurrentSpeechForNewInput()
             clearMainAacConversationContext()
             clearMainAacSentenceState()
-            val children=mainAacChildrenFor(item)
+            val children=if (item.id == "dont_understand") emptyList() else mainAacChildrenFor(item)
+            shouldResetMainAacRootAfterSpeech = children.isEmpty()
             recordMainAacUsage(item)
             if(children.isNotEmpty()) {
                 mainAacHistory.addLast(currentMainAacPageSnapshot(selectedMainAacItemIdBeforeTap))
@@ -1775,14 +1778,16 @@ class MainActivity : AppCompatActivity() {
                 isMainAacTerminalSelectionAccepted=false
                 showMainAacItems(children)
             }
-            if(mode!="navigate_only") {
+            if(mode!="navigate_only" && AacSpeechTimingSettings.read(this).speakSingleIconEnabled) {
                 val language=getActiveSpeechLanguage()
-                val text=if(mode=="speak_label") AacLocalizedTextResolver.resolveLabel(item,language) else AacLocalizedTextResolver.resolveSpeakText(item,language)
+                val text=if(item.id=="dont_understand") {
+                    if(language=="uk") "Я не розумію." else "Ne razumem."
+                } else if(mode=="speak_label") AacLocalizedTextResolver.resolveLabel(item,language) else AacLocalizedTextResolver.resolveSpeakText(item,language)
                 if(text.isNotBlank()) {
                     shouldLockMainAacInputOnSpeechStart=false
                     speakMainAacTextOnce("v4_direct",item.id,text,language)
-                }
-            }
+                } else completeMainAacSpeechLock()
+            } else completeMainAacSpeechLock()
             return
         }
         val targetPageItems = mainAacPageItems(item.targetPageId)
@@ -3494,6 +3499,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mainAacChildrenFor(item: AacItem): List<AacItem> {
+        if (item.id in setOf("no", "dont_understand")) return emptyList()
         val explicitChildren = item.children.mapNotNull { childId -> mainAacItemsById[childId] }
         val visibleUnderChildren = mainAacItemsById.values
             .filter { child -> item.id in child.visibleUnderIds && child.id !in item.children }

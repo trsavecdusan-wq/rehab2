@@ -20,16 +20,25 @@ import com.rehab2.aac.AacSpeechRequestPolicy
 class Handler {
  val tasks=ArrayDeque<()->Unit>()
  fun post(action:()->Unit){tasks.add(action)}
+ fun postDelayed(action:()->Unit, delay:Long){}
  fun drain(){while(tasks.isNotEmpty()) tasks.removeFirst()()}
 }
 open class UtteranceProgressListener {
+ open fun onStop(utteranceId:String?,interrupted:Boolean){}
  open fun onStart(utteranceId:String?){}
  open fun onDone(utteranceId:String?){}
  open fun onError(utteranceId:String?){}
  open fun onError(utteranceId:String?,errorCode:Int){}
 }
+class Context {val cacheDir=File(System.getProperty("java.io.tmpdir"))}
+object AacSpeechApiConfig {fun read(c:Context)=this;fun normalizedSpeed()=0.88}
 class Bundle {fun putString(k:String,v:String){}}
 object AudioManager {const val STREAM_MUSIC=3}
+object RadioDuckingCoordinator {fun duckForSpeech(c:Any,owner:Any){}}
+class AudioAttributes {
+ companion object {const val USAGE_MEDIA=1;const val CONTENT_TYPE_SPEECH=1}
+ class Builder {fun setUsage(v:Int)=this;fun setContentType(v:Int)=this;fun build()=AudioAttributes()}
+}
 object Toast {const val LENGTH_SHORT=0;fun makeText(c:Any,s:String,n:Int)=this;fun show(){}}
 object Log {fun d(t:String,s:String){};fun w(t:String,s:String){};fun e(t:String,s:String){}}
 object AacLanguageResolver {
@@ -38,6 +47,7 @@ object AacLanguageResolver {
  fun ttsLanguageTag(s:String)=s
 }
 class MediaPlayer {
+ fun setAudioAttributes(attributes:AudioAttributes){}
  var duration=1500;var completion:((MediaPlayer)->Unit)?=null
  var error:((MediaPlayer,Int,Int)->Boolean)?=null
  var releases=0;var starts=0;var prepared:((MediaPlayer)->Unit)?=null
@@ -62,6 +72,9 @@ class TextToSpeech {
  fun setLanguage(locale:Locale):Int {voice=Voice("fake",locale);return languages[locale.language]?:LANG_NOT_SUPPORTED}
  fun setOnUtteranceProgressListener(value:UtteranceProgressListener?){listener=value}
  fun speak(text:String,mode:Int,params:Bundle,id:String):Int {check(com.rehab2.aac.LiveTestSession.last=="speech_will_start");spoken.add(Spoken(text,voice!!.locale.language,id));return SUCCESS}
+ var rate=0f
+ fun setSpeechRate(value:Float):Int {rate=value;return SUCCESS}
+ fun synthesizeToFile(text:String,params:Bundle,file:File,id:String):Int {file.writeText("fake wav");spoken.add(Spoken(text,voice!!.locale.language,id));return SUCCESS}
  fun stop(){stops++}
  fun shutdown(){shutdowns++}
 }
@@ -70,17 +83,21 @@ class Audio {
  var released=false;var isTtsReady=false;var isTtsFailed=false
  var pendingTextToSpeak:String?=null;var pendingLanguageCode="sl"
  val engine=TextToSpeech();var textToSpeech:TextToSpeech?=engine
- val context=Any();val TAG="test";val mainHandler=Handler()
+ val context=Context();val TAG="test";val mainHandler=Handler()
  var speechRequestSerial=1;var starts=0;var completions=0;var errors=0
  var speechListener:SpeechListener?=null
  var mediaPlayer:MediaPlayer?=null
  val MIN_AUDIO_DURATION_MS=700
+ val STATUS_SPEECH_GENERATION_TIMEOUT_MS=30000L
+ val synthesisFiles=java.util.concurrent.ConcurrentHashMap<String,File>()
+ var temporaryPlayback:File?=null
  fun applySpeechLoudness(player:MediaPlayer){}
  fun releaseMediaPlayer(){mediaPlayer?.release();mediaPlayer=null}
  fun traceAudio(s:String){}
  fun notifySpeechStarted(){starts++}
  fun notifySpeechCompleted(){completions++}
  fun notifySpeechError(){errors++}
+ fun notifySpeechCancelled(){}
  fun stopPlayback(notifyCancellation:Boolean=true,restoreDuckingWhenSilent:Boolean=false){}
  fun requestMusicAudioFocus(){}
 '''+ '\n'.join(body(n) for n in methods)+r'''
@@ -111,12 +128,17 @@ fun main(){
  replaced.speakAndroidFallback("novo","sl");verify(replaced.engine.spoken.single().text=="novo")
  // Every TTS callback is checked when dispatched, including both error overloads.
  val events=Audio();events.onInit(0);val listener=events.engine.listener!!
- listener.onStart("aac_1");events.mainHandler.drain();verify(events.starts==1)
+ listener.onStart("aac_1");events.mainHandler.drain();verify(events.starts==0)
  listener.onDone("aac_1");listener.onError("aac_1");listener.onError("aac_1",-1)
  events.beginSpeechRequest();events.mainHandler.drain()
  verify(events.completions==0 && events.errors==0)
+ events.engine.languages["sl"]=0
+ events.speakAndroidFallback("Novo", "sl");verify(events.engine.rate==0.88f)
  listener.onStart("aac_2");listener.onDone("aac_2");events.mainHandler.drain()
- verify(events.starts==2 && events.completions==1)
+ verify(events.starts==0 && events.completions==0 && events.mediaPlayer!=null)
+ val synthesized=events.mediaPlayer!!;synthesized.prepared!!(synthesized)
+ verify(events.starts==1)
+ synthesized.completion!!(synthesized);verify(events.completions==1)
  listener.onError("aac_2",-1);events.mainHandler.drain();verify(events.errors==1)
  listener.onDone(null);events.mainHandler.drain();verify(events.completions==1)
  // Already queued UI notifications are also invalidated by new input.
@@ -126,7 +148,7 @@ fun main(){
  // Release invalidates both pending init and all old engine callbacks.
  val dead=Audio();dead.speakAndroidFallback("old","sl");dead.release();dead.onInit(0)
  verify(dead.engine.spoken.isEmpty() && dead.pendingTextToSpeak==null && dead.engine.shutdowns==1)
- listener.onStart("aac_3");events.release();events.mainHandler.drain();verify(events.starts==2)
+ listener.onStart("aac_3");events.release();events.mainHandler.drain();verify(events.starts==1)
  // Late events from a replaced MediaPlayer must not release or fail the new one.
  val media=Audio();val file=File.createTempFile("lifecycle-", ".wav");file.writeText("fake")
  verify(media.playAudioFileIfAvailable(file));val old=media.mediaPlayer!!

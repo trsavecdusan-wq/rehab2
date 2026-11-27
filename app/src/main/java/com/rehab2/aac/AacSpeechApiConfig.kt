@@ -31,7 +31,12 @@ data class AacSpeechApiConfig(
         DEFAULT_RESPONSE_FORMAT
     }
 
-    fun normalizedSpeed(): Double = speed.coerceIn(0.25, 4.0)
+    fun normalizedSpeed(): Double = if (speed.isFinite()) speed.coerceIn(0.25, 4.0) else DEFAULT_SPEED
+
+    fun generationIdentity(language: String): String = org.json.JSONArray(listOf(
+        "speech-842-v1", provider.lowercase(), normalizedBaseUrl(), normalizedModel(),
+        normalizedResponseFormat(), AacSpeechPronunciationPolicy.instructions(language)
+    )).toString()
 
     companion object {
         const val PROVIDER_OPENAI = "openai"

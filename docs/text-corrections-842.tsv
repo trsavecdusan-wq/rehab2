@@ -1,0 +1,199 @@
+id	language	kind	old	new
+problem	uk	speech	Мені потрібно: проблема.	У мене проблема.
+family_group	uk	speech	Я хочу поговорити про: родина.	Родина.
+friends_group	uk	speech	Я хочу поговорити про: друзі.	Друзі.
+friends_group	uk	question	Який друг?	Кого з друзів?
+acquaintances_group	uk	label		ЗНАЙОМІ
+acquaintances_group	uk	speech	Я хочу поговорити про: .	Знайомі.
+acquaintances_group	uk	question		Кого зі знайомих?
+about_me	uk	speech	Я хочу поговорити про: про мене.	Виберіть інформацію про мене.
+speech_difficulty	uk	speech	Я хочу поговорити про: мені важко говорити.	Мені важко говорити.
+i_understand	uk	speech	Я хочу поговорити про: я вас розумію.	Я вас розумію.
+my_name	uk	speech	Я хочу поговорити про: моє ім'я.	Цю інформацію ще не внесено.
+my_age	uk	speech	Я хочу поговорити про: вік.	Цю інформацію ще не внесено.
+my_birth_date	uk	speech	Я хочу поговорити про: народження.	Цю інформацію ще не внесено.
+my_home	uk	speech	Я хочу поговорити про: де я живу.	Цю інформацію ще не внесено.
+my_country	uk	speech	Я хочу поговорити про: країна.	Цю інформацію ще не внесено.
+my_language	uk	speech	Я хочу поговорити про: мова.	Цю інформацію ще не внесено.
+my_caregiver	uk	speech	Я хочу поговорити про: опікун.	Цю інформацію ще не внесено.
+my_therapist	uk	speech	Я хочу поговорити про: терапевт.	Цю інформацію ще не внесено.
+call_my_caregiver	uk	speech	Я хочу поговорити про: подзвоніть опікуну.	Цю інформацію ще не внесено.
+call_my_therapist	uk	speech	Я хочу поговорити про: подзвоніть терапевту.	Цю інформацію ще не внесено.
+what_root	uk	speech	ЩО??	ЩО?
+where_root	uk	speech	ДЕ??	ДЕ?
+when_root	uk	speech	КОЛИ??	КОЛИ?
+home	uk	speech	Я хочу туди: додому.	Я хочу додому.
+what_do	uk	speech	ЩО БУДЕМО РОБИТИ??	ЩО БУДЕМО РОБИТИ?
+what_is_this	uk	speech	ЩО ЦЕ??	ЩО ЦЕ?
+what_is_happening	uk	speech	ЩО ВІДБУВАЄТЬСЯ??	ЩО ВІДБУВАЄТЬСЯ?
+what_next	uk	speech	ЩО БУДЕ ПОТІМ??	ЩО БУДЕ ПОТІМ?
+what_did_i_say	uk	speech	ЩО Я СКАЗАЛА??	ЩО Я СКАЗАЛА?
+activity_group	uk	speech	ЩО Я ХОЧУ РОБИТИ?.	Виберіть заняття.
+music	uk	speech	МУЗИКА.	Я хотіла б послухати музику.
+tv	uk	speech	ТЕЛЕВІЗОР.	Я хотіла б подивитися телевізор.
+environment_group	uk	speech	СЕРЕДОВИЩЕ.	Виберіть, що потрібно змінити в кімнаті.
+walk	uk	speech	ПРОГУЛЯНКА.	Я хотіла б піти на прогулянку із супроводом.
+visit	uk	speech	ВІЗИТ.	Я хотіла б, щоб мене відвідали.
+animals	uk	speech	ТВАРИНИ.	Виберіть тварину.
+dog	uk	speech	СОБАКА.	Я хотіла б побачити собаку.
+cat	uk	speech	КІТ.	Я хотіла б побачити кота.
+bird	uk	speech	ПТАХ.	Я хотіла б побачити птаха.
+fish	uk	speech	РИБА.	Я хотіла б побачити рибу.
+horse	uk	speech	КІНЬ.	Я хотіла б побачити коня.
+rabbit	uk	speech	КРОЛИК.	Я хотіла б побачити кролика.
+where_go	uk	speech	КУДИ МИ ЙДЕМО??	КУДИ МИ ЙДЕМО?
+where_zana	uk	speech	ДЕ ЖАНА??	ДЕ ЖАНА?
+where_dusan	uk	speech	ДЕ ДУШАН??	ДЕ ДУШАН?
+where_are_we	uk	speech	ДЕ МИ??	ДЕ МИ?
+where_phone	uk	speech	ДЕ ТЕЛЕФОН??	ДЕ ТЕЛЕФОН?
+where_wheelchair	uk	speech	ДЕ ВІЗОК??	ДЕ ВІЗОК?
+place_group	uk	label		КУДИ Я ХОЧУ
+place_group	uk	speech	Я хочу туди: .	Виберіть, куди я хочу піти.
+miss_little	uk	speech	Я хочу поговорити про: трохи.	Я трохи сумую за вами.
+miss_very	uk	speech	Я хочу поговорити про: дуже.	Я дуже сумую за вами.
+repeat_question	uk	speech	ПИТАННЯ.	Будь ласка, повторіть запитання.
+repeat_last_sentence	uk	speech	ОСТАННЄ РЕЧЕННЯ.	Будь ласка, повторіть останнє речення.
+repeat_slower	uk	speech	ПОВІЛЬНІШЕ.	Будь ласка, повторіть повільніше.
+slower_little	uk	speech	ТРОХИ ПОВІЛЬНІШЕ.	Будь ласка, говоріть трохи повільніше.
+slower_much	uk	speech	НАБАГАТО ПОВІЛЬНІШЕ.	Будь ласка, говоріть набагато повільніше.
+help_drinking	uk	speech	Мені потрібно: пиття.	Мені потрібна допомога, щоб попити.
+help_feeding	uk	speech	Мені потрібно: годування.	Мені потрібна допомога з годуванням.
+position	uk	speech	Мені потрібно: положення.	Будь ласка, допоможіть мені змінити положення тіла.
+i_want	uk	speech	Я ХОТІЛА Б.	Я хотіла б дещо.
+smoking	uk	speech	КУРИТИ.	Я хотіла б покурити.
+lighter	uk	speech	ЗАПАЛЬНИЧКА.	Мені потрібна запальничка.
+ashtray	uk	speech	ПОПІЛЬНИЧКА.	Мені потрібна попільничка.
+rest	uk	speech	Мені потрібно: відпочинок.	Я хотіла б відпочити.
+food	uk	speech	Будь ласка, я хочу їжа.	Я хотіла б поїсти.
+emergency	uk	speech	Мені потрібно: терміново.	Виберіть, що потрібно терміново.
+urgent_help	uk	speech	Мені потрібно: терміново.	Мені терміново потрібна допомога.
+feel_bad	uk	speech	Мені потрібно: мені погано.	Мені погано.
+cannot_breathe	uk	speech	Мені потрібно: не можу дихати.	Я не можу дихати.
+call_doctor	uk	speech	Мені потрібно: покличте лікаря.	Будь ласка, покличте лікаря.
+call_nurse	uk	speech	Мені потрібно: покличте сестру.	Будь ласка, покличте медсестру.
+pain_area	uk	speech	У мене болить біль.	Де тебе болить?
+sister_zana	uk	speech	Я хочу поговорити про: сестра жана.	Будь ласка, покличте сестру Жану.
+grandfather_sergej	uk	speech	Я хочу поговорити про: дідусь сергій.	Будь ласка, покличте дідуся Сергія.
+julija	uk	speech	Я хочу поговорити про: юлія.	Будь ласка, покличте Юлію.
+oksana	uk	speech	Я хочу поговорити про: оксана.	Будь ласка, покличте Оксану.
+inna	uk	speech	Я хочу поговорити про: інна.	Будь ласка, покличте Інну.
+franc	uk	speech	Я хочу поговорити про: франц.	Будь ласка, покличте Франца.
+miss_you	uk	speech	Я хочу поговорити про: сумую за тобою.	Я сумую за тобою.
+love_you	uk	speech	Я хочу поговорити про: я тебе люблю.	Я тебе люблю.
+rada_te_imam	uk	speech	Я хочу поговорити про: я тебе люблю.	Я тебе люблю.
+pogresam_te	uk	speech	Я хочу поговорити про: сумую за тобою.	Я сумую за тобою.
+turn_me	uk	speech	Мені потрібно: поверніть мене.	Будь ласка, поверніть мене.
+fix_me	uk	speech	Мені потрібно: поправте мене.	Будь ласка, допоможіть мені змінити положення тіла.
+turn_left	uk	speech	Мені потрібно: поверніть ліворуч.	Будь ласка, поверніть мене ліворуч.
+turn_right	uk	speech	Мені потрібно: поверніть праворуч.	Будь ласка, поверніть мене праворуч.
+turn_back	uk	speech	Мені потрібно: на спину.	Будь ласка, переверніть мене на спину.
+turn_side	uk	speech	Мені потрібно: на бік.	Будь ласка, переверніть мене на бік.
+cannot_speak	uk	speech	ГОВОРИТИ.	Я не можу говорити.
+cannot_stand	uk	speech	ВСТАТИ.	Я не можу встати.
+cannot_drink	uk	speech	ПИТИ.	Я не можу пити.
+cannot_eat	uk	speech	ЇСТИ.	Я не можу їсти.
+cannot_move	uk	speech	ПЕРЕСУНУТИСЯ.	Я не можу повернутися або пересунутися.
+cannot_understand	uk	speech	РОЗУМІТИ.	Я не можу зрозуміти.
+contact_message	uk	speech	ПОВІДОМЛЕННЯ.	Я хочу надіслати повідомлення.
+contact_call	uk	label		ПОДЗВОНИТИ
+contact_call	uk	speech	.	Будь ласка, подзвоніть цій людині.
+cancel_call	uk	label		СКАСУВАТИ
+cancel_call	uk	speech	.	Скасуйте.
+contact_help	uk	speech	Мені потрібно: допомога.	Будь ласка, допоможіть мені.
+person_dusan	uk	speech	Я хочу поговорити про: душан.	Душан.
+person_dusan	uk	question		Подзвонити чи скасувати?
+person_zana	uk	speech	Я хочу поговорити про: жана.	Жана.
+person_zana	uk	question		Подзвонити чи скасувати?
+person_sergej	uk	speech	Я хочу поговорити про: сергій.	Сергій.
+person_sergej	uk	question		Подзвонити чи скасувати?
+person_julija	uk	speech	Я хочу поговорити про: юлія.	Юлія.
+person_julija	uk	question		Подзвонити чи скасувати?
+person_oksana	uk	speech	Я хочу поговорити про: оксана.	Оксана.
+person_oksana	uk	question		Подзвонити чи скасувати?
+person_inna	uk	speech	Я хочу поговорити про: інна.	Інна.
+person_inna	uk	question		Подзвонити чи скасувати?
+person_franc	uk	speech	Я хочу поговорити про: франц.	Франц.
+person_franc	uk	question		Подзвонити чи скасувати?
+person_other	uk	speech	Я хочу поговорити про: інше.	Інша людина.
+person_other	uk	question		Подзвонити чи скасувати?
+person_see	uk	label	БАЧИЛА	ПОБАЧИТИ
+person_see	uk	speech	БАЧИЛА.	Я хотіла б побачити цю людину.
+person_come	uk	label	ЩОБ ПРИЙШОВ	ЩОБ ПРИЙШЛА ЛЮДИНА
+person_come	uk	speech	ЩОБ ПРИЙШОВ.	Я хотіла б, щоб ця людина прийшла.
+person_where_is	uk	speech	ДЕ Є?	Де ця людина?
+person_tell	uk	speech	СКАЖІТЬ ЙОМУ/ЇЙ.	Скажіть цій людині.
+friend_1	uk	speech	Я хочу поговорити про: друг 1.	Друг.
+friend_2	uk	speech	Я хочу поговорити про: друг 2.	Друг.
+friend_3	uk	speech	Я хочу поговорити про: друг 3.	Друг.
+mineral_water	uk	label	ГАЗОВАНА ВОДА	МІНЕРАЛЬНА ВОДА
+not_thirsty	uk	speech	Будь ласка, я хочу я не хочу пити.	Я не хочу пити.
+not_hungry	uk	speech	Будь ласка, я хочу я не голодна.	Я не голодна.
+hungry_lamb	uk	label	БАРАНИНА	ЯГНЯТИНА
+hungry_pleskavica	uk	speech	Будь ласка, я хочу плескавиця.	Будь ласка, я хочу плескавицю.
+diaper	uk	speech	Мені потрібно: підгузок.	Будь ласка, замініть мені підгузок.
+wc_now	uk	speech	Мені потрібно: зараз.	Мені негайно потрібно в туалет.
+wc_soon	uk	speech	Мені потрібно: скоро.	Мені скоро потрібно буде в туалет.
+wc_help	uk	speech	Мені потрібно: допомога.	Мені потрібна допомога в туалеті.
+dressing_help	uk	speech	Мені потрібно: переодягання.	Мені потрібна допомога з переодяганням.
+body_position	uk	speech	Мені потрібно: поправте мене.	Будь ласка, допоможіть мені змінити положення тіла.
+wc_call_nurse	uk	speech	Мені потрібно: покличте медсестру.	Будь ласка, покличте медсестру.
+pillow	uk	speech	Мені потрібно: подушка.	Мені потрібна подушка.
+blanket	uk	speech	Мені потрібно: ковдра.	Мені потрібна ковдра.
+clothing	uk	speech	Мені потрібно: одяг.	Виберіть одяг.
+shirt	uk	speech	Мені потрібно: футболка.	Мені потрібна футболка.
+pants	uk	speech	Мені потрібно: штани.	Мені потрібні штани.
+socks	uk	speech	Мені потрібно: шкарпетки.	Мені потрібні шкарпетки.
+shoes	uk	speech	Мені потрібно: взуття.	Мені потрібне взуття.
+jacket	uk	speech	Мені потрібно: куртка.	Мені потрібна куртка.
+pajamas	uk	speech	Мені потрібно: піжама.	Мені потрібна піжама.
+underwear	uk	speech	Мені потрібно: нижня білизна.	Мені потрібна нижня білизна.
+hat	uk	speech	Мені потрібно: шапка.	Мені потрібна шапка.
+scarf	uk	speech	Мені потрібно: шарф.	Мені потрібен шарф.
+gloves	uk	speech	Мені потрібно: рукавички.	Мені потрібні рукавички.
+bed	uk	speech	Мені потрібно: ліжко.	Будь ласка, допоможіть мені лягти в ліжко.
+change_position	uk	label		ЗМІНИТИ ПОЛОЖЕННЯ
+change_position	uk	speech	Мені потрібно: .	Будь ласка, допоможіть мені змінити положення тіла.
+sit_up	uk	speech	Мені потрібно: підніміть мене.	Будь ласка, підніміть мене.
+lie_down	uk	speech	Мені потрібно: покладіть мене.	Будь ласка, покладіть мене.
+pain_when_standing	uk	speech	Болить, коли стою.	Болить, коли встаю.
+dont_know_problem	uk	speech	НЕ ЗНАЮ?	Я не знаю.
+peace	uk	speech	ТИША.	Я хотіла б тиші.
+dusan	uk	speech	Я хочу поговорити про: душан.	Будь ласка, покличте Душана.
+daughter	uk	speech	Я хочу поговорити про: донька.	Будь ласка, покличте доньку.
+son	uk	speech	Я хочу поговорити про: син.	Будь ласка, покличте сина.
+therapist	uk	speech	Я хочу поговорити про: терапевт.	Будь ласка, покличте терапевта.
+therapist	uk	question		Подзвонити чи скасувати?
+doctor	uk	speech	Я хочу поговорити про: лікар.	Будь ласка, покличте лікаря.
+doctor	uk	question		Подзвонити чи скасувати?
+nurse	uk	speech	Я хочу поговорити про: медсестра.	Будь ласка, покличте медсестру.
+nurse	uk	question		Подзвонити чи скасувати?
+when_come	uk	speech	КОЛИ ПРИЙДЕ??	КОЛИ ПРИЙДЕ?
+when_go	uk	speech	КОЛИ МИ ЙДЕМО??	КОЛИ МИ ЙДЕМО?
+when_therapy	uk	speech	КОЛИ БУДЕ ТЕРАПІЯ??	КОЛИ БУДЕ ТЕРАПІЯ?
+when_home	uk	speech	КОЛИ ДОДОМУ??	КОЛИ ДОДОМУ?
+when_eat	uk	speech	КОЛИ МИ ЇМО??	КОЛИ МИ ЇМО?
+time_group	uk	speech	ЧАС?	Виберіть час.
+today	uk	speech	СЬОГОДНІ?	Сьогодні.
+tomorrow	uk	speech	ЗАВТРА?	Завтра.
+yesterday	uk	speech	ВЧОРА?	Учора.
+now	uk	speech	ЗАРАЗ?	Зараз.
+morning	uk	speech	ВРАНЦІ?	Вранці.
+afternoon	uk	speech	ПІСЛЯ ОБІДУ?	Після обіду.
+evening	uk	speech	УВЕЧЕРІ?	Увечері.
+night	uk	speech	ВНОЧІ?	Вночі.
+medicine	uk	label		ЛІКИ
+medicine	uk	speech	Мені потрібно: .	Будь ласка, дайте мені ліки.
+therapy	uk	speech	ТЕРАПІЯ?	Я хотіла б піти на терапію.
+wheelchair	uk	speech	Мені потрібно: візок.	Будь ласка, допоможіть мені сісти у візок.
+crutch	uk	speech	Мені потрібно: милиця.	Будь ласка, допоможіть мені з милицею.
+not_safe	uk	speech	НЕБЕЗПЕЧНО.	Я не почуваюся в безпеці.
+need_rest	uk	speech	Мені потрібно: мені потрібен відпочинок.	Мені потрібен відпочинок.
+help_to_wc	uk	speech	Мені потрібно: допоможіть мені до туалету.	Будь ласка, допоможіть мені дістатися до туалету.
+vending_drinks	uk	speech	АВТОМАТ НАПОЇВ.	Будь ласка, допоможіть мені біля автомата з напоями.
+vending_coffee_tea	uk	speech	АВТОМАТ КАВА/ЧАЙ.	Будь ласка, допоможіть мені біля автомата з кавою та чаєм.
+shop	uk	speech	МАГАЗИН.	Будь ласка, допоможіть мені в магазині.
+restaurant	uk	speech	РЕСТОРАН.	Будь ласка, допоможіть мені в ресторані.
+transport	uk	speech	ТРАНСПОРТ.	Будь ласка, допоможіть мені з транспортом.
+vending_photo_step_1	uk	speech	КРОК 1.	Подивіться на зображення першого кроку.
+vending_photo_step_2	uk	speech	КРОК 2.	Подивіться на зображення другого кроку.
+move_me	uk	speech	Мені потрібно: пересуньте мене.	Будь ласка, пересуньте мене.

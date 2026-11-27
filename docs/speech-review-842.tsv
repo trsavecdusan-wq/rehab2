@@ -1,0 +1,981 @@
+id	language	label	speech	question	text_review	listened	corrected	note
+vest	sl	BREZROKAVNIK	Potrebujem brezrokavnik.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+vest	uk	ЖИЛЕТ	Мені потрібен жилет.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+choose_myself	sl	SAMA BOM IZBRALA	Želim iti v trgovino. Tam bom sama izbrala, kaj potrebujem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+choose_myself	uk	Я САМА ВИБЕРУ	Я хочу піти до магазину. Там я сама виберу, що мені потрібно.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+show_you	sl	POKAŽEM TI	Prosim poglej, pokazala ti bom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+show_you	uk	ПОКАЖУ ТОБІ	Будь ласка, подивись, я тобі покажу.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+not_here	sl	NI TUKAJ	Tukaj ni tega, kar želim povedati.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+not_here	uk	ТУТ ЦЬОГО НЕМАЄ	Тут немає того, що я хочу сказати.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+not_this	sl	NI TO	Ne, to ni tisto, kar mislim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+not_this	uk	НЕ ТЕ	Ні, це не те, що я маю на увазі.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+no	sl	NE	Ne.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. V4: NE je tih; NE RAZUMEM nima podikon.
+no	uk	НІ	Ні.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. V4: NE je tih; NE RAZUMEM nima podikon.
+yes	sl	DA	Da.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+yes	uk	ТАК	Так.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dont_understand	sl	NE RAZUMEM	Ne razumem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. V4: NE je tih; NE RAZUMEM nima podikon.
+dont_understand	uk	НЕ РОЗУМІЮ	Я не розумію.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. V4: NE je tih; NE RAZUMEM nima podikon.
+thank_you	sl	HVALA	Hvala.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+thank_you	uk	ДЯКУЮ	Дякую.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help	sl	POMOČ	Prosim, pomagajte mi.	Pri čem potrebuješ pomoč?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help	uk	ДОПОМОГА	Будь ласка, допоможіть мені.	З чим тобі потрібна допомога?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wait	sl	POČAKAJ	Počakajte, prosim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wait	uk	ЗАЧЕКАЙТЕ	Будь ласка, зачекайте.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+repeat	sl	PONOVI	Prosim, ponovite.	Kaj naj ponovim?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+repeat	uk	ПОВТОРІТЬ	Будь ласка, повторіть.	Що повторити?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+slower	sl	POČASNEJE	Prosim, govorite počasneje.	Kako počasi?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+slower	uk	ПОВІЛЬНІШЕ	Будь ласка, говоріть повільніше.	Наскільки повільно?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+understand	sl	RAZUMEM	Razumem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+understand	uk	РОЗУМІЮ	РОЗУМІЮ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+people	sl	LJUDJE	Ljudje.	O kom želiš govoriti?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+people	uk	ЛЮДИ	Люди.	Про кого ти хочеш говорити?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+need	sl	POTREBUJEM	Potrebujem pomoč.	Kaj potrebuješ?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+need	uk	ПОТРІБНО	Мені потрібна допомога.	Що тобі потрібно?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+problem	sl	TEŽAVA	Imam težavo.	Kaj je narobe?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+problem	uk	ПРОБЛЕМА	Мені потрібно: проблема.	Що не так?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+family_group	sl	DRUŽINA	Družina.	Koga iz družine?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+family_group	uk	РОДИНА	Я хочу поговорити про: родина.	Кого з родини?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+friends_group	sl	PRIJATELJI	Prijatelji.	Katerega prijatelja?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+friends_group	uk	ДРУЗІ	Я хочу поговорити про: друзі.	Який друг?	besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+call	sl	POKLIČI	Izberite skupino oseb.	Katero skupino oseb?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+call	uk	ПОДЗВОНИТИ	Будь ласка, подзвоніть комусь.	Кому подзвонити?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+acquaintances_group	sl	ZNANCI	Znanci.	Katerega znanca?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+acquaintances_group	uk		Я хочу поговорити про: .		besedilno pregledano	ne	da: label,speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+message	sl	SPOROČILO	Pošljite sporočilo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+message	uk	ПОВІДОМЛЕННЯ	Будь ласка, надішліть повідомлення.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+miss_someone	sl	POGREŠAM	Pogrešam vas.	Kako zelo?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+miss_someone	uk	СУМУЮ	Я сумую за вами.	Наскільки сильно?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+about_me	sl	O MENI	Izberite podatek o meni.	Kaj želiš povedati o sebi?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+about_me	uk	ПРО МЕНЕ	Я хочу поговорити про: про мене.	Що ти хочеш сказати про себе?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+stroke_info	sl	PO MOŽGANSKI KAPI	Prebolela sem možgansko kap.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+stroke_info	uk	ПІСЛЯ ІНСУЛЬТУ	Я перенесла інсульт.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+speech_difficulty	sl	TEŽKO GOVORIM	Težko govorim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+speech_difficulty	uk	МЕНІ ВАЖКО ГОВОРИТИ	Я хочу поговорити про: мені важко говорити.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+i_understand	sl	RAZUMEM VAS	Razumem vas.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+i_understand	uk	Я ВАС РОЗУМІЮ	Я хочу поговорити про: я вас розумію.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+speak_slowly	sl	GOVORITE POČASI	Prosim, govorite počasneje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+speak_slowly	uk	ГОВОРІТЬ ПОВІЛЬНО	ГОВОРІТЬ ПОВІЛЬНО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+give_me_time	sl	DAJTE MI ČAS	Prosim, dajte mi čas.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+give_me_time	uk	ДАЙТЕ МЕНІ ЧАС	ДАЙТЕ МЕНІ ЧАС.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+be_patient	sl	POTRPITE Z MANO	Prosim, potrpite z mano.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+be_patient	uk	БУДЬТЕ ТЕРПЛЯЧІ ЗІ МНОЮ	БУДЬТЕ ТЕРПЛЯЧІ ЗІ МНОЮ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+my_name	sl	MOJE IME	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+my_name	uk	МОЄ ІМ'Я	Я хочу поговорити про: моє ім'я.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+my_age	sl	STAROST	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+my_age	uk	ВІК	Я хочу поговорити про: вік.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+my_birth_date	sl	ROJSTVO	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+my_birth_date	uk	НАРОДЖЕННЯ	Я хочу поговорити про: народження.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+my_home	sl	KJE ŽIVIM	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+my_home	uk	ДЕ Я ЖИВУ	Я хочу поговорити про: де я живу.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+my_country	sl	DRŽAVA	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+my_country	uk	КРАЇНА	Я хочу поговорити про: країна.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+my_language	sl	JEZIK	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+my_language	uk	МОВА	Я хочу поговорити про: мова.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+my_caregiver	sl	SKRBNIK	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+my_caregiver	uk	ОПІКУН	Я хочу поговорити про: опікун.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+my_therapist	sl	TERAPEVT	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+my_therapist	uk	ТЕРАПЕВТ	Я хочу поговорити про: терапевт.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+call_my_caregiver	sl	POKLIČI SKRBNIKA	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+call_my_caregiver	uk	ПОДЗВОНІТЬ ОПІКУНУ	Я хочу поговорити про: подзвоніть опікуну.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+call_my_therapist	sl	POKLIČI TERAPEVTA	Ta podatek še ni vpisan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+call_my_therapist	uk	ПОДЗВОНІТЬ ТЕРАПЕВТУ	Я хочу поговорити про: подзвоніть терапевту.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+thirsty	sl	PIJAČA	Izberi pijačo.	Izberi, kaj želiš piti.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+thirsty	uk	Я ХОЧУ ПИТИ	Я хочу пити.	Що ти хочеш пити?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry	sl	HRANA	Izberi hrano.	Kaj bi jedla?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry	uk	Я ГОЛОДНА	Будь ласка, я хотіла б щось поїсти.	Що ти хочеш їсти?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc	sl	TOALETA	Moram v toaleto.	Izberi, kaj potrebuješ.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc	uk	ТУАЛЕТ	Мені потрібно в туалет.	Що тобі потрібно?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tired	sl	UTRUJENA SEM	Utrujena sem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tired	uk	Я ВТОМИЛАСЯ	Я втомилася.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+what_root	sl	KAJ?	Kaj?	Kaj želiš vprašati?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+what_root	uk	ЩО?	ЩО??	Що ти хочеш запитати?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+where_root	sl	KJE?	Kje?	Kaj iščeš ali kje je?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+where_root	uk	ДЕ?	ДЕ??	Що ти шукаєш або де це?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+when_root	sl	KDAJ?	Kdaj?	Kaj želiš vprašati glede časa?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+when_root	uk	КОЛИ?	КОЛИ??	Що ти хочеш запитати про час?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+home	sl	DOMOV	Domov.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+home	uk	ДОДОМУ	Я хочу туди: додому.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+other	sl	DRUGO	Drugo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+other	uk	ІНШЕ	ІНШЕ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+real_world	sl	RESNIČNI SVET	Resnični svet.	Kje potrebuješ pomoč?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+real_world	uk	РЕАЛЬНИЙ СВІТ	РЕАЛЬНИЙ СВІТ.	Де тобі потрібна допомога?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+what_do	sl	KAJ BOMO DELALI?	Kaj bomo delali?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+what_do	uk	ЩО БУДЕМО РОБИТИ?	ЩО БУДЕМО РОБИТИ??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+what_is_this	sl	KAJ JE TO?	Kaj je to?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+what_is_this	uk	ЩО ЦЕ?	ЩО ЦЕ??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+what_is_happening	sl	KAJ SE DOGAJA?	Kaj se dogaja?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+what_is_happening	uk	ЩО ВІДБУВАЄТЬСЯ?	ЩО ВІДБУВАЄТЬСЯ??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+what_next	sl	KAJ BO POTEM?	Kaj bo potem?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+what_next	uk	ЩО БУДЕ ПОТІМ?	ЩО БУДЕ ПОТІМ??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+what_did_i_say	sl	KAJ SEM REKLA?	Kaj sem rekla?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+what_did_i_say	uk	ЩО Я СКАЗАЛА?	ЩО Я СКАЗАЛА??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+activity_group	sl	KAJ BI DELALA?	Izberite dejavnost.	Kaj bi delala?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+activity_group	uk	ЩО Я ХОЧУ РОБИТИ?	ЩО Я ХОЧУ РОБИТИ?.	Що ти хотіла б робити?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+music	sl	GLASBA	Rada bi poslušala glasbo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+music	uk	МУЗИКА	МУЗИКА.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+tv	sl	TELEVIZIJA	Rada bi gledala televizijo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tv	uk	ТЕЛЕВІЗОР	ТЕЛЕВІЗОР.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+environment_group	sl	OKOLJE	Izberite pomoč v prostoru.	Kaj naj uredimo v prostoru?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+environment_group	uk	СЕРЕДОВИЩЕ	СЕРЕДОВИЩЕ.	Що потрібно змінити в кімнаті?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+turn_on_tv	sl	PRIŽGI TV	Prosim, prižgite televizijo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_on_tv	uk	УВІМКНІТЬ ТЕЛЕВІЗОР	УВІМКНІТЬ ТЕЛЕВІЗОР.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_off_tv	sl	UGASNI TV	Prosim, ugasnite televizijo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_off_tv	uk	ВИМКНІТЬ ТЕЛЕВІЗОР	ВИМКНІТЬ ТЕЛЕВІЗОР.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_on_light	sl	PRIŽGI LUČ	Prosim, prižgite luč.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_on_light	uk	УВІМКНІТЬ СВІТЛО	УВІМКНІТЬ СВІТЛО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_off_light	sl	UGASNI LUČ	Prosim, ugasnite luč.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_off_light	uk	ВИМКНІТЬ СВІТЛО	ВИМКНІТЬ СВІТЛО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+open_window	sl	ODPRI OKNO	Prosim, odprite okno.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+open_window	uk	ВІДКРИЙТЕ ВІКНО	ВІДКРИЙТЕ ВІКНО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+close_window	sl	ZAPRI OKNO	Prosim, zaprite okno.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+close_window	uk	ЗАКРИЙТЕ ВІКНО	ЗАКРИЙТЕ ВІКНО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+walk	sl	SPREHOD	Rada bi šla na sprehod s spremstvom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+walk	uk	ПРОГУЛЯНКА	ПРОГУЛЯНКА.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+visit	sl	OBISK	Rada bi obisk.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+visit	uk	ВІЗИТ	ВІЗИТ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+animals	sl	ŽIVALI	Izberite žival.	Katero žival?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+animals	uk	ТВАРИНИ	ТВАРИНИ.	Яка тварина?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+dog	sl	PES	Rada bi videla psa.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dog	uk	СОБАКА	СОБАКА.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cat	sl	MAČKA	Rada bi videla mačko.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cat	uk	КІТ	КІТ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+bird	sl	PTIČ	Rada bi videla ptiča.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+bird	uk	ПТАХ	ПТАХ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+fish	sl	RIBA	Rada bi videla ribo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+fish	uk	РИБА	РИБА.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+horse	sl	KONJ	Rada bi videla konja.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+horse	uk	КІНЬ	КІНЬ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+rabbit	sl	ZAJEC	Rada bi videla zajca.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+rabbit	uk	КРОЛИК	КРОЛИК.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+where_go	sl	KAM GREMO?	Kam gremo?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+where_go	uk	КУДИ МИ ЙДЕМО?	КУДИ МИ ЙДЕМО??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+where_zana	sl	KJE JE ŽANA?	Kje je Žana?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+where_zana	uk	ДЕ ЖАНА?	ДЕ ЖАНА??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+where_dusan	sl	KJE JE DUŠAN?	Kje je Dušan?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+where_dusan	uk	ДЕ ДУШАН?	ДЕ ДУШАН??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+where_are_we	sl	KJE SMO?	Kje smo?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+where_are_we	uk	ДЕ МИ?	ДЕ МИ??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+where_phone	sl	KJE JE TELEFON?	Kje je telefon?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+where_phone	uk	ДЕ ТЕЛЕФОН?	ДЕ ТЕЛЕФОН??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+where_wheelchair	sl	KJE JE VOZIČEK?	Kje je voziček?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+where_wheelchair	uk	ДЕ ВІЗОК?	ДЕ ВІЗОК??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+place_group	sl	KAM ŽELIM	Izberite, kam želim.	Kam želiš?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+place_group	uk		Я хочу туди: .	Куди ти хочеш?	besedilno pregledano	ne	da: label,speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+room	sl	SOBA	Rada bi v sobo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+room	uk	КІМНАТА	Я хочу в кімнату.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+terrace	sl	TERASA	Rada bi na teraso.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+terrace	uk	ТЕРАСА	Я хочу на терасу.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+balcony	sl	BALKON	Rada bi na balkon.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+balcony	uk	БАЛКОН	Я хочу на балкон.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+courtyard	sl	DVORIŠČE	Rada bi na dvorišče.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+courtyard	uk	ДВІР	Я хочу на подвір’я.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+go_outside_with_wheelchair	sl	VEN Z VOZIČKOM	Rada bi šla ven z vozičkom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+go_outside_with_wheelchair	uk	НАДВІР З ВІЗКОМ	Я хочу виїхати надвір на візку.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+go_inside	sl	NAZAJ NOTRI	Rada bi nazaj notri.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+go_inside	uk	НАЗАД УСЕРЕДИНУ	Я хочу повернутися всередину.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+bathroom	sl	KOPALNICA	Rada bi v kopalnico.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+bathroom	uk	ВАННА	Я хочу у ванну кімнату.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dining_room	sl	JEDILNICA	Rada bi v jedilnico.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dining_room	uk	ЇДАЛЬНЯ	Я хочу в їдальню.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+outside	sl	ZUNAJ	Rada bi ven.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+outside	uk	НАДВОРІ	Я хочу надвір.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+inside	sl	NOTRI	Rada bi notri.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+inside	uk	ВСЕРЕДИНУ	Я хочу всередину.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+miss_little	sl	MALO	Malo pogrešam.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+miss_little	uk	ТРОХИ	Я хочу поговорити про: трохи.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+miss_very	sl	ZELO	Zelo pogrešam.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+miss_very	uk	ДУЖЕ	Я хочу поговорити про: дуже.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+repeat_question	sl	VPRAŠANJE	Prosim, ponovi vprašanje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+repeat_question	uk	ПИТАННЯ	ПИТАННЯ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+repeat_last_sentence	sl	ZADNJI STAVEK	Prosim, ponovi zadnji stavek.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+repeat_last_sentence	uk	ОСТАННЄ РЕЧЕННЯ	ОСТАННЄ РЕЧЕННЯ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+repeat_slower	sl	POČASNEJE	Prosim, ponovi počasneje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+repeat_slower	uk	ПОВІЛЬНІШЕ	ПОВІЛЬНІШЕ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+slower_little	sl	MALO POČASNEJE	Prosim, govori malo počasneje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+slower_little	uk	ТРОХИ ПОВІЛЬНІШЕ	ТРОХИ ПОВІЛЬНІШЕ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+slower_much	sl	ZELO POČASNEJE	Prosim, govori zelo počasneje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+slower_much	uk	НАБАГАТО ПОВІЛЬНІШЕ	НАБАГАТО ПОВІЛЬНІШЕ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+help_drinking	sl	PITJE	Potrebujem pomoč pri pitju.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_drinking	uk	ПИТТЯ	Мені потрібно: пиття.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+help_feeding	sl	HRANJENJE	Potrebujem pomoč pri hranjenju.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_feeding	uk	ГОДУВАННЯ	Мені потрібно: годування.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+dressing	sl	OBLAČENJE	Potrebujem pomoč pri oblačenju.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dressing	uk	ОДЯГАННЯ	Мені потрібна допомога з одяганням.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+position	sl	POLOŽAJ	Potrebujem pomoč pri položaju.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+position	uk	ПОЛОЖЕННЯ	Мені потрібно: положення.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+i_want	sl	RADA BI	Rada bi nekaj.	Kaj želiš?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+i_want	uk	Я ХОТІЛА Б	Я ХОТІЛА Б.	Що ти хочеш?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cigarette	sl	CIGARETO, PROSIM	Mi lahko daste eno cigareto, prosim?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cigarette	uk	СИГАРЕТУ, БУДЬ ЛАСКА	Можете дати мені одну сигарету, будь ласка?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+smoking	sl	KADITI	Rada bi kadila.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+smoking	uk	КУРИТИ	КУРИТИ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+lighter	sl	VŽIGALNIK	Potrebujem vžigalnik.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+lighter	uk	ЗАПАЛЬНИЧКА	ЗАПАЛЬНИЧКА.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+ashtray	sl	PEPELNIK	Potrebujem pepelnik.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ashtray	uk	ПОПІЛЬНИЧКА	ПОПІЛЬНИЧКА.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+dont_want	sl	NE ŽELIM	Tega ne želim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dont_want	uk	НЕ ХОЧУ	Я цього не хочу.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+rest	sl	POČITEK	Rada bi počivala.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+rest	uk	ВІДПОЧИНОК	Мені потрібно: відпочинок.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+drink	sl	PIJAČA	Izberi, kaj želiš piti.	Izberi, kaj želiš piti.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink	uk	НАПІЙ	Будь ласка, я хочу напій.	Що ти хочеш пити?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food	sl	HRANA	Rada bi hrano.	Kaj želiš jesti?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food	uk	ЇЖА	Будь ласка, я хочу їжа.	Що ти хочеш їсти?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+feeling	sl	POČUTJE	Rada bi povedala, kako se počutim.	Kako se počutiš?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+feeling	uk	САМОПОЧУТТЯ	Я хочу сказати, як я почуваюся.	Як ти почуваєшся?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+care	sl	NEGA	Potrebujem pomoč pri negi.	Kaj potrebuješ?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+care	uk	ДОГЛЯД	Мені потрібна допомога з доглядом.	Що тобі потрібно?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+health	sl	ZDRAVJE	Kaj je z zdravjem?	Kaj je z zdravjem?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+health	uk	ЗДОРОВ'Я	Що зі здоров'ям?	Що зі здоров'ям?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+emergency	sl	NUJNO	Izberite nujno potrebo.	Kaj je nujno?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+emergency	uk	ТЕРМІНОВО	Мені потрібно: терміново.	Що терміново?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+urgent_help	sl	NUJNO	Nujno potrebujem pomoč.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+urgent_help	uk	ТЕРМІНОВО	Мені потрібно: терміново.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+feel_bad	sl	SLABO MI JE	Slabo mi je.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+feel_bad	uk	МЕНІ ПОГАНО	Мені потрібно: мені погано.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cannot_breathe	sl	NE MOREM DIHATI	Ne morem dihati.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cannot_breathe	uk	НЕ МОЖУ ДИХАТИ	Мені потрібно: не можу дихати.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+chest_pain	sl	BOLI ME V PRSIH	Boli me v prsih.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+chest_pain	uk	БОЛИТЬ У ГРУДЯХ	У мене болять груди.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+call_doctor	sl	POKLIČI ZDRAVNIKA	Prosim, pokličite zdravnika.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+call_doctor	uk	ПОКЛИЧТЕ ЛІКАРЯ	Мені потрібно: покличте лікаря.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+call_nurse	sl	POKLIČI SESTRO	Prosim, pokličite sestro.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+call_nurse	uk	ПОКЛИЧТЕ СЕСТРУ	Мені потрібно: покличте сестру.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+more	sl	VEČ	Kaj še potrebuješ?	Kaj še potrebuješ?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+more	uk	БІЛЬШЕ	БІЛЬШЕ.	Що ще потрібно?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_area	sl	BOLEČINA	Kje te boli?	Kje te boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_area	uk	БІЛЬ	У мене болить біль.	Де тебе болить?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+sister_zana	sl	SESTRA ŽANA	Pokličite sestro Žano.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sister_zana	uk	СЕСТРА ЖАНА	Я хочу поговорити про: сестра жана.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+grandfather_sergej	sl	DEDEK SERGEJ	Pokličite dedka Sergeja.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+grandfather_sergej	uk	ДІДУСЬ СЕРГІЙ	Я хочу поговорити про: дідусь сергій.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+julija	sl	JULIJA	Pokličite Julijo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+julija	uk	ЮЛІЯ	Я хочу поговорити про: юлія.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+oksana	sl	OKSANA	Pokličite Oksano.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+oksana	uk	ОКСАНА	Я хочу поговорити про: оксана.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+inna	sl	INNA	Pokličite Inno.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+inna	uk	ІННА	Я хочу поговорити про: інна.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+franc	sl	FRANC	Pokličite Franca.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+franc	uk	ФРАНЦ	Я хочу поговорити про: франц.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+miss_you	sl	POGREŠAM TE	Pogrešam te.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+miss_you	uk	СУМУЮ ЗА ТОБОЮ	Я хочу поговорити про: сумую за тобою.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+love_you	sl	RADA TE IMAM	Rada te imam.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+love_you	uk	Я ТЕБЕ ЛЮБЛЮ	Я хочу поговорити про: я тебе люблю.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+sorry	sl	OPROSTI	Oprosti.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sorry	uk	ВИБАЧТЕ	Вибачте.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please	sl	PROSIM	Prosim.	Kaj želiš prositi?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please	uk	БУДЬ ЛАСКА	Будь ласка.	Що ти хочеш попросити?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_more	sl	VEČ PROŠENJ	Več prošenj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_more	uk	ЩЕ ПРОХАННЯ	ЩЕ ПРОХАННЯ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_cigarettes	sl	CIGARETE	Cigarete.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_cigarettes	uk	СИГАРЕТИ	СИГАРЕТИ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_buy_cigarettes	sl	KUPITE MI CIGARETE	Mi lahko kupite cigarete, prosim?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_buy_cigarettes	uk	КУПІТЬ МЕНІ СИГАРЕТИ	Можете купити мені сигарети, будь ласка?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_blanket	sl	ODEJA	Odeja.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_blanket	uk	КОВДРА	КОВДРА.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_blanket_laundry	sl	V PRANJE	Prosim, dajte to odejo osebju, da jo operejo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_blanket_laundry	uk	У ПРАННЯ	Будь ласка, передайте цю ковдру персоналу, щоб її випрали.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_blanket_bed	sl	ČISTA ODEJA NA POSTELJO	Prosim, vzemite čisto odejo iz omare in jo dajte na posteljo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+please_blanket_bed	uk	ЧИСТА КОВДРА НА ЛІЖКО	Будь ласка, візьміть чисту ковдру з шафи й покладіть її на ліжко.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+socialno	sl	SOCIALNO	Socialno.	Kaj želiš povedati?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+socialno	uk	СПІЛКУВАННЯ	Спілкування.	Що ти хочеш сказати?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pogovor	sl	POGOVOR	Pogovor.	Kaj potrebuješ pri pogovoru?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pogovor	uk	РОЗМОВА	Розмова.	Що тобі потрібно під час розмови?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dober_dan	sl	DOBER DAN	Dober dan.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dober_dan	uk	ДОБРИЙ ДЕНЬ	ДОБРИЙ ДЕНЬ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dobro_jutro	sl	DOBRO JUTRO	Dobro jutro.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dobro_jutro	uk	ДОБРОГО РАНКУ	ДОБРОГО РАНКУ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dober_vecer	sl	DOBER VEČER	Dober večer.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dober_vecer	uk	ДОБРИЙ ВЕЧІР	ДОБРИЙ ВЕЧІР.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+lahko_noc	sl	LAHKO NOČ	Lahko noč.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+lahko_noc	uk	НАДОБРАНІЧ	НАДОБРАНІЧ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+prosim	sl	PROSIM	Prosim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+prosim	uk	БУДЬ ЛАСКА	БУДЬ ЛАСКА.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+oprosti_social	sl	OPROSTI	Oprosti.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+oprosti_social	uk	ВИБАЧТЕ	ВИБАЧТЕ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+v_redu_je	sl	V REDU JE	V redu je.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+v_redu_je	uk	ВСЕ ГАРАЗД	ВСЕ ГАРАЗД.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+rada_te_imam	sl	RADA TE IMAM	Rada te imam.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+rada_te_imam	uk	Я ТЕБЕ ЛЮБЛЮ	Я хочу поговорити про: я тебе люблю.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+pogresam_te	sl	POGREŠAM TE	Pogrešam te.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pogresam_te	uk	СУМУЮ ЗА ТОБОЮ	Я хочу поговорити про: сумую за тобою.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+govori_pocasneje	sl	GOVORITE POČASI	Govorite počasneje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+govori_pocasneje	uk	ГОВОРІТЬ ПОВІЛЬНО	ГОВОРІТЬ ПОВІЛЬНО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ponovi	sl	PONOVI	Prosim, ponovite.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ponovi	uk	ПОВТОРІТЬ	ПОВТОРІТЬ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pocakaj	sl	POČAKAJ	Počakaj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pocakaj	uk	ЗАЧЕКАЙТЕ	ЗАЧЕКАЙТЕ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+nisem_koncala	sl	NISEM KONČALA	Nisem končala.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+nisem_koncala	uk	Я НЕ ЗАКІНЧИЛА	Я НЕ ЗАКІНЧИЛА.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dajte_mi_cas	sl	DAJTE MI ČAS	Dajte mi čas.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dajte_mi_cas	uk	ДАЙТЕ МЕНІ ЧАС	ДАЙТЕ МЕНІ ЧАС.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+napisi_mi	sl	NAPIŠI MI	Napišite mi.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+napisi_mi	uk	НАПИШІТЬ МЕНІ	НАПИШІТЬ МЕНІ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pokazi_mi	sl	POKAŽI MI	Pokažite mi.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pokazi_mi	uk	ПОКАЖІТЬ МЕНІ	ПОКАЖІТЬ МЕНІ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+call_me	sl	POKLIČI ME	Prosim, pokliči me.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+call_me	uk	ПОДЗВОНІТЬ МЕНІ	ПОДЗВОНІТЬ МЕНІ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+come_to_me	sl	PRIDI K MENI	Prosim, pridi k meni.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+come_to_me	uk	ПРИЙДИ ДО МЕНЕ	ПРИЙДИ ДО МЕНЕ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+look_at_me	sl	POGLEJ ME	Prosim, poglej me.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+look_at_me	uk	ПОДИВІТЬСЯ НА МЕНЕ	ПОДИВІТЬСЯ НА МЕНЕ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_me	sl	OBRNI ME	Prosim, obrnite me.	Kam?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_me	uk	ПОВЕРНІТЬ МЕНЕ	Мені потрібно: поверніть мене.	Куди?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+fix_me	sl	POPRAVI ME	Prosim, popravi me.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+fix_me	uk	ПОПРАВТЕ МЕНЕ	Мені потрібно: поправте мене.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+turn_left	sl	OBRNI LEVO	Prosim, obrnite me na levo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_left	uk	ПОВЕРНІТЬ ЛІВОРУЧ	Мені потрібно: поверніть ліворуч.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+turn_right	sl	OBRNI DESNO	Prosim, obrnite me na desno.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_right	uk	ПОВЕРНІТЬ ПРАВОРУЧ	Мені потрібно: поверніть праворуч.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+turn_back	sl	NA HRBET	Prosim, obrni me na hrbet.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_back	uk	НА СПИНУ	Мені потрібно: на спину.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+turn_side	sl	NA BOK	Prosim, obrni me na bok.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+turn_side	uk	НА БІК	Мені потрібно: на бік.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cannot	sl	NE MOREM	Ne morem.	Česa ne moreš?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cannot	uk	Я НЕ МОЖУ	Я НЕ МОЖУ.	Що ти не можеш зробити?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cannot_speak	sl	GOVORITI	Ne morem govoriti.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cannot_speak	uk	ГОВОРИТИ	ГОВОРИТИ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cannot_stand	sl	VSTATI	Ne morem vstati.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cannot_stand	uk	ВСТАТИ	ВСТАТИ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cannot_drink	sl	PITI	Ne morem piti.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cannot_drink	uk	ПИТИ	ПИТИ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cannot_eat	sl	JESTI	Ne morem jesti.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cannot_eat	uk	ЇСТИ	ЇСТИ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cannot_move	sl	PREMAKNITI SE	Ne morem se premakniti.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cannot_move	uk	ПЕРЕСУНУТИСЯ	ПЕРЕСУНУТИСЯ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cannot_understand	sl	RAZUMETI	Ne morem razumeti.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cannot_understand	uk	РОЗУМІТИ	РОЗУМІТИ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cold_hot	sl	MRAZ/VROČE	Mraz ali vroče.	Kaj je?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cold_hot	uk	ХОЛОДНО/ЖАРКО	ХОЛОДНО/ЖАРКО.	Що це?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+contact_message	sl	SPOROČILO	Želim poslati sporočilo.	Kdaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+contact_message	uk	ПОВІДОМЛЕННЯ	ПОВІДОМЛЕННЯ.	Коли?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+contact_call	sl	KLIČI	Prosim, pokličite to osebo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+contact_call	uk		.		besedilno pregledano	ne	da: label,speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cancel_call	sl	PREKLIČI	Prekliči.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cancel_call	uk		.		besedilno pregledano	ne	da: label,speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+contact_help	sl	POMOČ	Prosim, pomagajte mi.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+contact_help	uk	ДОПОМОГА	Мені потрібно: допомога.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+back_to_main	sl	NAZAJ	Nazaj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+back_to_main	uk	НАЗАД	НАЗАД.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_dusan	sl	DUŠAN	Dušan.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_dusan	uk	ДУШАН	Я хочу поговорити про: душан.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_zana	sl	ŽANA	Žana.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_zana	uk	ЖАНА	Я хочу поговорити про: жана.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_sergej	sl	SERGEJ	Sergej.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_sergej	uk	СЕРГІЙ	Я хочу поговорити про: сергій.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_julija	sl	JULIJA	Julija.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_julija	uk	ЮЛІЯ	Я хочу поговорити про: юлія.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_oksana	sl	OKSANA	Oksana.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_oksana	uk	ОКСАНА	Я хочу поговорити про: оксана.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_inna	sl	INNA	Inna.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_inna	uk	ІННА	Я хочу поговорити про: інна.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_franc	sl	FRANC	Franc.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_franc	uk	ФРАНЦ	Я хочу поговорити про: франц.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_other	sl	DRUGO	Druga oseba.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_other	uk	ІНШЕ	Я хочу поговорити про: інше.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_see	sl	VIDELA	Rada bi videla to osebo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_see	uk	БАЧИЛА	БАЧИЛА.		besedilno pregledano	ne	da: label,speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_come	sl	DA PRIDE	Rada bi, da pride.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_come	uk	ЩОБ ПРИЙШОВ	ЩОБ ПРИЙШОВ.		besedilno pregledano	ne	da: label,speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+later	sl	KASNEJE	Kasneje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+later	uk	ПІЗНІШЕ	ПІЗНІШЕ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_where_is	sl	KJE JE	Kje je?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_where_is	uk	ДЕ Є	ДЕ Є?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+person_tell	sl	POVEJ MU/JI	Povej mu ali ji.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+person_tell	uk	СКАЖІТЬ ЙОМУ/ЇЙ	СКАЖІТЬ ЙОМУ/ЇЙ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+friend_1	sl	PRIJATELJ 1	Prijatelj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+friend_1	uk	ДРУГ 1	Я хочу поговорити про: друг 1.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+friend_2	sl	PRIJATELJ 2	Prijatelj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+friend_2	uk	ДРУГ 2	Я хочу поговорити про: друг 2.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+friend_3	sl	PRIJATELJ 3	Prijatelj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+friend_3	uk	ДРУГ 3	Я хочу поговорити про: друг 3.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+water	sl	VODA	Rada bi vodo.	Kakšno vodo?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+water	uk	ВОДА	Будь ласка, я хочу воду.	Яку воду?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+water_detail	sl	VODA PODROBNO	Kakšno vodo?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+water_detail	uk	ВОДА ДЕТАЛЬНО	Яку воду?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cold_water	sl	HLADNA	Rada bi mrzlo vodo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cold_water	uk	ХОЛОДНА ВОДА	Будь ласка, я хочу холодну воду.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+non_sparkling_water	sl	NAVADNA	Rada bi negazirano vodo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+non_sparkling_water	uk	НЕГАЗОВАНА ВОДА	Будь ласка, я хочу негазовану воду.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+flavored_water	sl	VODA Z OKUSOM	Rada bi vodo z okusom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+flavored_water	uk	ВОДА ЗІ СМАКОМ	Будь ласка, я хочу воду зі смаком.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+mineral_water	sl	MINERALNA	Rada bi mineralno vodo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+mineral_water	uk	ГАЗОВАНА ВОДА	Будь ласка, я хочу мінеральну воду.		besedilno pregledano	ne	da: label	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+sparkling_water	sl	VODA Z MEHURČKI	Rada bi vodo z mehurčki.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sparkling_water	uk	ГАЗОВАНА	Будь ласка, я хочу газовану мінеральну воду.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+coffee	sl	KAVA	Prosim, rada bi kavo.	Kakšno kavo?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+coffee	uk	КАВА	Будь ласка, я хочу каву.	Яку каву?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea	sl	ČAJ	Prosim, rada bi čaj.	Kakšen čaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea	uk	ЧАЙ	Будь ласка, я хочу чай.	Який чай?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+juice	sl	SOK	Rada bi sok.	Kakšen sok?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+juice	uk	СІК	Будь ласка, я хочу сік.	Який сік?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sparkling_drink	sl	GAZIRANA PIJAČA	Prosim, rada bi gazirano pijačo.	Katero gazirano pijačo?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sparkling_drink	uk	ГАЗОВАНИЙ НАПІЙ	Будь ласка, я хотіла б газований напій.	Який газований напій?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_fanta	sl	FANTA	Prosim, rada bi Fanto.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_fanta	uk	ФАНТА	Будь ласка, я хочу Фанту.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_coca_cola	sl	COCA COLA	Prosim, rada bi Coca-Colo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_coca_cola	uk	КОКА-КОЛА	Будь ласка, я хочу Кока-Колу.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_pepsi	sl	PEPSI	Prosim, rada bi Pepsi.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_pepsi	uk	ПЕПСІ	Будь ласка, я хочу Пепсі.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+radenska	sl	RADENSKA	Rada bi Radensko.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+radenska	uk	РАДЕНСЬКА	Будь ласка, я хочу Раденську.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+milk_drinks	sl	MLEČNI NAPITKI	Prosim, rada bi mlečni napitek.	Kateri mlečni napitek?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+milk_drinks	uk	МОЛОЧНІ НАПОЇ	Будь ласка, я хочу молочний напій.	Який молочний напій?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_yogurt	sl	JOGURT	Prosim, rada bi jogurt.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_yogurt	uk	ЙОГУРТ	Будь ласка, я хочу питний йогурт.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cocoa_drink	sl	KAKAV	Prosim, rada bi kakav.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cocoa_drink	uk	КАКАО	Будь ласка, я хочу какао.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_milk	sl	MLEKO	Prosim, rada bi mleko.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_milk	uk	МОЛОКО	Будь ласка, я хочу молоко.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+chocolate_milk	sl	ČOKOLADNO MLEKO	Prosim, rada bi čokoladno mleko.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+chocolate_milk	uk	ШОКОЛАДНЕ МОЛОКО	Будь ласка, я хочу шоколадне молоко.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_warm	sl	TOPLO	Rada bi toplo pijačo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_warm	uk	ТЕПЛО	Будь ласка, я хочу теплий напій.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_cold	sl	HLADNO	Rada bi hladno pijačo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_cold	uk	ХОЛОДНО	Будь ласка, я хочу холодний напій.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_small	sl	MALO	Samo malo, prosim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_small	uk	ТРОХИ	Лише трохи, будь ласка.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_more	sl	VEČ	Še malo, prosim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_more	uk	БІЛЬШЕ	Ще трохи, будь ласка.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_no_additive	sl	BREZ DODATKA	Rada bi brez dodatka.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+drink_no_additive	uk	БЕЗ ДОДАТКІВ	Будь ласка, я хочу напій без добавок.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+coffee_plain	sl	NAVADNA	Prosim, rada bi navadno kavo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+coffee_plain	uk	ЗВИЧАЙНА	Будь ласка, я хочу звичайну каву.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+coffee_milk	sl	Z MLEKOM	Prosim, rada bi kavo z mlekom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+coffee_milk	uk	З МОЛОКОМ	Будь ласка, я хочу каву з молоком.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+coffee_no_sugar	sl	BREZ SLADKORJA	Prosim, rada bi kavo brez sladkorja.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+coffee_no_sugar	uk	БЕЗ ЦУКРУ	Будь ласка, я хочу каву без цукру.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_chamomile	sl	KAMILIČNI	Prosim, rada bi kamilični čaj.	Kaj dodaš v kamilični čaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_chamomile	uk	РОМАШКОВИЙ	Будь ласка, я хочу ромашковий чай.	Що додати до ромашкового чаю?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_chamomile_lemon	sl	Z LIMONO	Prosim, rada bi kamilični čaj z limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_chamomile_lemon	uk	З ЛИМОНОМ	Будь ласка, я хочу ромашковий чай з лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_chamomile_honey	sl	Z MEDOM	Prosim, rada bi kamilični čaj z medom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_chamomile_honey	uk	З МЕДОМ	Будь ласка, я хочу ромашковий чай з медом.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_chamomile_honey_lemon	sl	Z MEDOM IN LIMONO	Prosim, rada bi kamilični čaj z medom in limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_chamomile_honey_lemon	uk	З МЕДОМ І ЛИМОНОМ	Будь ласка, я хочу ромашковий чай з медом і лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_fruit	sl	SADNI	Prosim, rada bi sadni čaj.	Kaj dodaš v sadni čaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_fruit	uk	ФРУКТОВИЙ	Будь ласка, я хочу фруктовий чай.	Що додати до фруктового чаю?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_fruit_lemon	sl	Z LIMONO	Prosim, rada bi sadni čaj z limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_fruit_lemon	uk	З ЛИМОНОМ	Будь ласка, я хочу фруктовий чай з лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_fruit_honey	sl	Z MEDOM	Prosim, rada bi sadni čaj z medom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_fruit_honey	uk	З МЕДОМ	Будь ласка, я хочу фруктовий чай з медом.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_fruit_honey_lemon	sl	Z MEDOM IN LIMONO	Prosim, rada bi sadni čaj z medom in limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_fruit_honey_lemon	uk	З МЕДОМ І ЛИМОНОМ	Будь ласка, я хочу фруктовий чай з медом і лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_green	sl	ZELENI	Prosim, rada bi zeleni čaj.	Kaj dodaš v zeleni čaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_green	uk	ЗЕЛЕНИЙ	Будь ласка, я хочу зелений чай.	Що додати до зеленого чаю?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_green_lemon	sl	Z LIMONO	Prosim, rada bi zeleni čaj z limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_green_lemon	uk	З ЛИМОНОМ	Будь ласка, я хочу зелений чай з лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_green_honey	sl	Z MEDOM	Prosim, rada bi zeleni čaj z medom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_green_honey	uk	З МЕДОМ	Будь ласка, я хочу зелений чай з медом.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_green_honey_lemon	sl	Z MEDOM IN LIMONO	Prosim, rada bi zeleni čaj z medom in limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_green_honey_lemon	uk	З МЕДОМ І ЛИМОНОМ	Будь ласка, я хочу зелений чай з медом і лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_black	sl	ČRNI	Prosim, rada bi črni čaj.	Kaj dodaš v črni čaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_black	uk	ЧОРНИЙ	Будь ласка, я хочу чорний чай.	Що додати до чорного чаю?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_black_lemon	sl	Z LIMONO	Prosim, rada bi črni čaj z limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_black_lemon	uk	З ЛИМОНОМ	Будь ласка, я хочу чорний чай з лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_black_honey	sl	Z MEDOM	Prosim, rada bi črni čaj z medom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_black_honey	uk	З МЕДОМ	Будь ласка, я хочу чорний чай з медом.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_black_honey_lemon	sl	Z MEDOM IN LIMONO	Prosim, rada bi črni čaj z medom in limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_black_honey_lemon	uk	З МЕДОМ І ЛИМОНОМ	Будь ласка, я хочу чорний чай з медом і лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_mint	sl	METIN	Prosim, rada bi metin čaj.	Kaj dodaš v metin čaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_mint	uk	М'ЯТНИЙ	Будь ласка, я хочу м'ятний чай.	Що додати до м'ятного чаю?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_mint_lemon	sl	Z LIMONO	Prosim, rada bi metin čaj z limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_mint_lemon	uk	З ЛИМОНОМ	Будь ласка, я хочу м'ятний чай з лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_mint_honey	sl	Z MEDOM	Prosim, rada bi metin čaj z medom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_mint_honey	uk	З МЕДОМ	Будь ласка, я хочу м'ятний чай з медом.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_mint_honey_lemon	sl	Z MEDOM IN LIMONO	Prosim, rada bi metin čaj z medom in limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_mint_honey_lemon	uk	З МЕДОМ І ЛИМОНОМ	Будь ласка, я хочу м'ятний чай з медом і лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_rosehip	sl	ŠIPKOV	Prosim, rada bi šipkov čaj.	Kaj dodaš v šipkov čaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_rosehip	uk	ШИПШИНОВИЙ	Будь ласка, я хочу шипшиновий чай.	Що додати до шипшинового чаю?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_rosehip_lemon	sl	Z LIMONO	Prosim, rada bi šipkov čaj z limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_rosehip_lemon	uk	З ЛИМОНОМ	Будь ласка, я хочу шипшиновий чай з лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_rosehip_honey	sl	Z MEDOM	Prosim, rada bi šipkov čaj z medom.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_rosehip_honey	uk	З МЕДОМ	Будь ласка, я хочу шипшиновий чай з медом.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_rosehip_honey_lemon	sl	Z MEDOM IN LIMONO	Prosim, rada bi šipkov čaj z medom in limono.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tea_rosehip_honey_lemon	uk	З МЕДОМ І ЛИМОНОМ	Будь ласка, я хочу шипшиновий чай з медом і лимоном.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+orange_juice	sl	POMARANČNI	Rada bi pomarančni sok.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+orange_juice	uk	АПЕЛЬСИНОВИЙ СІК	Будь ласка, я хочу апельсиновий сік.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+apple_juice	sl	JABOLČNI	Rada bi jabolčni sok.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+apple_juice	uk	ЯБЛУЧНИЙ СІК	Будь ласка, я хочу яблучний сік.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+blueberry_juice	sl	BOROVNIČEV	Rada bi sok iz borovnic.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+blueberry_juice	uk	ЧОРНИЧНИЙ СІК	Будь ласка, я хочу чорничний сік.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+strawberry_juice	sl	JAGODNI	Rada bi jagodni sok.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+strawberry_juice	uk	ПОЛУНИЧНИЙ СІК	Будь ласка, я хочу полуничний сік.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cedevita	sl	CEDEVITA	Rada bi Cedevito.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cedevita	uk	ЦЕДЕВІТА	Будь ласка, я хочу Цедевіту.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+not_thirsty	sl	NISEM ŽEJNA	Nisem žejna.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+not_thirsty	uk	Я НЕ ХОЧУ ПИТИ	Будь ласка, я хочу я не хочу пити.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+not_hungry	sl	NISEM LAČNA	Nisem lačna.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+not_hungry	uk	Я НЕ ГОЛОДНА	Будь ласка, я хочу я не голодна.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+hungry_main_dish	sl	GLAVNA JED	Glavna jed.	Izberi glavno jed.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_main_dish	uk	ОСНОВНА СТРАВА	Основна страва.	Вибери основну страву.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_snack	sl	PRIGRIZEK	Prigrizek.	Izberi prigrizek.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_snack	uk	ПЕРЕКУС	Перекус.	Вибери перекус.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fast_food	sl	HITRA PREHRANA	Hitra prehrana.	Izberi hitro prehrano.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fast_food	uk	ШВИДКА ЇЖА	Швидка їжа.	Вибери швидку їжу.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fruit	sl	SADJE	Sadje.	Izberi sadje.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fruit	uk	ФРУКТИ	Фрукти.	Вибери фрукт.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_dessert	sl	SLADICA	Sladica.	Izberi sladico.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_dessert	uk	ДЕСЕРТ	Десерт.	Вибери десерт.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_soup	sl	JUHA	Juha.	Izberi juho.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_soup	uk	СУП	Суп.	Вибери суп.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_meat	sl	MESO	Meso.	Izberi meso.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_meat	uk	М'ЯСО	М’ясо.	Вибери м'ясо.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_side_dishes	sl	PRILOGE	Priloge.	Izberi prilogo.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_side_dishes	uk	ГАРНІРИ	Гарнір.	Вибери гарнір.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_potato	sl	KROMPIR	Krompir.	Izberi krompir.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_potato	uk	КАРТОПЛЯ	Картопля.	Вибери картоплю.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_beef_soup	sl	GOVEJA	Prosim, rada bi govejo juho.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_beef_soup	uk	ЯЛОВИЧИЙ	Будь ласка, я хочу яловичий суп.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_chicken_soup	sl	KOKOŠJA	Prosim, rada bi kokošjo juho.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_chicken_soup	uk	КУРЯЧИЙ	Будь ласка, я хочу курячий суп.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_vegetable_soup	sl	ZELENJAVNA	Prosim, rada bi zelenjavno juho.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_vegetable_soup	uk	ОВОЧЕВИЙ	Будь ласка, я хочу овочевий суп.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pork	sl	SVINJINA	Prosim, rada bi svinjino.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pork	uk	СВИНИНА	Будь ласка, я хочу свинину.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_chicken	sl	PIŠČANEC	Prosim, rada bi piščanca.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_chicken	uk	КУРКА	Будь ласка, я хочу курятину.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_beef	sl	GOVEDINA	Prosim, rada bi govedino.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_beef	uk	ЯЛОВИЧИНА	Будь ласка, я хочу яловичину.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_veal	sl	TELETINA	Prosim, rada bi teletino.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_veal	uk	ТЕЛЯТИНА	Будь ласка, я хочу телятину.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_lamb	sl	JAGNJETINA	Prosim, rada bi jagnjetino.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_lamb	uk	БАРАНИНА	Будь ласка, я хочу ягнятину.		besedilno pregledano	ne	da: label	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+hungry_kid_goat	sl	KOZLIČEK	Prosim, rada bi kozlička.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_kid_goat	uk	КОЗЛЯТИНА	Будь ласка, я хочу козлятину.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fish	sl	RIBA	Prosim, rada bi ribo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fish	uk	РИБА	Будь ласка, я хочу рибу.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pasta	sl	TESTENINE	Prosim, rada bi testenine.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pasta	uk	МАКАРОНИ	Будь ласка, я хочу макарони.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_rice	sl	RIŽ	Prosim, rada bi riž.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_rice	uk	РИС	Будь ласка, я хочу рис.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_vegetables	sl	ZELENJAVA	Prosim, rada bi zelenjavo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_vegetables	uk	ОВОЧІ	Будь ласка, я хочу овочі.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_roasted_potato	sl	PEČEN KROMPIR	Prosim, rada bi pečen krompir.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_roasted_potato	uk	ЗАПЕЧЕНА КАРТОПЛЯ	Будь ласка, я хочу запечену картоплю.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fries	sl	POMFRI	Prosim, rada bi pomfri.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fries	uk	КАРТОПЛЯ ФРІ	Будь ласка, я хочу картоплю фрі.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_mashed_potato	sl	PIRE	Prosim, rada bi pire krompir.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_mashed_potato	uk	ПЮРЕ	Будь ласка, я хочу картопляне пюре.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_yogurt	sl	JOGURT	Prosim, rada bi jogurt.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_yogurt	uk	ЙОГУРТ	Будь ласка, я хочу йогурт.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fruit_yogurt	sl	SADNI JOGURT	Prosim, rada bi sadni jogurt.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_fruit_yogurt	uk	ФРУКТОВИЙ ЙОГУРТ	Будь ласка, я хочу фруктовий йогурт.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_chips	sl	ČIPS	Prosim, rada bi čips.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_chips	uk	ЧИПСИ	Будь ласка, я хочу чипси.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_crackers	sl	KREKERJI	Prosim, rada bi krekerje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_crackers	uk	КРЕКЕРИ	Будь ласка, я хочу крекери.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_hamburger	sl	HAMBURGER	Prosim, rada bi hamburger.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_hamburger	uk	ГАМБУРГЕР	Будь ласка, я хочу гамбургер.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_cevapcici	sl	ČEVAPČIČI	Prosim, rada bi čevapčiče.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_cevapcici	uk	ЧЕВАПЧИЧІ	Будь ласка, я хочу чевапчичі.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pleskavica	sl	PLESKAVICA	Prosim, rada bi pleskavico.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pleskavica	uk	ПЛЕСКАВИЦЯ	Будь ласка, я хочу плескавиця.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+hungry_hotdog	sl	HOTDOG	Prosim, rada bi hotdog.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_hotdog	uk	ХОТ-ДОГ	Будь ласка, я хочу хот-дог.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pizza	sl	PICA	Prosim, rada bi pico.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pizza	uk	ПІЦА	Будь ласка, я хочу піцу.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_burek	sl	BUREK	Prosim, rada bi burek.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_burek	uk	БУРЕК	Будь ласка, я хочу бурек.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_toast	sl	TOAST	Prosim, rada bi toast.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_toast	uk	ТОСТ	Будь ласка, я хочу тост.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pancakes	sl	PALAČINKE	Prosim, rada bi palačinke.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pancakes	uk	МЛИНЦІ	Будь ласка, я хочу млинці.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_apple	sl	JABOLKO	Prosim, rada bi jabolko.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_apple	uk	ЯБЛУКО	Будь ласка, я хочу яблуко.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pear	sl	HRUŠKA	Prosim, rada bi hruško.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_pear	uk	ГРУША	Будь ласка, я хочу грушу.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_banana	sl	BANANA	Prosim, rada bi banano.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_banana	uk	БАНАН	Будь ласка, я хочу банан.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_grapes	sl	GROZDJE	Prosim, rada bi grozdje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_grapes	uk	ВИНОГРАД	Будь ласка, я хочу виноград.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_blueberries	sl	BOROVNICE	Prosim, rada bi borovnice.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_blueberries	uk	ЧОРНИЦЯ	Будь ласка, я хочу чорницю.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_strawberries	sl	JAGODE	Prosim, rada bi jagode.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_strawberries	uk	ПОЛУНИЦЯ	Будь ласка, я хочу полуницю.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_kiwi	sl	KIVI	Prosim, rada bi kivi.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_kiwi	uk	КІВІ	Будь ласка, я хочу ківі.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_ice_cream	sl	SLADOLED	Prosim, rada bi sladoled.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_ice_cream	uk	МОРОЗИВО	Будь ласка, я хочу морозиво.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_cake	sl	TORTA	Prosim, rada bi torto.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_cake	uk	ТОРТ	Будь ласка, я хочу торт.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_cookies	sl	PIŠKOTI	Prosim, rada bi piškote.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_cookies	uk	ПЕЧИВО	Будь ласка, я хочу печиво.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_doughnut	sl	KROF	Prosim, rada bi krof.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_doughnut	uk	ПОНЧИК	Будь ласка, я хочу пончик.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_kremsnita	sl	KREMŠNITA	Prosim, rada bi kremšnito.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hungry_kremsnita	uk	КРЕМШНІТА	Будь ласка, я хочу тістечко з кремом.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+soup	sl	JUHA	Želim jesti juho		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+soup	uk	СУП	Будь ласка, я хочу суп.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+bread	sl	KRUH	Želim jesti kruh		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+bread	uk	ХЛІБ	Будь ласка, я хочу хліб.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+fruit	sl	SADJE	Želim jesti sadje		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+fruit	uk	ФРУКТИ	Будь ласка, я хочу фрукти.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ice_cream	sl	SLADOLED	Rada bi sladoled.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ice_cream	uk	МОРОЗИВО	Будь ласка, я хочу морозиво.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+potato	sl	KROMPIR	Rada bi krompir.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+potato	uk	КАРТОПЛЯ	Будь ласка, я хочу картоплю.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+rice	sl	RIŽ	Rada bi riž.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+rice	uk	РИС	Будь ласка, я хочу рис.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+meat	sl	MESO	Rada bi jedla meso.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+meat	uk	М'ЯСО	Будь ласка, я хочу м’ясо.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sweet	sl	SLADKO	Rada bi nekaj sladkega.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sweet	uk	СОЛОДКЕ	Будь ласка, я хочу щось солодке.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+other_food	sl	DRUGO	Rada bi nekaj drugega.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+other_food	uk	ІНШЕ	Будь ласка, я хочу щось інше поїсти.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_yogurt	sl	JOGURT	Rada bi jogurt.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_yogurt	uk	ЙОГУРТ	Будь ласка, я хочу йогурт.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_banana	sl	BANANA	Rada bi banano.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_banana	uk	БАНАН	Будь ласка, я хочу банан.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_apple	sl	JABOLKO	Rada bi jabolko.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_apple	uk	ЯБЛУКО	Будь ласка, я хочу яблуко.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_lunch	sl	KOSILO	Rada bi kosilo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_lunch	uk	ОБІД	Будь ласка, я хочу обід.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_dinner	sl	VEČERJA	Rada bi večerjo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_dinner	uk	ВЕЧЕРЯ	Будь ласка, я хочу вечерю.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_little	sl	MALO	Rada bi malo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_little	uk	ТРОХИ	Лише трохи, будь ласка.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_more	sl	ŠE	Še malo, prosim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_more	uk	ЩЕ	Ще трохи, будь ласка.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_enough	sl	DOVOLJ	Dovolj je.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_enough	uk	ДОСИТЬ	Досить, дякую.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_later	sl	KASNEJE	Kasneje bi jedla.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+food_later	uk	ПІЗНІШЕ	Я поїм пізніше.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+diaper	sl	PLENICA	Prosim, zamenjajte mi plenico.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+diaper	uk	ПІДГУЗОК	Мені потрібно: підгузок.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+wc_now	sl	TAKOJ	Takoj moram v toaleto.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_now	uk	ЗАРАЗ	Мені потрібно: зараз.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+wc_soon	sl	KMALU	Kmalu moram v toaleto.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_soon	uk	СКОРО	Мені потрібно: скоро.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+wc_help	sl	POMOČ	Potrebujem pomoč pri toaleti.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_help	uk	ДОПОМОГА	Мені потрібно: допомога.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+dressing_help	sl	PREOBLAČENJE	Potrebujem pomoč pri preoblačenju.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dressing_help	uk	ПЕРЕОДЯГАННЯ	Мені потрібно: переодягання.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+washing_help	sl	UMIVANJE	Potrebujem pomoč pri umivanju.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+washing_help	uk	МИТТЯ	Будь ласка, допоможіть мені помитися.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+body_position	sl	POPRAVI ME	Prosim, popravite moj položaj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+body_position	uk	ПОПРАВТЕ МЕНЕ	Мені потрібно: поправте мене.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+wc_wet	sl	MOKRA	Prosim, zamenjajte mi plenico. Mokra sem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_wet	uk	МОКРА	Будь ласка, замініть мені підгузок. Я мокра.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_dirty	sl	UMAZANA	Prosim, zamenjajte mi plenico. Umazana sem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_dirty	uk	БРУДНА	Будь ласка, замініть мені підгузок. Я брудна.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_wet_and_dirty	sl	OBOJE	Prosim, zamenjajte mi plenico. Mokra in umazana sem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_wet_and_dirty	uk	ОБОЄ	Будь ласка, замініть мені підгузок. Я мокра і брудна.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+nurse_help	sl	SESTRA	Potrebujem medicinsko sestro.	Kaj naj naredi sestra?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+nurse_help	uk	МЕДСЕСТРА	Мені потрібна медсестра.	Що має зробити медсестра?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_dressing	sl	OBLAČENJE	Rabim pomoč pri oblačenju.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_dressing	uk	ОДЯГАННЯ	Мені потрібна допомога з одяганням.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_washing	sl	UMIVANJE	Rabim pomoč pri umivanju.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_washing	uk	МИТТЯ	Мені потрібна допомога з миттям.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_showering	sl	TUŠ	Rabim pomoč pri tuširanju.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_showering	uk	ДУШ	Мені потрібна допомога з душем.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+noticed_blood	sl	KRI	Opazila sem kri pri negi.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+noticed_blood	uk	КРОВ	Я помітила кров під час догляду. Будь ласка, покличте медсестру.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_pee	sl	LULAT	Moram lulat.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_pee	uk	ПО-МАЛЕНЬКОМУ	Мені треба в туалет по-маленькому.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_poop	sl	NA BLATO	Moram na blato.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. V4 napis BLATO; govor ostane nespremenjen.
+wc_poop	uk	ПО-ВЕЛИКОМУ	Мені треба в туалет по-великому.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_diaper_change	sl	MENJAVA PLENICE	Prosim, zamenjajte mi plenico.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. V4 napis MENJAVA; govor ostane nespremenjen.
+wc_diaper_change	uk	ЗАМІНА ПІДГУЗКА	Будь ласка, замініть мені підгузок.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_burning	sl	PEČE	Peče me.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_burning	uk	ПЕЧЕ	ПЕЧЕ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_pain	sl	BOLI	Boli me.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_pain	uk	БОЛИТЬ	БОЛИТЬ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_itching	sl	SRBI	Srbi me.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_itching	uk	СВЕРБИТЬ	СВЕРБИТЬ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_blood	sl	KRI	Vidim kri.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_blood	uk	КРОВ	Я бачу кров.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_please	sl	PROSIM	Prosim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_please	uk	БУДЬ ЛАСКА	БУДЬ ЛАСКА.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_very_urgent	sl	ZELO NUJNO	Zelo nujno.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_very_urgent	uk	ДУЖЕ ТЕРМІНОВО	ДУЖЕ ТЕРМІНОВО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_call_nurse	sl	POKLIČI MEDICINSKO SESTRO	Prosim, pokličite medicinsko sestro.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wc_call_nurse	uk	ПОКЛИЧТЕ МЕДСЕСТРУ	Мені потрібно: покличте медсестру.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+pillow	sl	BLAZINA	Potrebujem blazino.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pillow	uk	ПОДУШКА	Мені потрібно: подушка.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+blanket	sl	ODEJA	Potrebujem odejo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+blanket	uk	КОВДРА	Мені потрібно: ковдра.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+uncomfortable	sl	NEUDOBNO	Neudobno mi je.	Kaj je neudobno?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+uncomfortable	uk	НЕЗРУЧНО	НЕЗРУЧНО.	Що незручно?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+clothing	sl	OBLAČILA	Izberite oblačilo.	Katero oblačilo?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+clothing	uk	ОДЯГ	Мені потрібно: одяг.	Який одяг?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+shirt	sl	MAJICA	Potrebujem majico.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+shirt	uk	ФУТБОЛКА	Мені потрібно: футболка.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+pants	sl	HLAČE	Potrebujem hlače.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pants	uk	ШТАНИ	Мені потрібно: штани.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+socks	sl	NOGAVICE	Potrebujem nogavice.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+socks	uk	ШКАРПЕТКИ	Мені потрібно: шкарпетки.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+shoes	sl	ČEVLJI	Potrebujem čevlje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+shoes	uk	ВЗУТТЯ	Мені потрібно: взуття.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+jacket	sl	JAKNA	Potrebujem jakno.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+jacket	uk	КУРТКА	Мені потрібно: куртка.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+pajamas	sl	PIŽAMA	Potrebujem pižamo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pajamas	uk	ПІЖАМА	Мені потрібно: піжама.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+underwear	sl	SPODNJE PERILO	Potrebujem spodnje perilo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+underwear	uk	НИЖНЯ БІЛИЗНА	Мені потрібно: нижня білизна.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+hat	sl	KAPA	Potrebujem kapo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hat	uk	ШАПКА	Мені потрібно: шапка.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+scarf	sl	ŠAL	Potrebujem šal.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+scarf	uk	ШАРФ	Мені потрібно: шарф.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+gloves	sl	ROKAVICE	Potrebujem rokavice.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+gloves	uk	РУКАВИЧКИ	Мені потрібно: рукавички.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+bed	sl	POSTELJA	Prosim, pomagajte mi v posteljo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+bed	uk	ЛІЖКО	Мені потрібно: ліжко.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+change_position	sl	PREMESTITEV	Prosim, pomagajte mi spremeniti položaj.	Kako naj spremenimo položaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+change_position	uk		Мені потрібно: .	Як змінити положення?	besedilno pregledano	ne	da: label,speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+sit_up	sl	DVIGNI ME	Prosim, dvignite me.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sit_up	uk	ПІДНІМІТЬ МЕНЕ	Мені потрібно: підніміть мене.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+lie_down	sl	POLOŽI ME	Prosim, položite me.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+lie_down	uk	ПОКЛАДІТЬ МЕНЕ	Мені потрібно: покладіть мене.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+movement_pain	sl	BOLI PRI PREMIKU	Boli me pri premiku.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+movement_pain	uk	БОЛИТЬ ПРИ РУСІ	Болить, коли мене пересувають.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain	sl	BOLI ME	Boli me.	Izberi, kaj te boli.	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain	uk	БОЛИТЬ	У мене болить.	Де тебе болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm	sl	ROKA	Boli me roka.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm	uk	РУКА	У мене болить рука.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg	sl	NOGA	Boli me noga.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg	uk	НОГА	У мене болить нога.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+throat	sl	GRLO	Boli me grlo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+throat	uk	ГОРЛО	У мене болить горло.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+head	sl	GLAVA	Boli me glava.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+head	uk	ГОЛОВА	У мене болить голова.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+left_arm	sl	LEVA ROKA	Leva roka me boli.	Kje na levi roki?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+left_arm	uk	ЛІВА РУКА	У мене болить ліва рука.	Де на лівій руці?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+right_arm	sl	DESNA ROKA	Desna roka me boli.	Kje na desni roki?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+right_arm	uk	ПРАВА РУКА	У мене болить права рука.	Де на правій руці?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+left_leg	sl	LEVA NOGA	Leva noga me boli.	Kje na levi nogi?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+left_leg	uk	ЛІВА НОГА	У мене болить ліва нога.	Де на лівій нозі?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+right_leg	sl	DESNA NOGA	Desna noga me boli.	Kje na desni nogi?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+right_leg	uk	ПРАВА НОГА	У мене болить права нога.	Де на правій нозі?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+back	sl	HRBET	Boli me hrbet.	Kje boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+back	uk	СПИНА	У мене болить спина.	Де болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly	sl	TREBUH	Boli me trebuh.	Kje boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly	uk	ЖИВІТ	У мене болить живіт.	Де болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+chest	sl	PRSI	Boli me v prsih.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+chest	uk	ГРУДИ	У мене болять груди.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+neck	sl	VRAT	Boli me vrat.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+neck	uk	ШИЯ	У мене болить шия.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+eye	sl	OKO	Boli me oko.	Katero oko?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+eye	uk	ОКО	У мене болить око.	Яке око?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ear	sl	UHO	Boli me uho.	Katero uho?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ear	uk	ВУХО	У мене болить вухо.	Яке вухо?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+nose	sl	NOS	Boli me nos.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+nose	uk	НІС	У мене болить ніс.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+mouth	sl	USTA	Bolijo me usta.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+mouth	uk	РОТ	У мене болить рот.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth	sl	ZOB	Boli me zob.	Kateri zob?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth	uk	ЗУБ	У мене болить зуб.	Який зуб?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_shoulder	sl	RAMA	Boli me rama.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_shoulder	uk	ПЛЕЧЕ	У мене болить плече.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_upper	sl	NADLAHT	Boli me nadlaht.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_upper	uk	ВЕРХ РУКИ	У мене болить верхня частина руки.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_elbow	sl	KOMOLEC	Boli me komolec.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_elbow	uk	ЛІКОТЬ	У мене болить лікоть.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_forearm	sl	PODLAHT	Boli me podlaht.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_forearm	uk	ПЕРЕДПЛІЧЧЯ	У мене болить передпліччя.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_wrist	sl	ZAPESTJE	Boli me zapestje.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_wrist	uk	ЗАП'ЯСТЯ	У мене болить зап’ясток.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_palm	sl	DLAN	Dlan me boli.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_palm	uk	ДОЛОНЯ	У мене болить долоня.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_fingers	sl	PRSTI	Bolijo me prsti na roki.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+arm_fingers	uk	ПАЛЬЦІ	У мене болять пальці руки.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_hip	sl	KOLK	Boli me kolk.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_hip	uk	КУЛЬША	У мене болить кульшовий суглоб.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_thigh	sl	STEGNO	Boli me stegno.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_thigh	uk	СТЕГНО	У мене болить стегно.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_knee	sl	KOLENO	Boli me koleno.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_knee	uk	КОЛІНО	У мене болить коліно.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_shin	sl	GOLEN	Boli me golen.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_shin	uk	ГОМІЛКА	У мене болить гомілка.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_ankle	sl	GLEŽENJ	Boli me gleženj.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_ankle	uk	ЩИКОЛОТКА	У мене болить щиколотка.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_foot	sl	STOPALO	Boli me stopalo.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_foot	uk	СТОПА	У мене болить стопа.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_toes	sl	PRSTI	Bolijo me prsti na nogi.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+leg_toes	uk	ПАЛЬЦІ	У мене болять пальці ноги.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+back_upper	sl	ZGORNJI DEL	Boli me zgornji del hrbta.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+back_upper	uk	ВЕРХНЯ ЧАСТИНА	У мене болить верхня частина спини.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+back_middle	sl	SREDNJI DEL	Boli me srednji del hrbta.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+back_middle	uk	СЕРЕДНЯ ЧАСТИНА	У мене болить середня частина спини.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+back_lower	sl	SPODNJI DEL	Boli me spodnji del hrbta.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+back_lower	uk	НИЖНЯ ЧАСТИНА	У мене болить нижня частина спини.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly_left	sl	LEVO	Boli me leva stran trebuha.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly_left	uk	ЛІВОРУЧ	У мене болить лівий бік живота.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly_right	sl	DESNO	Boli me desna stran trebuha.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly_right	uk	ПРАВОРУЧ	У мене болить правий бік живота.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly_upper	sl	ZGORAJ	Boli me zgornji del trebuha.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly_upper	uk	ВГОРІ	У мене болить верхня частина живота.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly_lower	sl	SPODAJ	Boli me spodnji del trebuha.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+belly_lower	uk	ВНИЗУ	У мене болить нижня частина живота.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+eye_left	sl	LEVO	Boli me levo oko.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+eye_left	uk	ЛІВОРУЧ	У мене болить ліве око.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+eye_right	sl	DESNO	Boli me desno oko.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+eye_right	uk	ПРАВОРУЧ	У мене болить праве око.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+eye_both	sl	OBE	Bolita me obe očesi.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+eye_both	uk	ОБИДВІ	У мене болять обидва ока.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ear_left	sl	LEVO	Boli me levo uho.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ear_left	uk	ЛІВОРУЧ	У мене болить ліве вухо.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ear_right	sl	DESNO	Boli me desno uho.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ear_right	uk	ПРАВОРУЧ	У мене болить праве вухо.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ear_both	sl	OBE	Bolita me obe ušesi.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+ear_both	uk	ОБИДВІ	У мене болять обидва вуха.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth_left	sl	LEVO	Boli me levi zob.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth_left	uk	ЛІВОРУЧ	Зуб болить ліворуч.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth_right	sl	DESNO	Boli me desni zob.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth_right	uk	ПРАВОРУЧ	Зуб болить праворуч.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth_upper	sl	ZGORAJ	Boli me zgornji zob.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth_upper	uk	ВГОРІ	Зуб болить угорі.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth_lower	sl	SPODAJ	Boli me spodnji zob.	Kako močno boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tooth_lower	uk	ВНИЗУ	Зуб болить унизу.	Наскільки сильно болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+left_side	sl	LEVA	Na levi strani.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+left_side	uk	ЛІВА	Болить зліва.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+right_side	sl	DESNA	Na desni strani.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+right_side	uk	ПРАВА	Болить справа.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+other_body	sl	DRUGO	Boli drugje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+other_body	uk	ІНШЕ	Болить в іншому місці.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_light	sl	MALO	Malo boli.	Od kdaj boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_light	uk	ТРОХИ	Трохи болить.	Відколи болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_medium	sl	SREDNJE	Srednje močno boli.	Od kdaj boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_medium	uk	СЕРЕДНЬО	Помірно болить.	Відколи болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_strong	sl	MOČNO	Močno boli.	Od kdaj boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_strong	uk	СИЛЬНО	Сильно болить.	Відколи болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_very	sl	ZELO	Zelo boli.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_very	uk	ДУЖЕ	Дуже сильно болить.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_very_strong	sl	ZELO MOČNO	Zelo močno boli.	Od kdaj boli?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_very_strong	uk	ДУЖЕ СИЛЬНО	Дуже сильно болить.	Відколи болить?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_now	sl	ZDAJ	Boli me zdaj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_now	uk	ЗАРАЗ	Болить зараз.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_today	sl	DANES	Boli me od danes.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_today	uk	СЬОГОДНІ	Болить від сьогодні.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_many_days	sl	VEČ DNI	Boli me več dni.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_many_days	uk	КІЛЬКА ДНІВ	Болить уже кілька днів.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_today	sl	OD DANES	Od danes		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_today	uk	ВІД СЬОГОДНІ	Болить від сьогодні.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_yesterday	sl	OD VČERAJ	Od včeraj		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_yesterday	uk	ВІД УЧОРА	Болить від учора.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_morning	sl	OD JUTRA	Od jutra		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_morning	uk	ВІД РАНКУ	Болить від ранку.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_evening	sl	OD VEČERA	Od večera		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_evening	uk	ВІД ВЕЧОРА	Болить від вечора.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_long	sl	ŽE DOLGO	Že dolgo		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_since_long	uk	ВЖЕ ДАВНО	Болить уже давно.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_moving	sl	PRI GIBANJU	Pri gibanju		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_moving	uk	ПРИ РУСІ	Болить під час руху.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_lifting	sl	PRI DVIGOVANJU	Pri dvigovanju		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_lifting	uk	ПРИ ПІДНІМАННІ	Болить, коли щось піднімаю.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_gripping	sl	PRI PRIJEMU	Pri prijemu		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_gripping	uk	ПРИ СТИСКАННІ	Болить, коли щось стискаю.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_walking	sl	PRI HOJI	Pri hoji		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_walking	uk	ПРИ ХОДЬБІ	Болить під час ходьби.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_sitting	sl	PRI SEDENJU	Pri sedenju		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_sitting	uk	ПРИ СИДІННІ	Болить, коли сиджу.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_standing	sl	PRI VSTAJANJU	Pri vstajanju		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+pain_when_standing	uk	ПРИ ВСТАВАННІ	Болить, коли стою.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+good	sl	DOBRO SEM	Dobro sem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+good	uk	МЕНІ ДОБРЕ	МЕНІ ДОБРЕ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+bad	sl	SLABO SEM	Slabo se počutim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+bad	uk	МЕНІ ПОГАНО	МЕНІ ПОГАНО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+afraid	sl	STRAH ME JE	Strah me je.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+afraid	uk	МЕНІ СТРАШНО	МЕНІ СТРАШНО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dont_know_problem	sl	NE VEM	Ne vem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dont_know_problem	uk	НЕ ЗНАЮ	НЕ ЗНАЮ?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+angry	sl	JEZNA SEM	Jezna sem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+angry	uk	Я ЗЛЮСЯ	Я ЗЛЮСЯ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sad	sl	ŽALOSTNA SEM	Žalostna sem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sad	uk	МЕНІ СУМНО	МЕНІ СУМНО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+happy	sl	VESELA SEM	Vesela sem.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+happy	uk	Я РАДА	Я РАДА.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cold	sl	MRAZ MI JE	Mraz mi je.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cold	uk	МЕНІ ХОЛОДНО	МЕНІ ХОЛОДНО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hot	sl	VROČE MI JE	Vroče mi je.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hot	uk	МЕНІ ЖАРКО	МЕНІ ЖАРКО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+peace	sl	MIR	Rada bi mir.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+peace	uk	ТИША	ТИША.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+dusan	sl	DUŠAN	Prosim, pokličite Dušana.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+dusan	uk	ДУШАН	Я хочу поговорити про: душан.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+daughter	sl	HČERKA	Prosim, pokličite hčerko.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+daughter	uk	ДОНЬКА	Я хочу поговорити про: донька.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+son	sl	SIN	Prosim, pokličite sina.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+son	uk	СИН	Я хочу поговорити про: син.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+therapist	sl	TERAPEVT	Prosim, pokličite terapevta.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+therapist	uk	ТЕРАПЕВТ	Я хочу поговорити про: терапевт.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+doctor	sl	ZDRAVNIK	Prosim, pokličite zdravnika.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+doctor	uk	ЛІКАР	Я хочу поговорити про: лікар.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+nurse	sl	MEDICINSKA SESTRA	Prosim, pokličite medicinsko sestro.	Pokliči ali prekliči?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+nurse	uk	МЕДСЕСТРА	Я хочу поговорити про: медсестра.		besedilno pregledano	ne	da: speech,question	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+who_is_coming	sl	KDO PRIHAJA	Kdo prihaja?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+who_is_coming	uk	ХТО ПРИХОДИТЬ	ХТО ПРИХОДИТЬ?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+when_come	sl	KDAJ PRIDE?	Kdaj pride?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+when_come	uk	КОЛИ ПРИЙДЕ?	КОЛИ ПРИЙДЕ??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+when_go	sl	KDAJ GREMO?	Kdaj gremo?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+when_go	uk	КОЛИ МИ ЙДЕМО?	КОЛИ МИ ЙДЕМО??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+when_therapy	sl	KDAJ BO TERAPIJA?	Kdaj bo terapija?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+when_therapy	uk	КОЛИ БУДЕ ТЕРАПІЯ?	КОЛИ БУДЕ ТЕРАПІЯ??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+when_home	sl	KDAJ DOMOV?	Kdaj gremo domov?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+when_home	uk	КОЛИ ДОДОМУ?	КОЛИ ДОДОМУ??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+when_eat	sl	KDAJ JEMO?	Kdaj jemo?		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+when_eat	uk	КОЛИ МИ ЇМО?	КОЛИ МИ ЇМО??		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+time_group	sl	ČAS	Izberite čas.	Kdaj?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+time_group	uk	ЧАС	ЧАС?	Коли?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+today	sl	DANES	Danes.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+today	uk	СЬОГОДНІ	СЬОГОДНІ?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+tomorrow	sl	JUTRI	Jutri.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+tomorrow	uk	ЗАВТРА	ЗАВТРА?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+yesterday	sl	VČERAJ	Včeraj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+yesterday	uk	ВЧОРА	ВЧОРА?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+now	sl	ZDAJ	Zdaj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+now	uk	ЗАРАЗ	ЗАРАЗ?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+morning	sl	ZJUTRAJ	Zjutraj.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+morning	uk	ВРАНЦІ	ВРАНЦІ?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+afternoon	sl	POPOLDNE	Popoldne.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+afternoon	uk	ПІСЛЯ ОБІДУ	ПІСЛЯ ОБІДУ?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+evening	sl	ZVEČER	Zvečer.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+evening	uk	УВЕЧЕРІ	УВЕЧЕРІ?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+night	sl	PONOČI	Ponoči.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+night	uk	ВНОЧІ	ВНОЧІ?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+medicine	sl	ZDRAVILA	Prosim za zdravila.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+medicine	uk		Мені потрібно: .		besedilno pregledano	ne	da: label,speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+therapy	sl	TERAPIJA	Rada bi na terapijo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+therapy	uk	ТЕРАПІЯ	ТЕРАПІЯ?		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+wheelchair	sl	VOZIČEK	Prosim, pomagajte mi v voziček.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+wheelchair	uk	ВІЗОК	Мені потрібно: візок.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+crutch	sl	BERGLA	Prosim, pomagajte mi z berglo.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+crutch	uk	МИЛИЦЯ	Мені потрібно: милиця.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+not_safe	sl	NE VARNO	Ne počutim se varno.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+not_safe	uk	НЕБЕЗПЕЧНО	НЕБЕЗПЕЧНО.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+stop_movement	sl	USTAVIMO SE	Ustavimo se, prosim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+stop_movement	uk	ЗУПИНІМОСЯ	ЗУПИНІМОСЯ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+need_rest	sl	RABIM POČITEK	Rabim počitek.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+need_rest	uk	МЕНІ ПОТРІБЕН ВІДПОЧИНОК	Мені потрібно: мені потрібен відпочинок.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+cold_feeling	sl	MRZLO MI JE	Mrzlo mi je.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+cold_feeling	uk	МЕНІ ХОЛОДНО	МЕНІ ХОЛОДНО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hot_feeling	sl	VROČE MI JE	Vroče mi je.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+hot_feeling	uk	МЕНІ ЖАРКО	МЕНІ ЖАРКО.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sleepy	sl	SPI SE MI	Spi se mi.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+sleepy	uk	МЕНІ ХОЧЕТЬСЯ СПАТИ	МЕНІ ХОЧЕТЬСЯ СПАТИ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+fear_falling	sl	STRAH PASTI	Strah me je, da bom padla.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+fear_falling	uk	БОЮСЯ ВПАСТИ	БОЮСЯ ВПАСТИ.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_to_wc	sl	POMAGAJTE MI DO TOALETE	Prosim, pomagajte mi do stranišča.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+help_to_wc	uk	ДОПОМОЖІТЬ МЕНІ ДО ТУАЛЕТУ	Мені потрібно: допоможіть мені до туалету.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+vending_drinks	sl	AVTOMAT PIJAČ	Prosim, pomagajte mi pri avtomatu za pijače.	Kaj želiš izbrati?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+vending_drinks	uk	АВТОМАТ НАПОЇВ	АВТОМАТ НАПОЇВ.	Що ти хочеш вибрати?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+vending_coffee_tea	sl	AVTOMAT KAVA/ČAJ	Prosim, pomagajte mi pri avtomatu za kavo in čaj.	Kaj želiš izbrati?	besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+vending_coffee_tea	uk	АВТОМАТ КАВА/ЧАЙ	АВТОМАТ КАВА/ЧАЙ.	Що ти хочеш вибрати?	besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+shop	sl	TRGOVINA	Prosim, pomagajte mi v trgovini.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+shop	uk	МАГАЗИН	МАГАЗИН.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+restaurant	sl	RESTAVRACIJA	Prosim, pomagajte mi v restavraciji.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+restaurant	uk	РЕСТОРАН	РЕСТОРАН.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+transport	sl	PREVOZ	Prosim, pomagajte mi pri prevozu.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+transport	uk	ТРАНСПОРТ	ТРАНСПОРТ.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+vending_photo_step_1	sl	KORAK 1	Poglejte sliko prvega koraka.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+vending_photo_step_1	uk	КРОК 1	КРОК 1.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+vending_photo_step_2	sl	KORAK 2	Poglejte sliko drugega koraka.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+vending_photo_step_2	uk	КРОК 2	КРОК 2.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+move_me	sl	PREMAKNITE ME	Prosim, premaknite me.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+move_me	uk	ПЕРЕСУНЬТЕ МЕНЕ	Мені потрібно: пересуньте мене.		besedilno pregledano	ne	da: speech	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice. Ciljni popravek v AacTextCorrections842; ta stolpec ohranja izvorno besedilo.
+faster	sl	HITREJE	Prosim, hitreje.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+faster	uk	ШВИДШЕ	Будь ласка, швидше.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+correct_message	sl	POPRAVI	Prosim, popravi to.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+correct_message	uk	ВИПРАВ	Будь ласка, виправ це.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+lets_go	sl	GREMO	Gremo, prosim.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.
+lets_go	uk	ХОДІМО	Ходімо, будь ласка.		besedilno pregledano	ne	ne	Pregled sistemskega besedila; brez poslušanja in brez osebnih podatkov s tablice.

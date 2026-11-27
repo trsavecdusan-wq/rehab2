@@ -11,7 +11,8 @@ object AacLocalizedTextResolver {
 
     fun resolveLabel(item: AacItem, languageCode: String): String {
         val localizedTexts = item.toLocalizedTexts()
-        val label = resolveText(localizedTexts, languageCode) { it.label }
+        val label = AacTextCorrections842.resolve(item, AacLanguageResolver.normalize(languageCode), "label",
+            resolveText(localizedTexts, languageCode) { it.label })
             ?: resolveText(localizedTexts, languageCode) { it.speakText }
             ?: safeMissingTextFallback(item, languageCode)
             ?: item.id
@@ -24,7 +25,9 @@ object AacLocalizedTextResolver {
 
     fun resolveSpeakTextResult(item: AacItem, languageCode: String): ResolvedSpeechText {
         val result = resolveStoredSpeakTextResult(item, languageCode)
-        return result.copy(text = AacPatientVoiceSettings.itemText(item, result.text, result.languageCode))
+        val corrected = AacTextCorrections842.resolve(item, result.languageCode, "speech", result.text).orEmpty()
+        return result.copy(text = AacPatientVoiceSettings.itemText(item, corrected, result.languageCode),
+            usedLanguageFallback = result.usedLanguageFallback && corrected == result.text)
     }
 
     private fun resolveStoredSpeakTextResult(item: AacItem, languageCode: String): ResolvedSpeechText {
@@ -63,7 +66,8 @@ object AacLocalizedTextResolver {
 
     fun resolveQuestion(item: AacItem, languageCode: String): String? {
         val localizedTexts = item.toLocalizedTexts()
-        return resolveText(localizedTexts, languageCode) { it.question }?.let {
+        return AacTextCorrections842.resolve(item, AacLanguageResolver.normalize(languageCode), "question",
+            resolveText(localizedTexts, languageCode) { it.question })?.let {
             AacPatientVoiceSettings.itemText(item, it, languageCode)
         }
     }

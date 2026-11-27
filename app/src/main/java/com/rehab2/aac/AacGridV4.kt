@@ -42,7 +42,10 @@ object AacGridV4 {
                 ?: old.speakTextUk?.takeIf{it.any{c->c in '\u0400'..'\u04ff'}} ?: n.getString("speechUk") else n.getString("speechUk")
             val label=n.getString("motiv");val ukLabel=n.getString("labelUk")
             val base=old ?: AacItem(id=id,labelSl=label,imagePath="",actionType="speak",targetPageId="",isRootItem=false)
-            val a=n.getJSONArray("children");val children=((0 until a.length()).map{a.getString(it)}+base.children).distinct()
+            val a=n.getJSONArray("children")
+            // Disconnect this route only; retain catalogue entries and all other parents.
+            val children=if(id in setOf("no","dont_understand")) emptyList() else
+                ((0 until a.length()).map{a.getString(it)}+base.children).distinct()
             items[id]=base.copy(
                 labelSl=if(custom)base.labelSl else label,labelUk=if(custom)base.labelUk else ukLabel,
                 labelByLanguage=if(custom)base.labelByLanguage else base.labelByLanguage+mapOf("sl" to label,"uk" to ukLabel),
@@ -53,6 +56,11 @@ object AacGridV4 {
                 isRootItem=base.isRootItem||id in roots,isHiddenUntilParent=if(id in roots)false else base.isHiddenUntilParent,
                 actionType="speak",targetPageId="",questionSl=null,questionUk=null,questionByLanguage=emptyMap(),followUpQuestion=null,
                 guidedQuestionsEnabled=false,addsToSentence=false,speaksImmediately=n.getString("speech_mode")!="navigate_only")
+        }
+        for ((id, label) in mapOf("wc_poop" to "BLATO", "wc_diaper_change" to "MENJAVA")) {
+            val old = items[id] ?: continue
+            if (!old.locked && !old.userEdited && !old.translationManualOverride)
+                items[id] = old.copy(labelSl = label, labelByLanguage = old.labelByLanguage + ("sl" to label))
         }
         return items.values.toList()
     }

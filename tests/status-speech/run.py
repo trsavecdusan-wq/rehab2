@@ -40,7 +40,7 @@ object Toast {val LENGTH_SHORT=0;fun makeText(c:Any,s:String,n:Int)=this;fun sho
 object Log {fun d(tag:String,message:String){}}
 class Coordinator {
  var available=true
- fun getOrGenerateSpeechFile(text:String,languageCode:String,voiceId:String):File?=if(available) File("fake.wav") else null
+ fun getOrGenerateSpeechFile(text:String,languageCode:String,voiceId:String,speed:Double=0.88):File?=if(available) File("fake.wav") else null
 }
 object AacPatientVoiceSettings {fun voice(context:Any, guide:Boolean)="test"}
 object AacSpeechApiConfig { fun read(c:Any)=this; fun normalizedSpeed()=0.88 }

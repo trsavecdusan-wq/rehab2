@@ -1,0 +1,79 @@
+NovaRehab 1.2.842 / 11030 — pregled kandidatne izdaje
+
+Osnova: v1.2.840, a8681a7fd981e487092b5a8bbbae90232fda431c.
+Veja: codex/v1.2.842-speech-fix. Main in prejšnje izdaje niso spremenjeni.
+
+Ugotovitve v kodi (ne predstavljajo meritve na Lanini tablici)
+- MP3 je uporabljal privzeti faktor 1,2 (približno +1,58 dB), lokalni TTS
+  pa tega ojačenja sploh ni uporabljal. Stišanje radia spreminja samo
+  RadioPlayerController.player.volume, ne sistemske glasnosti ali AAC MediaPlayerja.
+- Hitrost za oblačni govor je nastavljena, lokalni TTS prej ni izrecno uporabljal
+  iste vrednosti. Datoteke audioSl so imele prednost pred konfiguriranim govorom.
+  Stari ključ ni zajel modela, formata in vseh navodil za generiranje.
+  Brez originalnih posnetkov ni mogoče dokazati izvora vsake razlike na tablici.
+
+Spremembe
+- MP3 in lokalni TTS uporabljata isti MediaPlayer, USAGE_MEDIA/CONTENT_TYPE_SPEECH,
+  glasnost predvajalnika 1,0 in sejsko omejeno ojačenje LoudnessEnhancer +6 dB.
+  Android pri prekoračitvi razpona uporabi kompresijo. Ojačenje je pripeto samo
+  seji govora, pred začetkom predvajanja; radio in sistemski drsnik nista znižana.
+  Če naprava učinka ne podpira, se govor predvaja brez učinka in zabeleži diagnostiko.
+  Zaznavna izenačenost in odsotnost slišnega popačenja zahtevata dejanski preizkus.
+- Lokalni TTS najprej sintetizira začasni WAV z enako nastavljeno hitrostjo,
+  nato ga predvaja skupna pot. Predvajalnik ne spreminja hitrosti še drugič.
+  Sinteza sama ne sproži stišanja radia. Datoteka se po uporabi odstrani.
+- Ključ vsebuje besedilo, jezik, glas, natančno hitrost, ponudnika, naslov,
+  model, format in navodila. Stare identitete ostanejo rezervna možnost brez
+  interneta, niso preimenovane ali označene kot skladne z novo generacijo.
+  Nadomestni posnetki nastajajo ob uporabi. Starih datotek ne brišemo.
+  Novi odgovor se zapiše v začasno datoteko, sinhronizira, preveri z Android
+  MediaMetadataRetriever in atomarno preimenuje. Ob napaki ostane stari posnetek.
+- Govorne zahteve imajo lastnika in zaporedno številko. Stari zaključki ne
+  sprožijo novega govora ali navigacije. Radio se obnovi po zaključku/napaki/prekinitvi.
+- NE se tiho vrne na DOM; NE RAZUMEM nima podikon v tej poti in govori enkrat.
+  Končna izbira V4 se vrne po govoru; kategorija ostane odprta. Pri izključenem
+  govoru se končna izbira vrne takoj. Katalog odklopljenih podikon ostaja ohranjen.
+- TOALETA: SESTRA 8, LULAT 17, BLATO 19, MOKRA 21, MENJAVA 23, UMAZANA 25.
+  OBOJE (wc_wet_and_dirty) ostaja na prostem mestu 18. Dodatne osebne povezave
+  se razporedijo na prosta mesta; ne prepisujejo imenovanih ikon.
+- SESTRA: help_dressing (OBLAČENJE) 21 -> 22; noticed_blood (KRI) 25 -> 24.
+  Skrajšana napisa BLATO in MENJAVA ne spreminjata izgovorjenih stavkov.
+- Nastavitve osebnih slik, UUID, profilov, OTA, podpisovanja in rollbacka
+  se ne migrirajo ali brišejo. Stara datoteka nastavitve ojačenja ostane za rollback;
+  nov prikaz uporablja skupni drsnik in interno ojačenje brez drugega drsnika.
+
+Do sedaj opravljeni preizkusi
+- 32 testov dejanskih Kotlin metod življenjskega cikla TTS/MediaPlayer s testnimi
+  nadomestki Androida (tests/status-speech/tts_lifecycle.py).
+- 18 determinističnih preizkusov povratnih klicev (tests/status-speech/run.py).
+- 32 preverjanj dejanskega predpomnilnika, razporeda in upravljanja radia
+  s testnimi nadomestki (tests/release-842/cache.py).
+- 103 preverjanja slik, uvoza, varnostnih kopij in pacientovih profilov
+  (tests/patient-images/run.ps1).
+- V4: 72 ID-jev, 25 mest DOM, aciklične povezave in SL/UK definicije.
+- Podpisana 840 je bila nameščena v izolirani emulator. Ob prekinitvi lokalnega
+  izvajalnika se je emulator ustavil. Preizkus nadgradnje še ni zaključen.
+
+Zvočno preverjanje
+Poslušano: noben dejanski Lanin posnetek.
+»Boli me.« in »Kaj te boli?«: naglasa še nista poslušano potrjena.
+Kratke/dolge SL/UK fraze: zaznavna hitrost in glasnost še nista poslušano potrjeni.
+Fizična tablica v tej nalogi ni bila priključena. Sintetični testi niso dokaz
+dejanske izgovorjave, zaznane glasnosti ali obnašanja konkretnega TTS pogona.
+
+Besedilni pregled
+- Pregledanih 980 vrstic sistemskega kataloga (490 zapisov x SL/UK) in vseh
+  72 definicij V4. Evidenca: speech-review-842.tsv, spremembe: text-corrections-842.tsv.
+- 198 ciljnih popravkov, večinoma napačne generične ukrajinske predloge,
+  manjkajoča zanikanja, prazni napisi in dvojni vprašaji. Uporabijo se samo
+  pri točnem ujemanju starega sistemskega besedila in brez zastavic osebnega urejanja.
+  Katalog v shrambi ostane nespremenjen. Osebni vpisi na tablici niso pregledani.
+- Posnetek starega popravljenega besedila ostane možen rezervni posnetek brez
+  interneta do nove generacije. To ne pomeni, da je njegova vsebina ali naglas popravljen.
+- Izvorni pravilni slovenski napisi niso fonetično prepisani zaradi naglasov.
+
+Lokalna gradnja app:assembleDebug je uspela. Zadnji besedilni popravki se
+preverijo še s podpisano GitHub Actions gradnjo pred objavo.
+
+Tehnična referenca za omejevanje ojačenja:
+https://developer.android.com/reference/android/media/audiofx/LoudnessEnhancer

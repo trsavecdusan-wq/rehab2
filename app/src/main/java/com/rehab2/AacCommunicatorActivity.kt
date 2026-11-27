@@ -150,6 +150,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             override fun onSpeechCompleted() {
+                if (finishTerminalSelection()) return
                 com.rehab2.aac.LiveTestSession.record("input_ready")
                 val completedMode = activeSpeechMode
                 lastSpeechEndedAt = System.currentTimeMillis()
@@ -179,6 +180,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             override fun onSpeechCancelled() {
+                if (finishTerminalSelection()) return
                 lastSpeechEndedAt = System.currentTimeMillis()
                 Log.d(TAG, "AAC_INPUT speech_cancelled inputLocked=false mode=$activeSpeechMode")
                 Log.d(TAG, "AAC_SPEECH SPEECH_CANCELLED mode=$activeSpeechMode")
@@ -187,6 +189,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
             }
 
             override fun onSpeechError() {
+                if (finishTerminalSelection()) return
                 val errorMode = activeSpeechMode
                 lastSpeechEndedAt = System.currentTimeMillis()
                 Log.d(TAG, "AAC_INPUT speech_error inputLocked=false mode=$errorMode")
@@ -458,7 +461,21 @@ class AacCommunicatorActivity : AppCompatActivity() {
         }
     }
 
+    private var returnHomeAfterSelection = false
+
+    private fun finishTerminalSelection(): Boolean {
+        if (!returnHomeAfterSelection) return false
+        returnHomeAfterSelection = false
+        resetSpeechState("terminal_selection")
+        sentenceManager.clear()
+        updateSentenceBar()
+        goHome()
+        return true
+    }
+
     private fun handleItemClick(item: AacItem) {
+        // A newer tap owns navigation; an interrupted older utterance must not close it.
+        returnHomeAfterSelection = false
         com.rehab2.aac.LiveTestSession.record("tap", item.id)
         Log.d(
             TAG,
@@ -466,18 +483,35 @@ class AacCommunicatorActivity : AppCompatActivity() {
                 "isSpeakingSentence=$isSpeakingSentence isSpeakingSingleIcon=$isSpeakingSingleIcon"
         )
         cancelPendingPartialAutoReturn()
+        if (item.id == "no") {
+            cancelPendingSpeech()
+            interruptActiveSpeechForNewInput()
+            sentenceManager.clear()
+            goHome()
+            return
+        }
         val v4PersonChoice = com.rehab2.aac.AacGridV4.enabled(this) &&
             currentVisibleItems.any { it.id == "v4_hug" } && item.id !in com.rehab2.aac.AacGridV4.home(this)
-        (com.rehab2.aac.AacGridV4.mode(this,item.id) ?: "speak_label".takeIf { v4PersonChoice })?.let { mode ->
+        (com.rehab2.aac.AacGridV4.mode(this,item.id)
+            ?: "speak_label".takeIf { v4PersonChoice }
+            ?: "speak".takeIf { item.id == "dont_understand" || com.rehab2.aac.AacGridV4.enabled(this) })?.let { mode ->
             cancelPendingSpeech()
             interruptActiveSpeechForNewInput()
             sentenceManager.clear()
             clearPromptText()
-            val children=resolveV2ChildItems(item)
+            val children = if (item.id == "dont_understand") emptyList() else resolveV2ChildItems(item)
             AacUsageStats.recordUse(this,item.id)
             if(children.isNotEmpty()) { currentV2VisibleHistory.addLast(currentVisibleItems);showItems(children) }
-            if(mode=="speak_label") audioPlayer.speakPatientText(AacLocalizedTextResolver.resolveLabel(item,languageCode),languageCode)
-            else if(mode!="navigate_only") audioPlayer.playOrSpeak(item,languageCode)
+            returnHomeAfterSelection = children.isEmpty()
+            if (!speechTimingSettings.speakSingleIconEnabled || mode == "navigate_only") {
+                finishTerminalSelection()
+            } else if (mode == "speak_label") {
+                audioPlayer.speakPatientText(AacLocalizedTextResolver.resolveLabel(item, languageCode), languageCode)
+            } else if (item.id == "dont_understand") {
+                audioPlayer.speakPatientText(if (languageCode == "uk") "Я не розумію." else "Ne razumem.", languageCode)
+            } else {
+                audioPlayer.playOrSpeak(item, languageCode)
+            }
             return
         }
         confirmGuidedTopSuggestionIfYesItem(item)?.let { suggestedItem ->
@@ -1000,7 +1034,19 @@ class AacCommunicatorActivity : AppCompatActivity() {
         val capacity = AacFixedTopRow.dynamicCapacity(getAacGridSize())
         contentPageCount = ((content.size + capacity - 1) / capacity).coerceAtLeast(1)
         contentPageIndex = contentPageIndex.coerceIn(0, contentPageCount - 1)
-        return getPersistentTopRowItems(items) + content.drop(contentPageIndex * capacity).take(capacity)
+        val fixed = getPersistentTopRowItems(items)
+        val page = content.drop(contentPageIndex * capacity).take(capacity)
+        if (getAacGridSize() == 5 && currentV2VisibleHistory.isNotEmpty()) {
+            val ids = items.map { it.id }.toSet()
+            val positions = when {
+                "wc_pee" in ids || "wc_poop" in ids -> com.rehab2.aac.AacCareLayout.toilet
+                "help_dressing" in ids || "noticed_blood" in ids -> com.rehab2.aac.AacCareLayout.nurse
+                else -> null
+            }
+            if (positions != null) return com.rehab2.aac.AacCareLayout.place(page, fixed, positions)
+                .mapIndexed { index, item -> item ?: AacItem(id="__care_empty_$index", labelSl="", imagePath="", actionType="", targetPageId="") }
+        }
+        return fixed + page
     }
 
     private fun asPersistentTopRowItem(item: AacItem): AacItem {
@@ -1218,6 +1264,7 @@ class AacCommunicatorActivity : AppCompatActivity() {
     }
 
     private fun cancelPendingSpeech() {
+        returnHomeAfterSelection = false
         cancelPendingSingleIconSpeak()
         cancelPendingAutoSpeakSentence()
         cancelPendingPartialAutoReturn()
@@ -1705,6 +1752,13 @@ class AacCommunicatorActivity : AppCompatActivity() {
 
             fun bind(item: AacItem) {
                 applyGridTileHeight(allowRetry = true)
+                if (item.id.startsWith("__care_empty_")) {
+                    itemView.visibility = View.INVISIBLE
+                    itemView.setOnClickListener(null)
+                    itemView.contentDescription = null
+                    return
+                }
+                itemView.visibility = View.VISIBLE
                 tileColor = tileColorFor(item)
                 itemView.setBackgroundColor(tileColor)
                 image.setBackgroundColor(android.graphics.Color.TRANSPARENT)

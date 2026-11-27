@@ -808,9 +808,7 @@ class SettingsActivity : AppCompatActivity() {
         editAudioDuckingPercent.setOnClickListener {
             showAudioDuckingPercentPicker()
         }
-        editAacSpeechLoudnessGain.setOnClickListener {
-            showAacSpeechLoudnessPicker()
-        }
+        editAacSpeechLoudnessGain.isEnabled = false
         findViewById<Button>(R.id.btnTestAacSpeechLoudness).setOnClickListener {
             testAacSpeechLoudness()
         }
@@ -1950,10 +1948,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun refreshAacSpeechLoudnessSection() {
-        val settings = AacSpeechLoudnessSettings.load(this)
-        val settingsPath = AacSpeechLoudnessSettings.settingsFile(this)?.absolutePath.orEmpty().ifBlank { "ni poti" }
-        txtAacSpeechLoudnessStatus.text = "Jakost AAC govora: ${settings.label()}"
-        editAacSpeechLoudnessGain.setText("${settings.label()}\n$settingsPath")
+        txtAacSpeechLoudnessStatus.text = "Govor uporablja skupni drsnik glasnosti."
+        editAacSpeechLoudnessGain.visibility = View.GONE
     }
 
     private fun refreshPatientProfileSection() {

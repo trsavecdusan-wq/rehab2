@@ -42,7 +42,8 @@ class OpenAiAacSpeechApiClient(context: Context) : AacSpeechApiClient {
                 put("input", trimmedText)
                 put("voice", voiceId.trim().ifBlank { config.normalizedVoiceId() })
                 put("speed", speed.coerceIn(0.25, 4.0))
-                put("instructions", languageInstructions(languageCode))
+                if (config.normalizedModel().startsWith("gpt-"))
+                    put("instructions", AacSpeechPronunciationPolicy.instructions(languageCode))
                 put("response_format", config.normalizedResponseFormat())
             }
 

@@ -1,11 +1,14 @@
 package com.rehab2.aac
 
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import java.io.File
+import java.io.FileOutputStream
 import java.security.MessageDigest
 
 class AacSpeechCache(private val context: Context) {
     internal val namespace: String get() = context.filesDir.absolutePath
+    internal fun generationIdentity(language: String) = AacSpeechApiConfig.read(context).generationIdentity(language)
     fun getCacheMp3File(itemId: String): File? = getCacheFile(itemId, "mp3")
 
     fun getCacheWavFile(itemId: String): File? = getCacheFile(itemId, "wav")
@@ -60,11 +63,27 @@ class AacSpeechCache(private val context: Context) {
             return null
         }
 
+        val pending = File.createTempFile("speech-", ".mp3", parentDir)
         return try {
-            cacheFile.writeBytes(audioBytes)
-            if (cacheFile.exists() && cacheFile.length() > 0L) cacheFile else null
+            FileOutputStream(pending).use { stream ->
+                stream.write(audioBytes)
+                stream.fd.sync()
+            }
+            // HTTP success/byte count alone does not prove that this is playable audio.
+            val metadata = MediaMetadataRetriever()
+            val valid = try {
+                metadata.setDataSource(pending.absolutePath)
+                (metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L) > 0L
+            } finally { metadata.release() }
+            if (!valid) return null
+            synchronized(AacSpeechCache::class.java) {
+                if (cacheFile.isFile && cacheFile.length() > 0L) cacheFile
+                else if (pending.renameTo(cacheFile)) cacheFile else null
+            }
         } catch (_: Exception) {
             null
+        } finally {
+            pending.delete()
         }
     }
 
@@ -75,8 +94,12 @@ class AacSpeechCache(private val context: Context) {
         voiceId: String,
         speed: Double
     ): File? {
-        val file = getGeneratedSpeechCacheFile(text, languageCode, voiceId, speed, legacy = true)
-        return file?.takeIf { it.isFile && it.length() > 0L }
+        // 840 pronunciation-aware and pre-840 identities are offline fallback only.
+        val texts = listOf(text) + AacTextCorrections842.previousSpeech(text, AacLanguageResolver.normalize(languageCode))
+        return texts.flatMap { previousText -> listOf(false, true).mapNotNull {
+            getGeneratedSpeechCacheFile(previousText, languageCode, voiceId, speed, legacy = it, previous = true)
+        }
+        }.firstOrNull { it.isFile && it.length() > 0L }
     }
 
     private fun getCacheFile(itemId: String, extension: String): File? {
@@ -94,7 +117,8 @@ class AacSpeechCache(private val context: Context) {
         languageCode: String,
         voiceId: String,
         speed: Double,
-        legacy: Boolean = false
+        legacy: Boolean = false,
+        previous: Boolean = false
     ): File? {
         val normalizedText = text.trim()
         if (normalizedText.isBlank()) return null
@@ -104,8 +128,10 @@ class AacSpeechCache(private val context: Context) {
         val normalizedSpeed = normalizeSpeed(speed)
         val normalizedHashText = normalizeTextForHash(normalizedText)
         val legacyIdentity = "$normalizedLanguage|$normalizedVoice|$normalizedSpeed|$normalizedHashText"
-        val cacheIdentity = if (legacy) legacyIdentity else
-            AacSpeechPronunciationPolicy.cacheIdentity(normalizedLanguage, legacyIdentity)
+        val cacheIdentity = if (previous) {
+            if (legacy) legacyIdentity else AacSpeechPronunciationPolicy.cacheIdentity(normalizedLanguage, legacyIdentity)
+        } else org.json.JSONArray(listOf(normalizedLanguage, voiceId.trim(), speed.toString(),
+            normalizedText, generationIdentity(normalizedLanguage))).toString()
         val hash = sha256(cacheIdentity)
         val audioDir = File(
             context.filesDir,

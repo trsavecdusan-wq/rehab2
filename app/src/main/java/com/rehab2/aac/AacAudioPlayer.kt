@@ -2,6 +2,7 @@ package com.rehab2.aac
 
 import android.content.Context
 import android.media.AudioManager
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.audiofx.LoudnessEnhancer
 import android.os.Bundle
@@ -17,7 +18,6 @@ import org.json.JSONObject
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.log10
 
 class AacAudioPlayer(
     private val context: Context,
@@ -38,7 +38,13 @@ class AacAudioPlayer(
         speedProvider = { AacSpeechApiConfig.read(context).normalizedSpeed() }
     )
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { }
+    private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { change ->
+        if (change == AudioManager.AUDIOFOCUS_LOSS || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            mainHandler.post { stopCurrentSpeech() }
+        }
+    }
+    private val synthesisFiles = java.util.concurrent.ConcurrentHashMap<String, File>()
+    private var temporaryPlayback: File? = null
     private var mediaPlayer: MediaPlayer? = null
     private var loudnessEnhancer: LoudnessEnhancer? = null
     private var textToSpeech: TextToSpeech? = TextToSpeech(context, this)
@@ -76,19 +82,32 @@ class AacAudioPlayer(
         traceAudio("TTS available=$isTtsReady")
         textToSpeech?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
-                postCurrentTtsCallback(utteranceId) { notifySpeechStarted() }
+                // Synthesis is silent. Playback alone reports speech start/ducks radio.
             }
 
             override fun onDone(utteranceId: String?) {
-                postCurrentTtsCallback(utteranceId) { notifySpeechCompleted() }
+                val file = utteranceId?.let { synthesisFiles.remove(it) } ?: return
+                mainHandler.post {
+                    if (AacSpeechRequestPolicy.isCurrent(utteranceId, speechRequestSerial, released)) {
+                        temporaryPlayback = file
+                        if (!playAudioFileIfAvailable(file)) { file.delete(); notifySpeechError() }
+                    } else file.delete()
+                }
+            }
+
+            override fun onStop(utteranceId: String?, interrupted: Boolean) {
+                utteranceId?.let { synthesisFiles.remove(it)?.delete() }
+                postCurrentTtsCallback(utteranceId) { notifySpeechCancelled() }
             }
 
             @Deprecated("Deprecated in Java")
             override fun onError(utteranceId: String?) {
+                utteranceId?.let { synthesisFiles.remove(it)?.delete() }
                 postCurrentTtsCallback(utteranceId) { notifySpeechError() }
             }
 
             override fun onError(utteranceId: String?, errorCode: Int) {
+                utteranceId?.let { synthesisFiles.remove(it)?.delete() }
                 postCurrentTtsCallback(utteranceId) { notifySpeechError() }
             }
         })
@@ -123,8 +142,6 @@ class AacAudioPlayer(
             return
         }
 
-        if (speechLanguageCode == "sl" && item.audioSl.isNotBlank() &&
-            playAudioFileIfAvailable(File(item.audioSl))) return
         playGeneratedSpeechOrFallback(
             text = fallbackText,
             languageCode = speechLanguageCode,
@@ -257,7 +274,8 @@ class AacAudioPlayer(
             val generatedAudioFile = speechCoordinator.getOrGenerateSpeechFile(
                 text = text,
                 languageCode = languageCode,
-                voiceId = voiceId
+                voiceId = voiceId,
+                speed = speed
             )
 
             mainHandler.post {
@@ -271,13 +289,14 @@ class AacAudioPlayer(
                 }
 
                 if (playAudioFileIfAvailable(generatedAudioFile)) {
-                    Log.d(TAG, generatedLog)
+                    if (generatedAudioFile == legacy) traceAudio("legacy fallback: speed/settings unverified")
+                    else Log.d(TAG, generatedLog)
                     traceAudio("selected path=generated audio file=${generatedAudioFile?.absolutePath}")
                     return@post
                 }
 
                 traceAudio("generated audio unavailable -> fallback")
-                fallback()
+                if (!playAudioFileIfAvailable(legacy)) fallback()
             }
         }.start()
     }
@@ -322,6 +341,9 @@ class AacAudioPlayer(
             val serial = speechRequestSerial
             val player = MediaPlayer()
             mediaPlayer = player
+            player.setAudioAttributes(AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
             player.setDataSource(audioFile.absolutePath)
             player.setOnCompletionListener { completed ->
                 if (mediaPlayer !== completed || serial != speechRequestSerial || released) return@setOnCompletionListener
@@ -338,6 +360,8 @@ class AacAudioPlayer(
                 if (mediaPlayer !== prepared || serial != speechRequestSerial || released) return@setOnPreparedListener
                 try {
                     applySpeechLoudness(prepared)
+                    requestMusicAudioFocus()
+                    RadioDuckingCoordinator.duckForSpeech(context, this)
                     com.rehab2.aac.LiveTestSession.record("speech_will_start")
                     prepared.start()
                     notifySpeechStarted()
@@ -379,13 +403,7 @@ class AacAudioPlayer(
             return true
         }
 
-        val defaultResult = tts.setLanguage(Locale.getDefault())
-        Log.d(TAG, "TTS language default=${Locale.getDefault()} result=$defaultResult")
-        traceAudio("TTS language default=${Locale.getDefault()} result=$defaultResult")
-        if (isLanguageUsable(defaultResult)) {
-            return true
-        }
-
+        // Never read Slovenian text using the device's unrelated default language.
         return false
     }
 
@@ -413,13 +431,25 @@ class AacAudioPlayer(
 
         traceAudio("TTS speak request text='${text.take(80)}' language=${AacLanguageResolver.normalize(languageCode)} voice=${textToSpeech?.voice?.name ?: "unknown"}")
         Toast.makeText(context, "TTS: ${text}", Toast.LENGTH_SHORT).show()
-        requestMusicAudioFocus()
-        val params = Bundle().apply {
-            putString(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC.toString())
-        }
         val utteranceId = "aac_${speechRequestSerial}"
-        com.rehab2.aac.LiveTestSession.record("speech_will_start")
-        val result = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
+        val file = runCatching { File.createTempFile("aac-tts-", ".wav", context.cacheDir) }.getOrNull()
+        if (file == null) { notifySpeechError(); return }
+        synthesisFiles[utteranceId] = file
+        val result = runCatching {
+            val rate = textToSpeech?.setSpeechRate(AacSpeechApiConfig.read(context).normalizedSpeed().toFloat())
+            if (rate != TextToSpeech.SUCCESS) TextToSpeech.ERROR
+            else textToSpeech?.synthesizeToFile(text, Bundle(), file, utteranceId)
+        }.getOrDefault(TextToSpeech.ERROR)
+        if (result != TextToSpeech.SUCCESS) synthesisFiles.remove(utteranceId)?.delete()
+        mainHandler.postDelayed({
+            if (synthesisFiles.remove(utteranceId) != null) {
+                if (AacSpeechRequestPolicy.isCurrent(utteranceId, speechRequestSerial, released)) {
+                    textToSpeech?.stop()
+                    notifySpeechError()
+                }
+                file.delete()
+            }
+        }, STATUS_SPEECH_GENERATION_TIMEOUT_MS)
         when (result) {
             TextToSpeech.SUCCESS -> {
                 Log.d(TAG, "TTS speak OK: $text")
@@ -473,16 +503,16 @@ class AacAudioPlayer(
         }
 
         val slText = when (resolvedText.trim().uppercase(Locale.ROOT)) {
-            "VODA" -> "Želim piti vodo."
-            "MRZLA VODA" -> "Želim piti mrzlo vodo."
-            "TOPLA VODA" -> "Želim piti toplo vodo."
-            "VODA Z MEHURČKI" -> "Želim piti vodo z mehurčki."
-            "VODA BREZ MEHURČKOV" -> "Želim piti vodo brez mehurčkov."
-            "ČAJ" -> "Želim piti čaj."
-            "SOK" -> "Želim piti sok."
-            "KAVA" -> "Želim piti kavo."
-            "MLEKO" -> "Želim piti mleko."
-            "LIMONADA" -> "Želim piti limonado."
+            "VODA" -> "Ĺ˝elim piti vodo."
+            "MRZLA VODA" -> "Ĺ˝elim piti mrzlo vodo."
+            "TOPLA VODA" -> "Ĺ˝elim piti toplo vodo."
+            "VODA Z MEHURÄŚKI" -> "Ĺ˝elim piti vodo z mehurÄŤki."
+            "VODA BREZ MEHURÄŚKOV" -> "Ĺ˝elim piti vodo brez mehurÄŤkov."
+            "ÄŚAJ" -> "Ĺ˝elim piti ÄŤaj."
+            "SOK" -> "Ĺ˝elim piti sok."
+            "KAVA" -> "Ĺ˝elim piti kavo."
+            "MLEKO" -> "Ĺ˝elim piti mleko."
+            "LIMONADA" -> "Ĺ˝elim piti limonado."
             else -> resolvedText
         }
         return resolvedSpeech.copy(text = slText)
@@ -495,6 +525,8 @@ class AacAudioPlayer(
         textToSpeech?.setOnUtteranceProgressListener(null)
         textToSpeech?.shutdown()
         textToSpeech = null
+        synthesisFiles.values.forEach { it.delete() }
+        synthesisFiles.clear()
         isTtsReady = false
         speechListener = null
     }
@@ -509,9 +541,10 @@ class AacAudioPlayer(
         releaseMediaPlayer()
         if (shouldNotifyCancelled) {
             notifySpeechCancelled()
-        } else if (restoreDuckingWhenSilent && hadActiveSpeech) {
+        } else {
             isSpeechActive = false
-            runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
+            abandonMusicAudioFocus()
+            runCatching { RadioDuckingCoordinator.restoreAfterSpeech(this) }
         }
     }
 
@@ -524,24 +557,21 @@ class AacAudioPlayer(
         releaseLoudnessEnhancer()
         mediaPlayer?.release()
         mediaPlayer = null
+        temporaryPlayback?.delete()
+        temporaryPlayback = null
     }
 
     private fun applySpeechLoudness(player: MediaPlayer) {
         releaseLoudnessEnhancer()
-        val gain = AacSpeechLoudnessSettings.load(context).gain
-        if (gain <= 1.0) {
-            Log.d(TAG, "SPEECH_LOUDNESS disabled gain=$gain")
-            return
-        }
-
+        // Session-local gain with Android's compression limiter; never alter STREAM_MUSIC.
+        // TTS and all recorded sources use this same path, at unity playback speed.
+        player.setVolume(1f, 1f)
         runCatching {
-            val gainMb = (20.0 * log10(gain) * 100.0).toInt().coerceIn(0, MAX_LOUDNESS_GAIN_MB)
-            if (gainMb <= 0) return
             loudnessEnhancer = LoudnessEnhancer(player.audioSessionId).apply {
-                setTargetGain(gainMb)
+                setTargetGain(MAX_LOUDNESS_GAIN_MB)
                 enabled = true
             }
-            Log.d(TAG, "SPEECH_LOUDNESS applied gain=$gain targetGainMb=$gainMb")
+            Log.d(TAG, "SPEECH_LOUDNESS targetGainMb=$MAX_LOUDNESS_GAIN_MB")
         }.onFailure { error ->
             Log.w(TAG, "SPEECH_LOUDNESS enhancer unavailable: ${error.javaClass.simpleName}")
             releaseLoudnessEnhancer()
@@ -559,7 +589,7 @@ class AacAudioPlayer(
     private fun notifySpeechStarted() {
         com.rehab2.aac.LiveTestSession.record("sound_start")
         isSpeechActive = true
-        runCatching { RadioDuckingCoordinator.duckForSpeech(context) }
+        runCatching { RadioDuckingCoordinator.duckForSpeech(context, this) }
         Log.d(TAG, "SPEECH_STARTED")
         traceAudio("onSpeechStarted")
         postSpeechCallback { it.onSpeechStarted() }
@@ -570,7 +600,7 @@ class AacAudioPlayer(
         if (!isSpeechActive) return
         isSpeechActive = false
         abandonMusicAudioFocus()
-        runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
+        runCatching { RadioDuckingCoordinator.restoreAfterSpeech(this) }
         Log.d(TAG, "SPEECH_COMPLETED")
         traceAudio("onSpeechCompleted")
         postSpeechCallback { it.onSpeechCompleted() }
@@ -578,10 +608,9 @@ class AacAudioPlayer(
 
     private fun notifySpeechCancelled() {
         com.rehab2.aac.LiveTestSession.record("speech_cancelled")
-        if (!isSpeechActive) return
         isSpeechActive = false
         abandonMusicAudioFocus()
-        runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
+        runCatching { RadioDuckingCoordinator.restoreAfterSpeech(this) }
         Log.d(TAG, "SPEECH_CANCELLED")
         traceAudio("onSpeechCancelled")
         postSpeechCallback { it.onSpeechCancelled() }
@@ -591,7 +620,7 @@ class AacAudioPlayer(
         com.rehab2.aac.LiveTestSession.record("speech_error")
         isSpeechActive = false
         abandonMusicAudioFocus()
-        runCatching { RadioDuckingCoordinator.restoreAfterSpeech() }
+        runCatching { RadioDuckingCoordinator.restoreAfterSpeech(this) }
         Log.d(TAG, "SPEECH_ERROR")
         traceAudio("notifySpeechError called")
         postSpeechCallback { it.onSpeechError() }
@@ -638,7 +667,7 @@ class AacAudioPlayer(
 
     private companion object {
         const val TAG = "AacAudioPlayer"
-        const val MAX_LOUDNESS_GAIN_MB = 400
+        const val MAX_LOUDNESS_GAIN_MB = 600
         const val SPEECH_GENERATION_TIMEOUT_MS = 1800L
         const val STATUS_SPEECH_GENERATION_TIMEOUT_MS = 30_000L
         const val PREFS_AUDIO_DIAGNOSTICS = "audio_diagnostics"

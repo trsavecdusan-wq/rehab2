@@ -7,10 +7,13 @@ import java.util.WeakHashMap
 
 object RadioDuckingCoordinator {
     private val controllers = Collections.newSetFromMap(WeakHashMap<RadioPlayerController, Boolean>())
+    private val speechOwners = mutableSetOf<Any>()
+    private var activePercent = AudioDuckingSettings.DEFAULT_DUCKING_PERCENT
 
     fun register(controller: RadioPlayerController) {
         synchronized(controllers) {
             controllers.add(controller)
+            if (speechOwners.isNotEmpty()) controller.applyDucking(activePercent)
         }
     }
 
@@ -20,15 +23,19 @@ object RadioDuckingCoordinator {
         }
     }
 
-    fun duckForSpeech(context: Context) {
+    fun duckForSpeech(context: Context, owner: Any) {
         val settings = AudioDuckingSettings.load(context)
         if (!settings.enabled || settings.duckingPercent <= 0) return
+        activePercent = settings.duckingPercent
+        speechOwners.add(owner)
         applyToControllers { controller ->
-            controller.applyDucking(settings.duckingPercent)
+            controller.applyDucking(activePercent)
         }
     }
 
-    fun restoreAfterSpeech() {
+    fun restoreAfterSpeech(owner: Any) {
+        speechOwners.remove(owner)
+        if (speechOwners.isNotEmpty()) return
         applyToControllers { controller ->
             controller.restoreDucking()
         }

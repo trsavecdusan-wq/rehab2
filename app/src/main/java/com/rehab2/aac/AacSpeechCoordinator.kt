@@ -33,7 +33,8 @@ class AacSpeechCoordinator(
             return cachedFile
         }
 
-        val key = listOf(speechCache.namespace, normalizedLanguage, voiceId, speed.toString(), trimmed).joinToString("\u001f")
+        val identity = speechCache.generationIdentity(normalizedLanguage)
+        val key = listOf(speechCache.namespace, identity, normalizedLanguage, voiceId, speed.toString(), trimmed).joinToString("\u001f")
         val task = FutureTask<File?> {
             if (!generationSlots.tryAcquire()) return@FutureTask speechCache.getLegacyGeneratedSpeechFile(trimmed, normalizedLanguage, voiceId, speed)
             try { generateAndSave(trimmed, normalizedLanguage, voiceId, speed) }
@@ -49,6 +50,7 @@ class AacSpeechCoordinator(
     private fun generateAndSave(trimmed: String, normalizedLanguage: String, voiceId: String, speed: Double): File? {
         // Recheck after joining the request queue; another owner may already have populated it.
         speechCache.getGeneratedSpeechFile(trimmed, normalizedLanguage, voiceId, speed)?.let { return it }
+        val identity = speechCache.generationIdentity(normalizedLanguage)
         val generatedAudio = apiClient.generateSpeech(
             text = trimmed,
             languageCode = normalizedLanguage,
@@ -58,6 +60,8 @@ class AacSpeechCoordinator(
             trimmed, normalizedLanguage, voiceId, speed
         )
 
+        // A service/settings change during HTTP must not mislabel the returned recording.
+        if (identity != speechCache.generationIdentity(normalizedLanguage)) return null
         val savedFile = speechCache.saveGeneratedSpeech(
             text = trimmed,
             languageCode = normalizedLanguage,

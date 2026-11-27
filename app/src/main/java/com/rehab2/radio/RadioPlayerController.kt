@@ -83,7 +83,7 @@ class RadioPlayerController(
     }
 
     fun applyDucking(duckingPercent: Int) {
-        if (!player.isPlaying) return
+        // Also duck buffering/new stations before their first audible sample.
         val normalizedPercent = duckingPercent.coerceIn(0, 100)
         if (normalizedPercent <= 0) return
         if (volumeBeforeDucking == null) {
