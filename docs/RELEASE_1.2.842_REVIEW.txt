@@ -60,10 +60,19 @@ Do sedaj opravljeni preizkusi
   njuna hramba je nespremenjena, zaščito preverjajo zgornji testi profila/slik.
 - Primerjanih vseh 1018 vsebinskih assets v APK-jih 840 in 842: brez sprememb.
   Gradlovi prevedeni profili assets/dexopt se pričakovano razlikujejo in niso slike.
-- Emulator Android 16 je že pri 840 ponavljal ANR za com.android.systemui in
-  napake DeadSystemException. Tudi po ponovnem zagonu System UI ni omogočil
-  zanesljivega preizkusa dotikov; am start -W je vrnil timeout. Polni preizkus
-  navigacije, položajev, SL/UK prikaza in zvoka v emulatorju zato NI potrjen.
+- Emulator Android 16 je pri omejitvi 1536 MB ponavljal ANR za System UI,
+  napake DeadSystemException in pozneje ANR com.rehab2 pri odpiranju podmenija.
+  Sled aplikacije: BitmapFactory.decodeFile -> bindMainAacIcon, na glavni niti.
+  Hkrati: 99 % CPU, spominski pritisk, 117620 KB zamenjanega pomnilnika aplikacije.
+  Ne sklepamo, da je bilo krivo samo testno okolje: razreševanje in dekodiranje slik
+  sta zdaj na ločeni niti, prikaz omejen na 512 px in predpomnilnik na 12 MB.
+  Preklici in identiteta vezave preprečujejo rezultate starega menija. Izvirniki
+  slik ostajajo nespremenjeni. 10 testov dejanske kode nalagalnika z nadomestki
+  Androida: velikost, delo izven glavne niti, cache, preklic, zaprtje, napaka.
+- Pred popravkom slik je UI pokazal pravilna mesta TOALETA 8/17/19/21/23/25
+  in OBOJE 18; nadaljnji test SESTRA/NE je prekinil navedeni ANR.
+- Prva objava iz oznake je bila preklicana pred ustvarjanjem GitHub Release.
+  Podpisani APK iz f6ae2f5 je bil testni kandidat, ne končna objavljena izdaja.
 
 Zvočno preverjanje
 Poslušano: noben dejanski Lanin posnetek.
@@ -83,8 +92,8 @@ Besedilni pregled
   interneta do nove generacije. To ne pomeni, da je njegova vsebina ali naglas popravljen.
 - Izvorni pravilni slovenski napisi niso fonetično prepisani zaradi naglasov.
 
-Lokalna gradnja app:assembleDebug je uspela. Končna koda je uspešno prevedena
-in podpisana na GitHub Actions 46029329793 (commit f6ae2f5d1fa6a8139807f187b83b77f2ca2dc167).
+Lokalna gradnja app:assembleDebug je uspela. Predhodni kandidat je uspešno preveden
+in podpisan na GitHub Actions 46029329793 (commit f6ae2f5d1fa6a8139807f187b83b77f2ca2dc167).
 https://github.com/trsavecdusan-wq/rehab2/actions/runs/46029329793
 Preverjen podpis APK v1/v2, package com.rehab2, versionCode 11030, versionName 1.2.842.
 Certifikat je enak podpisani 840:
@@ -94,3 +103,26 @@ sta spremenjeni samo različica in koda različice.
 
 Tehnična referenca za omejevanje ojačenja:
 https://developer.android.com/reference/android/media/audiofx/LoudnessEnhancer
+
+Kandidat s popravkom nalaganja slik
+- Commit 607cff2e32576d1060e5ce10b2c6dac011b952d5.
+- GitHub Actions 46032982985: debug, podpisana release gradnja in observation-contract uspešni.
+- Certifikat SHA256 je znova enak 840.
+- SHA256 testnega podpisanega APK: 4417625ff5594ad215357e53455f2ce704c65de6c8a20cbbae3a03eb6e2038b4.
+
+Ponovitev namestitve zadnjega kandidata
+- V izoliranem emulatorju: podpisana 840 / 11028 nameščena uspešno, nato
+  podpisani 607cff2 / 11030 z install -r uspešno. Brez odstranitve podatkov.
+- Pred in po zadnji nadgradnji enaki SHA256 patient_profile.json in aac_items.json.
+- Znova primerjanih 1018 vsebinskih assets: vsi enaki osnovi 840.
+- Emulator 4 GB je izčrpal gostiteljev pomnilnik (8 GB gostitelj). Ponovni
+  preizkus s 2560 MB, brez dejavnosti Play Store/Google Search, je prikazal
+  »Process system isn't responding«. Pred tem dumpsys lastanr in crash log
+  nista pokazala nove napake NovaRehab. Celotnega preizkusa UI zato NE štejemo
+  kot uspešnega. Popravek dekodiranja je preveden in pokrit s ciljnimi testi,
+  vendar njegova odzivnost pri dejanskih dotikih še zahteva zdravo napravo.
+- Polna navigacija V4, zaporedni dotiki, dejanska obnova glasnosti radia,
+  vse govorne poti, enotna zaznana hitrost in SL/UK naglasi na fizični tablici
+  niso potrjeni. Testni emulator je brez zvočnega izhoda.
+- Objava normalne izdaje ne pomeni, da so te omejitve odpravljene ali preizkusi
+  izvedeni; prenesene so tudi v opombe izdaje.
