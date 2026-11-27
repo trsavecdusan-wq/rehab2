@@ -1,4 +1,4 @@
-NovaRehab 1.2.842 / 11030 — pregled kandidatne izdaje
+NovaRehab 1.2.842 / 11030 — pregled za izdajo
 
 Osnova: v1.2.840, a8681a7fd981e487092b5a8bbbae90232fda431c.
 Veja: codex/v1.2.842-speech-fix. Main in prejšnje izdaje niso spremenjeni.
@@ -43,16 +43,27 @@ Spremembe
   nov prikaz uporablja skupni drsnik in interno ojačenje brez drugega drsnika.
 
 Do sedaj opravljeni preizkusi
-- 32 testov dejanskih Kotlin metod življenjskega cikla TTS/MediaPlayer s testnimi
+- 34 testov dejanskih Kotlin metod življenjskega cikla TTS/MediaPlayer s testnimi
   nadomestki Androida (tests/status-speech/tts_lifecycle.py).
 - 18 determinističnih preizkusov povratnih klicev (tests/status-speech/run.py).
-- 32 preverjanj dejanskega predpomnilnika, razporeda in upravljanja radia
+- 36 preverjanj dejanskega predpomnilnika, besedilnih popravkov, razporeda in upravljanja radia
   s testnimi nadomestki (tests/release-842/cache.py).
 - 103 preverjanja slik, uvoza, varnostnih kopij in pacientovih profilov
   (tests/patient-images/run.ps1).
 - V4: 72 ID-jev, 25 mest DOM, aciklične povezave in SL/UK definicije.
-- Podpisana 840 je bila nameščena v izolirani emulator. Ob prekinitvi lokalnega
-  izvajalnika se je emulator ustavil. Preizkus nadgradnje še ni zaključen.
+- Statični katalog: 487 enoličnih ID-jev, 661 povezav, 21 komunikacijskih poti,
+  283 pregledanih slikovnih preslikav. Obe poti do MENJAVE PLENICE sta ohranjeni.
+- Podpisana 840 je bila nameščena v izolirani emulator in nato nadgrajena z
+  install -r na podpisano 842 brez odstranitve aplikacije. Namestitev: Success.
+  Datoteki patient_profile.json in aac_items.json imata pred in po nadgradnji
+  enaki SHA256. Zasebni UUID in zasebne slike niso neposredno primerjani v emulatorju;
+  njuna hramba je nespremenjena, zaščito preverjajo zgornji testi profila/slik.
+- Primerjanih vseh 1018 vsebinskih assets v APK-jih 840 in 842: brez sprememb.
+  Gradlovi prevedeni profili assets/dexopt se pričakovano razlikujejo in niso slike.
+- Emulator Android 16 je že pri 840 ponavljal ANR za com.android.systemui in
+  napake DeadSystemException. Tudi po ponovnem zagonu System UI ni omogočil
+  zanesljivega preizkusa dotikov; am start -W je vrnil timeout. Polni preizkus
+  navigacije, položajev, SL/UK prikaza in zvoka v emulatorju zato NI potrjen.
 
 Zvočno preverjanje
 Poslušano: noben dejanski Lanin posnetek.
@@ -72,8 +83,14 @@ Besedilni pregled
   interneta do nove generacije. To ne pomeni, da je njegova vsebina ali naglas popravljen.
 - Izvorni pravilni slovenski napisi niso fonetično prepisani zaradi naglasov.
 
-Lokalna gradnja app:assembleDebug je uspela. Zadnji besedilni popravki se
-preverijo še s podpisano GitHub Actions gradnjo pred objavo.
+Lokalna gradnja app:assembleDebug je uspela. Končna koda je uspešno prevedena
+in podpisana na GitHub Actions 46029329793 (commit f6ae2f5d1fa6a8139807f187b83b77f2ca2dc167).
+https://github.com/trsavecdusan-wq/rehab2/actions/runs/46029329793
+Preverjen podpis APK v1/v2, package com.rehab2, versionCode 11030, versionName 1.2.842.
+Certifikat je enak podpisani 840:
+b253edef6ab6de917e70961c65d4d8b3cbc4727cbab109c6e9319e521583c51b
+Workflow, podpisovanje, OTA in rollback niso spremenjeni; v app/build.gradle
+sta spremenjeni samo različica in koda različice.
 
 Tehnična referenca za omejevanje ojačenja:
 https://developer.android.com/reference/android/media/audiofx/LoudnessEnhancer
