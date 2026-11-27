@@ -15,7 +15,6 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.GradientDrawable
@@ -648,12 +647,16 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private val mainAacIconLoader = com.rehab2.aac.AacIconLoader()
+
     private data class MainAacTileBinding(
         val view: View,
         val icon: TextView?,
         val label: TextView,
         val fallbackIconText: CharSequence,
-        var item: AacItem? = null
+        var item: AacItem? = null,
+        var iconRequest: java.util.concurrent.Future<*>? = null,
+        var iconToken: Any = Any()
     ) {
         companion object {
             fun from(view: View): MainAacTileBinding {
@@ -1028,6 +1031,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        mainAacIconLoader.close()
         stopStatusUpdates()
         stopSpeedUpdates()
         stopPowerMonitoring()
@@ -3279,23 +3283,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindMainAacIcon(binding: MainAacTileBinding, item: AacItem) {
         val iconView = binding.icon ?: return
+        binding.iconRequest?.cancel(true)
+        val token = Any().also { binding.iconToken = it }
         val noLabels = com.rehab2.aac.AacIconPresentation.hidden(this)
         val frame = binding.view as? FrameLayout
-        var fitImage = frame?.findViewWithTag<ImageView>("aac-no-label-image")
-        fitImage?.apply { visibility = View.GONE;setImageDrawable(null) }
-        if (noLabels && frame != null) {
-            val file = com.rehab2.aac.AacPatientImages.resolve(this,item)
-            val bitmap = file?.let { BitmapFactory.decodeFile(it.path) }
-            if (bitmap != null) {
-                if (fitImage == null) {
-                    fitImage = ImageView(this).apply { tag="aac-no-label-image";scaleType=ImageView.ScaleType.FIT_CENTER;importantForAccessibility=View.IMPORTANT_FOR_ACCESSIBILITY_NO }
-                    frame.addView(fitImage,FrameLayout.LayoutParams(-1,-1).apply { setMargins(dp(2),dp(2),dp(2),dp(2)) })
-                }
-                fitImage.setImageBitmap(bitmap);fitImage.visibility=View.VISIBLE
-                iconView.setCompoundDrawables(null,null,null,null);iconView.text=""
-                iconView.visibility=View.GONE
-                return
-            }
+        frame?.findViewWithTag<ImageView>("aac-no-label-image")?.apply {
+            visibility = View.GONE
+            setImageDrawable(null)
         }
         if (!noLabels && fixedMainAacAnswerDisplayMode(item) == "text") {
             iconView.visibility = View.INVISIBLE
@@ -3306,26 +3300,44 @@ class MainActivity : AppCompatActivity() {
         iconView.visibility = View.VISIBLE
         iconView.setTextColor(mainAacIconTextColorFor(item))
         iconView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mainAacFallbackIconTextSizeSp())
-        val iconFile = com.rehab2.aac.AacPatientImages.resolve(this, item)
-        if (iconFile?.isFile != true) {
-            restoreMainAacFallbackIcon(binding, item)
-            return
+        restoreMainAacFallbackIcon(binding, item)
+        binding.iconRequest = mainAacIconLoader.load(
+            { com.rehab2.aac.AacPatientImages.resolve(this, item) }
+        ) { bitmap ->
+            if (binding.iconToken !== token || binding.item !== item || isDestroyed || bitmap == null) return@load
+            if (noLabels && frame != null) {
+                val fitImage = frame.findViewWithTag<ImageView>("aac-no-label-image") ?: ImageView(this).apply {
+                    tag = "aac-no-label-image"
+                    scaleType = ImageView.ScaleType.FIT_CENTER
+                    importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                    frame.addView(this, FrameLayout.LayoutParams(-1, -1).apply {
+                        setMargins(dp(2), dp(2), dp(2), dp(2))
+                    })
+                }
+                fitImage.setImageBitmap(bitmap)
+                fitImage.visibility = View.VISIBLE
+                iconView.setCompoundDrawables(null, null, null, null)
+                iconView.text = ""
+                iconView.visibility = View.GONE
+            } else {
+                iconView.text = ""
+                bindMainAacBitmapDrawable(iconView, bitmap) {
+                    binding.iconToken === token && binding.item === item && !isDestroyed
+                }
+            }
         }
-        val bitmap = BitmapFactory.decodeFile(iconFile.absolutePath)
-        if (bitmap == null) {
-            restoreMainAacFallbackIcon(binding, item)
-            return
-        }
-        iconView.text = ""
-        bindMainAacBitmapDrawable(iconView, bitmap)
     }
 
-    private fun bindMainAacBitmapDrawable(iconView: TextView, bitmap: Bitmap) {
+    private fun bindMainAacBitmapDrawable(iconView: TextView, bitmap: Bitmap, current: () -> Boolean) {
+        if (!current()) return
         val availableWidth = (iconView.width - iconView.paddingLeft - iconView.paddingRight).coerceAtLeast(0)
         val availableHeight = (iconView.height - iconView.paddingTop - iconView.paddingBottom).coerceAtLeast(0)
         if (availableWidth <= 0 || availableHeight <= 0) {
             iconView.post {
-                bindMainAacBitmapDrawable(iconView, bitmap)
+                if (current() && iconView.width > iconView.paddingLeft + iconView.paddingRight &&
+                    iconView.height > iconView.paddingTop + iconView.paddingBottom) {
+                    bindMainAacBitmapDrawable(iconView, bitmap, current)
+                }
             }
             return
         }
